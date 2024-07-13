@@ -49,7 +49,7 @@ const HomePage = () => {
 
   return (
     <div className="homepage">
-      <h1 className="homepage-title">School San Patrick Oklahoma</h1>
+      <h1 className="homepage-title">Educando - generador de reportes</h1>
       <Menubar model={items}  style={{justifyContent:"center"}} />
 
       <div className="container-homepage-background" style={{marginTop:"10px"}}>

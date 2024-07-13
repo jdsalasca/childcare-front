@@ -7,7 +7,7 @@ export const login = async (username, password) => {
   try {
     console.log('Attempting login with:', username, password);
     const body = { username, password };
-    const response =  true || API.post(API_BASE_URL, '/users/login', body);
+    const response =  {} || API.post(API_BASE_URL, '/users/login', body);
 
     console.log('Response:', response);
 

@@ -28,7 +28,7 @@ const Login = () => {
       login(token);
       navigate('/');
     } catch (error) {
-      setError('Invalid username or password');
+      setError('Usuario o contraseña incorrectas');
     } finally {
       setLoading(false);
     }
@@ -45,17 +45,24 @@ const Login = () => {
         <Card className="login-card">
           <h2>Login</h2>
           <form onSubmit={handleLogin} style={{display:"flex", flexDirection: "column"}}>
-            <div className="p-field" >
+            <div className="p-field field-username"  >
               <label htmlFor="username" > Username</label>
-              <InputText id="username" value={username} onChange={(e) => setUsername(e.target.value)} className="rounded-input" />
+              <InputText id="username" value={username} onChange={(e) => setUsername(e.target.value)} 
+              className="rounded-input username-field" />
             </div>
-            <div className="p-field">
+            <div className="p-field field-password">
               <label htmlFor="password">Contraseña</label>
               <Password id="password"
-               value={password} onChange={(e) => setPassword(e.target.value)} feedback={false} toggleMask className="rounded-input password-field" />
+              
+               value={password}
+                onChange={(e) => 
+                setPassword(e.target.value)} 
+                feedback={false} toggleMask 
+                className="rounded-input password-field" />
             </div>
             {error && <div className="error">{error}</div>}
-            <Button type="submit" label="Login" className="login-button" />
+            <Button type="submit" label="Login"
+             className="login-button" />
           </form>
         </Card>
       </div>

@@ -1,12 +1,10 @@
-// src/assets/styles/general.scss
-
 // Import PrimeReact styles
 @import "~primeicons/primeicons.css";
 @import "~primereact/resources/themes/saga-blue/theme.css"; // Replace with your desired theme
 @import "~primereact/resources/primereact.min.css";
 
 // Variables
-$primary-color: #8d4ee4;
+$primary-color: #be1622;
 $secondary-color: #f8f9fa;
 $font-stack: 'Helvetica Neue', sans-serif;
 
@@ -22,6 +20,11 @@ $color-primary: $primary-color;
 $color-secondary: #333;
 $color-background: $secondary-color;
 $color-text: #333;
+
+$color-hover1: #ffd400;
+$color-hover2: #0071ba;
+$color-hover3: #de0d1d;
+$color-hover4: #00af5e;
 
 // Mixins
 @mixin flex-center {
@@ -89,4 +92,52 @@ p {
   text-align: center;
   margin-bottom: 20px;
   color: $color-primary;
+}
+
+.login-card {
+
+  .field-username{
+    background-color: $primary-color;
+    padding: 10px;
+    label{
+      color: $secondary-color;
+    }
+    .username-field{
+      
+      margin-top:10px ;
+    }
+
+
+  }
+  .field-password {
+    display: flex;
+    flex-direction: column;
+    min-width: 100%;
+    .password-field {
+      background-color: #be1622;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      justify-content: center;
+    }
+  }
+
+  .login-button {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
+    border-radius: 5px;
+    background-color: $primary-color;
+    border: none;
+    color: #fff; /* Text color for button */
+    transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+    &:hover {
+      background-color: $color-hover1; /* Adjust this to your desired hover color */
+    }
+  }
+}
+
+.login-container .login-form-container .p-field .rounded-input .p-input-icon {
+  margin: revert-layer;
+  color: $secondary-color;
 }
