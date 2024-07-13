@@ -1,0 +1,105 @@
+/* src/components/Login.scss */
+.login-container {
+  display: flex;
+  height: 100vh;
+  background-color: #f9f9f9;
+
+  .login-cover {
+    width: 50%;
+    background-color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+  }
+
+  .login-form-container {
+    width: 50%;
+    background-color: #e0e0e0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+
+    .login-card {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+      width: 100%;
+      max-width: 400px;
+      background: linear-gradient(135deg, #fff, #f3f4f6);
+      border-radius: 10px;
+    }
+
+    .p-field {
+      margin-bottom: 1.5rem;
+
+      label {
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+      }
+
+      .rounded-input {
+        .p-password-input{
+          margin-left: 5px;
+          margin-right: 10px;
+        }
+        .p-input-icon{
+
+          
+          margin: auto;
+        }
+        width: 100%;
+        border-radius: 5px;
+        padding: 0.5rem;
+        border: 1px solid #ced4da;
+        &:focus {
+          border-color: #80bdff;
+          box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+      }
+
+      .password-field {
+        position: relative;
+        
+        .p-password-toggle {
+          margin-right: 0.5rem;
+          top: 50%;
+          transform: translateY(-50%);
+        }
+      }
+    }
+
+    .error {
+      color: red;
+      margin-bottom: 1rem;
+    }
+
+    .login-button {
+      width: 100%;
+      padding: 0.75rem;
+      font-size: 1rem;
+      border-radius: 5px;
+      background-color: #007bff;
+      border: none;
+      &:hover {
+        background-color: #0056b3;
+      }
+    }
+  }
+}
+
+.loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}

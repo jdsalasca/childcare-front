@@ -1,0 +1,42 @@
+// src/assets/styles/general.scss
+// Import PrimeReact styles
+@import "~primeicons/primeicons.css";
+@import "~primereact/resources/themes/saga-blue/theme.css"; // Replace with your desired theme
+@import "~primereact/resources/primereact.min.css";
+
+// Variables
+$primary-color: #007ad9;
+$secondary-color: #f8f9fa;
+$font-stack: 'Helvetica Neue', sans-serif;
+
+// Mixins
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+// Global styles
+body {
+  font-family: $font-stack;
+  background-color: $secondary-color;
+  margin: 0;
+  padding: 0;
+  color: #333;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: $primary-color;
+}
+
+.container {
+  @include flex-center;
+  padding: 1rem;
+}
+
+.container-homepage-background{
+
+}
+.container-homepage-menutab{
+
+}
