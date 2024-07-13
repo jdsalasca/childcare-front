@@ -1,13 +1,27 @@
 // src/assets/styles/general.scss
+
 // Import PrimeReact styles
 @import "~primeicons/primeicons.css";
 @import "~primereact/resources/themes/saga-blue/theme.css"; // Replace with your desired theme
 @import "~primereact/resources/primereact.min.css";
 
 // Variables
-$primary-color: #007ad9;
+$primary-color: #8d4ee4;
 $secondary-color: #f8f9fa;
 $font-stack: 'Helvetica Neue', sans-serif;
+
+// Constants
+$font-size-h1: 24px;
+$font-size-h2: 20px;
+$font-size-h3: 18px;
+$font-size-h4: 16px;
+$font-size-h5: 14px;
+$font-size-p: 14px;
+
+$color-primary: $primary-color;
+$color-secondary: #333;
+$color-background: $secondary-color;
+$color-text: #333;
 
 // Mixins
 @mixin flex-center {
@@ -19,14 +33,40 @@ $font-stack: 'Helvetica Neue', sans-serif;
 // Global styles
 body {
   font-family: $font-stack;
-  background-color: $secondary-color;
+  background-color: $color-background;
   margin: 0;
   padding: 0;
-  color: #333;
+  color: $color-text;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  color: $primary-color;
+h1 {
+  font-size: $font-size-h1;
+  color: $color-primary;
+}
+
+h2 {
+  font-size: $font-size-h2;
+  color: $color-primary;
+}
+
+h3 {
+  font-size: $font-size-h3;
+  color: $color-primary;
+}
+
+h4 {
+  font-size: $font-size-h4;
+  color: $color-primary;
+}
+
+h5 {
+  font-size: $font-size-h5;
+  color: $color-primary;
+}
+
+p {
+  font-size: $font-size-p;
+  color: $color-text;
 }
 
 .container {
@@ -34,9 +74,19 @@ h1, h2, h3, h4, h5, h6 {
   padding: 1rem;
 }
 
-.container-homepage-background{
-
+.container-homepage-background {
+  max-width: 90%;
+  margin: auto;
+  text-align: center;
+  background-color: #333; /* Example of dark theme background */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
-.container-homepage-menutab{
 
+.homepage-title {
+  font-size: $font-size-h1;
+  text-align: center;
+  margin-bottom: 20px;
+  color: $color-primary;
 }

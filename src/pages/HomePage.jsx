@@ -49,13 +49,17 @@ const HomePage = () => {
 
   return (
     <div className="homepage">
-      <Menubar model={items} />
+      <h1 className="homepage-title">School San Patrick Oklahoma</h1>
+      <Menubar model={items}  style={{justifyContent:"center"}} />
 
-      <div className="centered-image">
-      <img src={`${process.env.PUBLIC_URL}/homepage_image.jpg`} alt="Cover" />
+      <div className="container-homepage-background" style={{marginTop:"10px"}}>
+      <img src={`${process.env.PUBLIC_URL}/homepage_image.jpg`} 
+      alt="Cover"
+      style={{ maxWidth: '900px', maxHeight: '600px', 
+      display: 'block', 
+      margin: 'auto' }}
+      />
       </div>
-
-      <h1>Welcome to the Home Page</h1>
     </div>
   );
 };
