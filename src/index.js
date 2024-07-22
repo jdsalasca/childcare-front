@@ -4,8 +4,9 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { AuthProvider } from './context/AuthContext';
-import HomePage from './pages/HomePage';
-
+import 'primereact/resources/themes/saga-blue/theme.css';  // Choose the theme you prefer
+import 'primereact/resources/primereact.min.css';
+import 'primeicons/primeicons.css';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
 

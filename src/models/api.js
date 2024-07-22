@@ -11,15 +11,18 @@ const makeRequest = async (url, method, endpoint, headers = {}, body, options = 
   body = body instanceof FormData ? body : JSON.stringify(body);
 
   const requestOptions = {
-    url: `${url}${endpoint}`,
+    ...options,
+    mode: "cors",
     method: method,
     headers: myHeaders,
+    url: `${url}${endpoint}`,
     data: method === 'GET' && !withPayload ? null : body,
-    ...options,
   };
 
   try {
-    const response = await axios(requestOptions);
+    console.log("requestOptions", requestOptions);
+   const response = await axios(requestOptions);
+   //const response = await axios(`${url}${endpoint}`, body);
 
     if (response.status === 401) {
       window.location = '/info/session-expired';
@@ -38,8 +41,8 @@ const API = {
     return makeRequest(url, 'GET', endpoint, null, {}, options, withPayload);
   },
 
-  async post(url, endpoint, body, options) {
-    return await makeRequest(url, 'POST', endpoint, null, body, options);
+  post(url, endpoint, body, options) {
+    return  makeRequest(url, 'POST', endpoint, null, body, options);
   },
 
   put(url, endpoint, body, options) {

@@ -136,8 +136,48 @@ p {
     }
   }
 }
+.logout-item {
+  background-color: $primary-color;
+  color: $primary-color;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  margin-left: 20px;
+  max-width: 120px;
+  text-align: center;
+  cursor: pointer;
+  display: inline-block;
 
-.login-container .login-form-container .p-field .rounded-input .p-input-icon {
-  margin: revert-layer;
-  color: $secondary-color;
+  &:hover {
+    background-color: $primary-color;
+  }
+}
+.p-menubar .p-menubar-root-list > .p-menuitem.logout-item > .p-menuitem-content {
+  .p-menuitem-text{
+    color: $secondary-color;
+  }
+  background-color: $primary-color ;
+}
+
+
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+  padding: 20px;
+}
+.button-form-pdf{
+  margin: auto;
+  display: flex;
+  align-self: center;
+  margin-top: 5em;
+  background-color: $primary-color;
+  border-color: $secondary-color;
+  border-radius: 10px;
+}
+.p-steps .p-steps-item .p-menuitem-link{
+  background-color: transparent !important;
 }
