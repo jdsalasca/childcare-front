@@ -180,7 +180,29 @@ const renderFormattedLine = (doc, line, options, centerText = false) => {
   centerText = false;
 };
 
+export function compressPDF(pdf = new jsPDF(), options) {
+	// Check if the options object is defined
+	if (!options) {
+		options = {};
+	}
 
+	// Set the compression algorithm
+	options.compression = "gzip";
+	options.compress = 1;
+	// Reduce the resolution of the PDF
+	if (options.resolution) {
+		options.resolution = 150;
+	}
+
+	// Remove unused fonts and images
+	if (options.removeUnusedFonts && options.removeUnusedImages) {
+		options.removeUnusedFonts = true;
+		options.removeUnusedImages = true;
+	}
+
+	// Output the compressed PDF
+	return pdf.output("datauristring", options);
+}
 const contractGenerator = (contractInformation =defaultContractInfo) => {
   const contractBase = contractInfo(contractInformation);
   const doc = new jsPDF({
@@ -217,7 +239,10 @@ const contractGenerator = (contractInformation =defaultContractInfo) => {
   // addPageContent(doc, contractBase, pageOptions, 'page7',true);
 
   // Save the document
-  doc.save("contract.pdf");
+  //doc.save("contract.pdf");
+
+  const pdfBase64 = compressPDF(doc);
+  return pdfBase64; 
 };
 
   // Function to add the first page

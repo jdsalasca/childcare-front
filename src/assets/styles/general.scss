@@ -181,3 +181,36 @@ p {
 .p-steps .p-steps-item .p-menuitem-link{
   background-color: transparent !important;
 }
+.form-container {
+  padding: 2rem;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.child-form {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.p-float-label {
+  flex: 1;
+}
+
+.p-button-danger {
+  margin-left: auto;
+}
+
+.button-group {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.p-error {
+  color: #f44336;
+  font-size: 0.75rem;
+}
