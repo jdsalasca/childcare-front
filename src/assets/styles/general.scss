@@ -2,7 +2,7 @@
 @import "~primeicons/primeicons.css";
 @import "~primereact/resources/themes/saga-blue/theme.css"; // Replace with your desired theme
 @import "~primereact/resources/primereact.min.css";
-
+@import "~react-phone-number-input/style.css";
 // Variables
 $primary-color: #be1622;
 $secondary-color: #f8f9fa;
@@ -142,7 +142,8 @@ p {
   padding: 0.5rem 1rem;
   border-radius: 5px;
   margin-left: 20px;
-  max-width: 120px;
+  max-width: 10rem;
+  min-width: 10rem;
   text-align: center;
   cursor: pointer;
   display: inline-block;
@@ -157,12 +158,11 @@ p {
   }
   background-color: $primary-color ;
 }
-
-
 .layout {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  margin-bottom: 50px;
 }
 
 .main-content {
@@ -181,26 +181,69 @@ p {
 .p-steps .p-steps-item .p-menuitem-link{
   background-color: transparent !important;
 }
+
+
 .form-container {
+
   padding: 2rem;
   background-color: #f9f9f9;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  &.terms{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    .child-form {
+      flex-direction: column;
+      gap: 2rem;
+      align-items: center;
+      min-width: 200px;
+      margin-bottom: 2rem;
+      .p-float-label {
+        flex: 1;
+        margin-bottom: 0.5rem;
+        display: flex;
+        flex-direction: column;
+      }
+      
+    }
+    
+  }
 }
 
 .child-form {
   display: flex;
-  align-items: center;
+  flex-direction: row;
   gap: 1rem;
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
 }
 
 .p-float-label {
   flex: 1;
+  margin-bottom: 0.5rem;
+  display: flex;
+  flex-direction: column;
 }
 
 .p-button-danger {
   margin-left: auto;
+  background-color: red;
+  color: white;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.checkbox-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.checkbox-wrapper .p-checkbox {
+  margin-right: 1rem;
 }
 
 .button-group {
@@ -210,7 +253,82 @@ p {
   margin-top: 1rem;
 }
 
+.rounded-button {
+  border-radius: 20px; /* Adjust as needed */
+}
+
+.p-button-primary {
+  background-color: #007bff;
+  color: white;
+}
+
+.p-button-secondary {
+  background-color: grey;
+  color: white;
+}
+
+.p-button-success {
+  background-color: green;
+  color: white;
+}
+
 .p-error {
-  color: #f44336;
+  color: gray;
   font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.phone-input-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.phone-input-wrapper .phone-input {
+  border: 1px solid #ced4da;
+  border-radius: .25rem;
+  padding: .375rem .75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #495057;
+  background-color: #fff;
+  width: 100%;
+}
+
+.phone-input-wrapper .phone-input.p-invalid {
+  border-color: #dc3545;
+  background-color: #fff3f3;
+}
+
+.phone-input-wrapper label {
+  position: absolute;
+  top: 50%;
+  left: .75rem;
+  transform: translateY(-50%);
+  pointer-events: none;
+  transition: 0.1s ease-in-out;
+  font-size: 1rem;
+  color: #6c757d;
+}
+
+.phone-input-wrapper .phone-input:focus ~ label,
+.phone-input-wrapper .phone-input:not(:placeholder-shown) ~ label {
+  top: 0;
+  left: .75rem;
+  font-size: .75rem;
+  color: #007bff;
+}
+
+
+// Add the following CSS to your stylesheet (e.g., src/App.css or src/Contracts.css)
+.step-valid .p-steps-title {
+  color: green !important;
+}
+
+.step-invalid .p-steps-title {
+  color: red !important;
+}
+
+.step-default .p-steps-title {
+  color: inherit !important;
 }

@@ -1,87 +1,51 @@
 import React from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { Button } from 'primereact/button';
+import { Checkbox } from 'primereact/checkbox';
+import { useTranslation } from 'react-i18next';
 
 
-export const StepComponentThree = ({ setActiveIndex, contractInformation, setContractInformation }) => {
-    const handleTermChange = (event) => {
-        const { name, checked } = event.target;
-        setContractInformation({ ...contractInformation, terms: { ...contractInformation.terms, [name]: checked } });
+export const StepComponentThree = ({ setActiveIndex, contractInformation, setContractInformation, toast }) => {
+    const { control, handleSubmit } = useForm({
+        defaultValues: {
+            terms: contractInformation.terms
+        }
+    });
+
+    const { t } = useTranslation();
+
+    const onSubmit = (data) => {
+        setContractInformation({ ...contractInformation, terms: data.terms });
+        toast.current.show({ severity: 'success', summary: t('termsUpdated'), detail: t('termsUpdatedMessage') });
+        setActiveIndex(3); // Move to the next step or handle as needed
     };
 
     return (
-        <div>
-            <label>
-                <input
-                    type="checkbox"
-                    name="walkAroundNeighborhood"
-                    checked={contractInformation.terms.walkAroundNeighborhood}
-                    onChange={handleTermChange}
-                />
-                Walk Around Neighborhood
-            </label>
-            <label>
-                <input
-                    type="checkbox"
-                    name="walkToThePark"
-                    checked={contractInformation.terms.walkToThePark}
-                    onChange={handleTermChange}
-                />
-                Walk to the Park
-            </label>
-            <label>
-                <input
-                    type="checkbox"
-                    name="walkAroundSchool"
-                    checked={contractInformation.terms.walkAroundSchool}
-                    onChange={handleTermChange}
-                />
-                Walk Around School
-            </label>
-            <label>
-                <input
-                    type="checkbox"
-                    name="receiveManual"
-                    checked={contractInformation.terms.receiveManual}
-                    onChange={handleTermChange}
-                />
-                Receive Manual
-            </label>
-            <label>
-                <input
-                    type="checkbox"
-                    name="photosAllowed"
-                    checked={contractInformation.terms.photosAllowed}
-                    onChange={handleTermChange}
-                />
-                Allow Photos
-            </label>
-            <label>
-                <input
-                    type="checkbox"
-                    name="externalPhotosAllowed"
-                    checked={contractInformation.terms.externalPhotosAllowed}
-                    onChange={handleTermChange}
-                />
-                Allow External Photos
-            </label>
-            <label>
-                <input
-                    type="checkbox"
-                    name="specialExternalUsage"
-                    checked={contractInformation.terms.specialExternalUsage}
-                    onChange={handleTermChange}
-                />
-                Special External Usage
-            </label>
-            <label>
-                <input
-                    type="checkbox"
-                    name="externalUsageAllowed"
-                    checked={contractInformation.terms.externalUsageAllowed}
-                    onChange={handleTermChange}
-                />
-                External Usage Allowed
-            </label>
+        <div className="form-container">
+            <form onSubmit={handleSubmit(onSubmit)}>
+                {["walkAroundNeighborhood", "walkToThePark", "walkAroundSchool",  "allowPhotos", "allowExternalPhotos", "specialExternalUsage", "externalUsageAllowed","receiveManual"].map((term) => (
+                    <div key={term} className="checkbox-container">
+                        <Controller
+                            name={`terms.${term}`}
+                            control={control}
+                            render={({ field }) => (
+                                <div className="checkbox-wrapper">
+                                    <Checkbox id={term} {...field} checked={field.value} />
+                                    <label htmlFor={term} style={{ fontWeight: term === "receiveManual" ? "bold" : "normal" }}>{t(term)}</label>
+
+                                </div>
+                            )}
+                        />
+                    </div>
+                ))}
+                <div className="button-group">
+                    <Button type="submit" label={t('save')} className="p-button-primary rounded-button" />
+                    <Button label={t('returnToPreviousStep')} className="p-button-secondary rounded-button" onClick={() => setActiveIndex(1)} />
+                    <Button label={t('nextStep')} className="p-button-success rounded-button" onClick={() => setActiveIndex(4)} />
+                </div>
+            </form>
         </div>
     );
 };
+
 export default StepComponentThree;

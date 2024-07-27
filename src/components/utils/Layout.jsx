@@ -1,44 +1,61 @@
+
+// src/Layout.js
 import React from 'react';
-import { Menubar } from 'primereact/menubar';
 import { useNavigate } from 'react-router-dom';
+import { Menubar } from 'primereact/menubar';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 
 const Layout = ({ children }) => {
   const navigate = useNavigate();
   const { logout } = useAuth();
+  const { t, i18n } = useTranslation();
+
   const handleHomeClick = () => {
     navigate('/');
   };
 
+  const handleLanguageChange = (lang) => {
+    i18n.changeLanguage(lang);
+  };
+
   const items = [
     {
-        label: <div onClick={handleHomeClick} className="home-item"><i className="pi pi-home"></i></div>,
-        className: 'home-item',
-      },
+      label: <div onClick={handleHomeClick} className="home-item"><i className="pi pi-home"></i></div>,
+      className: 'home-item',
+    },
     {
-      label: 'Cajas',
+      label: t('boxes'),
       items: []
     },
     {
-      label: 'Contratos',
+      label: t('contracts'),
       items: [
-        { label: 'Generar contrato', command: () => navigate('/contracts') },
-        { label: 'Active Users Report', command: () => navigate('/active-users-report') },
+        { label: t('generateContract'), command: () => navigate('/contracts') },
+        { label: t('activeUsersReport'), command: () => navigate('/active-users-report') },
       ]
     },
     {
-      label: 'Depósitos',
+      label: t('deposits'),
       items: [
-        { label: 'Manage Students', command: () => navigate('/manage-students') }
+        { label: t('manageBills'), command: () => navigate('/bills') }
       ]
     },
     {
-      label: 'Logout',
+      label: t('logout'),
       className: 'logout-item',
       command: () => {
         logout();
         navigate('/login');
       }
+    },
+    {
+      label: 'Language',
+      className: 'logout-item',
+      items: [
+        { label: 'English', command: () => handleLanguageChange('en') },
+        { label: 'Español', command: () => handleLanguageChange('es') },
+      ]
     }
   ];
 

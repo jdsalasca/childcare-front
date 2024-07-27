@@ -3,6 +3,7 @@
 import jsPDF from 'jspdf';
 import {  contractInfo } from './contractJson';
 import { addFonts } from './jsPdfArial';
+import { defaultContractInfo, formatDateToYYYYMMDD } from '../utilsAndConsts';
 
 // Function to add the header
 const initialYposition  = 12.7 + 10;
@@ -126,14 +127,7 @@ text = text.replace(/<\/?[^>]+>/g, '');
 return text;
 };
 
-// Default object with contractStartDate set to current date in ISO format
-export const defaultContractInfo = {
-  contractStartDate: new Date().toISOString().split('T')[0], // Format to YYYY-MM-DD
-  todayDate: new Date().toISOString().split('T')[0], // Format to YYYY-MM-DD,
-  guardian:{
-    name:"Jorge Salazar"
-  },
-};
+
 const renderFormattedLine = (doc, line, options, centerText = false) => {
   const tokens = line.split(/(\*\*|__|_|#|\u2610|\u2611)/);
   
@@ -250,7 +244,7 @@ const contractGenerator = (contractInformation =defaultContractInfo) => {
     options.yPosition = options.yPosition - 10
     addHeader(doc, "Educando Childcare Center", options,"title");
     addHeader(doc, "Contrato", options,"title");
-    addDateOnContract(doc,`Fecha de Comienzo ${contractInformation.contractStartDate}`,options)
+    addDateOnContract(doc,`Fecha de Comienzo ${formatDateToYYYYMMDD(contractInformation.startDate)}`,options)
     addPageContent(doc, contractInfo, options, 'page1');
     options.yPosition = options.initialY
     

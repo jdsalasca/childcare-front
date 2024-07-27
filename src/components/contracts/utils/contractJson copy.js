@@ -1,4 +1,4 @@
-import { defaultContractInfo, formatDateToYYYYMMDD } from "../utilsAndConsts"
+import { defaultContractInfo } from "./contractPdfUtils"
 
 export const fontStyles = {
     ITALIC: "italic",
@@ -6,28 +6,19 @@ export const fontStyles = {
     NORMAL: "normal"
 }
 
-export const contractInfo = (contractData = defaultContractInfo) => {
-    console.log('====================================');
-    console.log("contractData", contractData);
-    console.log('====================================');
-    const todayDate = formatDateToYYYYMMDD(contractData.todayDate);
-    const startDate = formatDateToYYYYMMDD(contractData.startDate);
-    const endDate = formatDateToYYYYMMDD(contractData.endDate);
-
-    const guardians = contractData.guardians.map(g => g.name).join(', ');
-    const children = contractData.children.map(child => `- Nombre del niño: ${child.name}, fecha de nacimiento: ${formatDateToYYYYMMDD(child.bornDate)}`).join(`\n`);
-    
+export const contractInfo = (contractInfo = defaultContractInfo) => {
+   
    
     return {
         page1: {
             parr1: `Educando Childcare dedicará el tiempo necesario para la Registración de su(s) niño(s), alimentando nuestro Programa especializado con toda su información y la de su(s) niño(s), brindándole así las facilidades tecnológicas para el registro diario de ingreso y salida de su(s) niño(s), nuestra comunicación e información diaria sobre su niño y la agilidad en sus pagos. /n `,
             parr2: `El presente Contrato de servicio de guardería, entre los Padres/Apoderado de los niños y Educando Childcare, se realizará bajo los siguientes términos y condiciones:`,
-            parr3: `\nEl servicio comenzará en la fecha: ${startDate} y terminará 5 días después del día de aviso por cualquiera de las dos partes de no continuación del servicio.`,
-            parr4: `\nLos Padres/Apoderado que vienen en persona a contratar el servicio de guardería para su(s) niño(s) es/son: ${guardians}`,
+            parr3: `\nEl servicio comenzará en la fecha: ${contractInfo.startDate} y terminará 5 días después del día de aviso por cualquiera de las dos partes de no continuación del servicio.`,
+            parr4: `\nLos Padres/Apoderado que vienen en persona a contratar el servicio de guardería para su(s) niño(s) es/son: ${contractInfo?.guardianInfo}`,
             parr5: `\nY el nombre de los niños a quienes Educando Childcare brindará el servicio de cuidado infantil son:`,
-            parr6: `${children}`,
+            parr6: `${contractInfo?.childrenInfo?.map(child => `- Nombre del niño: ${child.name}, fecha de nacimiento: ${child.bornDate}`).join(`\n`)}`,
             parr7: `\nEl Pago por el servicio de cuidado infantil de su niño será de forma:`,
-            parr8: `\n /n - Cash - Programa de Subsidio y Co-pay Mensual de: $${contractData.totalAmount}`,
+            parr8: `\n /n - Cash - Programa de Subsidio y Co-pay Mensual de: $`,
             parr9: `\nEducando Childcare provee un servicio de cuidado infantil y enseñanza de calidad ayudando en el desarrollo de los primeros años del niño, bajo los estándares del Departamento de Educación de Nebraska.`,
             parr10: `\nAdemás, provee alimentos saludables preparados diariamente bajo regulaciones del Programa de Comidas del Departamento de Salud y Servicios Humanos del Estado de Nebraska. La alimentación dependerá del horario acordado en este Contrato y la aprobación del Subsidy program, si fuera el caso (Por favor llenar y firmar la forma de comidas).`
         },
@@ -37,12 +28,12 @@ export const contractInfo = (contractData = defaultContractInfo) => {
             parr3: `\nPasada la hora acordada de recogida de su niño es tardanza; sin embargo, tendremos una tolerancia de 15 minutos. Pasado este tiempo, el pago en ese momento por tardanza es:\n\n - Pasados los primeros 15 minutos: $15\n - Pasados 30 minutos: $30`,
             parr4: `\nSi los Padres/Guardian deben pagar al daycare el Co-pay del Subsidy Program o Título XX, este deberá ser realizado durante <strong> los primeros 3 días de cada mes </strong>. Pasado ese tiempo, se cobrará un cargo adicional de $10 por cada día pasado.`,
             parr5: `\nEducando Childcare lleva a cabo un Calendario de actividades y festividades con sus niños dentro y fuera de sus instalaciones, lo que tendrá un costo simbólico de: $20 anuales por niño. No incluye a Bebés hasta 18 meses.`,
-            parr6: `\nEl Pago por el servicio de cuidado infantil de su niño será de forma:\n\n- Cash - Programa de Subsidio - Co-pay Mensual: $${contractData.totalAmount}`,
+            parr6: `\nEl Pago por el servicio de cuidado infantil de su niño será de forma:\n\n- Cash - Programa de Subsidio - Co-pay Mensual: $`,
             parr7: `\nEntonces, el pago por el servicio de cuidado infantil de su(s) niño(s) incluirá:`,
-            parr8: `\n-Pago anual por actividades de $20 por familia (${contractData.children.length} niños): Total $${contractData.children.length * 20}`,
-            parr9: `\n-Infant (bebés de 6 semanas a 18 meses): por (${contractData.children.filter(child => child.program === 'Infant').length} niños): Total $ \n -Toddler (18 meses a 3 años): por (${contractData.children.filter(child => child.program === 'Toddler').length} niños): Total $ \n -Pre-school (3 a 5 años): por (${contractData.children.filter(child => child.program === 'Pre-school').length} niños): Total $ \n -School age (5 a 12 años): por (${contractData.children.filter(child => child.program === 'School age').length} niños): Total $`,
-            parr10: `\n\nFirma y Nombre de Padres: _____________________________  Fecha: ${todayDate}`,
-            parr11: `\nFirma de Educando Childcare Center: _____________________________  Fecha: ${todayDate}`
+            parr8: `\n-Pago anual por actividades de $20 por familia (${contractInfo?.childrenInfo?.length} niños): Total $${contractInfo?.childrenInfo?.length * 20}`,
+            parr9: `\n-Infant (bebés de 6 semanas a 18 meses): por (${contractInfo?.childrenInfo?.filter(child => child.ageGroup === 'Infant').length} niños): Total $ \n -Toddler (18 meses a 3 años): por (${contractInfo?.childrenInfo?.filter(child => child.ageGroup === 'Toddler').length} niños): Total $ \n -Pre-school (3 a 5 años): por (${contractInfo?.childrenInfo?.filter(child => child.ageGroup === 'Pre-school').length} niños): Total $ \n -School age (5 a 12 años): por (${contractInfo?.childrenInfo?.filter(child => child.ageGroup === 'School age').length} niños): Total $`,
+            parr10: `\n\nFirma y Nombre de Padres: _____________________________  Fecha: ${contractInfo.today}`,
+            parr11: `\nFirma de Educando Childcare Center: _____________________________  Fecha: ${contractInfo.today}`
         },
         page3: {
             title: {text: `<i>Manual de Padres de Educando Childcare Center</i>`, fontStyle: fontStyles.ITALIC},
@@ -57,23 +48,21 @@ export const contractInfo = (contractData = defaultContractInfo) => {
             parr7: `\nLas actividades de los niños, como saltar, correr, columpiarse y deslizarse, no solo ayudan a estirar y fortalecer sus músculos para un crecimiento saludable, sino también a desarrollar habilidades de coordinación, fuerza y destreza. Además, el movimiento gradual, velocidad o lentitud les ayudará a manejar sus emociones.`,
             parr8: `\nEl baile y la música les ayudarán a desarrollar coordinación, pero también en el aprendizaje del lenguaje, escritura y el comportamiento positivo.`
         },
-        page4: {
-            title: {text:`Educando Childcare Center`, fontStyle: fontStyles.ITALIC},
-            separator: true,
-            parr1: `\n<em>#Misión##</em>\n\nEstamos comprometidos en brindar el más alto nivel de educación y crianza infantil, asegurando así el éxito escolar y un buen desarrollo académico, y un futuro prometedor. Todo dentro de un ambiente seguro, cómodo y rodeado de amor, mientras velamos por la salud física y emocional de nuestros niños.`,
-            parr2: `\n<em>#Visión##</em>\n\nNos aseguramos de fomentar el aprendizaje temprano a través de actividades educativas divertidas que ayudarán en las diversas etapas del desarrollo infantil. La práctica de valores y buenas costumbres, llevadas siempre con amor, son parte de nuestro servicio.`,
-            parr3: `\n<em>#Objetivos#"</em>\n\nNuestro objetivo es elevar el nivel de crianza y educación temprana en nuestra comunidad, brindando el servicio que los niños merecen en un ambiente seguro y confortable, asegurando su buen desarrollo escolar.`
-        },
-        page5: {
-            title: {text:`Fotos y Permisos`, fontStyle: fontStyles.ITALIC},
-            separator: true,
-            parr1: `\nPara mantener a los padres informados sobre el progreso y las actividades de sus hijos, y para compartir los logros y momentos especiales con la comunidad, solicitamos su permiso para tomar y utilizar fotos de su hijo(a).`,
-            parr2: `\n<strong>Permisos:</strong>`,
-            parr3: `\n- Se permite tomar fotos de mi hijo(a) y compartirlas dentro de Educando Childcare Center.`,
-            parr4: `\n- Se permite tomar fotos de mi hijo(a) y compartirlas en medios de comunicación externos (por ejemplo, sitio web, redes sociales)`,
-            parr5: `\n- Se permite el uso de fotos externas con fines especiales (por ejemplo, publicidad, eventos)`,
-            parr6: `\nFirma del Padre/Guardián: _____________________________  Fecha: ${formatDateToYYYYMMDD(contractData.todayDate)}`
-        },
+      page4: {
+    title: {text:`Educando Childcare Center`, fontStyle: fontStyles.ITALIC},
+    separator: true,
+    parr1: `\n<em>#Misión##</em>\n\nEstamos comprometidos en brindar el más alto nivel de educación y crianza infantil, asegurando así el éxito escolar y un buen desarrollo académico, y un futuro prometedor. Todo dentro de un ambiente seguro, cómodo y rodeado de amor, mientras velamos por la salud física y emocional de nuestros niños.`,
+    parr2: `\n<em>#Visión##</em>\n\nNos aseguramos de fomentar el aprendizaje temprano a través de actividades educativas divertidas que ayudarán en las diversas etapas del desarrollo infantil. La práctica de valores y buenas costumbres, llevadas siempre con amor, son parte de nuestro servicio.`,
+    parr3: `\n<em>#Objetivos#"</em>\n\nNuestro objetivo es elevar el nivel de crianza y educación temprana en nuestra comunidad, brindando el servicio que los niños merecen en un ambiente seguro y confortable, asegurando su buen desarrollo escolar.`
+},
+page5: {
+    title:  {text:`Educando Childcare Center - Pólizas`, fontStyle: fontStyles.ITALIC},
+    separator: true,
+    parr1: `\n<strong>Inclusión</strong>\n\nNuestro Programa da la bienvenida a todos los niños. Y como todos somos únicos, al igual que nuestras familias, las acogemos sin distinción de sexo, raza, color, religión, nacionalidad, o la diversa conformación de las familias o tutores. Siguiendo las regulaciones del Departamento de Educación y del DHHS, los niños trabajarán en la multiculturalidad, compartirán sus costumbres y aprenderán de los demás. Debido a la diversidad familiar, es necesario trabajar en conjunto con los padres o tutores en constante comunicación para ayudar adecuadamente a su hijo con los diferentes cambios o malestares en el hogar que pudieran afectarlo directamente y monitorear su comportamiento.`,
+    parr2: `\n<strong>Confidencialidad</strong>\nToda información que se nos proporcione es tratada con especial atención, respeto y total discreción. Esto quiere decir que no compartiremos su información con terceros o cualquier institución a menos que exista un documento legal que nos obligue a hacerlo.`,
+    parr3: `\n<strong>Ética Profesional</strong>\nNuestro servicio se basa en el respeto por los niños y sus familias. Valoramos y respetamos sus ideas y opiniones, y nuestro personal solo brindará sugerencias cuando estas sean requeridas por padres o tutores, siempre tratadas con respeto y confidencialidad.`,
+    parr4: `\n<strong>Libre de Alcohol, Drogas y Tabaco</strong>\nComprometidos en brindar un ambiente seguro para su niño y nuestros empleados, prohibimos cualquier tipo de sustancia o producto alucinógeno que sea fumado o ingerido en nuestras instalaciones, área de estacionamiento o alrededores de Educando Childcare.\n\nSiguiendo las regulaciones del DHHS, si algún padre, familiar o tutor llega a Educando Childcare bajo la influencia de alcohol o drogas, se le invitará a retirarse de nuestras instalaciones. Si viene a recoger a su niño(s) y no está en condiciones adecuadas, no se le entregará el niño y se procederá a comunicarnos con otro padre, madre o familiar de la lista de contacto autorizada. En caso de que la persona se niegue a retirarse y se ponga agresiva, nos veremos en la obligación de contactar a la policía por la seguridad de los niños y del personal.`
+},
 page6: {
 
     parr1: `<strong>Simulacros de Incendio y Tornado</strong>\nComo siempre debemos estar listos en caso de incendio o tornado, realizamos simulacros de incendio cada mes y de tornado cuatro veces al año y sin previo aviso. De esta manera, tanto los niños como el personal sabrán a dónde dirigirse en cada caso si fuese real.`,
@@ -106,7 +95,7 @@ page9: {
     parr4: `\n- Si es la segunda vez en el mismo día que el niño presenta vómitos o diarrea.`,
     parr5: `\n- Si el niño presenta infecciones como: paperas, varicela, sarampión, infección en los ojos y piojos.`,
     parr6: `\nEn todos estos casos, una nota del médico diciendo que el niño es lo suficientemente saludable para regresar al daycare será requerida.`,
-...firmSection(contractData)
+...firmSection(contractInfo)
 }
 ,
 page10: {
@@ -123,40 +112,40 @@ page10: {
     parr9: `\n- Si los padres o apoderados no trabajan junto a Educando Childcare para proporcionar al niño consistente disciplina, no realizan la misma práctica del entrenamiento al baño en casa, no proveen cambios de ropa, pañales, leche para su bebé y todo lo necesario para la buena salud de su niño o no atienden a reuniones o conferencias con la directora o maestra encargada de su niño para trabajar juntos por el bienestar de su niño.`,
     parr10: `\n- Si los padres no obedecen las pólizas y procedimientos establecidos por Educando Childcare y el Departamento de Servicios Humanos de Nebraska, inclusive las establecidas por el programa de Subsidio antes llamado Título 20 y Programa de Comidas.`,
     parr11: `\n\nAl momento de la noticia de terminación del servicio de Educando Childcare al niño, ambas partes acordarán cuál será el último día de servicio y el pago final correspondiente al daycare.`,
-    ...firmSection(contractData)    
+    ...firmSection(contractInfo)    
 }
 ,
     page11: {
         parr0: `<strong>Autorización de Uso de Fotografía y Media</strong>\n\n`,
-        parr1: `Yo, ${contractData?.guardians[0]?.name}, Madre/Padre o Apoderado de mi niño(s) llamado(s) ${contractData?.children?.map(child => child.name).join(", ") ?? "No hay niños asignados"}, estoy de acuerdo que Educando Childcare: (Por favor marque lo que desee)`,
-        parr2: `\n${contractData.photosAllowed ? '☑' : '☐'} Comparta fotos, videos, media con mi niño(s) allí con otras familias de niños registrados en el daycare para propósito solo familiar y personal (via email, libro del año o de su aula o impresión de fotos).`,
-        parr3: `\n${contractData.externalPhotosAllowed ? '☑' :'☐' } Permiso a otros Padres de los niños registrados en Educando Childcare para tomar fotografías, videos y media con mis niños allí, si están de acuerdo otros Padres para uso solamente personal y familiar como Celebraciones de cumpleaños, festividades celebradas en el daycare.`,
-        parr4: `\n${contractData.specialExternalUsage ? '☑' : '☐'} Uso de fotografías de mi niño para trabajos de artes manuales y actividades para familias de niños registrados en el daycare.`,
-        parr5: `\n${contractData.externalUsageAllowed ? '☑' : '☐'} Uso de fotografías, video, media con mi niño allí para promover Educando Childcare Center.`,
+        parr1: `Yo, ${contractInfo?.guardian?.name}, Madre/Padre o Apoderado de mi niño(s) llamado(s) ${contractInfo?.childrenInfo?.map(child => child.name).join(", ") ?? "No hay niños asignados"}, estoy de acuerdo que Educando Childcare: (Por favor marque lo que desee)`,
+        parr2: `\n${contractInfo.photosAllowed ? '☑' : '☐'} Comparta fotos, videos, media con mi niño(s) allí con otras familias de niños registrados en el daycare para propósito solo familiar y personal (via email, libro del año o de su aula o impresión de fotos).`,
+        parr3: `\n${contractInfo.externalPhotosAllowed ? '☑' :'☐' } Permiso a otros Padres de los niños registrados en Educando Childcare para tomar fotografías, videos y media con mis niños allí, si están de acuerdo otros Padres para uso solamente personal y familiar como Celebraciones de cumpleaños, festividades celebradas en el daycare.`,
+        parr4: `\n${contractInfo.specialExternalUsage ? '☑' : '☐'} Uso de fotografías de mi niño para trabajos de artes manuales y actividades para familias de niños registrados en el daycare.`,
+        parr5: `\n${contractInfo.externalUsageAllowed ? '☑' : '☐'} Uso de fotografías, video, media con mi niño allí para promover Educando Childcare Center.`,
         parr6: `\n\nYo doy mi consentimiento firmando abajo:`,
-        ...firmSection(contractData)
+        ...firmSection(contractInfo)
     },
 page12: {
     parr0: `<strong>Autorización para salir a caminar</strong>\n\n`,
     parr1: `Como parte del programa de Educando Childcare, incluye algunos paseos fuera de nuestras instalaciones como parte de la estimulación en contacto con la naturaleza, la Comunidad y el sano desarrollo físico. Los lugares típicos para caminar podrían incluir, pero no limitarse a:`,
-    parr2: `\n${contractData.walkAroundNeighborhood ? '☑' : '☐'} Caminar alrededor del vecindario de Educando Childcare.`,
-    parr3: `\n${contractData.walkToThePark ? '☑' : '☐'} Caminar hacia parque del vecindario o tal vez ir en el transporte de la guardería.`,
-    parr4: `\n${contractData.walkAroundSchool ? '☑' : '☐'} Caminar en la escuela del vecindario.`,
-    parr5: `\n\nYo, ${contractData?.guardian?.name}, autorizo a Educando Childcare llevar a mi(s) niño(s) a los paseos mencionados y que yo aprobé más arriba.\n\nComprendo que para otros paseos se me dará un calendario de días y horas y lugares a visitar fuera del daycare como parte del programa de enriquecimiento educativo de mi(s) niño(s).`,
-    ...firmSection(contractData)
+    parr2: `\n${contractInfo.walkAroundNeighborhood ? '☑' : '☐'} Caminar alrededor del vecindario de Educando Childcare.`,
+    parr3: `\n${contractInfo.walkToThePark ? '☑' : '☐'} Caminar hacia parque del vecindario o tal vez ir en el transporte de la guardería.`,
+    parr4: `\n${contractInfo.walkAroundSchool ? '☑' : '☐'} Caminar en la escuela del vecindario.`,
+    parr5: `\n\nYo, ${contractInfo?.guardian?.name}, autorizo a Educando Childcare llevar a mi(s) niño(s) a los paseos mencionados y que yo aprobé más arriba.\n\nComprendo que para otros paseos se me dará un calendario de días y horas y lugares a visitar fuera del daycare como parte del programa de enriquecimiento educativo de mi(s) niño(s).`,
+    ...firmSection(contractInfo)
 }
 ,
 page13: {
     subtitle: {text:`RECIBO DEL MANUAL DE PADRES DE EDUCANDO CHILDCARE\n`, fontStyle: fontStyles.BOLD},
     parr1: `Confirmo que he recibido una copia del Manual para Padres/Apoderados de Educando Childcare Center, de acuerdo con las normas del Departamento de Salud y Servicios Humanos del Estado de Nebraska, los procedimientos y las expectativas de la guardería que leeré, conoceré y cumpliré en beneficio de mi(s) hijo(s).`,
     parr2: `\n\nEntiendo que estas Políticas y reglamentos están sujetos a cambios, de los cuales recibiré y los pondré en práctica.`,
-    ...firmSection(contractData)
+    ...firmSection(contractInfo)
 }
 }
 }
 
-const firmSection =(contractData = defaultContractInfo)=> {
+const firmSection =(contractInfo)=> {
     return{
-        signSectionFirms: `\n\n                       ${contractData.guardians[0].name}                    ___________________________                     ${formatDateToYYYYMMDD(contractData.todayDate)}`,
+        signSectionFirms: `\n\n                       ${contractInfo.guardian.name}                    ___________________________                     ${contractInfo.todayDate}`,
     signSection: ` Nombre de Padre o Madre/Apoderado                     Firma                                                  Fecha`
 }}

@@ -1,59 +1,50 @@
-import React, { useRef } from 'react'
-
-import { useForm, Controller } from 'react-hook-form';
+import React, { useEffect, useRef, useState } from 'react'
+import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { classNames } from 'primereact/utils';
 import { Calendar } from 'primereact/calendar';
 import { Dropdown } from 'primereact/dropdown';
-const programOptions = [
-  { label: 'Infant', value: 'Infant', minWeek: 0, maxWeek: 78 }, // 6 weeks to 18 months (78 weeks)
-  { label: 'Toddler', value: 'Toddler', minWeek: 78, maxWeek: 156 }, // 18 months to 3 years (156 weeks)
-  { label: 'Pre-school', value: 'Pre-school', minWeek: 156, maxWeek: 260 }, // 3 to 5 years (260 weeks)
-  { label: 'School age', value: 'School age', minWeek: 260, maxWeek: 624 }, // 5 to 12 years (624 weeks)
-  { label: 'Other', value: 'Other', minWeek: 260, maxWeek: 624000}, // 12 and forward ...
-]
-
-
-const calculateWeeksOld = (bornDate) => {
-  const today = new Date();
-  const birthDate = new Date(bornDate);
-  const diffTime = Math.abs(today - birthDate);
-  const diffWeeks = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 7));
-  return diffWeeks;
-};
-
-const determineProgram = (weeksOld) => {
-  return programOptions.find(program => weeksOld >= program.minWeek && weeksOld <= program.maxWeek)?.value || '';
-};
+import { calculateAge, calculateWeeksOld, capitalizeFirstLetter, determineProgram, programOptions } from '../utilsAndConsts';
 
 export const StepComponentOne = ({ setActiveIndex, contractInformation, setContractInformation, toast, ...props }) => {
-  const { control, handleSubmit, formState: { errors }, setValue, getValues } = useForm({
+  const [validForm, setValidForm] = useState(false);
+
+  const { control, handleSubmit, formState: { errors }, setValue, getValues, clearErrors } = useForm({
     defaultValues: {
-      children: contractInformation.children
+      children: contractInformation.children || []
     }
   });
 
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'children'
+  });
+
+  useEffect(() => {
+  }, []);
+
   const onSubmit = (data) => {
+    setValidForm(true);
     setContractInformation({ ...contractInformation, children: data.children });
     toast.current.show({ severity: 'success', summary: 'Success', detail: 'Children information saved', life: 3000 });
   };
 
   const addChild = () => {
-    const updatedChildren = [...getValues('children'), { name: '', age: '', bornDate: null, program: '' }];
-    setValue('children', updatedChildren);
+    append({ name: '', age: '', bornDate: null, program: '' });
   };
 
   const removeChild = (index) => {
-    const updatedChildren = getValues('children').filter((_, i) => i !== index);
-    setValue('children', updatedChildren);
+    remove(index);
   };
 
   const handleBornDateChange = (date, index) => {
     const weeksOld = calculateWeeksOld(date);
     const program = determineProgram(weeksOld);
-    console.log("date", date, "index", index, "weekOld", weeksOld, "program", program);
+    const age = calculateAge(date);
     setValue(`children[${index}].program`, program);
+    setValue(`children[${index}].age`, age);
+    return date;
   };
 
   const getFormErrorMessage = (name) => {
@@ -64,11 +55,12 @@ export const StepComponentOne = ({ setActiveIndex, contractInformation, setContr
     setActiveIndex(1);
   };
 
+  
   return (
     <div className="form-container">
       <form onSubmit={handleSubmit(onSubmit)}>
-        {getValues('children').map((child, index) => (
-          <div key={index} className="child-form">
+        {fields.map((child, index) => (
+          <div key={child.id} className="child-form">
             <Controller
               name={`children[${index}].name`}
               control={control}
@@ -78,6 +70,10 @@ export const StepComponentOne = ({ setActiveIndex, contractInformation, setContr
                   <InputText 
                     id={`child-name-${index}`} 
                     {...field} 
+                    onChange={(e) => {
+                      const formattedValue = capitalizeFirstLetter(e.target.value);
+                      field.onChange(formattedValue);
+                    }}
                     className={classNames({ 'p-invalid': errors.children && errors.children[index] && errors.children[index].name })}
                     keyfilter={/^[a-zA-ZñÑ.,\s]*$/}
                   />
@@ -86,6 +82,29 @@ export const StepComponentOne = ({ setActiveIndex, contractInformation, setContr
               )}
             />
             {getFormErrorMessage(`children[${index}].name`)}
+
+            <Controller
+              name={`children[${index}].bornDate`}
+              control={control}
+              rules={{ required: 'Born date is required' }}
+              render={({ field }) => (
+                <span className="p-float-label">
+                  <Calendar 
+                    id={`child-bornDate-${index}`} 
+                    yearNavigator 
+                    monthNavigator 
+                    {...field} 
+                    value={field.value} 
+                    dateFormat="yy-mm-dd"
+                    showIcon
+                    onChange={(e) => field.onChange(handleBornDateChange(e.value, index))}
+                    className={classNames({ 'p-invalid': errors.children && errors.children[index] && errors.children[index].bornDate })}
+                  />
+                  <label htmlFor={`child-bornDate-${index}`}>Born Date</label>
+                </span>
+              )}
+            />
+            {getFormErrorMessage(`children[${index}].bornDate`)}
 
             <Controller
               name={`children[${index}].age`}
@@ -97,6 +116,7 @@ export const StepComponentOne = ({ setActiveIndex, contractInformation, setContr
                     id={`child-age-${index}`} 
                     {...field} 
                     type="number" 
+                    disabled
                     className={classNames({ 'p-invalid': errors.children && errors.children[index] && errors.children[index].age })}
                     keyfilter="int"
                   />
@@ -107,36 +127,12 @@ export const StepComponentOne = ({ setActiveIndex, contractInformation, setContr
             {getFormErrorMessage(`children[${index}].age`)}
 
             <Controller
-              name={`children[${index}].bornDate`}
-              control={control}
-              rules={{ required: 'Born date is required' }}
-              render={({ field }) => (
-                <span className="p-float-label">
-                  <Calendar 
-                    id={`child-bornDate-${index}`} 
-                    {...field} 
-                    value={field.value} 
-                    dateFormat="yy-mm-dd"
-                    showIcon
-                    yearNavigator 
-                    monthNavigator 
-                    minDate={new Date(new Date().getFullYear() - 15, 0, 1)}
-                    onChange={(e) => handleBornDateChange(e.value, index)}
-                    className={classNames({ 'p-invalid': errors.children && errors.children[index] && errors.children[index].bornDate })}
-                  />
-                  <label htmlFor={`child-bornDate-${index}`}>Born Date</label>
-                </span>
-              )}
-            />
-            {getFormErrorMessage(`children[${index}].bornDate`)}
-
-            <Controller
               name={`children[${index}].program`}
               control={control}
               render={({ field }) => (
                 <span className="p-float-label">
                   <Dropdown
-                  style={{minWidth:"10rem"}}
+                    style={{ minWidth: "10rem" }}
                     id={`child-program-${index}`}
                     {...field}
                     options={programOptions}
@@ -156,9 +152,12 @@ export const StepComponentOne = ({ setActiveIndex, contractInformation, setContr
           </div>
         ))}
         <div className="button-group">
-          <Button icon="pi pi-plus" label="Add Child" className="p-button-success" onClick={addChild} />
+          <Button icon="pi pi-plus" label="Add Child" className="p-button-success" onClick={(e) => {
+            e.preventDefault();
+            addChild();
+          }} />
           <Button type="submit" label="Save" className="p-button-primary p-ml-2" />
-          <Button label="Next" className="p-button-secondary p-ml-2" onClick={goToNextStep} />
+          <Button label={!validForm ? "Fill the form" : "Next"} className="p-button-secondary p-ml-2" onClick={goToNextStep} disabled={!validForm} />
         </div>
       </form>
     </div>
