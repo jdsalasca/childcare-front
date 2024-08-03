@@ -1,16 +1,18 @@
-import React, { useRef, useState, version } from 'react';
+import React, { useEffect, useRef, useState, version } from 'react';
 import { generateContractPdf } from './utils/contractPdfUtils'; // Adjust the path as per your file structure
 import { Steps } from 'primereact/steps';
 import StepComponentOne from './steps/StepComponentOne';
 import StepComponentTwo from './steps/StepComponentTwo';
 import StepComponentThree from './steps/StepComponentThree';
-import StepComponentFive from './steps/StepComponentFive';
+import StepComponentSeven from './steps/StepComponentSeven';
 import { Toast } from 'primereact/toast';
-import { defaultContractInfo } from './utilsAndConsts';
+import { defaultContractInfo, formatTime, validateSchedule } from './utilsAndConsts';
 import StepComponentFour from './steps/StepComponentFour';
 
 import { useTranslation } from 'react-i18next';
-
+import StepComponentFive from './steps/StepComponentFive';
+import StepComponentSix from './steps/StepComponentSix';
+import { contractFake } from './utils/testContract';
 export const Contracts = () => {
   const { t } = useTranslation();
   const [activeIndex, setActiveIndex] = useState(0);
@@ -28,6 +30,48 @@ export const Contracts = () => {
     return `${acceptedPermissions}/${totalPermissions}`;
   };
 
+  useEffect(() => {
+    const { schedule } = contractInformation;
+    let shouldUpdate = false;
+    const updatedSchedule = {};
+    ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'].forEach(day => {
+      const startKey = `${day}Start`;
+      const endKey = `${day}End`;
+      const startDate = new Date(schedule[startKey]);
+      const endDate = new Date(schedule[endKey]);
+      if (schedule[`${day}StartLabel`] !== formatTime(startDate) || schedule[`${day}EndLabel`] !== formatTime(endDate)) {
+        updatedSchedule[startKey] = schedule[startKey];
+        updatedSchedule[endKey] = schedule[endKey];
+        updatedSchedule[`${day}StartLabel`] = formatTime(startDate);
+        updatedSchedule[`${day}EndLabel`] = formatTime(endDate);
+        shouldUpdate = true;
+      }
+    });
+    console.log('====================================');
+    console.log("updatedSchedule", updatedSchedule);
+    console.log('====================================');
+    if (shouldUpdate) {
+      setContractInformation(prevContractInfo => ({
+        ...prevContractInfo,
+        schedule: {
+          ...prevContractInfo.schedule,
+          ...updatedSchedule
+        }
+      }));
+    }
+  }, [contractInformation.schedule]);
+
+  const countChildrenWithMedicalInfo = () => {
+    contractInformation?.children.forEach(child => console.log("child", child))
+    return contractInformation?.children.filter(child => 
+      child?.medicalInformation?.healthStatus !== '' &&
+      child?.medicalInformation?.healthStatus != null &&
+      child?.medicalInformation?.instructions !== '' &&
+      child?.medicalInformation?.instructions != null
+    ).length;
+  };
+  
+
   const getStepClass = (stepIndex) => {
     switch (stepIndex) {
       case 0:
@@ -37,18 +81,19 @@ export const Contracts = () => {
       case 2:
         const permissions = contractInformation.terms;
         const allPermissionsAccepted = Object.values(permissions)?.every(value => value);
-        return allPermissionsAccepted ? 'step-valid' : 'step-default'; // Green if all permissions are accepted
+        return allPermissionsAccepted ? 'step-valid' : 'step-default';
       case 3:
         const { totalAmount, paymentMethod, startDate, endDate } = contractInformation;
         const isStep3Valid = (totalAmount && paymentMethod && startDate && endDate) && startDate < endDate;
         return isStep3Valid ? 'step-valid' : 'step-invalid';
       case 4:
-        return 'step-default'; // Add your validation for step 5 if needed
+        return validateSchedule(contractInformation.schedule) ? 'step-valid' : 'step-invalid';
+      case 5:
+        return  countChildrenWithMedicalInfo() === contractInformation.children.length  ? 'step-valid' : 'step-invalid'; // Disable if no children
       default:
         return 'step-default';
     }
   };
-
   const items = [
     {
       label: `${t('children')} (${contractInformation.children.length})`,
@@ -67,11 +112,20 @@ export const Contracts = () => {
       command: (event) => setActiveIndex(3)
     },
     {
-      label: t('contractGenerator'),
+      label: t('schedule'),
       command: (event) => setActiveIndex(4)
+    },
+    {
+      label: `${t('medicalInformation')} (${countChildrenWithMedicalInfo()}/${contractInformation.children.length})`,
+      command: (event) => setActiveIndex(5),
+      disabled: contractInformation.children.length === 0 // Disable tab if no children
+    },
+    {
+      label: t('contractGenerator'),
+      command: (event) => setActiveIndex(6)
     }
   ];
-
+  
   const renderContent = () => {
     switch (activeIndex) {
       case 0:
@@ -84,6 +138,13 @@ export const Contracts = () => {
         return <StepComponentFour toast={toast} setActiveIndex={setActiveIndex} contractInformation={contractInformation} setContractInformation={setContractInformation} />;
       case 4:
         return <StepComponentFive toast={toast} setActiveIndex={setActiveIndex} contractInformation={contractInformation} setContractInformation={setContractInformation} />;
+      case 5:
+        return <StepComponentSix toast={toast} setActiveIndex={setActiveIndex} contractInformation={contractInformation} setContractInformation={setContractInformation} />;
+      case 6:
+        return <StepComponentSeven toast={toast} setActiveIndex={setActiveIndex} 
+        // contractInformation={contractInformation} 
+        contractInformation={contractFake}
+        setContractInformation={setContractInformation} />;
       default:
         return null;
     }
@@ -92,14 +153,14 @@ export const Contracts = () => {
   return (
     <>
       <Toast ref={toast} />
-      <Steps 
+      <Steps
         model={items.map((item, index) => ({
           ...item,
           className: getStepClass(index),
-        }))} 
-        activeIndex={activeIndex} 
-        readOnly={false} 
-        onSelect={(e) => setActiveIndex(e.index)} 
+        }))}
+        activeIndex={activeIndex}
+        readOnly={false}
+        onSelect={(e) => setActiveIndex(e.index)}
       />
       {renderContent()}
     </>

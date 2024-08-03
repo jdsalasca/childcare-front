@@ -184,11 +184,54 @@ p {
 
 
 .form-container {
-
   padding: 2rem;
   background-color: #f9f9f9;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  &.children-health{
+    display: flex;
+    justify-content: center;
+    gap:2rem;
+    h4{
+      text-align: center;
+    }
+    .p-fluid{
+      display: flex;
+      flex-direction: column;
+        gap: 2rem;
+    }
+  }
+  &.schedule {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    
+    .child-form{
+      flex-direction: column;
+      .form-days{
+        .day-schedule{
+          display: flex;
+          flex-direction: row;
+          gap: 5rem;
+          margin-bottom: 1rem;
+          .label-day{
+            display: flex;
+            max-width: 10%;
+            min-width: 10%;
+            align-self: center;
+            font-weight: bold;
+            margin: auto;
+            margin-top: 0.1rem;
+          }
+        }
+      }
+    .button-group{
+      justify-content: center;
+    }
+  }
+  }
+
   &.terms{
     display: flex;
     flex-direction: column;
@@ -211,6 +254,84 @@ p {
   }
 }
 
+
+.step-disabled {
+  position: relative;
+  pointer-events: none; // Makes the tab non-clickable
+  opacity: 0.6; // Optional: make disabled tabs appear faded
+}
+
+.step-disabled .tooltip {
+  visibility: hidden;
+  width: 200px;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  border-radius: 5px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%; /* Adjust as needed */
+  left: 50%;
+  margin-left: -100px; /* Half the width of the tooltip */
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.step-disabled:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+
+.p-field.p-col-4 {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.bills-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.form-row {
+  display: flex;
+  gap: 1rem;
+  padding: left 2rem right 2rem ;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+}
+.total-container {
+  text-align: center;
+  margin-top: 2rem;
+}
+.bills-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  justify-content: center;
+}
+
+.bill-card {
+  max-width: 15rem;
+  flex: 1 1 calc(20% - 1rem); 
+  background-color: #ffffff;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.submit-button {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+}
 .child-form {
   display: flex;
   flex-direction: row;

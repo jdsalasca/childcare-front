@@ -1,9 +1,9 @@
 // contractPdfUtils.js
 
 import jsPDF from 'jspdf';
-import {  contractInfo } from './contractJson';
 import { addFonts } from './jsPdfArial';
 import { defaultContractInfo, formatDateToYYYYMMDD } from '../utilsAndConsts';
+import { contractInfo } from './newFormatContract';
 
 // Function to add the header
 const initialYposition  = 12.7 + 10;
@@ -197,6 +197,8 @@ export function compressPDF(pdf = new jsPDF(), options) {
 	// Output the compressed PDF
 	return pdf.output("datauristring", options);
 }
+
+
 const contractGenerator = (contractInformation =defaultContractInfo) => {
   const contractBase = contractInfo(contractInformation);
   const doc = new jsPDF({
@@ -281,3 +283,35 @@ const addContractTerms =(doc,contractBase, pageOptions) => {
 
 export default contractGenerator;
 
+const drawSignatureSection = (doc, startX, startY, lineHeight, parentName, date) => {
+  const lineLength = 100; // Length of the lines
+  const labelGap = 10; // Gap between the label and the line
+  const signatureLineLength = 150; // Length of the signature line
+
+  // Labels
+  const labels = [
+    { text: 'Name of Mother/Father/Guardian', value: parentName },
+    { text: 'Signature', value: '' },
+    { text: 'Date', value: date }
+  ];
+
+  labels.forEach((label, i) => {
+    const yPos = startY + (i * lineHeight * 2); // Positioning lines with some space in between
+
+    // Draw label
+    doc.setFontSize(8);
+    doc.text(label.text, startX, yPos);
+
+    // Draw line
+    const lineStartX = startX + doc.getTextWidth(label.text) + labelGap;
+    const lineEndX = lineStartX + (label.text === 'Signature' ? signatureLineLength : lineLength);
+    doc.setDrawColor(0, 0, 0);
+    doc.setLineWidth(0.5);
+    doc.line(lineStartX, yPos, lineEndX, yPos);
+
+    // Draw value
+    if (label.value) {
+      doc.text(label.value, lineStartX + 2, yPos - 2); // Adjust position of value
+    }
+  });
+};

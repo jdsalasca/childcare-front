@@ -38,7 +38,8 @@ const Layout = ({ children }) => {
     {
       label: t('deposits'),
       items: [
-        { label: t('manageBills'), command: () => navigate('/bills') }
+        { label: t('manageBills'), command: () => navigate('/bills') },
+        { label: t('uploadInvoices'), command: () => navigate('/bills-upload') }
       ]
     },
     {

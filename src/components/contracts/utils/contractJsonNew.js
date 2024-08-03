@@ -1,7 +1,5 @@
 import { defaultContractInfo, fontStyles, formatDateToYYYYMMDD } from "../utilsAndConsts"
 
-
-
 export const contractInfo = (contractData = defaultContractInfo) => {
     console.log('====================================');
     console.log("contractData", contractData);

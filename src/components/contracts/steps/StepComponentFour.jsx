@@ -126,7 +126,7 @@ export const StepComponentFour = ({ setActiveIndex, contractInformation, setCont
                 <div className="button-group">
                     <Button type="submit" label={t('save')} className="p-button-primary rounded-button" />
                     <Button label={t('returnToPreviousStep')} className="p-button-secondary rounded-button" onClick={() => setActiveIndex(2)} />
-                    <Button label={t('nextStep')} className="p-button-success rounded-button" onClick={() => setActiveIndex(4)} />
+                    {/* <Button label={t('nextStep')} className="p-button-success rounded-button" onClick={() => setActiveIndex(4)} /> */}
                 </div>
             </form>
         </div>

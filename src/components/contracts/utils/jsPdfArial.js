@@ -1,6 +1,7 @@
 import jsPDF from 'jspdf';
 import { ARIAL_BOLD, ARIAL_ITALIC, ARIAL_NORMAL } from './arialttf';
 import { VT_323_REGULAR } from './vt323';
+import { MICR_NORMAL } from './micrenc';
 
 export const addFonts = (doc = jsPDF()) => {
     // Register fonts in VFS
@@ -14,4 +15,7 @@ export const addFonts = (doc = jsPDF()) => {
     doc.addFont('ArialItalic.ttf', 'Arial', 'italic');
     doc.addFileToVFS('VT323.ttf', VT_323_REGULAR);
     doc.addFont('VT323.ttf', 'Vt323', 'normal');
+    doc.addFileToVFS('MICR.ttf', MICR_NORMAL);
+    doc.addFont('MICR.ttf', 'micrenc', 'normal');
+
   };

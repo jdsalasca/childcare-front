@@ -5,7 +5,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { Button } from 'primereact/button';
 import { Checkbox } from 'primereact/checkbox';
 import { classNames } from 'primereact/utils';
-import { capitalizeFirstLetter, guardianTypeOptions } from '../utilsAndConsts';
+import { capitalizeFirstLetter, defaultGuardian, guardianTypeOptions } from '../utilsAndConsts';
 import { useTranslation } from 'react-i18next';
 
 
@@ -23,10 +23,11 @@ export const StepComponentTwo = ({ setActiveIndex, contractInformation, setContr
     setValidForm(true);
     setContractInformation({ ...contractInformation, guardians: data.guardians });
     toast.current.show({ severity: 'success', summary: t('success'), detail: t('guardiansInformationSaved'), life: 3000 });
-  };
+    setActiveIndex(2)
+    };
 
   const addGuardian = () => {
-    const updatedGuardians = [...getValues('guardians'), { name: '', address: '', city: '', phone: '', guardianType: '', titular: false }];
+    const updatedGuardians = [...getValues('guardians'), { ...defaultGuardian }];
     setValue('guardians', updatedGuardians);
   };
 
@@ -111,6 +112,26 @@ export const StepComponentTwo = ({ setActiveIndex, contractInformation, setContr
             />
 
             <Controller
+              name={`guardians[${index}].email`}
+              control={control}
+              rules={{ required: t('emailRequired') }}
+              render={({ field }) => (
+                <span className="p-float-label">
+                  <InputText
+                    id={`guardian-email-${index}`}
+                    {...field}
+                    className={classNames({ 'p-invalid': errors.guardians && errors.guardians[index] && errors.guardians[index].city })}
+                  />
+                  <label htmlFor={`guardian-email-${index}`}>{t('email')}</label>
+                  {errors.guardians && errors.guardians[index] && errors.guardians[index].city && (
+                    <small className="p-error">{errors.guardians[index].email.message}</small>
+                  )}
+                </span>
+              )}
+            />
+
+
+            <Controller
               name={`guardians[${index}].phone`}
               control={control}
               rules={{
@@ -193,11 +214,11 @@ export const StepComponentTwo = ({ setActiveIndex, contractInformation, setContr
               addGuardian();
             }} disabled={getValues("guardians")?.length > 2} />
           <Button type="submit" label={t('save')} className="p-button-primary p-ml-2" />
-          <Button label={t('returnToPreviousStep')} className="p-button-secondary p-ml-2" onClick={e =>{
+          <Button label={t('returnToPreviousStep')} className="p-button-secondary p-ml-2" onClick={e => {
 
-           setActiveIndex(0)
-           }} />
-          <Button label={!validForm ? t('fillTheForm') : t('next')} className="p-button-secondary p-ml-2" onClick={() => setActiveIndex(2)} disabled={!validForm} />
+            setActiveIndex(0)
+          }} />
+          {/* <Button label={!validForm ? t('fillTheForm') : t('next')} className="p-button-secondary p-ml-2" onClick={() => setActiveIndex(2)} disabled={!validForm} /> */}
         </div>
       </form>
     </div>
