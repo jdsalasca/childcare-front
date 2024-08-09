@@ -1,14 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { Calendar } from 'primereact/calendar';
 import { Dropdown } from 'primereact/dropdown';
 import { InputNumber } from 'primereact/inputnumber';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
-import { billTypes, programOptions } from '../../utilsAndConsts';
 import { useTranslation } from 'react-i18next';
+import { billTypes, programOptions } from '../../contracts/utilsAndConsts';
+import { Toast } from 'primereact/toast';
+import ChildrenAPI from '../../../models/childrens';
 
 export const BillsUpload = () => {
+  const toast = useRef(null)
     const { control, handleSubmit, watch, formState: { errors } } = useForm({
       defaultValues: {
         bills: billTypes.map(billType => ({
@@ -31,10 +34,35 @@ export const BillsUpload = () => {
     const { t } = useTranslation();
   
     const onSubmit = (data) => {
+      console.log("Sending information Total:", totalSum);
+      if(totalSum == null || totalSum == "" || totalSum <=0){
+        toast.current.show({ severity: 'success', summary: t('bills.empty'), detail: t('bills.emptyDetail') });
+        return
+      }
+
+      console.log('====================================');
+      console.log('====================================');
       console.log(data);
     };
   
     const bills = watch("bills");
+    useEffect(() => {
+      const fetchChildren = async () => {
+        try {
+          const response = await ChildrenAPI.getChildren();
+          console.log('====================================');
+          console.log("response", response);
+          console.log('====================================');
+          // setChildren(response);
+        } catch (err) {
+          // setError(err);
+        } finally {
+          // setLoading(false);
+        }
+      };
+  
+      fetchChildren();
+    }, []);
   
     useEffect(() => {
       const sum = bills.reduce((sum, bill) => {
@@ -65,8 +93,10 @@ export const BillsUpload = () => {
   
     return (
       <form onSubmit={handleSubmit(onSubmit)} className="form-container" >
+      <Toast ref={toast} />
+
         <div className="p-fluid p-formgrid p-grid">
-          <div className="form-row" >
+          <div className="form-row" style={{"paddingRight":"5rem", "paddingLeft": "5rem"}}> 
             <div className="p-field p-col-4">
               <span className="p-float-label">
                 <Controller

@@ -4,8 +4,9 @@ import Layout from './components/utils/Layout';
 import Login from './components/utils/Login';
 import { Contracts } from './components/contracts/Contracts';
 import HomePage from './components/homepage/HomePage';
-import Bills from './components/contracts/bills/Bills';
-import { BillsUpload } from './components/contracts/bills/billsUpload/BillsUpload';
+import Bills from './components/bills/Bills';
+import { BillsUpload } from './components/bills/billsUpload/BillsUpload';
+import ReviewContracts from './components/contracts/reviewContracts/ReviewContracts';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
                   <Route path="/report-teachers" element={<HomePage />} />
                   <Route path="/report-students" element={<HomePage />} />
                   <Route path="/contracts" element={<Contracts />} />
+                  <Route path="/review-contracts" element={<ReviewContracts />} />
                   <Route path="/bills" element={<Bills />} />
                   <Route path="/bills-upload" element={<BillsUpload />} />
                   <Route path="/active-users-report" element={<HomePage />} />

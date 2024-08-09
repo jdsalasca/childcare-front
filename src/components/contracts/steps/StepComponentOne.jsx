@@ -6,7 +6,7 @@ import { classNames } from 'primereact/utils';
 import { Calendar } from 'primereact/calendar';
 import { Dropdown } from 'primereact/dropdown';
 import { calculateAge, calculateWeeksOld, capitalizeFirstLetter, determineProgram, programOptions } from '../utilsAndConsts';
-import { childrenOptions } from '../bills/utils/utilsAndConstants';
+import { childrenOptions } from '../../bills/utils/utilsAndConstants';
 
 export const StepComponentOne = ({ setActiveIndex, contractInformation, setContractInformation, toast, ...props }) => {
   const [validForm, setValidForm] = useState(false);

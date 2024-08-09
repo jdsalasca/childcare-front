@@ -1,6 +1,6 @@
 import jsPDF from 'jspdf';
 import { logoImg } from './logoimg';
-import { addFonts } from '../utils/jsPdfArial';
+import { addFonts } from '../contracts/utils/jsPdfArial';
 
 
 export const exportToPDF = (bills) => {

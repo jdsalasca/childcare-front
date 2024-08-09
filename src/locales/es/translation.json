@@ -72,8 +72,14 @@
    "medicalInformation":"Información medica de los niños",
    "scheduleMandatoryMessage":"esta fecha es obligatoria",
   "childrenSchedule":"Horario de los niños",
+  "reviewContracts":"Revisar Contratos",
   "hourQuotaExceededMessage":"Se pueden tomar un máximo de 9 horas por dia.",
+  "program_required":"Se requiere un programa",
+  "select_program":"Selecciona un programa",
+
   "bills": {
+    "empty":"Factura vacía",
+    "emptyDetail":"La factura no puede estar vacía",
     "saved": "Facturas Guardadas",
     "savedDetail": "Las facturas se han guardado correctamente",
     "imported": "Facturas Importadas",
@@ -88,6 +94,7 @@
     "received": "Recibido",
     "total": "Total",
     "save": "Guardar",
+    "searchPlaceholder":"Busca por el nombre o el apellido del niño",
     "addNew": "Agregar Nueva Factura",
     "exportPDF": "Exportar a PDF",
     "downloadTemplate": "Descargar Plantilla",

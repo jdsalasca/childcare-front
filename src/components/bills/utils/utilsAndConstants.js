@@ -1,4 +1,4 @@
-import { formatDateToYYYYMMDD } from "../../utilsAndConsts";
+import { formatDateToYYYYMMDD } from "../../contracts/utilsAndConsts";
 
 export const childrenOptions = [
     { born_date: '2014-10-01', names: 'Emily Johnson', status: 'Activo' }, // 9 years old

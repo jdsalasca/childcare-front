@@ -7,7 +7,7 @@
   "deposits": "Deposits",
   "manageBills": "Manage Bills",
   "uploadInvoices": "upload Invoices",
-  "program":"program",
+  "program":"Program",
   "logout": "Logout",
   "submit":"Submit",
   "date":"Date",
@@ -71,11 +71,14 @@
    "start":"start",
    "end":"end",
    "medicalInformation":"Children's Medical information",
-
+   "reviewContracts":"Review Contracts",
    "scheduleMandatoryMessage":"This is a mandatory Date",
    "hourQuotaExceededMessage":"the maximum quota allowed of hours per day is 9.",
-
+   "program_required":"The program is required",
+   "select_program":"Select a program",
   "bills": {
+    "empty":"Empty bill",
+    "emptyDetail":"The bill can not be empty",
     "saved": "Bills Saved",
     "savedDetail": "Bills have been saved successfully",
     "imported": "Bills Imported",
@@ -87,6 +90,7 @@
     "subtotal": "Subtotal",
     "received": "Received",
     "total": "Total",
+    "searchPlaceholder":"Search by child names or last names",
     "totalCheck": "Total Check",
     "totalCash": "Total Money",
     "save": "Save",

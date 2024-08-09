@@ -1,4 +1,4 @@
-import API from "../models/api.js";
+import API from "../models/API.js";
 
 // src/utils/auth.js
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;

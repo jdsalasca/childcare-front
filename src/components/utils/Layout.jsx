@@ -32,7 +32,7 @@ const Layout = ({ children }) => {
       label: t('contracts'),
       items: [
         { label: t('generateContract'), command: () => navigate('/contracts') },
-        { label: t('activeUsersReport'), command: () => navigate('/active-users-report') },
+        { label: t('reviewContracts'), command: () => navigate('/review-contracts') },
       ]
     },
     {
