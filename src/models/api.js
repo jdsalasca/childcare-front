@@ -1,5 +1,6 @@
 import axios from 'axios';
-export const BASE_URL = 'localhost:8000';  // Replace with your actual API base URL
+//export const BASE_URL = 'localhost:8000';  // Replace with your actual API base URL
+export const BASE_URL = 'https://www.educandochildcare.com/childadmin';  // Replace with your actual API base URL
 
 const makeRequest = async (url, method, endpoint, headers = {}, body, options = {}, withPayload = false) => {
   // Create headers for the request

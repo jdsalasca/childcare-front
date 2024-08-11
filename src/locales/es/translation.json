@@ -69,6 +69,8 @@
    "Friday":"viernes",
    "start":"inicio",
    "end":"fin",
+   "yes":"Si",
+   "no": "No",
    "medicalInformation":"Información medica de los niños",
    "scheduleMandatoryMessage":"esta fecha es obligatoria",
   "childrenSchedule":"Horario de los niños",
@@ -76,10 +78,15 @@
   "hourQuotaExceededMessage":"Se pueden tomar un máximo de 9 horas por dia.",
   "program_required":"Se requiere un programa",
   "select_program":"Selecciona un programa",
-
   "bills": {
+    "dateRequired": "La fecha es obligatoria",
+    "dateRequiredDetails": "La fecha es obligatoria para poder guardar la información de pagos",
+
     "empty":"Factura vacía",
+    "confirmation": "Confirmación",
+
     "emptyDetail":"La factura no puede estar vacía",
+    "confirmExportPDF": "Te gustaría exportar a PDF las facturas generadas",
     "saved": "Facturas Guardadas",
     "savedDetail": "Las facturas se han guardado correctamente",
     "imported": "Facturas Importadas",

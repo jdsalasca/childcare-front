@@ -1,6 +1,5 @@
-import API from './API';
+import API, { BASE_URL } from './API';
 
-const BASE_URL = 'http://localhost:8000/childadmin';  // Ensure the correct protocol and port
 
 const ChildrenAPI = {
   // Create a new child
