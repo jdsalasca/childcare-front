@@ -21,7 +21,6 @@ const makeRequest = async (url, method, endpoint, headers = {}, body, options = 
   };
 
   try {
-    console.log('requestOptions', requestOptions);
     const response = await axios(requestOptions);
     
     if (response.status === 401) {

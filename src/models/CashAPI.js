@@ -5,9 +5,6 @@ const CashAPI = {
   getDetailsByDate: async (date) => {
     try {
       const response = await API.get(BASE_URL, `/daily_cash/details_by_date`, { params: { date } });
-      console.log('====================================');
-      console.log("getDetailsByDate",response);
-      console.log('====================================');
       return response;
     } catch (error) {
       console.log('Error fetching daily cash details by date:', error);

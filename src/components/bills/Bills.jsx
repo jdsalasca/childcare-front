@@ -23,6 +23,8 @@ const loadingDefault = {
   loading: false,
   loadingMessage: ""
 }
+
+
 const Bills = () => {
   const { data: currenciesInformation, error, isLoading } = useBillTypesByCurrencyCode("USD");
   const { data: children, error: errorChild, isLoading: loadingChildren } = useChildren();
@@ -32,7 +34,7 @@ const Bills = () => {
   useEffect(() => {
     setLoadingInfo({
       loading: true,
-      loadingMessage: "We are looking for Children information"
+      loadingMessage: t("weAreLookingForChildrenInformation")
     })
     if (children != null && currenciesInformation != null) {
       onStartForm()
@@ -51,7 +53,6 @@ const Bills = () => {
       }));
       return students;
     } catch (err) {
-      console.log("fetchChildren err", err);
     } finally {
 
     }
@@ -59,7 +60,6 @@ const Bills = () => {
 
   const onStartForm = async () => {
     const students = await fetchChildren();
-    console.log("currenciesInformation", currenciesInformation);
 
     reset({
       bills: students?.map((child, index) => ({
@@ -136,12 +136,11 @@ const Bills = () => {
   const saveInformation = async (data) => {
     setLoadingInfo({
       loading: true,
-      loadingMessage: "We are Saving the payment information for " + data.date
+      loadingMessage: t('savingPaymentInfo') + " "+ data.date
     })
     const response = await CashAPI.processCashData(data);
     setLoadingInfo(loadingDefault)
 
-    console.log("response", response);
     if (response.httpStatus === 200) {
       toast.current.show({ severity: 'success', summary: t('bills.saved'), detail: t('bills.savedDetail') })
     }
@@ -174,12 +173,6 @@ const Bills = () => {
       },
       reject: () => saveInformation(dataFormatted),
     });
-
-
-    console.log('====================================');
-    console.log("response", dataFormatted);
-    console.log('====================================');
-
   };
 
 
@@ -208,24 +201,28 @@ const Bills = () => {
       return acc;
     }, { cash: 0, check: 0, total: 0 });
   };
-
   const onFetchDataByDay = async (date) => {
-    console.log('====================================');
-    console.log("INVOKING DATE CHANGED");
-    console.log('====================================');
     const formattedDate = formatDateToYYYYMMDD(date);
     try {
       setLoadingInfo({
         loading: true,
-        loadingMessage: `We are looking for payment information for ${formatDate(getValues("date"))}`
-      })
+        loadingMessage: t('lookingForPaymentInfo', { date: formatDate(getValues("date")) })
+      });
       const dayInformation = await CashAPI.getDetailsByDate(formattedDate);
-      setLoadingInfo(loadingDefault)
-
-      console.log("dayInformation", date, formattedDate, dayInformation);
+      setLoadingInfo(loadingDefault);
       if (dayInformation?.httpStatus === 200) {
-        toast.current.show({ severity: 'success', summary: t('Information Found!'), detail: t('We added the data for picked day') })
+  
+        toast.current.show({
+          severity: 'success',
+          summary: t('informationFound'),
+          detail: t('dataAddedForPickedDay')
+        });
+        
         const { daily_cash_details, child_cash_records } = dayInformation.response;
+  
+        // Wait for onStartForm to complete before resetting the form
+        await onStartForm();
+  
         // Update children data
         const updatedChildren = getValues('bills').map(child => {
           const matchedChildRecord = child_cash_records.find(record => record.child_id === child.id);
@@ -235,10 +232,15 @@ const Bills = () => {
               cash: matchedChildRecord.cash,
               check: matchedChildRecord.check,
             };
+          }else{
+            return {
+              ...child,
+              cash: "",
+              check: "",
+            }
           }
-          return child;
         });
-
+  
         // Update bill types data
         const updatedBillTypes = getValues('billTypes').map(billType => {
           const matchedBillDetail = daily_cash_details.find(detail => detail.bill_type_id === billType.billTypeId);
@@ -248,10 +250,16 @@ const Bills = () => {
               amount: matchedBillDetail.amount,
               total: matchedBillDetail.total,
             };
+          }else{
+            return {
+              ...billType,
+              amount: "",
+              total: "",
+            };
           }
-          return billType;
+         
         });
-
+  
         // Reset form with updated data
         reset({
           bills: updatedChildren,
@@ -259,19 +267,23 @@ const Bills = () => {
           date: date,
         });
       } else {
-        toast.current.show({ severity: 'info', summary: t('Not Information Found!'), detail: t('We do not found data for picked day') })
-        onStartForm();
+        toast.current.show({ 
+          severity: 'info', 
+          summary: t('noInformationFound'), 
+          detail: t('noDataForPickedDay') 
+        });
+        await onStartForm();
       }
-
       return date;
     } catch (error) {
-      console.error('Error fetching data by date:', error);
       return date;
     }
   };
+  
   const sums = calculateSums();
   const [totalSum, setTotalSum] = useState(0);
   const billTypesController = watch("billTypes");
+  
   useEffect(() => {
     const sum = billTypesController?.reduce((sum, bill) => {
       const amount = parseFloat(bill.amount) || 0;
@@ -421,6 +433,7 @@ const Bills = () => {
           </div>
         ))}
         <div className="bills-container">
+          <h4> {t('paymentInformation')} </h4>
           {billTypeFields.map((bill, index) => (
             <div className="bill-card" key={bill.id}>
               <span className="p-field">
@@ -428,7 +441,7 @@ const Bills = () => {
                   name={`billTypes.${index}.billTypeId`}
                   control={control}
                   render={({ field }) => (
-                    <p style={{minWidth:"10rem"}}>  {t('bill')}      {bill.bill}   </p>
+                    <p style={{ minWidth: "10rem" }}>  {t('bill')}      {bill.bill}   </p>
                   )}
                 />
 
@@ -449,20 +462,15 @@ const Bills = () => {
                 <label htmlFor={`billTypes.${index}.amount`}>{t('quantity')}</label>
               </span>
 
-              <span className="p-float-label">
+              <span className="p-field">
                 <Controller
                   name={`billTypes.${index}.total`}
                   control={control}
                   render={({ field }) => (
-                    <InputText
-                      id={`billTypes.${index}.total`}
-                      className='input-text-label'
-                      value={`$${(billTypesController[index].amount * billTypesController[index].value).toFixed(2)}`}
-                      readOnly
-                    />
+                    <p style={{ minWidth: "10rem", marginLeft: "3rem" }}>  {t('total')}    {`$${(billTypesController[index].amount * billTypesController[index].value).toFixed(2)}`}  </p>
+
                   )}
                 />
-                <label htmlFor={`billTypes.${index}.total`}>{t('total')}</label>
               </span>
             </div>
           ))}
