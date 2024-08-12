@@ -3,9 +3,12 @@ import React from 'react';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import './Login.scss';
 
-const Loader = () => (
-  <div className="loader">
-    <ProgressSpinner />
+const Loader = ({ message = "", ...props }) => (
+  <div className="loader-container" {...props}>
+    <p className="loader-message">{message}</p>
+    <div className="loader-spinner">
+      <ProgressSpinner />
+    </div>
   </div>
 );
 

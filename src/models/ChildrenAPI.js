@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query';
 import API, { BASE_URL } from './API';
 
 
@@ -58,4 +59,14 @@ const ChildrenAPI = {
   }
 };
 
+
+// Custom hook to fetch all children
+export const useChildren = () => {
+  return useQuery({
+    queryKey: ['children'], // Unique key for caching
+    queryFn: ChildrenAPI.getChildren, // Function to fetch children
+    staleTime: 1000 * 60 * 20, // Cache time in milliseconds (20 minutes)
+    cacheTime: 1000 * 60 * 30, // Cache time in milliseconds (30 minutes)
+  });
+};
 export default ChildrenAPI;

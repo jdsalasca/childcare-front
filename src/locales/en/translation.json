@@ -83,7 +83,7 @@
     "dateRequiredDetails": "The date is mandatory to save payments information",
     "empty":"Empty bill",
     "confirmation": "Confirmation",
-    "confirmExportPDF": "Do you desire to export the invoices to PDF",
+    "confirmExportPDF": "Do you want to export the invoices to PDF",
     "emptyDetail":"The bill can not be empty",
     "saved": "Bills Saved",
     "savedDetail": "Bills have been saved successfully",

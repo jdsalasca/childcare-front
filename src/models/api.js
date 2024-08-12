@@ -1,7 +1,6 @@
 import axios from 'axios';
-//export const BASE_URL = 'localhost:8000';  // Replace with your actual API base URL
-export const BASE_URL = 'https://www.educandochildcare.com/childadmin';  // Replace with your actual API base URL
-
+export const BASE_URL = 'http://localhost:8000/childadmin';  // Replace with your actual API base URL
+//export const BASE_URL = 'https://www.educandochildcare.com/childadmin';  // Replace with your actual API base URL
 const makeRequest = async (url, method, endpoint, headers = {}, body, options = {}, withPayload = false) => {
   // Create headers for the request
   const myHeaders = {
@@ -14,7 +13,7 @@ const makeRequest = async (url, method, endpoint, headers = {}, body, options = 
 
   const requestOptions = {
     ...options,
-    mode: "cors",
+    mode: 'cors',
     method: method,
     headers: myHeaders,
     url: `${url}${endpoint}`,
@@ -22,21 +21,42 @@ const makeRequest = async (url, method, endpoint, headers = {}, body, options = 
   };
 
   try {
-    console.log("requestOptions", requestOptions);
-   const response = await axios(requestOptions);
-   //const response = await axios(`${url}${endpoint}`, body);
-
+    console.log('requestOptions', requestOptions);
+    const response = await axios(requestOptions);
+    
     if (response.status === 401) {
       window.location = '/info/session-expired';
-      return null;
+      return { response: null, httpStatus: 401 };
     }
 
-    return response.data;
+    return { response: response.data, httpStatus: response.status };
   } catch (error) {
-    console.error('Error during request:', error);
-    throw error;
+    let errorData = { response: null, httpStatus: null };
+
+    if (error.response) {
+      errorData.httpStatus = error.response.status;
+
+      if (error.response.status === 404) {
+        console.error('Record not found:', error.response.data);
+        errorData.response = error.response.data; // Error data for 404
+      } else if (error.response.status === 401) {
+        window.location = '/info/session-expired';
+        return { response: null, httpStatus: 401 };
+      } else {
+        console.error(`Error ${error.response.status}:`, error.response.data);
+        errorData.response = error.response.data; // General error data
+      }
+    } else {
+      // Handle network errors or other unexpected errors
+      console.error('Network or other error:', error.message);
+      errorData.response = error.message;
+    }
+
+    // Optionally re-throw the error if needed for further handling
+    throw errorData;
   }
 };
+
 
 const API = {
   get(url, endpoint, options, withPayload = false) {
@@ -44,7 +64,7 @@ const API = {
   },
 
   post(url, endpoint, body, options) {
-    return  makeRequest(url, 'POST', endpoint, null, body, options);
+    return  makeRequest(url, 'POST', endpoint, null, body, options, false);
   },
 
   put(url, endpoint, body, options) {

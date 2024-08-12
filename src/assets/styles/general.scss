@@ -318,7 +318,17 @@ p {
   margin-bottom: 2rem;
   justify-content: center;
 }
-
+.input-text-label {
+  border: none;
+  background-color: transparent;
+  padding-top: 0.5rem;
+  margin-left: 2rem;
+  color: inherit;
+  font-size: inherit;
+  font-family: inherit;
+  cursor: default;
+  pointer-events: none; // Prevent interaction, making it behave like plain text
+}
 .bill-card {
   min-width: 100%;
   border: 1px solid #dee2e6;

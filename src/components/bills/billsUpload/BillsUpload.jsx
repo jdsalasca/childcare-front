@@ -8,7 +8,7 @@ import { Button } from 'primereact/button';
 import { useTranslation } from 'react-i18next';
 import { billTypes, programOptions } from '../../contracts/utilsAndConsts';
 import { Toast } from 'primereact/toast';
-import ChildrenAPI from '../../../models/childrens';
+import ChildrenAPI from '../../../models/ChildrenAPI';
 
 export const BillsUpload = () => {
   const toast = useRef(null)
