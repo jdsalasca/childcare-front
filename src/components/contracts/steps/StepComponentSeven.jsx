@@ -13,7 +13,7 @@ const StepComponentSeven = ({ setActiveIndex, contractInformation = defaultContr
         handleDownloadPdf();
         return () => {};
     }, []);
-
+    
     const handleDownloadPdf = () => {
         const { guardians, children, totalAmount, paymentMethod, startDate, endDate } = contractInformation;
 

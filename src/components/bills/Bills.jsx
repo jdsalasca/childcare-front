@@ -375,7 +375,7 @@ const Bills = () => {
             <Controller
               name={`bills[${bill.originalIndex}].names`} // Use originalIndex
               control={control}
-              rules={{ required: t('bills.namesRequired') }}
+              // rules={{ required: t('bills.namesRequired') }}
               render={({ field }) => (
                 <span className="p-float-label">
                   <InputText
@@ -441,7 +441,7 @@ const Bills = () => {
                   name={`billTypes.${index}.billTypeId`}
                   control={control}
                   render={({ field }) => (
-                    <p style={{ minWidth: "10rem" }}>  {t('bill')}      {bill.bill}   </p>
+                    <p style={{ minWidth: "10rem" }}>   bill {t('bill')}      {bill.bill}   </p>
                   )}
                 />
 
