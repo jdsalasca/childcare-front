@@ -164,8 +164,10 @@ const renderRightContent = (doc, startX, startY, lineHeight, bill) => {
   doc.rect(cashBoxX, cashBoxY, boxWidth, boxHeight); // Draw border
   doc.setLineWidth(0.5); // Restore line width to 0.5
   doc.setFontSize(8);
-  doc.setFont(undefined, 'normal');
-  doc.text((Number(bill?.cash) || 0).toFixed(2), cashBoxX + 5, yPos, { align: 'left' });
+  doc.setFont(undefined, 'normal');  
+  if(bill?.cash &&bill?.cash >0){
+    doc.text((Number(bill?.cash) || 0).toFixed(2), cashBoxX + 5, yPos, { align: 'left' });
+  }
   yPos += lineHeight * 0.6;
   
   // Draw gray background with black border for Received
@@ -191,7 +193,9 @@ const renderRightContent = (doc, startX, startY, lineHeight, bill) => {
   doc.setLineWidth(0.5); // Restore line width to 0.5
   doc.setFontSize(8);
   doc.setFont(undefined, 'normal');
-  doc.text((Number(bill?.check) || 0).toFixed(2), checkBoxX + 5, yPos, { align: 'left' });
+  if(bill?.check &&bill?.check >0){
+    doc.text((Number(bill?.check) || 0).toFixed(2), checkBoxX + 5, yPos, { align: 'left' });
+  }
   yPos += lineHeight * 1.2;
 
   // Render OTHER SIDE text and box
@@ -254,5 +258,6 @@ const renderRightContent = (doc, startX, startY, lineHeight, bill) => {
   doc.setLineWidth(0.5); // Restore line width to 0.5
   doc.setFontSize(8);
   doc.setFont(undefined, 'normal');
+  
   doc.text(((Number(bill?.cash) || 0) + (Number(bill?.check) || 0)).toFixed(2), totalBoxX + 5, yPos, { align: 'left' });
 };

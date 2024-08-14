@@ -136,7 +136,7 @@ const Bills = () => {
   const saveInformation = async (data) => {
     setLoadingInfo({
       loading: true,
-      loadingMessage: t('savingPaymentInfo') + " "+ data.date
+      loadingMessage: t('savingPaymentInfo') + " " + data.date
     })
     const response = await CashAPI.processCashData(data);
     setLoadingInfo(loadingDefault)
@@ -201,89 +201,79 @@ const Bills = () => {
       return acc;
     }, { cash: 0, check: 0, total: 0 });
   };
-  const onFetchDataByDay = async (date) => {
-    const formattedDate = formatDateToYYYYMMDD(date);
-    try {
-      setLoadingInfo({
-        loading: true,
-        loadingMessage: t('lookingForPaymentInfo', { date: formatDate(getValues("date")) })
+  const isFetching = useRef(false);
+
+const onFetchDataByDay = async (date) => {
+  if (isFetching.current) return;
+
+  isFetching.current = true;
+  const formattedDate = formatDateToYYYYMMDD(date);
+  const formattedDateUSA = formatDate(date);
+
+  try {
+    setLoadingInfo({
+      loading: true,
+      loadingMessage: t('lookingForPaymentInfo', { date: formatDate(getValues("date")) })
+    });
+
+    const dayInformation = await CashAPI.getDetailsByDate(formattedDate);
+
+    if (dayInformation?.httpStatus === 200) {
+      await onStartForm();
+
+      toast.current.show({
+        severity: 'success',
+        summary: t('informationFound'),
+        detail: t('dataAddedForPickedDay', { date: formattedDateUSA })
       });
-      const dayInformation = await CashAPI.getDetailsByDate(formattedDate);
-      setLoadingInfo(loadingDefault);
-      if (dayInformation?.httpStatus === 200) {
-  
-        toast.current.show({
-          severity: 'success',
-          summary: t('informationFound'),
-          detail: t('dataAddedForPickedDay')
-        });
-        
-        const { daily_cash_details, child_cash_records } = dayInformation.response;
-  
-        // Wait for onStartForm to complete before resetting the form
-        await onStartForm();
-  
-        // Update children data
-        const updatedChildren = getValues('bills').map(child => {
-          const matchedChildRecord = child_cash_records.find(record => record.child_id === child.id);
-          if (matchedChildRecord) {
-            return {
-              ...child,
-              cash: matchedChildRecord.cash,
-              check: matchedChildRecord.check,
-            };
-          }else{
-            return {
-              ...child,
-              cash: "",
-              check: "",
-            }
-          }
-        });
-  
-        // Update bill types data
-        const updatedBillTypes = getValues('billTypes').map(billType => {
-          const matchedBillDetail = daily_cash_details.find(detail => detail.bill_type_id === billType.billTypeId);
-          if (matchedBillDetail) {
-            return {
-              ...billType,
-              amount: matchedBillDetail.amount,
-              total: matchedBillDetail.total,
-            };
-          }else{
-            return {
-              ...billType,
-              amount: "",
-              total: "",
-            };
-          }
-         
-        });
-  
-        // Reset form with updated data
-        reset({
-          bills: updatedChildren,
-          billTypes: updatedBillTypes,
-          date: date,
-        });
-      } else {
-        toast.current.show({ 
-          severity: 'info', 
-          summary: t('noInformationFound'), 
-          detail: t('noDataForPickedDay') 
-        });
-        await onStartForm();
-      }
-      return date;
-    } catch (error) {
-      return date;
+
+      const { daily_cash_details, child_cash_records } = dayInformation.response;
+
+      const updatedChildren = getValues('bills').map(child => {
+        const matchedChildRecord = child_cash_records.find(record => record.child_id === child.id);
+        return {
+          ...child,
+          cash: matchedChildRecord?.cash || "",
+          check: matchedChildRecord?.check || "",
+        };
+      });
+
+      const updatedBillTypes = getValues('billTypes').map(billType => {
+        const matchedBillDetail = daily_cash_details.find(detail => detail.bill_type_id === billType.billTypeId);
+        return {
+          ...billType,
+          amount: matchedBillDetail?.amount || "",
+          total: matchedBillDetail?.total || "",
+        };
+      });
+
+      reset({
+        bills: updatedChildren,
+        billTypes: updatedBillTypes,
+        date: date,
+      });
+    } else {
+      await onStartForm();
+
+      toast.current.show({
+        severity: 'info',
+        summary: t('noInformationFound'),
+        detail: t('noDataForPickedDay', { date: formattedDateUSA })
+      });
     }
-  };
-  
+
+    setLoadingInfo(loadingDefault);
+  } catch (error) {
+    setLoadingInfo(loadingDefault);
+  } finally {
+    isFetching.current = false; // Reset the flag when done
+  }
+};
+
   const sums = calculateSums();
   const [totalSum, setTotalSum] = useState(0);
   const billTypesController = watch("billTypes");
-  
+
   useEffect(() => {
     const sum = billTypesController?.reduce((sum, bill) => {
       const amount = parseFloat(bill.amount) || 0;
@@ -353,21 +343,32 @@ const Bills = () => {
               {errors.program && <span className="p-error">{errors.program.message}</span>}
             </div> */}
 
-        <div className="p-field p-col-4">
-          <span className="p-float-label">
-            <Controller
-              name="date"
-              control={control}
-              render={({ field }) => (
-                <Calendar id={field.name} {...field} onChange={e => {
-                  field.onChange((e.value))
-                  onFetchDataByDay(e.value);
-                }} showIcon dateFormat="mm/dd/yy" />
-              )}
-            />
-            <label htmlFor="date">{t('date')}</label>
-          </span>
-        </div>
+            <div className="p-field p-col-4">
+  <span className="p-float-label">
+    <Controller
+      name="date"
+      control={control}
+      render={({ field }) => (
+        <Calendar
+          id={field.name}
+          {...field}
+          onChange={e => {
+            field.onChange(e.value);
+            onFetchDataByDay(e.value);
+          }}
+          showIcon
+          dateFormat="mm/dd/yy"
+          mask="99/99/9999"
+          // Disable focus-triggered popup
+          showOnFocus={false}
+          // Disable the calendar dropdown, only trigger on icon click
+          hideOnDateTimeSelect={true}
+        />
+      )}
+    />
+    <label htmlFor="date">{t('date')}</label>
+  </span>
+</div>
       </div>
       <form onSubmit={handleSubmit(onSubmit)}>
         {filteredFields.map((bill, index) => (
