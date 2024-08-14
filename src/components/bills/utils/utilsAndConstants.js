@@ -32,6 +32,9 @@ export const childrenOptions = [
     date: formatDateToYYYYMMDD(new Date())
   };
   export const formatDate = (date) => {
+    if(date == null){
+      return;
+    }
     const month = ('0' + (date.getMonth() + 1)).slice(-2); // Months are 0-based
     const day = ('0' + date.getDate()).slice(-2);
     const year = date.getFullYear().toString().slice(-2); // Get last 2 digits of year

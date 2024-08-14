@@ -25,12 +25,72 @@ const loadingDefault = {
 }
 
 
+
 const Bills = () => {
   const { data: currenciesInformation, error, isLoading } = useBillTypesByCurrencyCode("USD");
   const { data: children, error: errorChild, isLoading: loadingChildren } = useChildren();
-
-
   const [loadingInfo, setLoadingInfo] = useState(loadingDefault)
+  const { t } = useTranslation(); // Initialize translation hook
+  const isFetching = useRef(false);
+  const toast = useRef(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchedProgram, SetSearchedProgram] = useState(null) 
+  const [exportableCount, setExportableCount] = useState(0);
+  
+  const [totalSum, setTotalSum] = useState(0);
+  const { control, handleSubmit, formState: { errors }, reset, getValues, watch } = useForm({
+    defaultValues: {
+      bills: [].map((child, index) => ({
+        originalIndex: index, // Add original index
+        disabled: true,
+        names: child.names,
+        cash: '',
+        check: '',
+        date: new Date().toISOString().split('T')[0], // Format date to YYYY-MM-DD,
+        classroom: child.classroom
+
+      })),
+      billTypes: [].map(billType => ({
+        bill: billType.label,
+        amount: 0,
+        value: billType.value,
+        total: 0
+      })),
+      date: null
+    }
+  });
+
+  const { fields, append, remove, update } = useFieldArray({
+    control,
+    name: 'bills'
+  });
+
+  const { fields: billTypeFields, update: updateBillType } = useFieldArray({
+    control,
+    name: 'billTypes'
+  });
+
+ 
+
+  useEffect(() => {
+    recalculateFields();
+  }, [fields]);
+  //#region method to calculate sums
+  const calculateSums = () => {
+    return fields.reduce((acc, bill) => {
+      acc.cash += Number(bill.cash) || 0;
+      acc.check += Number(bill.check) || 0;
+      acc.total += Number(bill.total) || 0;
+      return acc;
+    }, { cash: 0, check: 0, total: 0 });
+  };
+  //#endregion
+  const sums = calculateSums();
+  const billTypesController = watch("billTypes");
+  const getFormErrorMessage = (name) => {
+    return errors[name] && <small className="p-error">{errors[name].message}</small>;
+  };
+
   useEffect(() => {
     setLoadingInfo({
       loading: true,
@@ -69,7 +129,8 @@ const Bills = () => {
         names: child.childName,
         cash: '',
         check: '',
-        date: new Date().toISOString().split('T')[0], // Format date to YYYY-MM-DD
+        date: new Date().toISOString().split('T')[0], // Format date to YYYY-MM-DD,
+        classroom: child.classroom
       })),
       billTypes: currenciesInformation?.response?.map(billType => ({
         bill: billType.label,
@@ -82,45 +143,7 @@ const Bills = () => {
       date: getValues("date")
     });
   }
-  const { t } = useTranslation(); // Initialize translation hook
-  const { control, handleSubmit, formState: { errors }, reset, getValues, watch } = useForm({
-    defaultValues: {
-      bills: [].map((child, index) => ({
-        originalIndex: index, // Add original index
-        disabled: true,
-        names: child.names,
-        cash: '',
-        check: '',
-        date: new Date().toISOString().split('T')[0], // Format date to YYYY-MM-DD
 
-      })),
-      billTypes: [].map(billType => ({
-        bill: billType.label,
-        amount: 0,
-        value: billType.value,
-        total: 0
-      })),
-      date: null
-    }
-  });
-
-  const toast = useRef(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const { fields, append, remove, update } = useFieldArray({
-    control,
-    name: 'bills'
-  });
-
-  const { fields: billTypeFields, update: updateBillType } = useFieldArray({
-    control,
-    name: 'billTypes'
-  });
-
-  const [exportableCount, setExportableCount] = useState(0);
-
-  useEffect(() => {
-    recalculateFields();
-  }, [fields]);
 
 
 
@@ -147,6 +170,8 @@ const Bills = () => {
 
   }
 
+
+  //#region  method to send information
   const onSubmit = async (data) => {
     data.bills.forEach((bill, index) => {
       update(index, { ...bill, total: Number(bill.cash) + Number(bill.check) });
@@ -160,6 +185,7 @@ const Bills = () => {
       date: formatDate(data.date),
       bills: data.bills.filter(student => (student.cash != null && student.cash > 0) || (student.check != null && student.check > 0))
     }
+    //#endregion
 
     confirmDialog({
       message: t('bills.confirmExportPDF'),
@@ -187,21 +213,7 @@ const Bills = () => {
     });
   };
 
-  const getFormErrorMessage = (name) => {
-    return errors[name] && <small className="p-error">{errors[name].message}</small>;
-  };
 
-
-
-  const calculateSums = () => {
-    return fields.reduce((acc, bill) => {
-      acc.cash += Number(bill.cash) || 0;
-      acc.check += Number(bill.check) || 0;
-      acc.total += Number(bill.total) || 0;
-      return acc;
-    }, { cash: 0, check: 0, total: 0 });
-  };
-  const isFetching = useRef(false);
 
 const onFetchDataByDay = async (date) => {
   if (isFetching.current) return;
@@ -270,9 +282,6 @@ const onFetchDataByDay = async (date) => {
   }
 };
 
-  const sums = calculateSums();
-  const [totalSum, setTotalSum] = useState(0);
-  const billTypesController = watch("billTypes");
 
   useEffect(() => {
     const sum = billTypesController?.reduce((sum, bill) => {
@@ -283,7 +292,7 @@ const onFetchDataByDay = async (date) => {
     setTotalSum(sum);
   }, [billTypesController]);
 
-  const filteredFields = fields.filter(field => field.names.toLowerCase().includes(searchTerm.toLowerCase()));
+
   const handleAmountChange = (index, value) => {
 
     const amount = parseFloat(value) || 0;
@@ -303,7 +312,20 @@ const onFetchDataByDay = async (date) => {
     setTotalSum(newTotalSum);
   };
 
+//#region method to filter children
 
+  //#region  method to filter children
+  const filteredFields = fields.filter(field => 
+    field.names.toLowerCase().includes(searchTerm.toLowerCase()) &&
+    (searchedProgram ? field.classroom.includes(searchedProgram) : true)
+  );
+  
+  //#endregion
+
+//#endregion
+
+
+//#region  Component Return
   return (
     <div className="p-fluid form-container">
       {loadingInfo.loading && <Loader message={loadingInfo.loadingMessage} />}
@@ -322,16 +344,21 @@ const onFetchDataByDay = async (date) => {
         <label htmlFor={`child-browser`}>{t('bills.searchPlaceholder')}</label>
       </div>
       <div className="form-row" style={{ "paddingRight": "5rem", "paddingLeft": "5rem" }}>
-        {/* <div className="p-field p-col-4">
+       <div className="p-field p-col-4">
               <span className="p-float-label">
                 <Controller
                   name="program"
                   control={control}
-                  rules={{ required: t('program_required') }}
+                  //  rules={{ required: t('program_required') }}
                   render={({ field }) => (
                     <Dropdown
                       id={field.name}
                       {...field}
+                      showClear 
+                      onChange={(e) => {
+                        SetSearchedProgram(e.value)
+                      field.onChange(e.value)
+                      }}
                       style={{minWidth:"15rem"}}
                       options={programOptions}
                       placeholder={t('select_program')}
@@ -341,7 +368,7 @@ const onFetchDataByDay = async (date) => {
                 <label htmlFor="program">{t('program')}</label>
               </span>
               {errors.program && <span className="p-error">{errors.program.message}</span>}
-            </div> */}
+            </div>  
 
             <div className="p-field p-col-4">
   <span className="p-float-label">
