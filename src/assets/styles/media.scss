@@ -1,0 +1,20 @@
+$layout-breakpoint-small: 480px;
+
+@media (max-width: $layout-breakpoint-small) {
+    p,label {
+      
+    font-size: 1rem;
+    }
+    .c-button-media {
+        display: none;
+    }
+
+    .c-panel-media {
+        border: 2px solid rebeccapurple;
+    }
+    .form-row {
+        border: 2px solid rebeccapurple;
+        padding: left -1rem right -1rem ;
+      }
+    }
+  
