@@ -317,7 +317,7 @@ const onFetchDataByDay = async (date) => {
   //#region  method to filter children
   const filteredFields = fields.filter(field => 
     field.names.toLowerCase().includes(searchTerm.toLowerCase()) &&
-    (searchedProgram ? field.classroom.includes(searchedProgram) : true)
+    (searchedProgram ? field.classroom?.toLowerCase().includes(searchedProgram.toLowerCase()) : true)
   );
   
   //#endregion
