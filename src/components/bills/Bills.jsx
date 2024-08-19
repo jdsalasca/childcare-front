@@ -18,6 +18,8 @@ import { formatDate } from './utils/utilsAndConstants';
 import { BillTypeAPI, useBillTypesByCurrencyCode } from '../../models/BillTypeAPI';
 import { CashAPI } from '../../models/CashAPI';
 import Loader from '../utils/Loader';
+import { exportBoxesToPDF } from './utils/boxesPdf';
+import { dummyData } from './utils/testDataBoxes';
 
 const loadingDefault = {
   loading: false,
@@ -170,7 +172,18 @@ const Bills = () => {
 
   }
 
-
+  const onDownloadBoxedPdf  =() =>{
+    const data = getValues();
+    
+    let dataFormatted = {
+      ...data,
+      date: formatDate(data.date),
+      bills: data.bills.filter(student => (student.cash != null && student.cash > 0) || (student.check != null && student.check > 0))
+    }
+    exportBoxesToPDF(dummyData)
+    console.log('printing boxes', dummyData);
+  }
+  
   //#region  method to send information
   const onSubmit = async (data) => {
     data.bills.forEach((bill, index) => {
@@ -187,6 +200,7 @@ const Bills = () => {
     }
     //#endregion
 
+    console.log("information", fields, dataFormatted);
     confirmDialog({
       message: t('bills.confirmExportPDF'),
       header: t('bills.confirmation'),
@@ -215,7 +229,7 @@ const Bills = () => {
 
 
 
-const onFetchDataByDay = async (date) => {
+const onHandlerDateChanged = async (date) => {
   if (isFetching.current) return;
 
   isFetching.current = true;
@@ -333,8 +347,8 @@ const onFetchDataByDay = async (date) => {
 
       <Toast ref={toast} />
       <ConfirmDialog /> {/* Include ConfirmDialog component */}
-      <i className="pi pi-receipt p-overlay-badge" style={{ fontSize: '2rem', position: "fixed", right: "20px", top: "20px" }}>
-        <Badge value={exportableCount} severity="info" />
+      <i className="pi pi-receipt p-overlay-badge"  onClick={onDownloadBoxedPdf}  style={{ fontSize: '2rem', position: "fixed", right: "20px", top: "20px" }}>
+        <Badge value={exportableCount} severity="info"/>
       </i>
       <div className="p-float-label" style={{ marginBottom: "3rem" }}>
         <InputText
@@ -344,7 +358,9 @@ const onFetchDataByDay = async (date) => {
         />
         <label htmlFor={`child-browser`}>{t('bills.searchPlaceholder')}</label>
       </div>
-      <div className="form-row" style={{ "paddingRight": "5rem", "paddingLeft": "5rem" }}>
+      <div className="form-row" 
+      //style={{ "paddingRight": "5rem", "paddingLeft": "5rem" }}
+      >
        <div className="p-field p-col-4">
               <span className="p-float-label">
                 <Controller
@@ -382,7 +398,7 @@ const onFetchDataByDay = async (date) => {
           {...field}
           onChange={e => {
             field.onChange(e.value);
-            onFetchDataByDay(e.value);
+            onHandlerDateChanged(e.value);
           }}
           showIcon
           dateFormat="mm/dd/yy"

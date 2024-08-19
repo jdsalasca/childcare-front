@@ -17,9 +17,6 @@ export const exportToPDF = (bills) => {
   let billIndex = 0;
 
   bills.forEach((bill, index) => {
-    console.log('====================================');
-    console.log(bill );
-    console.log('====================================');
     if((bill.cash == null || bill.cash ==="" || bill.cash ===0) && (bill.check == null || bill.check ===""|| bill.check ===0) ){
       return;
     }
@@ -45,6 +42,8 @@ export const exportToPDF = (bills) => {
 
   doc.save('deposit_ticket.pdf');
 };
+
+
 
 const drawGrayLine = (doc, yPos, pageWidth) => {
   doc.setDrawColor(0, 0, 0); // Set draw color to gray
