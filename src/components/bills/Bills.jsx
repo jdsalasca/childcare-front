@@ -174,14 +174,19 @@ const Bills = () => {
 
   const onDownloadBoxedPdf  =() =>{
     const data = getValues();
+    if (data.date == null) {
+      toast.current.show({ severity: 'info', summary: t('bills.dateRequired'), detail: t('bills.dateRequiredDetails') })
+      return;
+    }
+    recalculateFields(data.bills)
     
     let dataFormatted = {
       ...data,
       date: formatDate(data.date),
       bills: data.bills.filter(student => (student.cash != null && student.cash > 0) || (student.check != null && student.check > 0))
     }
-    exportBoxesToPDF(dummyData)
-    console.log('printing boxes', dummyData);
+    exportBoxesToPDF(dataFormatted)
+    console.log('printing boxes', dataFormatted);
   }
   
   //#region  method to send information

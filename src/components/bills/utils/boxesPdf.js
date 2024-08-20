@@ -22,8 +22,16 @@ export const exportBoxesToPDF = (data) => {
     // Cash on Hand, Total Deposit, and TOTAL fields
     currentY = generateCashOnHandSection(doc, data, currentY, pageHeight, margin);
 
+    // Determine if enough space is available for both sections
+    const estimatedHeightForLeftTable = 70; // Estimate the height for the cash count table
+
+    if (currentY + estimatedHeightForLeftTable  > pageHeight) {
+        doc.addPage();
+        currentY = margin;
+    }
+
     // Conteo de Cash Table on the left side
-    const leftTableEndY = generateCashCountTable(doc, data.billTypes, currentY, halfPageWidth, pageHeight);
+    generateCashCountTable(doc, data.billTypes, currentY, halfPageWidth, pageHeight);
 
     // Notes and Scanned Date, QuickBooks, Signature on the right side
     generateNotesSection(doc, data, currentY, currentY, halfPageWidth, pageHeight, margin);
@@ -38,7 +46,7 @@ const generateChildrenTable = (doc, bills, startY, pageHeight, margin) => {
     bills.forEach(bill => {
         if ((bill.cash && bill.cash != 0) || (bill.check && bill.check != 0)) {
             const total = parseFloat(bill.cash || 0) + parseFloat(bill.check || 0);
-            rows.push([bill.names, (bill.cash > 0) ? `$${bill.cash}` : "",(bill.check > 0) ? `$${bill.check}`: "", `$${total}`]);
+            rows.push([bill.names, (bill.cash > 0) ? `$${bill.cash}` : "", (bill.check > 0) ? `$${bill.check}`: "", `$${total}`]);
         }
     });
 
@@ -65,6 +73,7 @@ const generateChildrenTable = (doc, bills, startY, pageHeight, margin) => {
 
     return doc.autoTable.previous.finalY + 10;  // Return the new Y position after the table
 };
+
 
 const generateCashOnHandSection = (doc, data, startY, pageHeight, margin) => {
     const { cashOnHand = "0.00", totalDeposit = "0.00", totalOverall = "0.00" } = data;
@@ -113,31 +122,44 @@ const generateCashCountTable = (doc, billTypes, startY, halfPageWidth, pageHeigh
 
 const generateNotesSection = (doc, data, startY, leftTableEndY, halfPageWidth, pageHeight, margin) => {
     // Ensure there's enough space after the left table, move to new page if necessary
-    if (startY + 50 > pageHeight || leftTableEndY + 50 > pageHeight) {
-        // doc.addPage();
+    if (startY + 60 > pageHeight || leftTableEndY + 60 > pageHeight) {
+        doc.addPage();
         startY = margin;
-    } else {
     }
-    startY = Math.max(startY, leftTableEndY);
-    startY= startY+7
-    halfPageWidth = halfPageWidth-12
-    
 
-    doc.text("SCANNED DATE:", halfPageWidth + 10, startY);
-    doc.text(data.date, halfPageWidth + 50, startY);
+    startY = Math.max(startY, leftTableEndY); // Adjust to start after the larger section
+    halfPageWidth = halfPageWidth - 12;
 
-    doc.text("QUICKBOOKS:", halfPageWidth + 10, startY + 10);
-    doc.text("_________________________", halfPageWidth + 50, startY + 10);
+    // Set up text positions
+    const boxHeight = 40;  // Define the height for the "Notas" box
+    const boxPadding = 5;
+    const boxYPosition = startY;  // Box will start here
 
-    doc.text("Signature:", halfPageWidth + 10, startY + 20);
-    doc.text("_________________________", halfPageWidth + 50, startY + 20);
+    // Draw the box for "Notas"
+    doc.setDrawColor(0);  // Black border
+    doc.setLineWidth(1);
+    doc.rect(halfPageWidth + 10, boxYPosition, halfPageWidth - 20, boxHeight);  // Draw the rectangle
 
-    doc.text("NOTAS:", halfPageWidth + 10, startY + 30);
+    // Write the "NOTAS:" label and content inside the box
+    doc.setFontSize(12);
+    doc.text("NOTAS:", halfPageWidth + 12, boxYPosition + 8);  // Label position inside the box
 
     doc.setFontSize(10);
-    doc.text(data.notes || "", halfPageWidth + 10, startY + 40, {
-        maxWidth: halfPageWidth - 20,
+    doc.text(data.notes || "", halfPageWidth + 12, boxYPosition + 18, {
+        maxWidth: halfPageWidth - 24,  // Leave space for padding
     });
 
-    return startY + 50;
+    // Now, place the other fields below the box
+    const newStartY = boxYPosition + boxHeight + 10;  // Start below the "Notas" box
+
+    doc.setFontSize(12);
+    doc.text("SCANNED DATE:", halfPageWidth + 10, newStartY);
+    doc.text(data.date, halfPageWidth + 50, newStartY);
+
+    doc.text("QUICKBOOKS:", halfPageWidth + 10, newStartY + 10);
+    doc.text(data.date, halfPageWidth + 50, newStartY + 10);
+
+    doc.text("_________________________", halfPageWidth + 30, newStartY + 20);
+
+    return newStartY + 30;  // Return the Y position after the signature field
 };

@@ -21,6 +21,58 @@ export const dummyData  = {
         "date": "2024-08-19",
         "classroom": "Toddlers 00679 Builders",
         "total": "246.00"
+      },     
+      {
+        "id": 386,
+        "originalIndex": 4,
+        "disabled": true,
+        "names": "Itzayana Francisco",
+        "cash": "123",
+        "check": "123",
+        "date": "2024-08-19",
+        "classroom": "Toddlers 00679 Bees",
+        "total": "0.00"
+      },
+      {
+        "id": 386,
+        "originalIndex": 4,
+        "disabled": true,
+        "names": "Itzayana Francisco",
+        "cash": "123",
+        "check": "123",
+        "date": "2024-08-19",
+        "classroom": "Toddlers 00679 Bees",
+        "total": "0.00"
+      },     {
+        "id": 386,
+        "originalIndex": 4,
+        "disabled": true,
+        "names": "Itzayana Francisco",
+        "cash": "123",
+        "check": "123",
+        "date": "2024-08-19",
+        "classroom": "Toddlers 00679 Bees",
+        "total": "0.00"
+      },      {
+        "id": 386,
+        "originalIndex": 4,
+        "disabled": true,
+        "names": "Itzayana Francisco",
+        "cash": "123",
+        "check": "123",
+        "date": "2024-08-19",
+        "classroom": "Toddlers 00679 Bees",
+        "total": "0.00"
+      },      {
+        "id": 386,
+        "originalIndex": 4,
+        "disabled": true,
+        "names": "Itzayana Francisco",
+        "cash": "123",
+        "check": "123",
+        "date": "2024-08-19",
+        "classroom": "Toddlers 00679 Bees",
+        "total": "0.00"
       },
       {
         "id": 386,
