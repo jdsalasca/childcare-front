@@ -24,10 +24,10 @@ const Layout = ({ children }) => {
       label: <div onClick={handleHomeClick} className="home-item"><i className="pi pi-home"></i></div>,
       className: 'home-item',
     },
-    {
-      label: t('boxes'),
-      items: []
-    },
+    // {
+    //   label: t('boxes'),
+    //   items: []
+    // },
     {
       label: t('contracts'),
       items: [
