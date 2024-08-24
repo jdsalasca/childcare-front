@@ -1,13 +1,13 @@
 
 // src/Layout.js
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Menubar } from 'primereact/menubar';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
+import useCustomNavigate from '../../utils/customHooks/useCustomNavigate';
 
 const Layout = ({ children }) => {
-  const navigate = useNavigate();
+  const navigate = useCustomNavigate()
   const { logout } = useAuth();
   const { t, i18n } = useTranslation();
 
@@ -62,7 +62,7 @@ const Layout = ({ children }) => {
 
   return (
     <div className="layout">
-      <Menubar model={items} style={{ justifyContent: 'center' }} />
+      <Menubar model={items} style={{ justifyContent: 'center' }} className='c-menubar' />
       <div className="main-content">
         {children}
       </div>

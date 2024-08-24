@@ -172,6 +172,36 @@ const Bills = () => {
 
   }
 
+  
+
+  /**
+   * @description : TODO method to handler amount changed to recalculated fields and also to add the new quantity of 
+   *  filled bills.
+   * @param {*} index  :: which position have the child on the list of children 
+   * @param {*} bill  :: the data inserted by user on the row for that specific children
+   * @param {*} data  ::  the defaultValues that saves the children and bills information
+   */
+  const onRecalculateAll = async (
+    index = 0,
+    bill = null,  
+   
+  ) => {
+    if(
+       bill.id ==null
+      || bill.originalIndex ==null
+      || index == null
+
+    ){
+      console.error("Error on onRecalculateAll usage. You're sending an empty data object ");
+      
+    }
+    const data =  getValues("bills")
+    update(bill.originalIndex, { ...getValues(`bills[${bill.originalIndex}]`), total: (Number(bill.cash) + Number(bill.check)).toFixed(2) });
+
+    
+    recalculateFields(data)
+  }
+
   const onDownloadBoxedPdf  =() =>{
     const data = getValues();
     if (data.date == null) {
@@ -447,7 +477,21 @@ const onHandlerDateChanged = async (date) => {
               // rules={{ required: t('bills.cashRequired') }}
               render={({ field }) => (
                 <span className="p-float-label">
-                  <InputText id={`cash-${bill.originalIndex}`} {...field} className={classNames({ 'p-invalid': errors.bills && errors.bills[bill.originalIndex] && errors.bills[bill.originalIndex].cash })} keyfilter="num" onChange={(e) => field.onChange(e.target.value)} />
+                  <InputText id={`cash-${bill.originalIndex}`} {...field} className={classNames({ 'p-invalid': errors.bills && errors.bills[bill.originalIndex] && errors.bills[bill.originalIndex].cash })} keyfilter="num"
+                   onChange={(e) => {
+                  //  const updatedBill = {
+                  //   ...bill,
+                  //   cash: e.target.value
+
+                  //  }
+                   field.onChange(e.target.value)
+                   // onRecalculateAll(bill.originalIndex, updatedBill)
+                   
+                  }  }
+                  onBlur={()  =>{
+                  onRecalculateAll(bill.originalIndex, bill)
+                  }}
+                   />
                   <label htmlFor={`cash-${bill.originalIndex}`}>{t('bills.cash')}</label>
                   {getFormErrorMessage(`bills[${bill.originalIndex}].cash`)}
                 </span>
@@ -459,7 +503,16 @@ const onHandlerDateChanged = async (date) => {
               // rules={{ required: t('bills.checkRequired') }}
               render={({ field }) => (
                 <span className="p-float-label">
-                  <InputText id={`check-${bill.originalIndex}`} {...field} className={classNames({ 'p-invalid': errors.bills && errors.bills[bill.originalIndex] && errors.bills[bill.originalIndex].check })} keyfilter="num" onChange={(e) => field.onChange(e.target.value)} />
+                  <InputText id={`check-${bill.originalIndex}`} {...field} className={classNames({ 'p-invalid': errors.bills && errors.bills[bill.originalIndex] && errors.bills[bill.originalIndex].check })} keyfilter="num"
+                   onChange={(e) => {
+
+                   field.onChange(e.target.value)
+                   
+                  } }
+                  onBlur={()  =>{
+                  onRecalculateAll(bill.originalIndex, bill)
+                  }}
+                    />
                   <label htmlFor={`check-${bill.originalIndex}`}>{t('bills.check')}</label>
                   {getFormErrorMessage(`bills[${bill.originalIndex}].check`)}
                 </span>
