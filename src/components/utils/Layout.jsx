@@ -20,6 +20,15 @@ const Layout = ({ children }) => {
   };
 
   const items = [
+
+    {
+      label: (
+        <div className="logo-container">
+          <img src={`${process.env.PUBLIC_URL}/educando_dashboard_logo.png`} alt="Cover" />
+        </div>
+      ),
+      className: 'home-item',
+    },
     {
       label: <div onClick={handleHomeClick} className="home-item"><i className="pi pi-home"></i></div>,
       className: 'home-item',
@@ -29,30 +38,31 @@ const Layout = ({ children }) => {
     //   items: []
     // },
     {
-      label: t('contracts'),
+      label: <span className="menu-item-contracts">{t('contracts')}</span>,
       items: [
-        { label: t('generateContract'), command: () => navigate('/contracts') },
-        { label: t('reviewContracts'), command: () => navigate('/review-contracts') },
+        { label: <span className="menu-item-contracts">{t('generateContract')}</span>, command: () => navigate('/contracts') },
+        { label: <span className="menu-item-contracts">{t('reviewContracts')}</span>, command: () => navigate('/review-contracts') },
       ]
     },
     {
-      label: t('deposits'),
+      label: <span className="menu-item-deposits">{t('deposits')}</span>,
       items: [
-        { label: t('manageBills'), command: () => navigate('/bills') },
+        { label: <span className="menu-item-deposits">{t('manageBills')}</span>, command: () => navigate('/bills') },
+       
         // { label: t('uploadInvoices'), command: () => navigate('/bills-upload') }
       ]
     },
     {
       label: t('logout'),
-      className: 'logout-item',
+      className: 'c-logout-item',
       command: () => {
         logout();
         navigate('/login');
       }
     },
     {
-      label: 'Language',
-      className: 'logout-item',
+      label:  t('language'),
+      className: 'c-logout-item',
       items: [
         { label: 'English', command: () => handleLanguageChange('en') },
         { label: 'Español', command: () => handleLanguageChange('es') },
@@ -62,7 +72,7 @@ const Layout = ({ children }) => {
 
   return (
     <div className="layout">
-      <Menubar model={items} style={{ justifyContent: 'center' }} className='c-menubar' />
+      <Menubar model={items} style={{ justifyContent: 'center', zIndex:"1000" }} className='c-menubar' />
       <div className="main-content">
         {children}
       </div>

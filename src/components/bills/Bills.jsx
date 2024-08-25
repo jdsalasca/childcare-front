@@ -20,12 +20,7 @@ import { CashAPI } from '../../models/CashAPI';
 import Loader from '../utils/Loader';
 import { exportBoxesToPDF } from './utils/boxesPdf';
 import { dummyData } from './utils/testDataBoxes';
-
-const loadingDefault = {
-  loading: false,
-  loadingMessage: ""
-}
-
+import { loadingDefault } from '../../utils/constans';
 
 
 const Bills = () => {

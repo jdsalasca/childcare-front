@@ -1,0 +1,43 @@
+@import 'constants.scss';
+.phone-input-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .phone-input-wrapper .phone-input {
+    border: 1px solid #ced4da;
+    border-radius: .25rem;
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    width: 100%;
+  }
+  
+  .phone-input-wrapper .phone-input.p-invalid {
+    border-color: $color-institutional-red;
+    background-color: #fff3f3;
+  }
+  
+  .phone-input-wrapper label {
+    position: absolute;
+    top: 50%;
+    left: .75rem;
+    transform: translateY(-50%);
+    pointer-events: none;
+    transition: 0.1s ease-in-out;
+    font-size: 1rem;
+    color: #6c757d;
+  }
+  
+  .phone-input-wrapper .phone-input:focus ~ label,
+  .phone-input-wrapper .phone-input:not(:placeholder-shown) ~ label {
+    top: 0;
+    left: .75rem;
+    font-size: .75rem;
+    color: $color-institutional-blue;
+  }
+  
+  

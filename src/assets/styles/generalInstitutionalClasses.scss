@@ -1,0 +1,15 @@
+.c-steps-component {
+    display: flex;
+    gap: 2rem;
+
+    ol {
+        gap: 2rem;
+        overflow-y: scroll;
+        padding-bottom: 2rem;
+    }
+}
+
+// ##region Styles for .layout
+.c-menubar {
+    z-index: 1000;
+}

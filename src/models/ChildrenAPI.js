@@ -62,6 +62,25 @@ const ChildrenAPI = {
 
 // Custom hook to fetch all children
 export const useChildren = () => {
+  const  children  =useQuery({
+    queryKey: ['children'], // Unique key for caching
+    queryFn: ChildrenAPI.getChildren, // Function to fetch children
+    staleTime: 1000 * 60 * 20, // Cache time in milliseconds (20 minutes)
+    cacheTime: 1000 * 60 * 30, // Cache time in milliseconds (30 minutes)
+  });
+
+  let updateChildren = children.data
+  if(children?.data?.httpStatus ===200){
+    updateChildren.response = children.data.response.map(child => ({
+      ...child,
+      fullName: `${child.first_name} ${child.last_name}`
+    }));
+  }
+console.log("updateChildren", updateChildren);
+
+
+   
+
   return useQuery({
     queryKey: ['children'], // Unique key for caching
     queryFn: ChildrenAPI.getChildren, // Function to fetch children

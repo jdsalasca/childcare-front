@@ -1,0 +1,33 @@
+.logo-container {
+    z-index: 1000;
+    margin-left: 0px;
+    padding-left: 0px;
+    width: 13rem; /* Set the desired width */
+    height: 3rem; /* Set the desired height */
+    display: flex; /* Flexbox to center content */
+    justify-content: flex-start; /* Align content to the start (left) */
+    align-items: center; /* Center content vertically if needed */
+    img {
+        max-width: 100%; /* Ensure the image fits within the container width */
+        max-height: 100%; /* Ensure the image fits within the container height */
+        object-fit: contain; /* Maintain the aspect ratio of the image */
+      }
+      
+  }
+  
+  /* Define the color classes */
+.menu-item-contracts {
+    z-index: 1000;
+    color: #3cae64; /* Green color for the first item */
+  }
+  
+  .menu-item-deposits {
+    z-index: 1000;
+    color: #1d71d8; /* Blue color for the second item */
+  }
+  
+  /* Optional: Define styles for hover or active states if needed */
+  .menu-item-contracts:hover,
+  .menu-item-deposits:hover {
+    color: darken(#ffd300, 10%); /* Adjust as needed */
+  }

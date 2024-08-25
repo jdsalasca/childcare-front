@@ -142,7 +142,7 @@ const generateNotesSection = (doc, data, startY, leftTableEndY, halfPageWidth, p
 
     // Write the "NOTAS:" label and content inside the box
     doc.setFontSize(12);
-    doc.text("NOTAS:", halfPageWidth + 12, boxYPosition + 8);  // Label position inside the box
+    doc.text(" NOTES:", halfPageWidth + 12, boxYPosition + 8);  // Label position inside the box
 
     doc.setFontSize(10);
     doc.text(data.notes || "", halfPageWidth + 12, boxYPosition + 18, {
