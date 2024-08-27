@@ -7,6 +7,7 @@ import HomePage from './components/homepage/HomePage';
 import Bills from './components/bills/Bills';
 import { BillsUpload } from './components/bills/billsUpload/BillsUpload';
 import ReviewContracts from './components/contracts/reviewContracts/ReviewContracts';
+import FormRegister from './components/register/FormRegister';
 
 function RouterLayout() {
   return (
@@ -24,7 +25,7 @@ function RouterLayout() {
                   <Route path="/childadmin/admin/report-teachers" element={<HomePage />} />
                   <Route path="/childadmin/admin/report-students" element={<HomePage />} />
                   <Route path="/childadmin/admin/contracts" element={<Contracts />} />
-                  <Route path="/childadmin/admin/review-contracts" element={<ReviewContracts />} />
+                  <Route path="/childadmin/admin/review-contracts" element={<FormRegister />} />
                   <Route path="/childadmin/admin/bills" element={<Bills />} />
                   <Route path="/childadmin/admin/bills-upload" element={<BillsUpload />} />
                   <Route path="/childadmin/admin/active-users-report" element={<HomePage />} />

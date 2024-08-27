@@ -4,11 +4,11 @@ import { InputTextarea } from 'primereact/inputtextarea';
 import { Password } from 'primereact/password';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import React, { useRef, useState } from 'react';
-import { emailRegex } from '../../../utils/constans';
 import { Message } from 'primereact/message';
 
 import { Messages } from 'primereact/messages';     
-const ReviewContracts = () => {
+import { emailRegex } from '../../utils/constans';
+const FormRegister = () => {
 
   const [count, setCount] = useState(0);
   const [textValue, setTextValue] = useState("");
@@ -23,7 +23,7 @@ const ReviewContracts = () => {
   )
   const onHandlerSubmit = (data) =>{
     if(!emailRegex.test(textValue4)){
-      msgs.current.show({sticky: true, severity: 'info', summary: 'Email Error', detail: 'Please put a valid Email', closable: false})
+      msgs.current.show({sticky: true, severity: 'info', closable:true, summary: 'Email Error', detail: 'Please put a valid Email'})
       setEmailError(true)
       return;
     }
@@ -67,7 +67,7 @@ const ReviewContracts = () => {
     keyfilter={/^[a-zA-Z\sñÑ@.#&_-]*$/} 
     //keyfilter="email"
     />
-    {emailError && <Message severity="error" text="No sabe escribir un email???" />}
+    {emailError && <Message severity="info" text="Please put a valid Email" />}
     </div>
     <div className='c-component-form'>
     <label>Contraseña</label>
@@ -90,5 +90,5 @@ const ReviewContracts = () => {
     );
   }
   
-export default ReviewContracts;
+export default FormRegister;
   

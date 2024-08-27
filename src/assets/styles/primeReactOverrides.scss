@@ -2,6 +2,12 @@
 .p-button-icon-only{
     background-color: $color-buttons;
 }
+// Common styles for buttons on tables
+@mixin button-common-styles {
+  margin-left: auto;
+  color: white;
+  max-height: 2.3rem;
+}
 
 // #region Buttons customization
 .rounded-button {
@@ -26,12 +32,17 @@
   }
     
   
+
+// Apply the mixin to buttons
 .p-button-danger {
-    margin-left: auto;
-    background-color: $color-buttons-danger;
-    color: white;
-    max-height: 2.3rem;
-  }
+  @include button-common-styles;
+  background-color: $color-buttons-danger;
+}
+
+.p-button-success {
+  @include button-common-styles;
+  background-color: $color-buttons-success;
+}
 
   .p-button-success {
     background-color: $color-buttons-success;

@@ -523,10 +523,7 @@ const onHandlerDateChanged = async (date) => {
                 </span>
               )}
             />
-            <Button icon="pi pi-save" className="c-button-media p-button-success p-button-text" onClick={() => {
-              update(bill.originalIndex, { ...getValues(`bills[${bill.originalIndex}]`), total: (Number(bill.cash) + Number(bill.check)).toFixed(2) });
-              recalculateFields(getValues('bills'));
-            }} />
+
             <Button icon="pi pi-trash" className="c-button-media p-button-danger p-button-text" onClick={() => remove(bill.originalIndex)} />
           </div>
         ))}

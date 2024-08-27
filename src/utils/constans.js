@@ -10,3 +10,7 @@ export const loadingDefault = {
   }
   
   
+/**
+ * Esta es la validación para los Emails usadas en toda la aplicación
+ */
+export const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
