@@ -1,7 +1,7 @@
 
 ## PROJECT ROADMAP
-### `--August`
--- August
+### `August`
+
 
     -Create form to register new users
     
@@ -10,8 +10,8 @@
     -Create form to create children into application
     
     -Create form to create guardians into application
-
--- September
+    
+### `September`
 
     -Do you remembeeer?? 
     
