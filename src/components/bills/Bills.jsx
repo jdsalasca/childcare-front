@@ -18,12 +18,9 @@ import { formatDate } from './utils/utilsAndConstants';
 import { BillTypeAPI, useBillTypesByCurrencyCode } from '../../models/BillTypeAPI';
 import { CashAPI } from '../../models/CashAPI';
 import Loader from '../utils/Loader';
-
-const loadingDefault = {
-  loading: false,
-  loadingMessage: ""
-}
-
+import { exportBoxesToPDF } from './utils/boxesPdf';
+import { dummyData } from './utils/testDataBoxes';
+import { loadingDefault } from '../../utils/constans';
 
 
 const Bills = () => {
@@ -170,7 +167,53 @@ const Bills = () => {
 
   }
 
+  
 
+  /**
+   * @description : TODO method to handler amount changed to recalculated fields and also to add the new quantity of 
+   *  filled bills.
+   * @param {*} index  :: which position have the child on the list of children 
+   * @param {*} bill  :: the data inserted by user on the row for that specific children
+   * @param {*} data  ::  the defaultValues that saves the children and bills information
+   */
+  const onRecalculateAll = async (
+    index = 0,
+    bill = null,  
+   
+  ) => {
+    if(
+       bill.id ==null
+      || bill.originalIndex ==null
+      || index == null
+
+    ){
+      console.error("Error on onRecalculateAll usage. You're sending an empty data object ");
+      
+    }
+    const data =  getValues("bills")
+    update(bill.originalIndex, { ...getValues(`bills[${bill.originalIndex}]`), total: (Number(bill.cash) + Number(bill.check)).toFixed(2) });
+
+    
+    recalculateFields(data)
+  }
+
+  const onDownloadBoxedPdf  =() =>{
+    const data = getValues();
+    if (data.date == null) {
+      toast.current.show({ severity: 'info', summary: t('bills.dateRequired'), detail: t('bills.dateRequiredDetails') })
+      return;
+    }
+    recalculateFields(data.bills)
+    
+    let dataFormatted = {
+      ...data,
+      date: formatDate(data.date),
+      bills: data.bills.filter(student => (student.cash != null && student.cash > 0) || (student.check != null && student.check > 0))
+    }
+    exportBoxesToPDF(dataFormatted)
+    console.log('printing boxes', dataFormatted);
+  }
+  
   //#region  method to send information
   const onSubmit = async (data) => {
     data.bills.forEach((bill, index) => {
@@ -187,6 +230,7 @@ const Bills = () => {
     }
     //#endregion
 
+    console.log("information", fields, dataFormatted);
     confirmDialog({
       message: t('bills.confirmExportPDF'),
       header: t('bills.confirmation'),
@@ -215,7 +259,7 @@ const Bills = () => {
 
 
 
-const onFetchDataByDay = async (date) => {
+const onHandlerDateChanged = async (date) => {
   if (isFetching.current) return;
 
   isFetching.current = true;
@@ -318,7 +362,7 @@ const onFetchDataByDay = async (date) => {
   //#region  method to filter children
   const filteredFields = fields.filter(field => 
     field.names.toLowerCase().includes(searchTerm.toLowerCase()) &&
-    (searchedProgram ? field.classroom.includes(searchedProgram) : true)
+    (searchedProgram ? field.classroom?.toLowerCase().includes(searchedProgram.toLowerCase()) : true)
   );
   
   //#endregion
@@ -333,8 +377,8 @@ const onFetchDataByDay = async (date) => {
 
       <Toast ref={toast} />
       <ConfirmDialog /> {/* Include ConfirmDialog component */}
-      <i className="pi pi-receipt p-overlay-badge" style={{ fontSize: '2rem', position: "fixed", right: "20px", top: "20px" }}>
-        <Badge value={exportableCount} severity="info" />
+      <i className="pi pi-receipt p-overlay-badge"  onClick={onDownloadBoxedPdf}  style={{ fontSize: '2rem', position: "fixed", right: "20px", top: "20px" }}>
+        <Badge value={exportableCount} severity="info"/>
       </i>
       <div className="p-float-label" style={{ marginBottom: "3rem" }}>
         <InputText
@@ -344,7 +388,9 @@ const onFetchDataByDay = async (date) => {
         />
         <label htmlFor={`child-browser`}>{t('bills.searchPlaceholder')}</label>
       </div>
-      <div className="form-row">
+      <div className="form-row" 
+      //style={{ "paddingRight": "5rem", "paddingLeft": "5rem" }}
+      >
        <div className="p-field p-col-4">
               <span className="p-float-label">
                 <Controller
@@ -382,7 +428,7 @@ const onFetchDataByDay = async (date) => {
           {...field}
           onChange={e => {
             field.onChange(e.value);
-            onFetchDataByDay(e.value);
+            onHandlerDateChanged(e.value);
           }}
           showIcon
           dateFormat="mm/dd/yy"
@@ -426,7 +472,21 @@ const onFetchDataByDay = async (date) => {
               // rules={{ required: t('bills.cashRequired') }}
               render={({ field }) => (
                 <span className="p-float-label">
-                  <InputText id={`cash-${bill.originalIndex}`} {...field} className={classNames({ 'p-invalid': errors.bills && errors.bills[bill.originalIndex] && errors.bills[bill.originalIndex].cash })} keyfilter="num" onChange={(e) => field.onChange(e.target.value)} />
+                  <InputText id={`cash-${bill.originalIndex}`} {...field} className={classNames({ 'p-invalid': errors.bills && errors.bills[bill.originalIndex] && errors.bills[bill.originalIndex].cash })} keyfilter="num"
+                   onChange={(e) => {
+                  //  const updatedBill = {
+                  //   ...bill,
+                  //   cash: e.target.value
+
+                  //  }
+                   field.onChange(e.target.value)
+                   // onRecalculateAll(bill.originalIndex, updatedBill)
+                   
+                  }  }
+                  onBlur={()  =>{
+                  onRecalculateAll(bill.originalIndex, bill)
+                  }}
+                   />
                   <label htmlFor={`cash-${bill.originalIndex}`}>{t('bills.cash')}</label>
                   {getFormErrorMessage(`bills[${bill.originalIndex}].cash`)}
                 </span>
@@ -438,7 +498,16 @@ const onFetchDataByDay = async (date) => {
               // rules={{ required: t('bills.checkRequired') }}
               render={({ field }) => (
                 <span className="p-float-label">
-                  <InputText id={`check-${bill.originalIndex}`} {...field} className={classNames({ 'p-invalid': errors.bills && errors.bills[bill.originalIndex] && errors.bills[bill.originalIndex].check })} keyfilter="num" onChange={(e) => field.onChange(e.target.value)} />
+                  <InputText id={`check-${bill.originalIndex}`} {...field} className={classNames({ 'p-invalid': errors.bills && errors.bills[bill.originalIndex] && errors.bills[bill.originalIndex].check })} keyfilter="num"
+                   onChange={(e) => {
+
+                   field.onChange(e.target.value)
+                   
+                  } }
+                  onBlur={()  =>{
+                  onRecalculateAll(bill.originalIndex, bill)
+                  }}
+                    />
                   <label htmlFor={`check-${bill.originalIndex}`}>{t('bills.check')}</label>
                   {getFormErrorMessage(`bills[${bill.originalIndex}].check`)}
                 </span>
@@ -454,10 +523,7 @@ const onFetchDataByDay = async (date) => {
                 </span>
               )}
             />
-            <Button icon="pi pi-save" className="c-button-media p-button-success p-button-text" onClick={() => {
-              update(bill.originalIndex, { ...getValues(`bills[${bill.originalIndex}]`), total: (Number(bill.cash) + Number(bill.check)).toFixed(2) });
-              recalculateFields(getValues('bills'));
-            }} />
+
             <Button icon="pi pi-trash" className="c-button-media p-button-danger p-button-text" onClick={() => remove(bill.originalIndex)} />
           </div>
         ))}

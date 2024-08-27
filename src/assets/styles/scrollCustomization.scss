@@ -1,0 +1,28 @@
+@import 'constants.scss';
+
+// Webkit Scrollbars
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: $color-background;
+  border-radius: 10px; // Optional: round corners of the track
+}
+
+::-webkit-scrollbar-thumb {
+  background: $color-buttons;
+  border-radius: 10px;
+  border: 3px solid $color-background; // Optional: adds space between thumb and track
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: $color-hover2;
+}
+
+// Firefox Scrollbars
+* {
+  scrollbar-width: thin;
+  scrollbar-color: $scroll-color $color-background;
+  
+}

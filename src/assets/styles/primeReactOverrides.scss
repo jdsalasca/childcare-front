@@ -1,0 +1,75 @@
+@import 'constants.scss';
+.p-button-icon-only{
+    background-color: $color-buttons;
+}
+// Common styles for buttons on tables
+@mixin button-common-styles {
+  margin-left: auto;
+  color: white;
+  max-height: 2.3rem;
+}
+
+// #region Buttons customization
+.rounded-button {
+    border-radius: 20px; /* Adjust as needed */
+  }
+  
+  .p-button-primary {
+    background-color: $color-buttons;
+    color: white;
+  }
+  
+  .p-button-secondary {
+    background-color: grey;
+    color: white;
+  }
+
+  .p-float-label {
+    flex: 1;
+    margin-bottom: 0.5rem;
+    display: flex;
+    flex-direction: column;
+  }
+    
+  
+
+// Apply the mixin to buttons
+.p-button-danger {
+  @include button-common-styles;
+  background-color: $color-buttons-danger;
+}
+
+.p-button-success {
+  @include button-common-styles;
+  background-color: $color-buttons-success;
+}
+
+  .p-button-success {
+    background-color: $color-buttons-success;
+    color: white;
+  }
+  
+  .p-error {
+    color: gray;
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+  }
+  
+// Add the following CSS to your stylesheet (e.g., src/App.css or src/Contracts.css)
+.step-valid .p-steps-title {
+    color: $color-institutional-green;
+  }
+  
+  .step-invalid .p-steps-title {
+    color: $color-institutional-red;
+  }
+  
+  .step-default .p-steps-title {
+    color: inherit;
+  }
+  
+.p-field.p-col-4 {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }

@@ -40,8 +40,6 @@ export const BillsUpload = () => {
         return
       }
 
-      console.log('====================================');
-      console.log('====================================');
       console.log(data);
     };
   

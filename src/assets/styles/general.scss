@@ -1,84 +1,50 @@
 // Import PrimeReact styles
-@import "~primeicons/primeicons.css";
+@import "~primeicons/primeicons.css"; // PrimeIcons for PrimeReact icons
 @import "~primereact/resources/themes/saga-blue/theme.css"; // Replace with your desired theme
-@import "~primereact/resources/primereact.min.css";
-@import "~react-phone-number-input/style.css";
-@import './ReviewContracts';
-@import 'HtmlOverrides';
-@import 'media';
+@import "~primereact/resources/primereact.min.css"; // PrimeReact core styles
+@import "~react-phone-number-input/style.css"; // Styles for the phone number input component
+@import './ReviewContracts'; // Custom styles for review contracts component
+@import 'HtmlOverrides'; // Custom HTML overrides
+@import 'media'; // Media queries for responsive design
+@import 'themes/theme-default.scss'; // Default theme styles
+@import 'constants.scss'; // Application constants (e.g., colors, fonts)
+@import 'homePage.scss'; // Styles for the homepage
+@import 'primeReactOverrides.scss'; // Custom overrides for PrimeReact components
+@import 'generalInstitutionalClasses.scss'; // General styles for institutional classes
+@import 'scrollCustomization.scss'; // Custom scrollbar styles
+@import 'phone-input-wrapper-custom.scss'; // Custom styles for phone input wrapper
 
-// Variables
-$primary-color: #be1622;
-$secondary-color: #f8f9fa;
-$font-stack: 'Helvetica Neue', sans-serif;
+// ## start region styles 
+.layout {
+  background-color: $background-color;
+  color: $text-color;
 
-// Constants
-$font-size-h1: 24px;
-$font-size-h2: 20px;
-$font-size-h3: 18px;
-$font-size-h4: 16px;
-$font-size-h5: 14px;
-$font-size-p: 14px;
+  &.theme-dark {
+    @import './themes/_theme-dark';
+    background-color: $background-color;
+    color: $text-color;
+  }
 
-$color-primary: $primary-color;
-$color-secondary: #333;
-$color-background: $secondary-color;
-$color-text: #333;
+  &.theme-light {
+    @import './themes/_theme-light';
+    background-color: $background-color;
+    color: $text-color;
+  }
+}
 
-$color-hover1: #ffd400;
-$color-hover2: #0071ba;
-$color-hover3: #de0d1d;
-$color-hover4: #00af5e;
+
 
 // Mixins
+// Centering flex container
 @mixin flex-center {
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-// Global styles
-body {
-  font-family: $font-stack;
-  background-color: $color-background;
-  margin: 0;
-  padding: 0;
-  color: $color-text;
-}
-
-h1 {
-  font-size: $font-size-h1;
-  color: $color-primary;
-}
-
-h2 {
-  font-size: $font-size-h2;
-  color: $color-primary;
-}
-
-h3 {
-  font-size: $font-size-h3;
-  color: $color-primary;
-}
-
-h4 {
-  font-size: $font-size-h4;
-  color: $color-primary;
-}
-
-h5 {
-  font-size: $font-size-h5;
-  color: $color-primary;
-}
-
-p {
-  font-size: $font-size-p;
-  color: $color-text;
-}
-
 .container {
-  @include flex-center;
-  padding: 1rem;
+  @include flex-center; // Center content using flex-center mixin
+  padding: 1rem; // Add padding around container
 }
 
 .container-homepage-background {
@@ -149,24 +115,29 @@ p {
     }
   }
 }
-.logout-item {
+.c-logout-item {
   background-color: $primary-color;
   color: $primary-color;
+  z-index: 400;
   padding: 0.5rem 1rem;
   border-radius: 5px;
   margin-left: 20px;
-  margin-bottom: 0.5rem;
-  max-width: 10rem;
   min-width: 10rem;
+  max-width: 10rem;
+  overflow-y: visible;
+  max-height: 4rem;
+  padding: 0px;
   text-align: center;
   cursor: pointer;
   display: inline-block;
+  .p-menuitem-link{
+  }
 
   &:hover {
     background-color: $primary-color;
   }
 }
-.p-menubar .p-menubar-root-list > .p-menuitem.logout-item > .p-menuitem-content {
+.p-menubar .p-menubar-root-list > .p-menuitem.c-logout-item > .p-menuitem-content {
   .p-menuitem-text{
     color: $secondary-color;
   }
@@ -298,11 +269,6 @@ p {
 }
 
 
-.p-field.p-col-4 {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-}
 
 .bills-container {
   display: flex;
@@ -371,19 +337,6 @@ p {
   margin-bottom: 2rem;
 }
 
-.p-float-label {
-  flex: 1;
-  margin-bottom: 0.5rem;
-  display: flex;
-  flex-direction: column;
-}
-
-.p-button-danger {
-  margin-left: auto;
-  background-color: red;
-  color: white;
-}
-
 .checkbox-container {
   display: flex;
   align-items: center;
@@ -404,84 +357,4 @@ p {
   justify-content: flex-end;
   gap: 1rem;
   margin-top: 1rem;
-}
-
-.rounded-button {
-  border-radius: 20px; /* Adjust as needed */
-}
-
-.p-button-primary {
-  background-color: #007bff;
-  color: white;
-}
-
-.p-button-secondary {
-  background-color: grey;
-  color: white;
-}
-
-.p-button-success {
-  background-color: green;
-  color: white;
-}
-
-.p-error {
-  color: gray;
-  font-size: 0.75rem;
-  margin-top: 0.25rem;
-}
-
-.phone-input-wrapper {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-}
-
-.phone-input-wrapper .phone-input {
-  border: 1px solid #ced4da;
-  border-radius: .25rem;
-  padding: .375rem .75rem;
-  font-size: 1rem;
-  line-height: 1.5;
-  color: #495057;
-  background-color: #fff;
-  width: 100%;
-}
-
-.phone-input-wrapper .phone-input.p-invalid {
-  border-color: #dc3545;
-  background-color: #fff3f3;
-}
-
-.phone-input-wrapper label {
-  position: absolute;
-  top: 50%;
-  left: .75rem;
-  transform: translateY(-50%);
-  pointer-events: none;
-  transition: 0.1s ease-in-out;
-  font-size: 1rem;
-  color: #6c757d;
-}
-
-.phone-input-wrapper .phone-input:focus ~ label,
-.phone-input-wrapper .phone-input:not(:placeholder-shown) ~ label {
-  top: 0;
-  left: .75rem;
-  font-size: .75rem;
-  color: #007bff;
-}
-
-
-// Add the following CSS to your stylesheet (e.g., src/App.css or src/Contracts.css)
-.step-valid .p-steps-title {
-  color: green !important;
-}
-
-.step-invalid .p-steps-title {
-  color: red !important;
-}
-
-.step-default .p-steps-title {
-  color: inherit !important;
 }

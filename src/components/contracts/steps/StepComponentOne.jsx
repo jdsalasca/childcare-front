@@ -1,17 +1,57 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { classNames } from 'primereact/utils';
 import { Calendar } from 'primereact/calendar';
 import { Dropdown } from 'primereact/dropdown';
+import { useTranslation } from 'react-i18next';
 import { calculateAge, calculateWeeksOld, capitalizeFirstLetter, determineProgram, programOptions } from '../utilsAndConsts';
-import { childrenOptions } from '../../bills/utils/utilsAndConstants';
+import { useChildren } from '../../../models/ChildrenAPI';
 
-export const StepComponentOne = ({ setActiveIndex, contractInformation, setContractInformation, toast, ...props }) => {
+/**
+ * 
+ * @param {setLoadingInfo}  setLoadingInfo :: Arg used to set an error message
+ * @returns 
+ */
+export const StepComponentOne = ({setLoadingInfo, setActiveIndex, contractInformation, setContractInformation, toast, ...props }) => {
+  const { t } = useTranslation();
   const [validForm, setValidForm] = useState(false);
   const [selectedChild, setSelectedChild] = useState(null);
+  const [childrenOptions, setChildrenOptions] = useState([]);
 
+  const { data: children, error: errorChild, isLoading: loadingChildren } = useChildren();
+
+  useEffect(() => {
+    console.log(children);
+    if(children?.response != null && children?.httpStatus ===200){
+
+        setChildrenOptions(
+          children?.response?.map(child => ({
+            ...child,
+            fullName: `${child.first_name} ${child.last_name}`}))
+        )
+      setLoadingInfo({
+        loading: false,
+        loadingMessage:""
+  })
+    }
+    return () => {
+    };
+  }, [children]);
+
+  /**
+   * Component Initialization
+   */
+  useEffect(() => {
+    setLoadingInfo({
+          loading: children == null,
+    loadingMessage: t("weAreLookingForChildrenInformation")
+    })
+    return () => {
+      
+    };
+  }, []);
   const { control, handleSubmit, formState: { errors }, setValue, getValues, clearErrors } = useForm({
     defaultValues: {
       children: contractInformation.children || []
@@ -23,13 +63,10 @@ export const StepComponentOne = ({ setActiveIndex, contractInformation, setContr
     name: 'children'
   });
 
-  useEffect(() => {
-  }, []);
-
   const onSubmit = (data) => {
     setValidForm(true);
     setContractInformation({ ...contractInformation, children: data.children });
-    toast.current.show({ severity: 'success', summary: 'Success', detail: 'Children information saved', life: 3000 });
+    toast.current.show({ severity: 'success', summary: 'Success', detail: t('childrenInfoSaved'), life: 3000 });
     setActiveIndex(1);
   };
 
@@ -60,14 +97,16 @@ export const StepComponentOne = ({ setActiveIndex, contractInformation, setContr
 
   const handleChildSelect = (e) => {
     const selectedChild = e.value;
-    toast.current.show({ severity: 'success', summary: 'Success', detail: 'Children information loaded', life: 3000 });
+    toast.current.show({ severity: 'success', summary: 'Success', detail: t('childrenInfoLoaded'), life: 3000 });
 
     // Check if the child already exists in the fields
     const existingChildIndex = fields.findIndex(child => child.name === selectedChild.names);
 
     if (existingChildIndex === -1) {
       // If the child does not exist, add it to the fields
-      append({ name: selectedChild.names, age: calculateAge(selectedChild.born_date), bornDate: new Date(selectedChild.born_date), program: determineProgram(calculateWeeksOld(selectedChild.born_date)) });
+      append({ name: selectedChild.names,
+         age: calculateAge(selectedChild.born_date),
+          bornDate: new Date(selectedChild.born_date), program: determineProgram(calculateWeeksOld(selectedChild.born_date)) });
     } else {
       // If the child exists, populate the form with the child's data
       setValue(`children[${existingChildIndex}].bornDate`, new Date(selectedChild.born_date));
@@ -76,26 +115,26 @@ export const StepComponentOne = ({ setActiveIndex, contractInformation, setContr
 
   return (
     <div className="form-container">
+    
       <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="field p-float-label"   style={{marginBottom:"30px", maxWidth:"15rem" }}>
-
-        <Dropdown
-          id="names-dropdown-child"
-          value={selectedChild}
-          filter
-          options={childrenOptions}
-          onChange={handleChildSelect}
-          optionLabel="names"
-        
-        />
-        <label htmlFor={`names-dropdown-child`} style={{paddingTop:"0px"}}>pick a children</label>
+        <div className="field p-float-label" style={{marginBottom:"30px", maxWidth:"15rem" }}>
+          <Dropdown
+            id="names-dropdown-child"
+            value={selectedChild}
+            filter
+            options={childrenOptions}
+            onChange={handleChildSelect}
+            optionLabel="fullName"
+            
+          />
+          <label htmlFor="names-dropdown-child" style={{paddingTop:"0px"}}>{t('pickAChild')}</label>
         </div>
         {fields.map((child, index) => (
           <div key={child.id} className="child-form">
             <Controller
               name={`children[${index}].name`}
               control={control}
-              rules={{ required: 'Child name is required' }}
+              rules={{ required: t('childNameRequired') }}
               render={({ field }) => (
                 <span className="p-float-label">
                   <InputText
@@ -108,7 +147,7 @@ export const StepComponentOne = ({ setActiveIndex, contractInformation, setContr
                     className={classNames({ 'p-invalid': errors.children && errors.children[index] && errors.children[index].name })}
                     keyfilter={/^[a-zA-ZñÑ.,\s]*$/}
                   />
-                  <label htmlFor={`child-name-${index}`}>Child's Name</label>
+                  <label htmlFor={`child-name-${index}`}>{t('childName')}</label>
                 </span>
               )}
             />
@@ -117,7 +156,7 @@ export const StepComponentOne = ({ setActiveIndex, contractInformation, setContr
             <Controller
               name={`children[${index}].bornDate`}
               control={control}
-              rules={{ required: 'Born date is required' }}
+              rules={{ required: t('bornDateRequired') }}
               render={({ field }) => (
                 <span className="p-float-label">
                   <Calendar
@@ -129,7 +168,7 @@ export const StepComponentOne = ({ setActiveIndex, contractInformation, setContr
                     onChange={(e) => field.onChange(handleBornDateChange(e.value, index))}
                     className={classNames({ 'p-invalid': errors.children && errors.children[index] && errors.children[index].bornDate })}
                   />
-                  <label htmlFor={`child-bornDate-${index}`}>Born Date</label>
+                  <label htmlFor={`child-bornDate-${index}`}>{t('bornDate')}</label>
                 </span>
               )}
             />
@@ -138,7 +177,7 @@ export const StepComponentOne = ({ setActiveIndex, contractInformation, setContr
             <Controller
               name={`children[${index}].age`}
               control={control}
-              rules={{ required: 'Child age is required', min: { value: 0, message: 'Age must be greater than zero' } }}
+              rules={{ required: t('childAgeRequired'), min: { value: 0, message: t('ageMustBeGreaterThanZero') } }}
               render={({ field }) => (
                 <span className="p-float-label">
                   <InputText
@@ -149,7 +188,7 @@ export const StepComponentOne = ({ setActiveIndex, contractInformation, setContr
                     className={classNames({ 'p-invalid': errors.children && errors.children[index] && errors.children[index].age })}
                     keyfilter="int"
                   />
-                  <label htmlFor={`child-age-${index}`}>Child's Age</label>
+                  <label htmlFor={`child-age-${index}`}>{t('childAge')}</label>
                 </span>
               )}
             />
@@ -168,7 +207,7 @@ export const StepComponentOne = ({ setActiveIndex, contractInformation, setContr
                     className={classNames({ 'p-invalid': errors.children && errors.children[index] && errors.children[index].program })}
                     disabled
                   />
-                  <label htmlFor={`child-program-${index}`}>Program</label>
+                  <label htmlFor={`child-program-${index}`}>{t('program')}</label>
                 </span>
               )}
             />
@@ -181,12 +220,17 @@ export const StepComponentOne = ({ setActiveIndex, contractInformation, setContr
           </div>
         ))}
         <div className="button-group">
-          <Button icon="pi pi-plus" label="Add Child" className="p-button-success" onClick={(e) => {
-            e.preventDefault();
-            addChild();
-          }} />
-          <Button type="submit" label="Save" className="p-button-primary p-ml-2" />
-          {/* <Button label={!validForm ? "Fill the form" : "Next"} className="p-button-secondary p-ml-2" onClick={goToNextStep} disabled={!validForm} /> */}
+          <Button
+            icon="pi pi-plus"
+            label={t('addChild')}
+            className="p-button-success"
+            onClick={(e) => {
+              e.preventDefault();
+              addChild();
+            }}
+          />
+          <Button type="submit" label={t('save')} className="p-button-primary p-ml-2" />
+          {/* <Button label={!validForm ? t('fillTheForm') : t('next')} className="p-button-secondary p-ml-2" onClick={goToNextStep} disabled={!validForm} /> */}
         </div>
       </form>
     </div>

@@ -1,7 +1,7 @@
 export const programOptions = [
     { label: 'Infant', value: 'Infant', minWeek: 0, maxWeek: 78 }, // 6 weeks to 18 months (78 weeks)
     { label: 'Toddler', value: 'Toddler', minWeek: 78, maxWeek: 156 }, // 18 months to 3 years (156 weeks)
-    { label: 'Pre-school', value: 'Pre-school', minWeek: 156, maxWeek: 260 }, // 3 to 5 years (260 weeks)
+    { label: 'Pre-school', value: 'Preschool', minWeek: 156, maxWeek: 260 }, // 3 to 5 years (260 weeks)
     { label: 'School age', value: 'School age', minWeek: 260, maxWeek: 624 }, // 5 to 12 years (624 weeks)
     { label: 'Other', value: 'Other', minWeek: 260, maxWeek: 624000}, // 12 and forward ...
   ]

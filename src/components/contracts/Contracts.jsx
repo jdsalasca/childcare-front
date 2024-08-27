@@ -13,7 +13,14 @@ import { useTranslation } from 'react-i18next';
 import StepComponentFive from './steps/StepComponentFive';
 import StepComponentSix from './steps/StepComponentSix';
 import { contractFake } from './utils/testContract';
+import { loadingDefault } from '../../utils/constans';
+import Loader from '../utils/Loader';
 export const Contracts = () => {
+  /**
+   * @param setLoadingInfo :: defaultObject loadingDefault
+   */
+  const [loadingInfo, setLoadingInfo] = useState(loadingDefault)
+
   const { t } = useTranslation();
   const [activeIndex, setActiveIndex] = useState(0);
   const [contractInformation, setContractInformation] = useState(defaultContractInfo);
@@ -129,7 +136,7 @@ export const Contracts = () => {
   const renderContent = () => {
     switch (activeIndex) {
       case 0:
-        return <StepComponentOne toast={toast} setActiveIndex={setActiveIndex} contractInformation={contractInformation} setContractInformation={setContractInformation} />;
+        return <StepComponentOne  setLoadingInfo={setLoadingInfo} toast={toast} setActiveIndex={setActiveIndex} contractInformation={contractInformation} setContractInformation={setContractInformation} />;
       case 1:
         return <StepComponentTwo toast={toast} setActiveIndex={setActiveIndex} contractInformation={contractInformation} setContractInformation={setContractInformation} />;
       case 2:
@@ -153,13 +160,16 @@ export const Contracts = () => {
   return (
     <>
       <Toast ref={toast} />
+      {loadingInfo.loading && <Loader message={loadingInfo.loadingMessage} />}
       <Steps
         model={items.map((item, index) => ({
           ...item,
           className: getStepClass(index),
         }))}
+        className='c-steps-component'
         activeIndex={activeIndex}
         readOnly={false}
+        
         onSelect={(e) => setActiveIndex(e.index)}
       />
       {renderContent()}
