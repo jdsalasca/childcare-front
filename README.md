@@ -1,11 +1,8 @@
-# Getting Started with Create React App
-
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-
-## Available Scripts
 
 ## PROJECT ROADMAP
+### `--August`
 -- August
+
     -Create form to register new users
     
     -Create table to save documentTypes
@@ -15,7 +12,9 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
     -Create form to create guardians into application
 
 -- September
+
     -Do you remembeeer?? 
+    
 In the project directory, you can run:
 
 ### `npm start`
