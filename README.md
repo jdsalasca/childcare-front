@@ -7,9 +7,13 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 ## PROJECT ROADMAP
 -- August
     -Create form to register new users
+    
     -Create table to save documentTypes
+    
     -Create form to create children into application
+    
     -Create form to create guardians into application
+
 -- September
     -Do you remembeeer?? 
 In the project directory, you can run:
