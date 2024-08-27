@@ -8,7 +8,6 @@ const HomePage = () => {
         <img
           src={`${process.env.PUBLIC_URL}/homepage_image.jpg`}
           alt="Cover"
-          style={{ maxWidth: '900px', maxHeight: '600px', display: 'block', margin: 'auto' }}
         />
       </div>
     </div>

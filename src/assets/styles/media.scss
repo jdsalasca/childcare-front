@@ -1,20 +1,33 @@
 $layout-breakpoint-small: 480px;
 
 @media (max-width: $layout-breakpoint-small) {
-    p,label {
-      
-    font-size: 1rem;
-    }
-    .c-button-media {
-        display: none;
-    }
 
-    .c-panel-media {
-        border: 2px solid rebeccapurple;
-    }
-    .form-row {
-        border: 2px solid rebeccapurple;
-        padding: left -1rem right -1rem ;
-      }
-    }
-  
+  p,
+  label {
+    font-size: 1rem;
+  }
+
+  .c-button-media {
+    display: none;
+  }
+
+  .form-row {
+    flex-direction: column;
+  }
+
+  #cash-total,
+  #check-total,
+  #total-total {
+    margin-top: 1rem;
+  }
+
+  .child-form .p-inputtext{
+    pointer-events: none;
+  }
+
+  .container-homepage-background img {
+    max-width: 470px;
+    max-height: 470px;
+  }
+
+}

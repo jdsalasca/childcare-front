@@ -344,7 +344,7 @@ const onFetchDataByDay = async (date) => {
         />
         <label htmlFor={`child-browser`}>{t('bills.searchPlaceholder')}</label>
       </div>
-      <div className="form-row" style={{ "paddingRight": "5rem", "paddingLeft": "5rem" }}>
+      <div className="form-row">
        <div className="p-field p-col-4">
               <span className="p-float-label">
                 <Controller
@@ -496,7 +496,7 @@ const onFetchDataByDay = async (date) => {
                   name={`billTypes.${index}.total`}
                   control={control}
                   render={({ field }) => (
-                    <p style={{ minWidth: "10rem", marginLeft: "3rem" }}>  {t('total')}    {`$${(billTypesController[index].amount * billTypesController[index].value).toFixed(2)}`}  </p>
+                    <p style={{ minWidth: "10rem"}}>  {t('total')}    {`$${(billTypesController[index].amount * billTypesController[index].value).toFixed(2)}`}  </p>
 
                   )}
                 />

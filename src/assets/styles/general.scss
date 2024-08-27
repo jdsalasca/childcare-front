@@ -82,13 +82,22 @@ p {
 }
 
 .container-homepage-background {
-  max-width: 90%;
+  display: flex;
+  width: 90vw;
   margin: auto;
+  overflow: hidden;
+  justify-content: center;
   text-align: center;
   background-color: #333; /* Example of dark theme background */
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.container-homepage-background img {
+  max-width: 80vw;
+  max-height: auto;
+  display: block;
 }
 
 .homepage-title {
@@ -146,6 +155,7 @@ p {
   padding: 0.5rem 1rem;
   border-radius: 5px;
   margin-left: 20px;
+  margin-bottom: 0.5rem;
   max-width: 10rem;
   min-width: 10rem;
   text-align: center;
@@ -335,7 +345,7 @@ p {
   border: 1px solid #dee2e6;
   border-radius: 8px;
   max-height: 5rem;
-  padding: 2rem;
+  padding: 2rem 1rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   display: flex;  
   flex-direction: row ;
@@ -347,7 +357,9 @@ p {
 
   }
 }
-
+.bill-card .p-field p {
+  margin-left: 1rem;
+}
 .submit-button {
   padding: 0.75rem 1.5rem;
   font-size: 1rem;
