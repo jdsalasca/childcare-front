@@ -76,7 +76,6 @@ export const useChildren = () => {
       fullName: `${child.first_name} ${child.last_name}`
     }));
   }
-console.log("updateChildren", updateChildren);
 
 
    

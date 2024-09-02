@@ -69,7 +69,7 @@ export const Contracts = () => {
   }, [contractInformation.schedule]);
 
   const countChildrenWithMedicalInfo = () => {
-    contractInformation?.children.forEach(child => console.log("child", child))
+    //contractInformation?.children.forEach(child => console.log("child", child))
     return contractInformation?.children.filter(child => 
       child?.medicalInformation?.healthStatus !== '' &&
       child?.medicalInformation?.healthStatus != null &&

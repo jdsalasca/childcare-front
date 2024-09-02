@@ -13,3 +13,15 @@
 .c-menubar {
     z-index: 1000;
 }
+
+.c-small-field {
+    max-width: 5rem;
+    // Targeting .p-float-label within .c-small-field
+    &.p-float-label {
+        // Targeting label inside .p-float-label
+        label {
+            word-break: break-all;
+            font-size: 0.80rem;
+        }
+    }
+}
