@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
 import { Button } from 'primereact/button';
@@ -7,24 +7,51 @@ import { Checkbox } from 'primereact/checkbox';
 import { classNames } from 'primereact/utils';
 import { capitalizeFirstLetter, defaultGuardian, guardianTypeOptions } from '../utilsAndConsts';
 import { useTranslation } from 'react-i18next';
+import { useGuardianOptions } from '../../../utils/customHooks/useGuardianOptions.js';
+import InputTextWrapper from '../../formsComponents/InputTextWrapper';
 
 
 export const StepComponentTwo = ({ setActiveIndex, contractInformation, setContractInformation, toast, ...props }) => {
-  const { control, handleSubmit, formState: { errors }, setValue, getValues, watch } = useForm({
+  const { t } = useTranslation();
+  const [guardianOptions, setGuardianOptions] = useState([]);
+  const { data: guardians } = useGuardianOptions()
+
+  useEffect(() => {
+    if (guardians?.response) {
+      setGuardianOptions(
+        guardians.response.map(type => ({
+          ...type,
+          label: type.name,  // Adjust according to your data structure
+          value: type.id     // Adjust according to your data structure
+        }))
+      );
+    }
+  }, [guardians]);
+
+  const { control, handleSubmit, formState: { errors }, setValue, getValues } = useForm({
     defaultValues: {
-      guardians: contractInformation.guardians
+      guardians: contractInformation.guardians || []
     }
   });
-
-  const { t } = useTranslation();
-  const [validForm, setValidForm] = useState(false);
-
-  const onSubmit = (data) => {
-    setValidForm(true);
-    setContractInformation({ ...contractInformation, guardians: data.guardians });
-    toast.current.show({ severity: 'success', summary: t('success'), detail: t('guardiansInformationSaved'), life: 3000 });
-    setActiveIndex(2)
-    };
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'guardians'
+  });
+  const onSubmit = async (data) => {
+    try {
+      // You can call the API to save the data here
+      console.log("Submitted data", data);
+      // Update parent component with the new guardians data
+      setContractInformation({ ...contractInformation, guardians: data.guardians });
+      // Show success toast message
+      toast.current.show({ severity: 'success', summary: 'Success', detail: t('guardiansInformationSaved'), life: 3000 });
+      // Move to the next step
+      // setActiveIndex(2);
+    } catch (error) {
+      console.error('Error saving guardians data', error);
+      toast.current.show({ severity: 'error', summary: 'Error', detail: t('guardiansInformationSaveFailed'), life: 3000 });
+    }
+  };
 
   const addGuardian = () => {
     const updatedGuardians = [...getValues('guardians'), { ...defaultGuardian }];
@@ -41,97 +68,83 @@ export const StepComponentTwo = ({ setActiveIndex, contractInformation, setContr
     return guardianTypeOptions.filter(option => !selectedTypes.includes(option.value));
   };
 
+  const handleGuardianSelect = (e) => {
+    const selectedGuardian = e.value;
+    console.log("selectedGuardian", selectedGuardian);
+
+    toast.current.show({ severity: 'success', summary: 'Success', detail: t('guardianInfoLoaded'), life: 3000 });
+
+    // Check if the guardian already exists in the fields
+    const existingGuardianIndex = fields.findIndex(guardian => guardian.email === selectedGuardian.email);
+
+    if (existingGuardianIndex === -1) {
+      // If the guardian does not exist, add it to the fields
+      append({
+        ...selectedGuardian,
+        name: selectedGuardian.name || '',
+        address: selectedGuardian.address || '',
+        city: selectedGuardian.city || '',
+        email: selectedGuardian.email || '',
+        phone: selectedGuardian.phone || '',
+        guardianType: selectedGuardian.guardianType || '',
+        titular: selectedGuardian.titular || false,
+      });
+    } else {
+      // If the guardian exists, populate the form with the guardian's data
+      setValue(`guardians[${existingGuardianIndex}].name`, selectedGuardian.name || '');
+      setValue(`guardians[${existingGuardianIndex}].address`, selectedGuardian.address || '');
+      setValue(`guardians[${existingGuardianIndex}].city`, selectedGuardian.city || '');
+      setValue(`guardians[${existingGuardianIndex}].email`, selectedGuardian.email || '');
+      setValue(`guardians[${existingGuardianIndex}].phone`, selectedGuardian.phone || '');
+      setValue(`guardians[${existingGuardianIndex}].guardianType`, selectedGuardian.guardianType || '');
+      setValue(`guardians[${existingGuardianIndex}].titular`, selectedGuardian.titular || false);
+    }
+  };
+  //#region form return
   return (
     <div className="form-container">
       <form onSubmit={handleSubmit(onSubmit)}>
-        {watch('guardians').map((guardian, index) => (
+        <div className="field p-float-label" style={{ marginBottom: "30px", maxWidth: "15rem" }}>
+          <Dropdown
+            id="names-dropdown-child"
+            filter
+            options={guardianOptions}
+            onChange={handleGuardianSelect}
+            optionLabel="fullName"
+          />
+          <label htmlFor="names-dropdown-child" style={{ paddingTop: "0px" }}>{t('pickAGuardian')}</label>
+        </div>
+
+        {fields.map((guardian, index) => (
           <div key={index} className="child-form">
-            <Controller
+            <InputTextWrapper
               name={`guardians[${index}].name`}
               control={control}
               rules={{ required: t('guardianNameRequired') }}
-              render={({ field }) => (
-                <span className="p-float-label">
-                  <InputText
-                    id={`guardian-name-${index}`}
-                    {...field}
-                    onChange={(e) => {
-                      const formattedValue = capitalizeFirstLetter(e.target.value);
-                      field.onChange(formattedValue);
-                    }}
-                    className={classNames({ 'p-invalid': errors.guardians && errors.guardians[index] && errors.guardians[index].name })}
-                  />
-                  <label htmlFor={`guardian-name-${index}`}>{t('guardianName')}</label>
-                  {errors.guardians && errors.guardians[index] && errors.guardians[index].name && (
-                    <small className="p-error">{errors.guardians[index].name.message}</small>
-                  )}
-                </span>
-              )}
+              label={t('guardianName')}
+              onChangeCustom={(value) => capitalizeFirstLetter(value)}
             />
-
-            <Controller
+            <InputTextWrapper
               name={`guardians[${index}].address`}
               control={control}
               rules={{ required: t('addressRequired') }}
-              render={({ field }) => (
-                <span className="p-float-label">
-                  <InputText
-                    id={`guardian-address-${index}`}
-                    {...field}
-                    onChange={(e) => {
-                      const formattedValue = capitalizeFirstLetter(e.target.value);
-                      field.onChange(formattedValue);
-                    }}
-                    className={classNames({ 'p-invalid': errors.guardians && errors.guardians[index] && errors.guardians[index].address })}
-                  />
-                  <label htmlFor={`guardian-address-${index}`}>{t('address')}</label>
-                  {errors.guardians && errors.guardians[index] && errors.guardians[index].address && (
-                    <small className="p-error">{errors.guardians[index].address.message}</small>
-                  )}
-                </span>
-              )}
+              label={t('address')}
+              onChangeCustom={(value) => capitalizeFirstLetter(value)}
             />
-
-            <Controller
+            <InputTextWrapper
               name={`guardians[${index}].city`}
               control={control}
               rules={{ required: t('cityRequired') }}
-              render={({ field }) => (
-                <span className="p-float-label">
-                  <InputText
-                    id={`guardian-city-${index}`}
-                    {...field}
-                    className={classNames({ 'p-invalid': errors.guardians && errors.guardians[index] && errors.guardians[index].city })}
-                  />
-                  <label htmlFor={`guardian-city-${index}`}>{t('city')}</label>
-                  {errors.guardians && errors.guardians[index] && errors.guardians[index].city && (
-                    <small className="p-error">{errors.guardians[index].city.message}</small>
-                  )}
-                </span>
-              )}
+              label={t('city')}
             />
-
-            <Controller
+            <InputTextWrapper
               name={`guardians[${index}].email`}
               control={control}
+              keyFilter="email"
               rules={{ required: t('emailRequired') }}
-              render={({ field }) => (
-                <span className="p-float-label">
-                  <InputText
-                    id={`guardian-email-${index}`}
-                    {...field}
-                    className={classNames({ 'p-invalid': errors.guardians && errors.guardians[index] && errors.guardians[index].city })}
-                  />
-                  <label htmlFor={`guardian-email-${index}`}>{t('email')}</label>
-                  {errors.guardians && errors.guardians[index] && errors.guardians[index].city && (
-                    <small className="p-error">{errors.guardians[index].email.message}</small>
-                  )}
-                </span>
-              )}
+              label={t('email')}
             />
-
-
-            <Controller
+            <InputTextWrapper
               name={`guardians[${index}].phone`}
               control={control}
               rules={{
@@ -141,20 +154,8 @@ export const StepComponentTwo = ({ setActiveIndex, contractInformation, setContr
                   message: t('phoneNumberPattern')
                 }
               }}
-              render={({ field }) => (
-                <span className="p-float-label">
-                  <InputText
-                    id={`guardian-phone-${index}`}
-                    {...field}
-                    keyfilter={/^[\d+]*$/}  // Allow numbers and "+"
-                    className={classNames({ 'p-invalid': errors.guardians && errors.guardians[index] && errors.guardians[index].phone })}
-                  />
-                  <label htmlFor={`guardian-phone-${index}`}>{t('phoneNumber')}</label>
-                  {errors.guardians && errors.guardians[index] && errors.guardians[index].phone && (
-                    <small className="p-error">{errors.guardians[index].phone.message}</small>
-                  )}
-                </span>
-              )}
+              label={t('phoneNumber')}
+              keyFilter="int"
             />
 
             <Controller

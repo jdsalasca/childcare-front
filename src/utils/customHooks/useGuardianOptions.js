@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useGuardiansCache } from '../../models/GuardiansAPI'; // Adjust path accordingly
+import { useGuardiansCache } from '../../models/cache/useGuardiansCache';
 
-const useGuardianOptions = () => {
+export const useGuardianOptions = () => {
   const [guardianOptions, setGuardianOptions] = useState([]);
   const { data: guardians, error, isLoading } = useGuardiansCache();
 
@@ -24,4 +24,3 @@ const useGuardianOptions = () => {
   return { guardianOptions, error, isLoading };
 };
 
-export default useGuardianOptions;

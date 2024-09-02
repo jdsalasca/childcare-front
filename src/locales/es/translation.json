@@ -24,6 +24,8 @@
   "program":"Programa",
   "logout": "Cerrar sesión",
   "date":"Fecha",
+  "genderRequired":"Se requiere el género",
+  "pickAGuardian":"Selecciona un guardián",
   "noInformationFound": "¡No se encontró información!",
   "noDataForPickedDay": "No encontramos datos para el día seleccionado {{date}}",
   "informationFound": "¡Información encontrada!",

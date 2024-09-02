@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { useForm, Controller, useFieldArray } from 'react-hook-form';
+import { useForm,  useFieldArray } from 'react-hook-form';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
 import { useTranslation } from 'react-i18next';
-import { calculateAge, calculateWeeksOld, capitalizeFirstLetter, determineProgram, programOptions } from '../utilsAndConsts';
+import { calculateAge, calculateWeeksOld, capitalizeFirstLetter, determineProgram} from '../utilsAndConsts';
 import ChildrenAPI, { useChildren } from '../../../models/ChildrenAPI';
 import InputTextWrapper from '../../formsComponents/InputTextWrapper';
 import CalendarWrapper from '../../formsComponents/CalendarWrapper';
@@ -117,7 +117,6 @@ export const StepComponentOne = ({ setLoadingInfo, setActiveIndex, contractInfor
     }
   };
   
-  
   //#region  onSubmit method
   const onSubmit = async(data) => {
  
@@ -163,10 +162,6 @@ export const StepComponentOne = ({ setLoadingInfo, setActiveIndex, contractInfor
     setValue(`children[${index}].program`, program);
     setValue(`children[${index}].age`, age);
     return date;
-  };
-
-  const getFormErrorMessage = (name) => {
-    return errors[name] && <small className="p-error">{errors[name].message}</small>;
   };
 
   const handleChildSelect = (e) => {
@@ -218,7 +213,6 @@ export const StepComponentOne = ({ setLoadingInfo, setActiveIndex, contractInfor
               optionValue="id"
               optionLabel="short_name"
               rules={{ required: t('genderRequired') }}
-              getFormErrorMessage={getFormErrorMessage}
               label={t('gender')}
               placeholder={t('selectGender')}
               spanClassName="c-small-field"
@@ -231,7 +225,7 @@ export const StepComponentOne = ({ setLoadingInfo, setActiveIndex, contractInfor
               label={t('childName')}
               keyFilter={/^[a-zA-ZñÑ.,\s]*$/}
               onChangeCustom={(value) => capitalizeFirstLetter(value)}
-              getFormErrorMessage={getFormErrorMessage}
+              errors={errors}
             />
 
             <InputTextWrapper
@@ -241,7 +235,6 @@ export const StepComponentOne = ({ setLoadingInfo, setActiveIndex, contractInfor
               label={t('childLastName')}
               keyFilter={/^[a-zA-ZñÑ.,\s]*$/}
               onChangeCustom={(value) => capitalizeFirstLetter(value)}
-              getFormErrorMessage={getFormErrorMessage}
 
             />
             <CalendarWrapper
@@ -252,7 +245,6 @@ export const StepComponentOne = ({ setLoadingInfo, setActiveIndex, contractInfor
               dateFormat="yy-mm-dd"
               showIcon
               onChangeCustom={(value) => handleBornDateChange(value, index)}
-              getFormErrorMessage={getFormErrorMessage}
             />
             <InputTextWrapper
               name={`children[${index}].age`}
@@ -260,7 +252,6 @@ export const StepComponentOne = ({ setLoadingInfo, setActiveIndex, contractInfor
               rules={{
                 min: { value: 0, message: t('ageMustBeGreaterThanZero') }
               }}
-              getFormErrorMessage={getFormErrorMessage}
               label={t('childAge')}
               disabled
               keyFilter="int"

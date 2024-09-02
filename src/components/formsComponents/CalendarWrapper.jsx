@@ -61,7 +61,9 @@ const CalendarWrapper = ({
               {...rest}
             />
             <label htmlFor={name}>{label}</label>
-            {getFormErrorMessage(name)}
+          {error && <small className="p-error">{error.message}</small>}
+
+            {/* {getFormErrorMessage(name)} */}
           </span>
         );
       }}
