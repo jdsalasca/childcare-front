@@ -16,6 +16,24 @@
 
 .c-small-field {
     max-width: 5rem;
+    &.r-6{
+        max-width: 6rem;
+    }
+    &.r-7{
+        max-width: 7rem;
+    }
+    &.r-8{
+        max-width: 8rem;
+    }
+    &.r-9{
+        max-width: 9rem;
+    }
+    &.r-10{
+        max-width: 10rem;
+    }
+    &.r-11{
+        max-width: 11rem;
+    }
     // Targeting .p-float-label within .c-small-field
     &.p-float-label {
         // Targeting label inside .p-float-label
@@ -25,3 +43,48 @@
         }
     }
 }
+
+
+.c-checkbox {
+    display: flex;
+    align-items: center !important;
+    width: fit-content;
+    justify-content: space-between !important; // Horizontally centers the items
+    max-width: 10rem;
+    padding: 1rem;
+
+
+
+    &.label-left {
+
+      flex-direction: row-reverse;
+      margin-left: 1rem;
+      
+      // Ensure no extra space between the checkbox and label
+      label {
+        margin-right: 0.5rem; // Controls space between label and checkbox
+        margin-left: 0;
+
+      }
+    }
+  
+    &.label-right {
+      flex-direction: row;
+      margin-right: 1rem;
+  
+      label {
+        margin-left: 0.5rem; // Controls space between checkbox and label
+      }
+    }
+  
+    // Additional styling for label (this ensures both label positions have consistent spacing)
+    label {
+      margin: 0; // Ensure there’s no default margin that adds extra space
+      padding: 0;
+    }
+  
+    .p-checkbox {
+      margin: 0; // Remove any default margins from the Checkbox component
+    }
+  }
+  

@@ -9,9 +9,12 @@ import { capitalizeFirstLetter, defaultGuardian, guardianTypeOptions } from '../
 import { useTranslation } from 'react-i18next';
 import { useGuardianOptions } from '../../../utils/customHooks/useGuardianOptions.js';
 import InputTextWrapper from '../../formsComponents/InputTextWrapper';
+import DropdownWrapper from '../../formsComponents/DropdownWrapper.jsx';
+import CheckboxWrapper from '../../formsComponents/CheckboxWrapper.jsx';
+import GuardiansAPI from '../../../models/GuardiansAPI.js';
 
 
-export const StepComponentTwo = ({ setActiveIndex, contractInformation, setContractInformation, toast, ...props }) => {
+export const StepComponentTwo = ({ setActiveIndex, contractInformation, setContractInformation, setLoadingInfo, toast, ...props }) => {
   const { t } = useTranslation();
   const [guardianOptions, setGuardianOptions] = useState([]);
   const { data: guardians } = useGuardianOptions()
@@ -37,21 +40,91 @@ export const StepComponentTwo = ({ setActiveIndex, contractInformation, setContr
     control,
     name: 'guardians'
   });
+  const onCreateGuardian = async (data) => {
+    try {
+      const response = await GuardiansAPI.createGuardian(data);
+      console.log("Guardian created:", response);
+      if (response.httpStatus === 200) {
+        return response.response; // Return the new guardian object
+      }
+    } catch (error) {
+      console.error("Error creating guardian", error);
+      throw error;
+    }
+  };
+  
+  const onUpdateGuardian = async (id, data) => {
+    try {
+      const response = await GuardiansAPI.updateGuardian(id, data);
+      console.log("Guardian updated:", response);
+      if (response.httpStatus === 200) {
+        return response.response; // Return the updated guardian object
+      }
+    } catch (error) {
+      console.error("Error updating guardian", error);
+      throw error;
+    }
+  };
+  
+  const onHandlerGuardianBackendAsync = async (data) => {
+    setLoadingInfo({
+      loading: true,
+      loadingMessage: t("weAreSavingGuardiansInformation")
+    });
+  
+    // Create an array of promises for creating/updating guardians
+    const promises = data.guardians.map(guardian => {
+      if (guardian.id == null) {
+        // Create guardian if ID is null
+        return onCreateGuardian(guardian);
+      } else {
+        // Update guardian if ID is present
+        return onUpdateGuardian(guardian);
+      }
+    });
+  
+    try {
+      // Wait for all promises to resolve
+      const responses = await Promise.all(promises);
+      setLoadingInfo({
+        loading: false,
+        loadingMessage: ""
+      });
+      console.log("All guardians responses received", responses);
+      
+      return responses;
+    } catch (error) {
+      setLoadingInfo({
+        loading: false,
+        loadingMessage: ""
+      });
+      console.error('Error processing guardians data', error);
+      throw error;
+    }
+  };
+  
   const onSubmit = async (data) => {
     try {
-      // You can call the API to save the data here
-      console.log("Submitted data", data);
+      console.log("data", data);
+  
+      // Handle creating/updating guardians asynchronously
+      const guardiansAsync = await onHandlerGuardianBackendAsync(data);
+      console.log("Guardians responses", guardiansAsync);
+  
       // Update parent component with the new guardians data
-      setContractInformation({ ...contractInformation, guardians: data.guardians });
+      setContractInformation({ ...contractInformation, guardians: guardiansAsync });
+  
       // Show success toast message
       toast.current.show({ severity: 'success', summary: 'Success', detail: t('guardiansInformationSaved'), life: 3000 });
-      // Move to the next step
-      // setActiveIndex(2);
+  
+      // Optionally update active index or handle other logic
+      //setActiveIndex(2);
     } catch (error) {
-      console.error('Error saving guardians data', error);
+      console.error('Error processing guardians data', error);
       toast.current.show({ severity: 'error', summary: 'Error', detail: t('guardiansInformationSaveFailed'), life: 3000 });
     }
   };
+
 
   const addGuardian = () => {
     const updatedGuardians = [...getValues('guardians'), { ...defaultGuardian }];
@@ -108,6 +181,7 @@ export const StepComponentTwo = ({ setActiveIndex, contractInformation, setContr
           <Dropdown
             id="names-dropdown-child"
             filter
+            emptyMessage={t('dropdownEmptyMessage')}
             options={guardianOptions}
             onChange={handleGuardianSelect}
             optionLabel="fullName"
@@ -122,21 +196,24 @@ export const StepComponentTwo = ({ setActiveIndex, contractInformation, setContr
               control={control}
               rules={{ required: t('guardianNameRequired') }}
               label={t('guardianName')}
-              onChangeCustom={(value) => capitalizeFirstLetter(value)}
-            />
+              onChangeCustom={(value) => capitalizeFirstLetter(value)}/>
+          <InputTextWrapper
+              name={`guardians[${index}].last_name`}
+              control={control}
+              rules={{ required: t('guardianLastNameRequired') }}
+              label={t('guardianLastName')}
+              onChangeCustom={(value) => capitalizeFirstLetter(value)}/>
             <InputTextWrapper
               name={`guardians[${index}].address`}
               control={control}
               rules={{ required: t('addressRequired') }}
               label={t('address')}
-              onChangeCustom={(value) => capitalizeFirstLetter(value)}
-            />
+              onChangeCustom={(value) => capitalizeFirstLetter(value)}/>
             <InputTextWrapper
               name={`guardians[${index}].city`}
               control={control}
               rules={{ required: t('cityRequired') }}
-              label={t('city')}
-            />
+              label={t('city')}/>
             <InputTextWrapper
               name={`guardians[${index}].email`}
               control={control}
@@ -147,58 +224,29 @@ export const StepComponentTwo = ({ setActiveIndex, contractInformation, setContr
             <InputTextWrapper
               name={`guardians[${index}].phone`}
               control={control}
-              rules={{
-                required: t('phoneNumberRequired'),
-                pattern: {
-                  value: /^[+]?[\d]+$/,
-                  message: t('phoneNumberPattern')
-                }
-              }}
+              rules={{required: t('phoneNumberRequired'), pattern: {value: /^[+]?[\d]+$/,message: t('phoneNumberPattern')}}}
               label={t('phoneNumber')}
               keyFilter="int"
+              spanClassName='c-small-field r-10'
             />
-
-            <Controller
+            <DropdownWrapper
               name={`guardians[${index}].guardianType`}
               control={control}
-              rules={{ required: t('guardianTypeRequired') }}
-              render={({ field }) => (
-                <span className="p-float-label">
-                  <Dropdown
-                    id={`guardian-type-${index}`}
-                    {...field}
-                    style={{ minWidth: "10rem" }}
-                    options={getAvailableGuardianTypes(index)}
-                    className={classNames({ 'p-invalid': errors.guardians && errors.guardians[index] && errors.guardians[index].guardianType })}
-                  />
-                  <label htmlFor={`guardian-type-${index}`}>{t('guardianType')}</label>
-                  {errors.guardians && errors.guardians[index] && errors.guardians[index].guardianType && (
-                    <small className="p-error">{errors.guardians[index].guardianType.message}</small>
-                  )}
-                </span>
-              )}
-            />
-
-            <Controller
+              options={getAvailableGuardianTypes(index)}
+              optionValue="value"
+              optionLabel="label"
+              label={t('guardianType')}
+              rules={{ required: t('guardianTypeRequired') }} 
+                spanClassName="c-small-field r-10"
+              />
+            <CheckboxWrapper
               name={`guardians[${index}].titular`}
               control={control}
-              render={({ field }) => (
-                <span className="p-float-label">
-                  <Checkbox
-                    id={`guardian-titular-${index}`}
-                    {...field}
-                    checked={field.value}
-                    defaultChecked
-                    className={classNames({ 'p-invalid': errors.guardians && errors.guardians[index] && errors.guardians[index].titular })}
-                  />
-                  <label htmlFor={`guardian-titular-${index}`}>{t('titular')}</label>
-                  {errors.guardians && errors.guardians[index] && errors.guardians[index].titular && (
-                    <small className="p-error">{errors.guardians[index].titular.message}</small>
-                  )}
-                </span>
-              )}
-            />
+              label={t('titular')}
+              labelPosition='left'
 
+                
+              />
             <Button
               icon="pi pi-trash"
               className="p-button-danger p-button-text p-ml-2"

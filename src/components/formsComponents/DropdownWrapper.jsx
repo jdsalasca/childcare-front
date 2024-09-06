@@ -2,6 +2,8 @@ import React from 'react';
 import { Controller, RegisterOptions } from 'react-hook-form';
 import { Dropdown } from 'primereact/dropdown';
 import { classNames } from 'primereact/utils';
+import { use } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Reusable Dropdown wrapper for react-hook-form
@@ -35,6 +37,8 @@ const DropdownWrapper = ({
   spanClassName = '',
   ...rest
 }) => {
+
+ const {t} = useTranslation();
   return (
     <Controller
       name={name}
@@ -46,6 +50,7 @@ const DropdownWrapper = ({
             id={name}
             {...field}
             options={options}
+            emptyMessage={t('dropdownEmptyMessage')}
             optionLabel={optionLabel}
             optionValue={optionValue}
             className={classNames({ 'p-invalid': error })}

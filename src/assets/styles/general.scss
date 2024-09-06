@@ -170,9 +170,18 @@
 
 .form-container {
   padding: 2rem;
+  display: flex;
+  flex-direction: column;
   background-color: #f9f9f9;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  .child-form{
+    display: flex;
+    flex-wrap: wrap;
+    border: gray solid 1px;
+    border-radius: 0.20rem;
+    
+  }
   &.children-health{
     display: flex;
     justify-content: center;
@@ -335,6 +344,8 @@
   flex-direction: row;
   gap: 1rem;
   margin-bottom: 2rem;
+  flex-wrap: wrap;
+  padding: 2rem;
 }
 
 .checkbox-container {
