@@ -3,7 +3,9 @@ import GuardianTypesAPI from "../GuardianTypesAPI";
 
 // Hook to fetch all guardian types
 export const useGuardianTypes = () => {
-  return useQuery(['guardianTypes'], GuardianTypesAPI.getGuardianTypes, {
+  return useQuery({
+    queryKey:['guardianTypes'],
+    queryFn: () => GuardianTypesAPI.getGuardianTypes(),
     staleTime: 1000 * 60 * 20,  // Cache time in milliseconds (20 minutes)
     cacheTime: 1000 * 60 * 30, // Cache time in milliseconds (30 minutes)
   });
@@ -11,7 +13,9 @@ export const useGuardianTypes = () => {
 
 // Hook to fetch only active guardian types
 export const useActiveGuardianTypes = () => {
-  return useQuery(['activeGuardianTypes'], GuardianTypesAPI.getActiveGuardianTypes, {
+  return useQuery({
+    queryKey: ['activeGuardianTypes'],
+    queryFn: () => GuardianTypesAPI.getActiveGuardianTypes(),
     staleTime: 1000 * 60 * 20,  // Cache time in milliseconds (20 minutes)
     cacheTime: 1000 * 60 * 30, // Cache time in milliseconds (30 minutes)
   });

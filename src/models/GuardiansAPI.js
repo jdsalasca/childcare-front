@@ -6,7 +6,7 @@ const GuardiansAPI = {
   getGuardians: async () => {
     try {
       const response = await API.get(BASE_URL,'/guardians');  
-      return response.data; // Ensure you return the actual data
+      return response; // Ensure you return the actual data
     } catch (error) {
       console.error('Error fetching guardians:', error);
       throw error;
@@ -17,7 +17,7 @@ const GuardiansAPI = {
   getGuardianById: async (id) => {
     try {
       const response = await API.get(BASE_URL,`/guardians/${id}`);
-      return response.data;
+      return response;
     } catch (error) {
       console.error(`Error fetching guardian with id ${id}:`, error);
       throw error;
@@ -28,7 +28,7 @@ const GuardiansAPI = {
   createGuardian: async (data) => {
     try {
       const response = await API.post(BASE_URL,`/guardians`, data);
-      return response.data;
+      return response;
     } catch (error) {
       console.error('Error creating guardian:', error);
       throw error;
@@ -39,7 +39,7 @@ const GuardiansAPI = {
   updateGuardian: async (id, data) => {
     try {
       const response = await API.put(BASE_URL,`/guardians/${id}`, data);
-      return response.data;
+      return response;
     } catch (error) {
       console.error(`Error updating guardian with id ${id}:`, error);
       throw error;
@@ -50,7 +50,7 @@ const GuardiansAPI = {
   deleteGuardian: async (id) => {
     try {
       const response = await API.delete(BASE_URL,`/guardians/${id}`);
-      return response.data;
+      return response;
     } catch (error) {
       console.error(`Error deleting guardian with id ${id}:`, error);
       throw error;

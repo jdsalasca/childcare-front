@@ -5,8 +5,8 @@ const DocumentTypeAPI = {
     // Get all document types
     getDocumentTypes: async () => {
       try {
-        const response = await API.get(`${BASE_URL}/document_types`);
-        return response.data;
+        const response = await API.get(BASE_URL,'/document_types');
+        return response;
       } catch (error) {
         console.error('Error fetching document types:', error);
         throw error;
@@ -16,8 +16,8 @@ const DocumentTypeAPI = {
     // Get only active document types
     getActiveDocumentTypes: async () => {
       try {
-        const response = await API.get(`${BASE_URL}/document_types/active`);
-        return response.data;
+        const response = await API.get(BASE_URL,`/document_types/active`);
+        return response;
       } catch (error) {
         console.error('Error fetching active document types:', error);
         throw error;

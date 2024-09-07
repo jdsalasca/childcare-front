@@ -5,20 +5,25 @@ import { Dropdown } from 'primereact/dropdown';
 import { Button } from 'primereact/button';
 import { Checkbox } from 'primereact/checkbox';
 import { classNames } from 'primereact/utils';
-import { capitalizeFirstLetter, defaultGuardian, guardianTypeOptions } from '../utilsAndConsts';
+import { capitalizeFirstLetter, defaultGuardian } from '../utilsAndConsts';
 import { useTranslation } from 'react-i18next';
 import { useGuardianOptions } from '../../../utils/customHooks/useGuardianOptions.js';
 import InputTextWrapper from '../../formsComponents/InputTextWrapper';
 import DropdownWrapper from '../../formsComponents/DropdownWrapper.jsx';
 import CheckboxWrapper from '../../formsComponents/CheckboxWrapper.jsx';
 import GuardiansAPI from '../../../models/GuardiansAPI.js';
+import useGenderOptions from '../../../utils/customHooks/useGenderOptions.js';
+import useGuardianTypeOptions from '../../../utils/customHooks/useGuardianTypeOptions.js';
 
 
 export const StepComponentTwo = ({ setActiveIndex, contractInformation, setContractInformation, setLoadingInfo, toast, ...props }) => {
   const { t } = useTranslation();
   const [guardianOptions, setGuardianOptions] = useState([]);
+  const { guardianTypeOptions } = useGuardianTypeOptions();
   const { data: guardians } = useGuardianOptions()
 
+  console.log("guardianTypeOptions",guardianTypeOptions);
+  
   useEffect(() => {
     if (guardians?.response) {
       setGuardianOptions(
@@ -41,6 +46,8 @@ export const StepComponentTwo = ({ setActiveIndex, contractInformation, setContr
     name: 'guardians'
   });
   const onCreateGuardian = async (data) => {
+    console.log("data on create", data);
+    
     try {
       const response = await GuardiansAPI.createGuardian(data);
       console.log("Guardian created:", response);
@@ -74,12 +81,14 @@ export const StepComponentTwo = ({ setActiveIndex, contractInformation, setContr
   
     // Create an array of promises for creating/updating guardians
     const promises = data.guardians.map(guardian => {
-      if (guardian.id == null) {
+      console.log("guardian", guardian);
+      
+      if (guardian.id == null || guardian.id ==="") {
         // Create guardian if ID is null
         return onCreateGuardian(guardian);
       } else {
         // Update guardian if ID is present
-        return onUpdateGuardian(guardian);
+        return onUpdateGuardian(guardian.id,guardian);
       }
     });
   
@@ -230,10 +239,10 @@ export const StepComponentTwo = ({ setActiveIndex, contractInformation, setContr
               spanClassName='c-small-field r-10'
             />
             <DropdownWrapper
-              name={`guardians[${index}].guardianType`}
+              name={`guardians[${index}].guardian_type_id`}
               control={control}
               options={getAvailableGuardianTypes(index)}
-              optionValue="value"
+              optionValue="id"
               optionLabel="label"
               label={t('guardianType')}
               rules={{ required: t('guardianTypeRequired') }} 

@@ -78,11 +78,6 @@ export const calculateAge = (bornDate) => {
 
     return `${year}-${month}-${day}`;
 };
-  export const guardianTypeOptions = [
-    { label: 'Mother', value: 'Mother' },
-    { label: 'Father', value: 'Father' },
-    { label: 'Apoderado', value: 'Apoderado' }
-  ];
 
   
 
