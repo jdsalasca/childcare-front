@@ -1,13 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Controller, RegisterOptions } from 'react-hook-form';
 import { Dropdown } from 'primereact/dropdown';
 import { classNames } from 'primereact/utils';
-import { use } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
 /**
  * Reusable Dropdown wrapper for react-hook-form
- *
  * @param {Object} props
  * @param {string} props.name - Name of the dropdown field in the form.
  * @param {Object} props.control - Control object from react-hook-form.
@@ -38,7 +36,19 @@ const DropdownWrapper = ({
   ...rest
 }) => {
 
- const {t} = useTranslation();
+  	let {t} = useTranslation();
+  
+    // Ensure options are filtered to remove any that have null or undefined values for optionValue
+    const validLabel = options.filter(option => option[optionValue] != null);
+    useEffect(() => {
+      if (options !=null&& options.length > 0 && validLabel.length === 0) {
+        console.log(options);
+        console.error(`Dropdown options must have a value for ${optionValue}`);
+      } else {
+      }
+    }, [optionValue, validLabel]);
+  
+
   return (
     <Controller
       name={name}

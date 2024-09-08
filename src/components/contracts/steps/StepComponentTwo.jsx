@@ -1,286 +1,490 @@
-import React, { useEffect, useState } from 'react';
-import { Controller, useFieldArray, useForm } from 'react-hook-form';
-import { InputText } from 'primereact/inputtext';
-import { Dropdown } from 'primereact/dropdown';
-import { Button } from 'primereact/button';
-import { Checkbox } from 'primereact/checkbox';
-import { classNames } from 'primereact/utils';
-import { capitalizeFirstLetter, defaultGuardian } from '../utilsAndConsts';
-import { useTranslation } from 'react-i18next';
-import { useGuardianOptions } from '../../../utils/customHooks/useGuardianOptions.js';
-import InputTextWrapper from '../../formsComponents/InputTextWrapper';
-import DropdownWrapper from '../../formsComponents/DropdownWrapper.jsx';
-import CheckboxWrapper from '../../formsComponents/CheckboxWrapper.jsx';
-import GuardiansAPI from '../../../models/GuardiansAPI.js';
-import useGenderOptions from '../../../utils/customHooks/useGenderOptions.js';
-import useGuardianTypeOptions from '../../../utils/customHooks/useGuardianTypeOptions.js';
+import React, { useEffect, useState } from 'react'
+import Swal from 'sweetalert2'
+import { set, useFieldArray, useForm } from 'react-hook-form'
+import { Dropdown } from 'primereact/dropdown'
+import { Button } from 'primereact/button'
+import { capitalizeFirstLetter, defaultGuardian } from '../utilsAndConsts'
+import { useTranslation } from 'react-i18next'
+import useGuardianOptions from '../../../utils/customHooks/useGuardianOptions.js'
+import InputTextWrapper from '../../formsComponents/InputTextWrapper'
+import DropdownWrapper from '../../formsComponents/DropdownWrapper.jsx'
+import CheckboxWrapper from '../../formsComponents/CheckboxWrapper.jsx'
+import GuardiansAPI from '../../../models/GuardiansAPI.js'
+import useGuardianTypeOptions from '../../../utils/customHooks/useGuardianTypeOptions.js'
+import { GuardiansValidations } from '../utils/contractValidations.js'
+import { ContractService } from '../contractModelView.js'
+import { ToastInterpreterUtils } from '../../utils/ToastInterpreterUtils.js'
+/**
+ *@param {Object} props
+ * @param {number} props.setActiveIndex - The active index of the stepper.
+ * @param {Object} props.contractInformation - The contract information object.
+ * @param {Function} props.setContractInformation - The function to set the contract information.
+ * @param {Object} props.setLoadingInfo - The function to set the loading information.
+ * @param {Object} props.toast - The toast reference.     
+ * @returns 
+ */
+export const StepComponentTwo = ({
+  setActiveIndex,
+  contractInformation,
+  setContractInformation,
+  setLoadingInfo,
+  toast,
+  ...props
+}) => {
+  const { t } = useTranslation()
+  const [guardianOptions, setGuardianOptions] = useState([])
+  const { guardianTypeOptions } = useGuardianTypeOptions()
+  const { guardianOptions: guardians } = useGuardianOptions()
 
-
-export const StepComponentTwo = ({ setActiveIndex, contractInformation, setContractInformation, setLoadingInfo, toast, ...props }) => {
-  const { t } = useTranslation();
-  const [guardianOptions, setGuardianOptions] = useState([]);
-  const { guardianTypeOptions } = useGuardianTypeOptions();
-  const { data: guardians } = useGuardianOptions()
-
-  console.log("guardianTypeOptions",guardianTypeOptions);
-  
   useEffect(() => {
-    if (guardians?.response) {
+    if (guardians?.length > 0) {
       setGuardianOptions(
-        guardians.response.map(type => ({
-          ...type,
-          label: type.name,  // Adjust according to your data structure
-          value: type.id     // Adjust according to your data structure
+        guardians.map(guardian => ({
+          ...guardian,
+          label: guardian.name, // Adjust according to your data structure
+          value: guardian.id // Adjust according to your data structure
         }))
-      );
+      )
     }
-  }, [guardians]);
+  }, [guardians])
 
-  const { control, handleSubmit, formState: { errors }, setValue, getValues } = useForm({
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    getValues
+  } = useForm({
     defaultValues: {
       guardians: contractInformation.guardians || []
     }
-  });
+  })
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'guardians'
-  });
-  const onCreateGuardian = async (data) => {
-    console.log("data on create", data);
-    
+  })
+  const onCreateGuardian = async data => {
+    console.log('data on create', data)
+
     try {
-      const response = await GuardiansAPI.createGuardian(data);
-      console.log("Guardian created:", response);
+      const response = await GuardiansAPI.createGuardian(data)
+      console.log('Guardian created:', response)
       if (response.httpStatus === 200) {
-        return response.response; // Return the new guardian object
+        return response.response // Return the new guardian object
       }
     } catch (error) {
-      console.error("Error creating guardian", error);
-      throw error;
+      console.error('Error creating guardian', error)
+      throw error
     }
-  };
-  
+  }
+
   const onUpdateGuardian = async (id, data) => {
     try {
-      const response = await GuardiansAPI.updateGuardian(id, data);
-      console.log("Guardian updated:", response);
+      const response = await GuardiansAPI.updateGuardian(id, data)
+      console.log('Guardian updated:', response)
       if (response.httpStatus === 200) {
-        return response.response; // Return the updated guardian object
+        return response.response // Return the updated guardian object
       }
     } catch (error) {
-      console.error("Error updating guardian", error);
-      throw error;
+      console.error('Error updating guardian', error)
+      throw error
     }
-  };
-  
-  const onHandlerGuardianBackendAsync = async (data) => {
+  }
+
+  const onHandlerGuardianBackendAsync = async data => {
     setLoadingInfo({
       loading: true,
-      loadingMessage: t("weAreSavingGuardiansInformation")
-    });
-  
+      loadingMessage: t('weAreSavingGuardiansInformation')
+    })
+
     // Create an array of promises for creating/updating guardians
     const promises = data.guardians.map(guardian => {
-      console.log("guardian", guardian);
-      
-      if (guardian.id == null || guardian.id ==="") {
+      console.log('guardian', guardian)
+
+      if (guardian.id == null || guardian.id === '') {
         // Create guardian if ID is null
-        return onCreateGuardian(guardian);
+        return onCreateGuardian(guardian)
       } else {
         // Update guardian if ID is present
-        return onUpdateGuardian(guardian.id,guardian);
+        return onUpdateGuardian(guardian.id, guardian)
       }
-    });
-  
+    })
+
     try {
       // Wait for all promises to resolve
-      const responses = await Promise.all(promises);
+      const responses = await Promise.all(promises)
       setLoadingInfo({
         loading: false,
-        loadingMessage: ""
-      });
-      console.log("All guardians responses received", responses);
-      
-      return responses;
+        loadingMessage: ''
+      })
+      console.log('All guardians responses received', responses)
+
+      return responses
     } catch (error) {
       setLoadingInfo({
         loading: false,
-        loadingMessage: ""
-      });
-      console.error('Error processing guardians data', error);
-      throw error;
+        loadingMessage: ''
+      })
+      console.error('Error processing guardians data', error)
+      throw error
     }
-  };
+  }
+  /**
+   * This function checks if the guardians are valid
+   * @param {*} data
+   * @returns
+   */
+  const onProcessGuardiansValidation = async data => {
+    if (data.guardians.length === 1 && !data.guardians[0].titular) {
+      console.log('data.guardians[0].titular', data.guardians[0].titular)
+      // Alert if no guardian is titular
+      const result = await Swal.fire({
+        title: t('noTitularAlertTitle'),
+        text: t('noTitularAlertText', {
+          guardian: data.guardians[0].name + ' ' + data.guardians[0].last_name
+        }),
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: t('yes'),
+        cancelButtonText: t('no')
+      })
+
+      if (result.isConfirmed) {
+        // Update the guardian to be titular
+        const updatedGuardians = data.guardians.map(guardian => ({
+          ...guardian,
+          titular: true
+        }))
+
+        // Set the updated guardians in the form state
+        setValue('guardians', updatedGuardians)
+      }
+    } else if (
+      !GuardiansValidations.allHaveUniqueGuardianTypes(data.guardians)
+    ) {
+      await Swal.fire({
+        title: t('NoMoreThanOneGuardianOfTheSameType'),
+        text: t('NoMoreThanOneGuardianOfTheSameTypeText'),
+        icon: 'warning',
+        confirmButtonText: t('ok')
+      })
+      return false
+    } else if (data.guardians.length > 1) {
+      const titularGuardians = data.guardians.filter(g => g.titular)
+
+      if (titularGuardians.length === 0) {
+        // Alert if no guardian is titular
+        await Swal.fire({
+          title: t('noTitularAlertTitle'),
+          text: t('titularRequiredAlertText'),
+          icon: 'warning',
+          confirmButtonText: t('ok')
+        })
+        return false
+      } else if (titularGuardians.length > 1) {
+        // Alert if more than one guardian is titular
+        await Swal.fire({
+          title: t('multipleTitularsAlertTitle'),
+          text: t('multipleTitularsAlertText'),
+          icon: 'warning',
+          confirmButtonText: t('ok')
+        })
+        return false
+      }
+    }
+    return true
+  }
+
+  //#region contract creation
+  const onCreateContract = async (children, guardians) => {
+    console.log('============')
+    console.log('children', children)
+    console.log('guardians', guardians)
+    const response = await Swal.fire({
+      title: t('areYouSure'),
+      text: t('areYouSureContractCreation'),
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: t('yes'),
+      cancelButtonText: t('no')
+    })
+ 
+    if (response.isConfirmed) {
+      setLoadingInfo({
+        loading: true,
+        loadingMessage: t('weAreSavingContract')
+      })
   
-  const onSubmit = async (data) => {
+      const contractResponseParent = await ContractService.createContract(  
+        children,
+        guardians,
+        t
+      )
+      const contractResponse = contractResponseParent.guardianChildren
+      setLoadingInfo({
+        loading: false,
+        loadingMessage: ''
+      })
+
+      console.log('contract', contractResponseParent)
+      console.log('contractResponse', contractResponse)
+      const error = contractResponse?.some(
+        response => response.httpStatus !== 200
+      ) ?? contractResponse.httpStatus !== 200
+
+      const message = contractResponse?.map(response => response.response?.message)
+        .join(', ')  ?? contractResponse.response?.message
+      if (error) {
+        ToastInterpreterUtils.toastInterpreter(
+          toast,
+          'error',
+          t('contractCreationFailed', { response: message })
+        )
+      } else {
+        setContractInformation({
+          ...contractInformation,
+          guardians: guardians,
+          contract_number: contractResponseParent?.contractInfo?.response?.contract_number ?? 0,
+          contract_id: contractResponseParent?.contractInfo?.response?.id ?? 0
+        })
+
+        ToastInterpreterUtils.toastInterpreter(
+          toast,
+          'success',
+          t('contractCreated')
+        )
+      
+        //#region new form step
+        setActiveIndex(2)
+      }
+      return contractResponseParent
+    }
+  } 
+  /**
+   * This function checks if the form data is valid
+   * @param {*} data Form data
+   * @returns
+   */
+  const isInvalidFormData = data => {
+    return !data || !data.guardians || data.guardians.length === 0
+  }
+
+  //#region form onSubmit
+  const onSubmit = async data => {
+    if (isInvalidFormData(data)) {
+      console.log('badUsage of the form')
+      return
+    }
     try {
-      console.log("data", data);
+      console.log('data', data)
+
+      if (!(await onProcessGuardiansValidation(data))) {
+        return
+      }
+      //  Handle creating/updating guardians asynchronously
+      const guardiansAsync = await onHandlerGuardianBackendAsync(data)
+      console.log('Guardians responses', guardiansAsync)
+      //  Update parent component with the new guardians data
   
-      // Handle creating/updating guardians asynchronously
-      const guardiansAsync = await onHandlerGuardianBackendAsync(data);
-      console.log("Guardians responses", guardiansAsync);
-  
-      // Update parent component with the new guardians data
-      setContractInformation({ ...contractInformation, guardians: guardiansAsync });
-  
-      // Show success toast message
-      toast.current.show({ severity: 'success', summary: 'Success', detail: t('guardiansInformationSaved'), life: 3000 });
-  
+      console.log('contractInformation', contractInformation)
+      const contract = await onCreateContract(
+        contractInformation.children,
+        guardiansAsync
+      )
+      console.log('contract', contract)
+
+      // ToastInterpreterUtils.toastInterpreter(toast,'success',t('guardiansInformationSaved'))
+
       // Optionally update active index or handle other logic
       //setActiveIndex(2);
     } catch (error) {
-      console.error('Error processing guardians data', error);
-      toast.current.show({ severity: 'error', summary: 'Error', detail: t('guardiansInformationSaveFailed'), life: 3000 });
+      console.error('Error processing guardians data', error)
+      ToastInterpreterUtils.toastInterpreter(
+        toast,
+        'error',
+        t('guardiansInformationSaveFailed')
+      )
     }
-  };
-
+  }
 
   const addGuardian = () => {
-    const updatedGuardians = [...getValues('guardians'), { ...defaultGuardian }];
-    setValue('guardians', updatedGuardians);
-  };
+    const updatedGuardians = [...getValues('guardians'), { ...defaultGuardian }]
+    setValue('guardians', updatedGuardians)
+  }
 
-  const removeGuardian = (index) => {
-    const updatedGuardians = getValues('guardians').filter((_, i) => i !== index);
-    setValue('guardians', updatedGuardians);
-  };
+  const removeGuardian = index => {
+    const updatedGuardians = getValues('guardians').filter(
+      (_, i) => i !== index
+    )
+    setValue('guardians', updatedGuardians)
+  }
 
-  const getAvailableGuardianTypes = (index) => {
-    const selectedTypes = getValues('guardians').map((g, i) => i !== index ? g.guardianType : null);
-    return guardianTypeOptions.filter(option => !selectedTypes.includes(option.value));
-  };
+  const getAvailableGuardianTypes = index => {
+    const selectedTypes = getValues('guardians').map((g, i) =>
+      i !== index ? g.guardianType : null
+    )
+    return guardianTypeOptions.filter(
+      option => !selectedTypes.includes(option.value)
+    )
+  }
 
-  const handleGuardianSelect = (e) => {
-    const selectedGuardian = e.value;
-    console.log("selectedGuardian", selectedGuardian);
+  const handleGuardianSelect = e => {
+    const selectedGuardian = e.value
+    const selectedGuardianObject = guardianOptions.find(g => g.id === e.value)
+    console.log('selectedGuardian', selectedGuardian, e, guardianOptions)
 
-    toast.current.show({ severity: 'success', summary: 'Success', detail: t('guardianInfoLoaded'), life: 3000 });
+    toast.current.show({
+      severity: 'success',
+      summary: 'Success',
+      detail: t('guardianInfoLoaded'),
+      life: 3000
+    })
 
     // Check if the guardian already exists in the fields
-    const existingGuardianIndex = fields.findIndex(guardian => guardian.email === selectedGuardian.email);
-
+    const existingGuardianIndex = fields.findIndex(
+      guardian => guardian.email === selectedGuardian.email
+    )
     if (existingGuardianIndex === -1) {
       // If the guardian does not exist, add it to the fields
+      // TODO add titular property from table
       append({
-        ...selectedGuardian,
-        name: selectedGuardian.name || '',
-        address: selectedGuardian.address || '',
-        city: selectedGuardian.city || '',
-        email: selectedGuardian.email || '',
-        phone: selectedGuardian.phone || '',
-        guardianType: selectedGuardian.guardianType || '',
-        titular: selectedGuardian.titular || false,
-      });
+        ...selectedGuardianObject
+      })
     } else {
       // If the guardian exists, populate the form with the guardian's data
-      setValue(`guardians[${existingGuardianIndex}].name`, selectedGuardian.name || '');
-      setValue(`guardians[${existingGuardianIndex}].address`, selectedGuardian.address || '');
-      setValue(`guardians[${existingGuardianIndex}].city`, selectedGuardian.city || '');
-      setValue(`guardians[${existingGuardianIndex}].email`, selectedGuardian.email || '');
-      setValue(`guardians[${existingGuardianIndex}].phone`, selectedGuardian.phone || '');
-      setValue(`guardians[${existingGuardianIndex}].guardianType`, selectedGuardian.guardianType || '');
-      setValue(`guardians[${existingGuardianIndex}].titular`, selectedGuardian.titular || false);
+      Object.keys(selectedGuardianObject).forEach(key => {
+        setValue(
+          `guardians[${existingGuardianIndex}].${key}`,
+          selectedGuardianObject[key]
+        )
+      })
     }
-  };
+  }
   //#region form return
   return (
-    <div className="form-container">
+    <div className='form-container'>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="field p-float-label" style={{ marginBottom: "30px", maxWidth: "15rem" }}>
+        <div
+          className='field p-float-label'
+          style={{ marginBottom: '30px', maxWidth: '15rem' }}
+        >
           <Dropdown
-            id="names-dropdown-child"
+            id='names-dropdown-child'
             filter
+            optionLabel='label'
             emptyMessage={t('dropdownEmptyMessage')}
             options={guardianOptions}
             onChange={handleGuardianSelect}
-            optionLabel="fullName"
           />
-          <label htmlFor="names-dropdown-child" style={{ paddingTop: "0px" }}>{t('pickAGuardian')}</label>
+          <label htmlFor='names-dropdown-child' style={{ paddingTop: '0px' }}>
+            {t('pickAGuardian')}
+          </label>
         </div>
 
         {fields.map((guardian, index) => (
-          <div key={index} className="child-form">
+          <div key={index} className='child-form'>
             <InputTextWrapper
               name={`guardians[${index}].name`}
               control={control}
               rules={{ required: t('guardianNameRequired') }}
               label={t('guardianName')}
-              onChangeCustom={(value) => capitalizeFirstLetter(value)}/>
-          <InputTextWrapper
+              onChangeCustom={value => capitalizeFirstLetter(value)}
+            />
+            <InputTextWrapper
               name={`guardians[${index}].last_name`}
               control={control}
               rules={{ required: t('guardianLastNameRequired') }}
               label={t('guardianLastName')}
-              onChangeCustom={(value) => capitalizeFirstLetter(value)}/>
+              onChangeCustom={value => capitalizeFirstLetter(value)}
+            />
             <InputTextWrapper
               name={`guardians[${index}].address`}
               control={control}
               rules={{ required: t('addressRequired') }}
               label={t('address')}
-              onChangeCustom={(value) => capitalizeFirstLetter(value)}/>
+              onChangeCustom={value => capitalizeFirstLetter(value)}
+            />
             <InputTextWrapper
               name={`guardians[${index}].city`}
               control={control}
               rules={{ required: t('cityRequired') }}
-              label={t('city')}/>
+              label={t('city')}
+            />
             <InputTextWrapper
               name={`guardians[${index}].email`}
               control={control}
-              keyFilter="email"
+              keyFilter='email'
               rules={{ required: t('emailRequired') }}
               label={t('email')}
             />
             <InputTextWrapper
               name={`guardians[${index}].phone`}
               control={control}
-              rules={{required: t('phoneNumberRequired'), pattern: {value: /^[+]?[\d]+$/,message: t('phoneNumberPattern')}}}
+              rules={{
+                required: t('phoneNumberRequired'),
+                pattern: {
+                  value: /^[+]?[\d]+$/,
+                  message: t('phoneNumberPattern')
+                }
+              }}
               label={t('phoneNumber')}
-              keyFilter="int"
+              keyFilter='int'
               spanClassName='c-small-field r-10'
             />
             <DropdownWrapper
               name={`guardians[${index}].guardian_type_id`}
               control={control}
               options={getAvailableGuardianTypes(index)}
-              optionValue="id"
-              optionLabel="label"
+              optionValue={'id'}
+              optionLabel='name'
               label={t('guardianType')}
-              rules={{ required: t('guardianTypeRequired') }} 
-                spanClassName="c-small-field r-10"
-              />
+              rules={{ required: t('guardianTypeRequired') }}
+              spanClassName='c-small-field r-10'
+            />
             <CheckboxWrapper
               name={`guardians[${index}].titular`}
               control={control}
               label={t('titular')}
+              labelClassName='c-label-checkbox left'
               labelPosition='left'
-
-                
-              />
+            />
             <Button
-              icon="pi pi-trash"
-              className="p-button-danger p-button-text p-ml-2"
+              icon='pi pi-trash'
+              className='p-button-danger p-button-text p-ml-2'
               onClick={() => removeGuardian(index)}
             />
           </div>
         ))}
 
-        <div className="button-group">
-          <Button icon="pi pi-plus" label={t('addGuardian')} className="p-button-success" onClick={
-            e => {
-              e.preventDefault();
-              e.stopPropagation();
-              addGuardian();
-            }} disabled={getValues("guardians")?.length > 2} />
-          <Button type="submit" label={t('save')} className="p-button-primary p-ml-2" />
-          <Button label={t('returnToPreviousStep')} className="p-button-secondary p-ml-2" onClick={e => {
-
-            setActiveIndex(0)
-          }} />
+        <div className='button-group'>
+          <Button
+            icon='pi pi-plus'
+            label={t('addGuardian')}
+            className='p-button-success'
+            onClick={e => {
+              e.preventDefault()
+              e.stopPropagation()
+              addGuardian()
+            }}
+            disabled={getValues('guardians')?.length > 2}
+          />
+          <Button
+            type='submit'
+            label={t('save')}
+            className='p-button-primary p-ml-2'
+          />
+          <Button
+            label={t('returnToPreviousStep')}
+            className='p-button-secondary p-ml-2'
+            onClick={e => {
+              setActiveIndex(0)
+            }}
+          />
           {/* <Button label={!validForm ? t('fillTheForm') : t('next')} className="p-button-secondary p-ml-2" onClick={() => setActiveIndex(2)} disabled={!validForm} /> */}
         </div>
       </form>
     </div>
-  );
-};
+  )
+}
 
-export default StepComponentTwo;
+export default StepComponentTwo

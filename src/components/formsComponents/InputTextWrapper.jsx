@@ -46,6 +46,7 @@ const InputTextWrapper = ({
           <InputText
             id={name}
             {...field}
+            value={field.value || ''}
             className={classNames({ 'p-invalid': error })}
             disabled={disabled}
             keyfilter={keyFilter}

@@ -13,6 +13,7 @@ import { classNames } from 'primereact/utils';
  * @param {string} props.label - Label text for the checkbox field (required).
  * @param {boolean} [props.disabled=false] - Whether the checkbox is disabled. Optional.
  * @param {string} [props.spanClassName] - Optional CSS class name(s) to apply to the `<span>` wrapper.
+ * @param {string} [props.labelClassName] - Optional CSS class name(s) to apply to the label.
  * @param {string} [props.labelPosition="right"] - Position of the label: 'left' or 'right'. Defaults to 'right'.
  * @param {Object} [props.rest] - Any additional props for the `Checkbox` component.
  * 
@@ -25,6 +26,7 @@ const CheckboxWrapper = ({
   getFormErrorMessage,
   label,
   disabled = false,
+  labelClassName= '',
   spanClassName = '',
   labelPosition = 'right',
   ...rest
@@ -36,7 +38,7 @@ const CheckboxWrapper = ({
       rules={rules}
       render={({ field, fieldState: { error } }) => (
         <span className={` p-float-label ${spanClassName} c-checkbox ${labelPosition === 'left' ? 'label-left' : 'label-right'}`}>
-          {labelPosition === 'left' && <label htmlFor={name}>{label}</label>}
+          {labelPosition === 'left' && <p className={labelClassName}  htmlFor={name}>{label}</p>}
           <Checkbox
             id={name}
             {...field}
@@ -46,7 +48,7 @@ const CheckboxWrapper = ({
             onChange={(e) => field.onChange(e.checked)}
             {...rest}
           />
-          {labelPosition === 'right' && <label htmlFor={name}>{label}</label>}
+          {labelPosition === 'right' && <p className={labelClassName} htmlFor={name}>{label}</p>}
           {error && <small className="p-error">{error.message}</small>}
         </span>
       )}

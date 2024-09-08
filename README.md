@@ -1,8 +1,6 @@
 
 ## PROJECT ROADMAP
 ### `August`
-
-
     -Create form to register new users
     
     -Create table to save documentTypes
@@ -12,6 +10,30 @@
     -Create form to create guardians into application
     
 ### `September`
+    -Create form to update children into application
+    
+    -Create form to update guardians into application
+    
+    -Create form to delete children into application
+    
+    -Create form to delete guardians into application
+    
+    -Create form to get all children into application
+    
+    -Create form to get all guardians into application
+    
+    -Create form to get all contracts into application
+    
+    -Create form to get all children-guardians into application
+
+### `October`
+    -Create form to create contracts into application
+
+### `November`
+    -Create form to update contracts into application
+
+### `December`
+    -Create form to delete contracts into application   
 
     -Do you remembeeer?? 
     

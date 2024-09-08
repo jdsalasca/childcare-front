@@ -1,3 +1,4 @@
+@import './constants.scss';
 .c-steps-component {
     display: flex;
     gap: 2rem;
@@ -6,13 +7,28 @@
         gap: 2rem;
         overflow-y: scroll;
         padding-bottom: 2rem;
+        min-width: 100%;
     }
 }
-
+// ##region Styles for .c-steps-component
+.c-label-checkbox{
+    min-width: max-content;
+    word-break: break-all;
+    font-size: $font-size-label;
+    &.left{
+        margin-left: 0;
+        margin-right: 1rem;
+    }
+    &.right{
+        margin-right: 0;
+        margin-left: 1rem;
+    }
+}
 // ##region Styles for .layout
 .c-menubar {
     z-index: 1000;
 }
+
 
 .c-small-field {
     max-width: 5rem;
@@ -50,20 +66,19 @@
     align-items: center !important;
     width: fit-content;
     justify-content: space-between !important; // Horizontally centers the items
-    max-width: 10rem;
-    padding: 1rem;
-
-
+    max-width: max-content;
 
     &.label-left {
 
-      flex-direction: row-reverse;
+      display: flex;
+      flex-direction: inherit;
+
+      // flex-direction: row-reverse;
       margin-left: 1rem;
       
       // Ensure no extra space between the checkbox and label
       label {
         margin-right: 0.5rem; // Controls space between label and checkbox
-        margin-left: 0;
 
       }
     }

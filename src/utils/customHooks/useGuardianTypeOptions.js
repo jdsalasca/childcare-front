@@ -1,17 +1,15 @@
 import { useState, useEffect } from 'react';
-import { useActiveGuardianTypes, useGuardianTypes } from '../../models/cache/useGuardianTypesCache';
+import { useGuardianTypes } from '../../models/cache/useGuardianTypesCache';
 
 const useGuardianTypeOptions = () => {
   const [guardianTypeOptions, setGuardianTypeOptions] = useState([]);
   const { data: guardianTypes, error, isLoading } = useGuardianTypes();
 
   useEffect(() => {
-    console.log("useGuardianTypeOptions:::guardianTypes", guardianTypes);
     if (guardianTypes && !isLoading) {
       
       // Filter guardian types where status is "Active"
-      const activeGuardianTypes = guardianTypes.filter(type => type.status === 'Active');
-      console.log("activeGuardianTypes", activeGuardianTypes);
+      const activeGuardianTypes = guardianTypes?.response?.filter(type => type.status === 'Active');
       
       setGuardianTypeOptions(activeGuardianTypes.map(type => ({
         ...type,
