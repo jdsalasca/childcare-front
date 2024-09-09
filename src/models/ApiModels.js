@@ -26,6 +26,14 @@ export const ApiModels = {
     defaultResponseModel: new ApiResponseModel()
 };
 
+export class paymentMethod {
+    constructor(method, status, translationLabel) {
+        this.method = method;
+        this.status = status;
+        this.translationLabel = translationLabel;
+    }
+}   
+
 
 export class ChildrenGuardiansBuilder {
     constructor(children, guardians) {
@@ -52,3 +60,5 @@ export class ChildrenGuardiansBuilder {
         return childrenGuardians;
     }
 }   
+
+

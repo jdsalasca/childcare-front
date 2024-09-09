@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
@@ -7,9 +7,22 @@ import { paymentMethods } from '../utilsAndConsts';
 import { Calendar } from 'primereact/calendar';
 import { classNames } from 'primereact/utils';
 import { useTranslation } from 'react-i18next'
+import { ToastInterpreterUtils } from '../../utils/ToastInterpreterUtils';
+import useDays from '../../../models/customHooks/useDays';
 
 export const StepComponentFive = ({ setActiveIndex, contractInformation, setContractInformation, toast }) => {
     const { t } = useTranslation();
+    let {daysOptions: daysCache, error, isLoading} = useDays();
+    useEffect(() => {
+        console.log("daysCache", daysCache)
+        
+        if (daysCache && !isLoading) {
+            const days = daysCache
+            console.log(days)
+        }
+        
+    }, [daysCache, isLoading]);
+    
     const { control, handleSubmit, setError, clearErrors, watch, formState: { errors } } = useForm({
         defaultValues: {
             schedule: contractInformation.schedule || {
@@ -59,14 +72,17 @@ export const StepComponentFive = ({ setActiveIndex, contractInformation, setCont
         const newSchedule = {
             schedule: data.schedule
         };
+        console.log('newSchedule', newSchedule)
+        
         setContractInformation({ ...contractInformation, ...newSchedule });
+        ToastInterpreterUtils.toastInterpreter(toast,'success',t('success'),t('scheduleUpdated'),3000)
         toast.current.show({ severity: 'success', summary: t('success'), detail: t('scheduleUpdated') });
-        setActiveIndex(5); // Move to the next step or handle as needed
+        // setActiveIndex(5); // Move to the next step or handle as needed
     };
 
     return (
         <>
-            <h4 className="form-title">{t('childrenSchedule')}</h4>
+            {/* <h4 className="form-title">{t('childrenSchedule')}</h4> */}
             <div className="form-container schedule">
                 <form className='child-form' onSubmit={handleSubmit(onSubmit)}>
                     <div className='form-days'>

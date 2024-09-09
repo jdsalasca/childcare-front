@@ -35,7 +35,9 @@ export const ToastInterpreterUtils = {
      * @example
      * ToastInterpreterUtils.toastInterpreter(toast, response, 'success', 'Data saved successfully.');
      */
-      toastInterpreter: (toast, severity = 'info', message = '', duration = 3000) => {
+      toastInterpreter: (toast, severity = 'info',title=severity.charAt(0).toUpperCase() + severity.slice(1), message = '', duration = 3000) => {
+        console.log('toastInterpreter', toast, severity, title, message, duration)
+        
         // Validate severity to ensure it matches one of the allowed values
         const allowedSeverities = ['success', 'info', 'warn', 'error'];
         if (!allowedSeverities.includes(severity)) {

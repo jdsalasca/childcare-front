@@ -18,6 +18,7 @@ import { classNames } from 'primereact/utils';
  * @param {boolean} [props.disabled=false] - Whether the calendar is disabled. Optional, defaults to false.
  * @param {Function} [props.onChangeCustom] - Custom onChange handler if needed. Optional.
  * @param {Object} [props.rest] - Any additional props for the `Calendar` component.
+ * @param {boolean} [props.showIcon=false] - Whether to show the calendar icon. Optional, defaults to false.  
  * @param {string} [props.spanClassName] - Optional CSS class name(s) to apply to the `<span>` wrapper element.
  * 
  * @returns {React.Element} The rendered CalendarWrapper component.
@@ -32,6 +33,7 @@ const CalendarWrapper = ({
   disabled = false,
   spanClassName = '',
   onChangeCustom,
+  showIcon = false,
   ...rest
 }) => {
   return (
@@ -51,6 +53,7 @@ const CalendarWrapper = ({
               dateFormat={dateFormat}
               className={classNames({ 'p-invalid': error })}
               disabled={disabled}
+              showIcon={showIcon}
               value={value || null} // Ensure value is a Date object or null
               onChange={(e) => {
                 field.onChange(e.value);

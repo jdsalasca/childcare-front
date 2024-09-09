@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next';
  * @param {Function} props.getFormErrorMessage - Function to retrieve the error message for the field.
  * @param {string} props.label - Label text for the dropdown field.
  * @param {boolean} props.disabled - Whether the dropdown is disabled.
+ * @param {boolean} props.filter - Whether to filter the dropdown options based on the input value.
  * @param {string} [props.placeholder] - Optional placeholder text for the dropdown.
  * @param {string} [props.spanClassName] - Optional CSS class name(s) to apply to the `<span>` wrapper element.
  * @param {Object} props.rest - Any additional props for Dropdown.
@@ -31,6 +32,7 @@ const DropdownWrapper = ({
   getFormErrorMessage,
   label,
   disabled = false,
+  filter = false,
   placeholder,
   spanClassName = '',
   ...rest
@@ -60,6 +62,7 @@ const DropdownWrapper = ({
             id={name}
             {...field}
             options={options}
+            filter = {filter}
             emptyMessage={t('dropdownEmptyMessage')}
             optionLabel={optionLabel}
             optionValue={optionValue}

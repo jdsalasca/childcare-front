@@ -10,6 +10,15 @@
         min-width: 100%;
     }
 }
+.c-dropdown-field{
+    &.m-r-15{
+        min-width: 15rem;
+    }
+    &.m-r-inherit{
+        min-width: inherit;
+    }
+}
+
 // ##region Styles for .c-steps-component
 .c-label-checkbox{
     min-width: max-content;

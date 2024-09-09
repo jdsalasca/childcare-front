@@ -12,6 +12,17 @@ const ContractAPI = {
         throw error;
       }
     },
+    updateContractPaymentDetails: async (contract) => {
+      console.log('contract on createContract', contract);
+      
+      try {
+        const response = await API.put(BASE_URL, `/contracts/payment_details/${contract.contract_id}`,  contract );
+        return response;
+      } catch (error) {
+        console.error('Error updating contract payment details:', error);
+        throw error;
+      }
+    },
     
     updateContract: async (contract) => {
         try {
