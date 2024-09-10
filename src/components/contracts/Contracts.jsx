@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, version } from 'react';
+import React, {  useRef, useState } from 'react';
 import { generateContractPdf } from './utils/contractPdfUtils'; // Adjust the path as per your file structure
 import { Steps } from 'primereact/steps';
 import StepComponentOne from './steps/StepComponentOne';
@@ -6,15 +6,16 @@ import StepComponentTwo from './steps/StepComponentTwo';
 import StepComponentThree from './steps/StepComponentThree';
 import StepComponentSeven from './steps/StepComponentSeven';
 import { Toast } from 'primereact/toast';
-import { defaultContractInfo, formatTime, validateSchedule } from './utilsAndConsts';
+import { defaultContractInfo, validateSchedule } from './utilsAndConsts';
 import StepComponentFour from './steps/StepComponentFour';
 
 import { useTranslation } from 'react-i18next';
 import StepComponentFive from './steps/StepComponentFive';
 import StepComponentSix from './steps/StepComponentSix';
 import { contractFake } from './utils/testContract';
-import { loadingDefault } from '../../utils/constans';
+import { loadingDefault } from '../../utils/constants';
 import Loader from '../utils/Loader';
+import useDays from '../../models/customHooks/useDays';
 export const Contracts = () => {
   /**
    * @param setLoadingInfo :: defaultObject loadingDefault
@@ -24,6 +25,7 @@ export const Contracts = () => {
   const { t } = useTranslation();
   const [activeIndex, setActiveIndex] = useState(0);
   const [contractInformation, setContractInformation] = useState(defaultContractInfo);
+  const {laboralDays: daysCache, error, isLoading} = useDays();
   const toast = useRef(null);
 
   // Function to calculate the number of accepted permissions
@@ -37,36 +39,7 @@ export const Contracts = () => {
     return `${acceptedPermissions}/${totalPermissions}`;
   };
 
-  useEffect(() => {
-    const { schedule } = contractInformation;
-    let shouldUpdate = false;
-    const updatedSchedule = {};
-    ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'].forEach(day => {
-      const startKey = `${day}Start`;
-      const endKey = `${day}End`;
-      const startDate = new Date(schedule[startKey]);
-      const endDate = new Date(schedule[endKey]);
-      if (schedule[`${day}StartLabel`] !== formatTime(startDate) || schedule[`${day}EndLabel`] !== formatTime(endDate)) {
-        updatedSchedule[startKey] = schedule[startKey];
-        updatedSchedule[endKey] = schedule[endKey];
-        updatedSchedule[`${day}StartLabel`] = formatTime(startDate);
-        updatedSchedule[`${day}EndLabel`] = formatTime(endDate);
-        shouldUpdate = true;
-      }
-    });
-    console.log('====================================');
-    console.log("updatedSchedule", updatedSchedule);
-    console.log('====================================');
-    if (shouldUpdate) {
-      setContractInformation(prevContractInfo => ({
-        ...prevContractInfo,
-        schedule: {
-          ...prevContractInfo.schedule,
-          ...updatedSchedule
-        }
-      }));
-    }
-  }, [contractInformation.schedule]);
+ 
 
   const countChildrenWithMedicalInfo = () => {
     //contractInformation?.children.forEach(child => console.log("child", child))
@@ -94,7 +67,7 @@ export const Contracts = () => {
         const isStep3Valid = (totalAmount && paymentMethod && startDate && endDate) && startDate < endDate;
         return isStep3Valid ? 'step-valid' : 'step-invalid';
       case 4:
-        return validateSchedule(contractInformation.schedule) ? 'step-valid' : 'step-invalid';
+        return validateSchedule(contractInformation?.schedule,daysCache) ? 'step-valid' : 'step-invalid';
       case 5:
         return  countChildrenWithMedicalInfo() === contractInformation.children.length  ? 'step-valid' : 'step-invalid'; // Disable if no children
       default:
@@ -150,7 +123,7 @@ export const Contracts = () => {
       case 6:
         return <StepComponentSeven setLoadingInfo={setLoadingInfo} toast={toast} setActiveIndex={setActiveIndex} 
         // contractInformation={contractInformation} 
-        contractInformation={contractFake}
+         contractInformation={contractInformation}
         setContractInformation={setContractInformation} />;
       default:
         return null;

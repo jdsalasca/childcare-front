@@ -31,6 +31,7 @@ export const ToastInterpreterUtils = {
      * 
      * @param {Object} toast - The toast reference (e.g., `toast.current`).
      * @param {string} severity - The severity of the toast message ('success', 'info', 'warn', or 'error').
+     * @param {string} title - The title of the toast message.
      * @param {string} message - The message to be shown in the toast.
      * @example
      * ToastInterpreterUtils.toastInterpreter(toast, response, 'success', 'Data saved successfully.');
@@ -39,7 +40,7 @@ export const ToastInterpreterUtils = {
         console.log('toastInterpreter', toast, severity, title, message, duration)
         
         // Validate severity to ensure it matches one of the allowed values
-        const allowedSeverities = ['success', 'info', 'warn', 'error'];
+        const allowedSeverities = ['success', 'info', 'warn', 'error',"contrast","secondary"];
         if (!allowedSeverities.includes(severity)) {
             console.warn(`Invalid severity level: ${severity}. Defaulting to 'info'.`);
             severity = 'info';

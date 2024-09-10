@@ -1,8 +1,7 @@
-import { useTranslation } from 'react-i18next'
 import {
-  ApiModels,
   ApiResponseModel,
-  ChildrenGuardiansBuilder
+  ChildrenGuardiansBuilder,
+  ContractDaySchedule
 } from '../../models/ApiModels'
 import { ChildrenGuardiansAPI } from '../../models/ChildrenGuardiansAPI'
 import { ContractAPI } from '../../models/ContractAPI'
@@ -17,6 +16,18 @@ import {
  * and creating relationships between children and guardians.
  */
 export class ContractService {
+
+  static isInvalidFormData (data, formData){ 
+    return !data || !data.guardians || data.guardians.length === 0 || !formData.children || formData.children.length === 0
+  }
+  /**
+   * method to check if the form data is valid for children
+   * @param {*} data 
+   * @returns 
+   */
+  static isInvalidFormDataChildren (data){ 
+    return  !data.children || data.children.length === 0
+  }
   /**
    * Validates the contract data by ensuring that all guardians have unique types
    * and all children have associated programs.
@@ -111,5 +122,11 @@ export class ContractService {
     const contractData = await this.createContractBase(guardians);
     console.log("contractData", contractData)
     return {guardianChildren:relationships,contractInfo: contractData} 
+  }
+
+  static async createContractSchedule(schedules = [ContractDaySchedule]){ 
+    const days = schedules.map(schedule => ContractAPI.createContractSchedule(schedule))
+    return await Promise.all(days)
+
   }
 }

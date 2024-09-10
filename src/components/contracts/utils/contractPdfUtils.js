@@ -3,7 +3,8 @@
 import jsPDF from 'jspdf';
 import { addFonts } from './jsPdfArial';
 import { defaultContractInfo, formatDateToYYYYMMDD } from '../utilsAndConsts';
-import { contractInfo } from './newFormatContract';
+import { contractInfo } from './newContractGenerator';
+import { Functions } from '../../../utils/functions';
 
 // Function to add the header
 const initialYposition  = 12.7 + 10;
@@ -246,7 +247,7 @@ const contractGenerator = (contractInformation =defaultContractInfo) => {
     options.yPosition = options.yPosition - 10
     addHeader(doc, "Educando Childcare Center", options,"title");
     addHeader(doc, "Contrato", options,"title");
-    addDateOnContract(doc,`Fecha de Comienzo ${formatDateToYYYYMMDD(contractInformation.startDate)}`,options)
+    addDateOnContract(doc,`Fecha de Comienzo ${Functions.formatDateToMMDDYY(contractInformation.startDate)}`,options)
     addPageContent(doc, contractInfo, options, 'page1');
     options.yPosition = options.initialY
     

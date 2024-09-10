@@ -10,22 +10,21 @@ import { classNames } from 'primereact/utils';
 import { useTranslation } from 'react-i18next';
 import { Badge } from 'primereact/badge';
 import { Calendar } from 'primereact/calendar';
-import { billTypes, formatDateToYYYYMMDD, programOptions } from '../contracts/utilsAndConsts';
+import {  formatDateToYYYYMMDD, programOptions } from '../contracts/utilsAndConsts';
 import { Dropdown } from 'primereact/dropdown';
 import { InputNumber } from 'primereact/inputnumber';
-import ChildrenAPI, { useChildren } from '../../models/ChildrenAPI';
+import  { useChildren } from '../../models/ChildrenAPI';
 import { formatDate } from './utils/utilsAndConstants';
-import { BillTypeAPI, useBillTypesByCurrencyCode } from '../../models/BillTypeAPI';
+import {  useBillTypesByCurrencyCode } from '../../models/BillTypeAPI';
 import { CashAPI } from '../../models/CashAPI';
 import Loader from '../utils/Loader';
 import { exportBoxesToPDF } from './utils/boxesPdf';
-import { dummyData } from './utils/testDataBoxes';
-import { loadingDefault } from '../../utils/constans';
+import { loadingDefault } from '../../utils/constants';
 
 
 const Bills = () => {
-  const { data: currenciesInformation, error, isLoading } = useBillTypesByCurrencyCode("USD");
-  const { data: children, error: errorChild, isLoading: loadingChildren } = useChildren();
+  const { data: currenciesInformation, } = useBillTypesByCurrencyCode("USD");
+  const { data: children } = useChildren();
   const [loadingInfo, setLoadingInfo] = useState(loadingDefault)
   const { t } = useTranslation(); // Initialize translation hook
   const isFetching = useRef(false);

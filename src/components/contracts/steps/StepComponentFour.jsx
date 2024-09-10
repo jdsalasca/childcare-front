@@ -24,13 +24,14 @@ import usePaymentMethodsOptions from '../../../utils/customHooks/usePaymentMetho
  * 
  * @returns {React.Element} The rendered StepComponentFour component.
  */ 
+// TODO  Improve dates validation, improve total amount validation
 export const StepComponentFour = ({
   setActiveIndex,
   contractInformation,
   setContractInformation,
   toast
 }) => {
-   let {paymentMethodsOptions: paymentMethodsCache, error, isLoading} = usePaymentMethodsOptions();
+   let {paymentMethodsOptions: paymentMethodsCache, isLoading} = usePaymentMethodsOptions();
    const [paymentMethods, setPaymentMethods] = useState([]);
 
   useEffect(() => {
@@ -69,7 +70,6 @@ export const StepComponentFour = ({
   //#region onSetDoubleNotation
   const onSetDoubleNotation = (value) => {
     return value;
-
   };
   
   useEffect(() => {
@@ -96,22 +96,19 @@ export const StepComponentFour = ({
       ToastInterpreterUtils.toastInterpreter(toast,'info','info',t('contractInformationRequiredMessage'),3000)
       return
     }
-    setContractInformation({ ...contractInformation, ...data })
 
+    setContractInformation({ ...contractInformation, ...data })
     const response =await  ContractAPI.updateContractPaymentDetails(data)
     console.log("response", response)
-    
     ToastInterpreterUtils.toastInterpreter(
       toast,
       'success',
       t('success'),
       t('termsUpdated')
     )
-
     // #region move to the next step
     setActiveIndex(4); // Move to the next step or handle as needed
   }
-
   //#region return component
   return (
     <div className='form-container terms'>
@@ -119,7 +116,7 @@ export const StepComponentFour = ({
         <CalendarWrapper
           name='start_date'
           control={control}
-          dateFormat='yy-mm-dd'
+          dateFormat="mm/dd/yy"
           label={t('contractStartDate')}
           spanClassName='p-float-label'
           showIcon
@@ -129,14 +126,13 @@ export const StepComponentFour = ({
         <CalendarWrapper
           name='end_date'
           control={control}
-          dateFormat='yy-mm-dd'
+          dateFormat="mm/dd/yy"
           label={t('contractEndDate')}
           spanClassName='p-float-label'
           showIcon
           disabled={false} // You can set this dynamically if needed
-          rules={{ required: t('contractEndDateRequired') }}
+          rules={{ required: t('contractEndDateRequired')}}
         />
-
         <DropdownWrapper
           name='payment_method_id'
           control={control}
@@ -148,17 +144,16 @@ export const StepComponentFour = ({
           rules={{ required: t('paymentMethodRequired') }}
           spanClassName='p-float-label c-dropdown-field m-r-inherit'
         />
+
         <InputTextWrapper
           name='total_to_pay'
           control={control}
-          rules={{ required: t('totalAmountRequired') }}
+          rules={{ required: t('totalAmountRequired'), min: { value: 0, message: [t('totalAmountRequired')] } }}
           label={t('totalAmount')}
           keyFilter={/^[0-9.]*$/}
-          onChangeCustom={(value) => onSetDoubleNotation(value)}
-
           spanClassName='p-float-label'
-
         />
+          {/* onChangeCustom={(value) => onSetDoubleNotation(value)} */}
         <div className='button-group'>
           <Button
             type='submit'

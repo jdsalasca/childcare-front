@@ -9,6 +9,9 @@ import InputTextWrapper from '../../formsComponents/InputTextWrapper';
 import CalendarWrapper from '../../formsComponents/CalendarWrapper';
 import DropdownWrapper from '../../formsComponents/DropdownWrapper';
 import useGenderOptions from '../../../utils/customHooks/useGenderOptions';
+import { ContractService } from '../contractModelView';
+import { ToastInterpreterUtils } from '../../utils/ToastInterpreterUtils';
+import { Validations } from '../../../utils/validations';
 
 /**
  * 
@@ -119,6 +122,10 @@ export const StepComponentOne = ({ setLoadingInfo, setActiveIndex, contractInfor
   
   //#region  onSubmit method
   const onSubmit = async(data) => {
+    if (ContractService.isInvalidFormDataChildren(data)) {
+      ToastInterpreterUtils.toastInterpreter(toast,'info',t('info'),t('addAtLeastOneGuardianAndAtLeastOneChild'),3000)
+      return
+    }
  
   try {
     console.log("data", data);
@@ -149,20 +156,31 @@ export const StepComponentOne = ({ setLoadingInfo, setActiveIndex, contractInfor
     remove(index);
   };
 
+  /**
+   * This function is called when the user changes the born date of a child
+   * @param {*} date 
+   * @param {*} index 
+   * @returns 
+   */
+  //#region handleBornDateChange
   const handleBornDateChange = (date, index) => {
     console.log("date", date);
     console.log("index", index);
-
 
     const weeksOld = calculateWeeksOld(date);
     console.log("weeksOld", weeksOld);
 
     const program = determineProgram(weeksOld);
-    const age = calculateAge(date);
+    let age = calculateAge(date);
+    console.log("program", program);
+    console.log("age", age);
+    if(age === 0){ age = "0" }
+
+    // Ensure that the age value is being set correctly, including 0
     setValue(`children[${index}].program`, program);
     setValue(`children[${index}].age`, age);
     return date;
-  };
+};
 
   const handleChildSelect = (e) => {
     const selectedChild = e.value;
@@ -224,25 +242,26 @@ export const StepComponentOne = ({ setLoadingInfo, setActiveIndex, contractInfor
               rules={{ required: t('childNameRequired') }}
               label={t('childName')}
               keyFilter={/^[a-zA-ZñÑ.,\s]*$/}
-              onChangeCustom={(value) => capitalizeFirstLetter(value)}
+              onChangeCustom={(value) => Validations.capitalizeFirstLetter(value)}
               errors={errors}
             />
-
+            
             <InputTextWrapper
               name={`children[${index}].last_name`}
               control={control}
               rules={{ required: t('childLastNameRequired') }}
               label={t('childLastName')}
               keyFilter={/^[a-zA-ZñÑ.,\s]*$/}
-              onChangeCustom={(value) => capitalizeFirstLetter(value)}
+              onChangeCustom={(value) => Validations.capitalizeFirstLetter(value)}
 
             />
             <CalendarWrapper
               name={`children[${index}].born_date`}
               control={control}
+              maxDate={new Date()}
               rules={{ required: t('bornDateRequired') }}
               label={t('bornDate')}
-              dateFormat="yy-mm-dd"
+             dateFormat="mm/dd/yy"
               showIcon
               onChangeCustom={(value) => handleBornDateChange(value, index)}
             />
@@ -253,10 +272,7 @@ export const StepComponentOne = ({ setLoadingInfo, setActiveIndex, contractInfor
                 min: { value: 0, message: t('ageMustBeGreaterThanZero') }
               }}
               label={t('childAge')}
-              disabled
-              keyFilter="int"
-              spanClassName="c-small-field"
-              placeholder={t('agePlaceholder')} // Optional placeholder text
+              spanClassName="c-small-field r-m-9"
             />
 
             {/* <Controller

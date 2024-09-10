@@ -21,7 +21,7 @@ export const useGendersCache = () => {
   return useQuery({
     queryKey: ['genders'],  // Unique key for caching
     queryFn: () => GenderAPI.getGenders(),  // API function
-    staleTime: 1000 * 60 * 20,  // Cache time in milliseconds (20 minutes)
+    staleTime: 1000 * 60 * 20,  // Cache time in milliseconds (20 minutes) // TODO add this as a constant
     cacheTime: 1000 * 60 * 30, // Cache time in milliseconds (30 minutes)
   });
 };

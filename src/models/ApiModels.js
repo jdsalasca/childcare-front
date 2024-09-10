@@ -13,7 +13,6 @@ export class ApiResponseModel {
         this.response = response;
     }
 }
-
 /**
  * Provides default response models for API calls.
  */
@@ -62,3 +61,31 @@ export class ChildrenGuardiansBuilder {
 }   
 
 
+/**
+ * Class representing a contract day schedule.
+ * 
+ */
+export class ContractDaySchedule {
+    constructor(contractId, dayId, checkIn, checkOut) {
+        this.contractId = contractId;
+        this.dayId = dayId;
+        this.checkIn = checkIn;
+        this.checkOut = checkOut;
+    }
+    
+    /**
+     * Builds an array of contract-day-schedule objects to use the method of creating contract-day-schedules.
+     * 
+     * @returns {Array} - An array of contract-day-schedule objects.
+     */
+    build() {
+        const contractDaySchedules = [];
+        contractDaySchedules.push({
+            contract_id: this.contractId,
+            day_id: this.dayId,
+            check_in: this.checkIn,
+            check_out: this.checkOut,
+        });
+        return contractDaySchedules;
+    }
+}   

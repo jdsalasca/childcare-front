@@ -18,6 +18,9 @@ import { classNames } from 'primereact/utils';
  * @param {boolean} [props.disabled=false] - Whether the calendar is disabled. Optional, defaults to false.
  * @param {Function} [props.onChangeCustom] - Custom onChange handler if needed. Optional.
  * @param {Object} [props.rest] - Any additional props for the `Calendar` component.
+ * @param {Date} [props.maxDate] - Maximum date for the calendar. Optional, defaults to null.
+ * @param {string} [props.icon="pi pi-calendar"] - Icon class name for the calendar icon. Optional, defaults to "pi pi-calendar".
+ * @param {boolean} [props.timeOnly=false] - Whether to display only the time picker. Optional, defaults to false.
  * @param {boolean} [props.showIcon=false] - Whether to show the calendar icon. Optional, defaults to false.  
  * @param {string} [props.spanClassName] - Optional CSS class name(s) to apply to the `<span>` wrapper element.
  * 
@@ -26,10 +29,13 @@ import { classNames } from 'primereact/utils';
 const CalendarWrapper = ({
   name,
   control,
-  dateFormat,
+  dateFormat = 'mm/dd/yy',
   rules,
+  maxDate = null, // Default null for no maximum date
   getFormErrorMessage,
   label,
+  icon= "pi pi-calendar",
+  timeOnly = false,
   disabled = false,
   spanClassName = '',
   onChangeCustom,
@@ -54,6 +60,9 @@ const CalendarWrapper = ({
               className={classNames({ 'p-invalid': error })}
               disabled={disabled}
               showIcon={showIcon}
+              maxDate={maxDate}
+              icon={icon}
+              timeOnly={timeOnly}
               value={value || null} // Ensure value is a Date object or null
               onChange={(e) => {
                 field.onChange(e.value);

@@ -7,11 +7,11 @@ export const contractInfo = (contractData = defaultContractInfo) => {
     console.log("contractData", contractData);
     console.log('====================================');
     const todayDate = formatDateToYYYYMMDD(contractData.todayDate);
-    const startDate = formatDateToYYYYMMDD(contractData.startDate);
-    const endDate = formatDateToYYYYMMDD(contractData.endDate);
+    const startDate = formatDateToYYYYMMDD(contractData.start_Date);
+    const endDate = formatDateToYYYYMMDD(contractData.end_date);
 
     const guardians = contractData.guardians.map(g => g.name).join(', ');
-    const children = contractData.children.map(child => `- Nombre del niño: ${child.name}, fecha de nacimiento: ${formatDateToYYYYMMDD(child.bornDate)}`).join(`\n`);
+    const children = contractData.children.map(child => `- Nombre del niño: ${child.first_name + " " + child.last_name}, fecha de nacimiento: ${formatDateToYYYYMMDD(child.bornDate)}`).join(`\n`);
     
    
     return {
@@ -23,7 +23,7 @@ export const contractInfo = (contractData = defaultContractInfo) => {
             parr5: `\nY el nombre de los niños a quienes Educando Childcare brindará el servicio de cuidado infantil son:\n\n`,
             parr6: `${children}`,
             parr7: `\nEl Pago por el servicio de cuidado infantil de su niño será de forma:`,
-            parr8: `\n /n - Cash - Programa de Subsidio y Co-pay Mensual de: $${contractData.totalAmount}`,
+            parr8: `\n /n - Cash - Programa de Subsidio y Co-pay Mensual de: $${contractData.total_to_pay}`,
             parr9: `\nEducando Childcare provee un servicio de cuidado infantil y enseñanza de calidad ayudando en el desarrollo de los primeros años del niño, bajo los estándares del Departamento de Educación de Nebraska.`,
             parr10: `\nAdemás, provee alimentos saludables preparados diariamente bajo regulaciones del Programa de Comidas del Departamento de Salud y Servicios Humanos del Estado de Nebraska. La alimentación dependerá del horario acordado en este Contrato y la aprobación del Subsidy program, si fuera el caso (Por favor llenar y firmar la forma de comidas).`
         },
@@ -33,7 +33,7 @@ export const contractInfo = (contractData = defaultContractInfo) => {
             parr3: `\nPasada la hora acordada de recogida de su niño es tardanza; sin embargo, tendremos una tolerancia de 15 minutos. Pasado este tiempo, el pago en ese momento por tardanza es:\n\n - Pasados los primeros 15 minutos: $15\n - Pasados 30 minutos: $30`,
             parr4: `\nSi los Padres/Guardian deben pagar al daycare el Co-pay del Subsidy Program o Título XX, este deberá ser realizado durante <strong> los primeros 3 días de cada mes </strong>. Pasado ese tiempo, se cobrará un cargo adicional de $10 por cada día pasado.`,
             parr5: `\nEducando Childcare lleva a cabo un Calendario de actividades y festividades con sus niños dentro y fuera de sus instalaciones, lo que tendrá un costo simbólico de: $20 anuales por niño. No incluye a Bebés hasta 18 meses.`,
-            parr6: `\nEl Pago por el servicio de cuidado infantil de su niño será de forma:\n\n- Cash - Programa de Subsidio - Co-pay Mensual: $${contractData.totalAmount}`,
+            parr6: `\nEl Pago por el servicio de cuidado infantil de su niño será de forma:\n\n- Cash - Programa de Subsidio - Co-pay Mensual: $${contractData.total_to_pay}`,
             parr7: `\nEntonces, el pago por el servicio de cuidado infantil de su(s) niño(s) incluirá:`,
             // parr8: `\n-Pago anual por actividades de $20 por familia (${contractData.children.length} niños): Total $${contractData.children.length * 20}`,
             parr8: `\n-Pago anual por actividades de $20 por familia (${contractData.children.length} niños): Total $${20}`,
@@ -125,7 +125,7 @@ page10: {
 ,
     page11: {
         parr0: `<strong>Autorización de Uso de Fotografía y Media</strong>\n\n`,
-        parr1: `Yo, ${contractData?.guardians[0]?.name}, Madre/Padre o Apoderado de mi niño(s) llamado(s) ${contractData?.children?.map(child => child.name).join(", ") ?? "No hay niños asignados"}, estoy de acuerdo que Educando Childcare: (Por favor marque lo que desee)`,
+        parr1: `Yo, ${contractData?.guardians[0]?.name}, Madre/Padre o Apoderado de mi niño(s) llamado(s) ${contractData?.children?.map(child => child.first_name).join(", ") ?? "No hay niños asignados"}, estoy de acuerdo que Educando Childcare: (Por favor marque lo que desee)`,
         parr2: `\n${contractData.photosAllowed ? '☑' : '☐'} Comparta fotos, videos, media con mi niño(s) allí con otras familias de niños registrados en el daycare para propósito solo familiar y personal (via email, libro del año o de su aula o impresión de fotos).`,
         parr3: `\n${contractData.externalPhotosAllowed ? '☑' :'☐' } Permiso a otros Padres de los niños registrados en Educando Childcare para tomar fotografías, videos y media con mis niños allí, si están de acuerdo otros Padres para uso solamente personal y familiar como Celebraciones de cumpleaños, festividades celebradas en el daycare.`,
         parr4: `\n${contractData.specialExternalUsage ? '☑' : '☐'} Uso de fotografías de mi niño para trabajos de artes manuales y actividades para familias de niños registrados en el daycare.`,

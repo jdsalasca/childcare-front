@@ -59,6 +59,27 @@
     &.r-11{
         max-width: 11rem;
     }
+    &.r-m-mw{
+        max-width: max-content;
+    }
+    &.r-m-8{
+        min-width: 8rem;
+    }
+    &.r-m-9{
+        min-width: 9rem;
+    }
+    &.r-m-10{
+        min-width: 10rem;
+    }
+    &.r-m-11{
+        min-width: 11rem;
+    }
+    &.r-m-12{
+        min-width: 12rem;
+    }
+    &.r-m-13{
+        min-width: 13rem;
+    }
     // Targeting .p-float-label within .c-small-field
     &.p-float-label {
         // Targeting label inside .p-float-label

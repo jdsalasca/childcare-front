@@ -12,6 +12,15 @@ const ContractAPI = {
         throw error;
       }
     },
+    createContractSchedule: async (contract) => {
+        try {
+          const response = await API.post(BASE_URL, '/contracts/schedule',  contract);
+          return response;
+        } catch (error) {
+          console.error('Error creating contract schedule:', error);
+          throw error;
+        }
+      },  
     updateContractPaymentDetails: async (contract) => {
       console.log('contract on createContract', contract);
       

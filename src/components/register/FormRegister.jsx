@@ -7,7 +7,7 @@ import React, { useRef, useState } from 'react';
 import { Message } from 'primereact/message';
 
 import { Messages } from 'primereact/messages';     
-import { emailRegex } from '../../utils/constans';
+import { emailRegex } from '../../utils/constants';
 const FormRegister = () => {
 
   const [count, setCount] = useState(0);
@@ -62,7 +62,6 @@ const FormRegister = () => {
     <InputText   className= "" 
     onFocus={() => setEmailError(false)} 
     onChange ={(e) => setTextValue4(e.target.value)}
-    
     value={textValue4}  
     keyfilter={/^[a-zA-Z\sñÑ@.#&_-]*$/} 
     //keyfilter="email"

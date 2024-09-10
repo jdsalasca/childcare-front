@@ -4,7 +4,7 @@ import { InputTextarea } from 'primereact/inputtextarea';
 import { Password } from 'primereact/password';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import React, { useRef, useState } from 'react';
-import { emailRegex } from '../../../utils/constans';
+import { emailRegex } from '../../../utils/constants';
 import { Message } from 'primereact/message';
 
 import { Messages } from 'primereact/messages';     

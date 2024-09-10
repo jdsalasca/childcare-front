@@ -49,10 +49,7 @@ export const calculateAge = (bornDate) => {
     { label: 'Programa de Subsidio', value: 'programa_de_subsidio' },
     { label: 'Co-pay Mensual', value: 'co_pay_mensual' }
   ];
-    // Function to capitalize the first letter of each word
-    export const capitalizeFirstLetter = (value) => {
-      return value.replace(/\b\w/g, (char) => char.toUpperCase());
-    };
+  
   
 
   export const formatDateToYYYYMMDD = (dateInput) => {
@@ -79,7 +76,136 @@ export const calculateAge = (bornDate) => {
     return `${year}-${month}-${day}`;
 };
 
-  
+export const defaultContractInfoFinished = {
+  "todayDate": "2024-09-10T04:16:56.132Z",
+  "startDate": "2024-09-10T04:16:56.132Z",
+  "endDate": "2024-09-10T04:16:56.132Z",
+  "children": [
+    {
+      "id": 382,
+      "child_id": 7,
+      "born_date": "2018-02-16T23:00:00.000000Z",
+      "first_name": "Emmanuel",
+      "status": "Active",
+      "created_at": "2024-09-07T11:28:24.000000Z",
+      "updated_at": "2024-09-07T11:28:24.000000Z",
+      "last_name": "Banderas Lemus",
+      "middle_initial": "B",
+      "identification_number": null,
+      "gender_id": 2,
+      "classroom": "School Age 003580 Dinosaurus",
+      "age": 6
+    },
+    {
+      "first_name": "El Niño De Las ",
+      "born_date": "2024-09-07T22:00:00.000000Z",
+      "gender_id": 1,
+      "last_name": "Camille",
+      "middle_initial": "C",
+      "child_id": 0,
+      "updated_at": "2024-09-10T04:24:01.000000Z",
+      "created_at": "2024-09-10T04:24:01.000000Z",
+      "id": 544,
+      "age": 0
+    }
+  ],
+  "guardians": [
+    {
+      "id": 14,
+      "name": "Vladimir Putin",
+      "last_name": "Valhalla",
+      "address": "El Kremlin",
+      "city": "Moscu",
+      "phone": "+1123123312",
+      "guardian_type_id": 1,
+      "created_at": "2024-09-10T03:32:35.000000Z",
+      "updated_at": "2024-09-10T04:27:18.000000Z",
+      "email": "putin@gmail.com",
+      "status": "Active"
+    },
+    {
+      "id": 11,
+      "name": "Osama",
+      "last_name": "Bin Ladin",
+      "address": "Avenida Siempre Viva",
+      "city": "Tunja",
+      "phone": "3211233211",
+      "guardian_type_id": 3,
+      "created_at": "2024-09-07T05:21:07.000000Z",
+      "updated_at": "2024-09-10T04:27:18.000000Z",
+      "email": "jdsalasc@unal.edu.co",
+      "status": "Active"
+    }
+  ],
+  "schedule": [
+    {
+      "contract_id": 26,
+      "day_id": 1,
+      "check_in": "08:00",
+      "check_out": "17:00",
+      "updated_at": "2024-09-10T04:40:34.000000Z",
+      "created_at": "2024-09-10T04:40:34.000000Z",
+      "id": 14
+    },
+    {
+      "contract_id": 26,
+      "day_id": 2,
+      "check_in": "08:00",
+      "check_out": "17:00",
+      "updated_at": "2024-09-10T04:40:34.000000Z",
+      "created_at": "2024-09-10T04:40:34.000000Z",
+      "id": 15
+    },
+    {
+      "contract_id": 26,
+      "day_id": 3,
+      "check_in": "08:00",
+      "check_out": "17:00",
+      "updated_at": "2024-09-10T04:40:34.000000Z",
+      "created_at": "2024-09-10T04:40:34.000000Z",
+      "id": 13
+    },
+    {
+      "contract_id": 26,
+      "day_id": 4,
+      "check_in": "08:00",
+      "check_out": "17:00",
+      "updated_at": "2024-09-10T04:40:34.000000Z",
+      "created_at": "2024-09-10T04:40:34.000000Z",
+      "id": 12
+    },
+    {
+      "contract_id": 26,
+      "day_id": 5,
+      "check_in": "08:00",
+      "check_out": "17:00",
+      "updated_at": "2024-09-10T04:40:34.000000Z",
+      "created_at": "2024-09-10T04:40:34.000000Z",
+      "id": 11
+    }
+  ],
+  "terms": {
+    "id": 8,
+    "contract_id": 26,
+    "share_media_with_families": true,
+    "allow_other_parents": false,
+    "use_for_art_and_activities": false,
+    "promote_childcare": false,
+    "walk_around_neighborhood": false,
+    "walk_to_park_or_transport": true,
+    "walk_in_school": true,
+    "guardian_received_manual": false,
+    "created_at": "2024-09-10T04:29:03.000000Z",
+    "updated_at": "2024-09-10T04:29:03.000000Z"
+  },
+  "contract_number": "ChildCare.10.7560",
+  "contract_id": 26,
+  "start_date": "2024-09-03T05:00:00.000Z",
+  "end_date": "2024-09-11T05:00:00.000Z",
+  "payment_method_id": 1,
+  "totalAmount": "",
+  "total_to_pay": "12.00"
+}
 
 export const defaultContractInfo = {
     todayDate: new Date(),
@@ -91,18 +217,7 @@ export const defaultContractInfo = {
     guardians: [
 
     ],
-    schedule:  {
-      mondayStart: new Date().setHours(8, 0, 0, 0),
-      mondayEnd: new Date().setHours(17, 0, 0, 0),
-      tuesdayStart: new Date().setHours(8, 0, 0, 0),
-      tuesdayEnd: new Date().setHours(17, 0, 0, 0),
-      wednesdayStart: new Date().setHours(8, 0, 0, 0),
-      wednesdayEnd: new Date().setHours(17, 0, 0, 0),
-      thursdayStart: new Date().setHours(8, 0, 0, 0),
-      thursdayEnd: new Date().setHours(17, 0, 0, 0),
-      fridayStart: new Date().setHours(8, 0, 0, 0),
-      fridayEnd: new Date().setHours(17, 0, 0, 0)
-    },
+    schedule:  undefined,
     terms: {
         walkAroundNeighborhood: false,
         walkToThePark: false,
@@ -167,13 +282,15 @@ export const defaultChild = {
 };
 
 
-export const validateSchedule = (schedule) => {
-  const dayKeys = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+export const validateSchedule = (schedule, days) => {
+  console.log("days on validateSchedule", days)
+  
+  if(days == null || schedule==null) return false;
   let isValid = true;
 
-  dayKeys.forEach(day => {
-    const start = schedule[`${day}Start`];
-    const end = schedule[`${day}End`];
+  days.forEach(day => {
+    const start = schedule[`${day}check_in`];
+    const end = schedule[`${day}check_out`];
     
     if (start && end) {
       const startTime = new Date(start);

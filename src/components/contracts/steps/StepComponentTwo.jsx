@@ -3,7 +3,7 @@ import Swal from 'sweetalert2'
 import { set, useFieldArray, useForm } from 'react-hook-form'
 import { Dropdown } from 'primereact/dropdown'
 import { Button } from 'primereact/button'
-import { capitalizeFirstLetter, defaultGuardian } from '../utilsAndConsts'
+import {defaultGuardian } from '../utilsAndConsts'
 import { useTranslation } from 'react-i18next'
 import useGuardianOptions from '../../../utils/customHooks/useGuardianOptions.js'
 import InputTextWrapper from '../../formsComponents/InputTextWrapper'
@@ -14,15 +14,17 @@ import useGuardianTypeOptions from '../../../utils/customHooks/useGuardianTypeOp
 import { GuardiansValidations } from '../utils/contractValidations.js'
 import { ContractService } from '../contractModelView.js'
 import { ToastInterpreterUtils } from '../../utils/ToastInterpreterUtils.js'
+import { Validations } from '../../../utils/validations.js'
 /**
  *@param {Object} props
  * @param {number} props.setActiveIndex - The active index of the stepper.
  * @param {Object} props.contractInformation - The contract information object.
  * @param {Function} props.setContractInformation - The function to set the contract information.
  * @param {Object} props.setLoadingInfo - The function to set the loading information.
- * @param {Object} props.toast - The toast reference.     
- * @returns 
+ * @param {Object} props.toast - The toast reference.
+ * @returns
  */
+// FIXME  improve the loading of guardian_types
 export const StepComponentTwo = ({
   setActiveIndex,
   contractInformation,
@@ -155,9 +157,10 @@ export const StepComponentTwo = ({
           ...guardian,
           titular: true
         }))
-
         // Set the updated guardians in the form state
         setValue('guardians', updatedGuardians)
+      } else {
+        return false
       }
     } else if (
       !GuardiansValidations.allHaveUniqueGuardianTypes(data.guardians)
@@ -208,14 +211,14 @@ export const StepComponentTwo = ({
       confirmButtonText: t('yes'),
       cancelButtonText: t('no')
     })
- 
+
     if (response.isConfirmed) {
       setLoadingInfo({
         loading: true,
         loadingMessage: t('weAreSavingContract')
       })
-  
-      const contractResponseParent = await ContractService.createContract(  
+
+      const contractResponseParent = await ContractService.createContract(
         children,
         guardians,
         t
@@ -228,23 +231,37 @@ export const StepComponentTwo = ({
 
       console.log('contract', contractResponseParent)
       console.log('contractResponse', contractResponse)
-      const error = contractResponse?.some(
-        response => response.httpStatus !== 200
-      ) ?? contractResponse.httpStatus !== 200
+      let error
+      if (Array.isArray(contractResponse)) {
+        error = contractResponse.some(response => response.httpStatus !== 200)
+      } else {
+        error = contractResponse?.httpStatus !== 200
+      }
+      let message
 
-      const message = contractResponse?.map(response => response.response?.message)
-        .join(', ')  ?? contractResponse.response?.message
+      if (Array.isArray(contractResponse)) {
+        message = contractResponse
+          .map(response => response.response?.message)
+          .join(', ')
+      } else {
+        message =
+          contractResponse?.response?.message ?? contractResponse?.message
+      }
+
       if (error) {
         ToastInterpreterUtils.toastInterpreter(
           toast,
           'error',
+          t('contractCreationFailed'),
           t('contractCreationFailed', { response: message })
         )
       } else {
         setContractInformation({
           ...contractInformation,
           guardians: guardians,
-          contract_number: contractResponseParent?.contractInfo?.response?.contract_number ?? 0,
+          contract_number:
+            contractResponseParent?.contractInfo?.response?.contract_number ??
+            0,
           contract_id: contractResponseParent?.contractInfo?.response?.id ?? 0
         })
 
@@ -253,26 +270,30 @@ export const StepComponentTwo = ({
           'success',
           t('contractCreated')
         )
-      
+
         //#region new form step
         setActiveIndex(2)
       }
       return contractResponseParent
     }
-  } 
+  }
   /**
    * This function checks if the form data is valid
    * @param {*} data Form data
    * @returns
    */
-  const isInvalidFormData = data => {
-    return !data || !data.guardians || data.guardians.length === 0
-  }
 
-  //#region form onSubmit
+  //#region  onSubmit form
+  // TODO  improve table guardian_children add contract_id and program_id
   const onSubmit = async data => {
-    if (isInvalidFormData(data)) {
-      console.log('badUsage of the form')
+    if (ContractService.isInvalidFormData(data,contractInformation)) {
+      ToastInterpreterUtils.toastInterpreter(
+        toast,
+        'info',
+        t('info'),
+        t('addAtLeastOneGuardianAndAtLeastOneChild'),
+        3000
+      )
       return
     }
     try {
@@ -285,7 +306,7 @@ export const StepComponentTwo = ({
       const guardiansAsync = await onHandlerGuardianBackendAsync(data)
       console.log('Guardians responses', guardiansAsync)
       //  Update parent component with the new guardians data
-  
+
       console.log('contractInformation', contractInformation)
       const contract = await onCreateContract(
         contractInformation.children,
@@ -328,25 +349,31 @@ export const StepComponentTwo = ({
     )
   }
 
+  /**
+   * this function is called when the user selects a guardian from the dropdown
+   * @param {*} selectedGuardianIndex
+   */
+  //#region select guardian
   const handleGuardianSelect = e => {
     const selectedGuardian = e.value
     const selectedGuardianObject = guardianOptions.find(g => g.id === e.value)
-    console.log('selectedGuardian', selectedGuardian, e, guardianOptions)
-
-    toast.current.show({
-      severity: 'success',
-      summary: 'Success',
-      detail: t('guardianInfoLoaded'),
-      life: 3000
-    })
 
     // Check if the guardian already exists in the fields
     const existingGuardianIndex = fields.findIndex(
-      guardian => guardian.email === selectedGuardian.email
+      guardian => guardian.email === selectedGuardianObject.email
     )
+    console.log('existingGuardianIndex', existingGuardianIndex)
+    console.log('fields', fields)
+    console.log('selectedGuardian', selectedGuardian)
     if (existingGuardianIndex === -1) {
-      // If the guardian does not exist, add it to the fields
-      // TODO add titular property from table
+      ToastInterpreterUtils.toastInterpreter(
+        toast,
+        'success',
+        t('success'),
+        t('guardianInfoLoaded'),
+        3000
+      )
+
       append({
         ...selectedGuardianObject
       })
@@ -388,21 +415,21 @@ export const StepComponentTwo = ({
               control={control}
               rules={{ required: t('guardianNameRequired') }}
               label={t('guardianName')}
-              onChangeCustom={value => capitalizeFirstLetter(value)}
+              onChangeCustom={value => Validations.capitalizeFirstLetter(value)}
             />
             <InputTextWrapper
               name={`guardians[${index}].last_name`}
               control={control}
               rules={{ required: t('guardianLastNameRequired') }}
               label={t('guardianLastName')}
-              onChangeCustom={value => capitalizeFirstLetter(value)}
+              onChangeCustom={value => Validations.capitalizeFirstLetter(value)}
             />
             <InputTextWrapper
               name={`guardians[${index}].address`}
               control={control}
               rules={{ required: t('addressRequired') }}
               label={t('address')}
-              onChangeCustom={value => capitalizeFirstLetter(value)}
+              onChangeCustom={value => Validations.capitalizeFirstLetter(value)}
             />
             <InputTextWrapper
               name={`guardians[${index}].city`}
@@ -414,8 +441,15 @@ export const StepComponentTwo = ({
               name={`guardians[${index}].email`}
               control={control}
               keyFilter='email'
-              rules={{ required: t('emailRequired') }}
+              rules={{
+                required: t('emailRequired'),
+                pattern: {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: t('emailInvalid')
+                }
+              }}
               label={t('email')}
+              spanClassName='c-small-field r-m-13'
             />
             <InputTextWrapper
               name={`guardians[${index}].phone`}
@@ -428,8 +462,8 @@ export const StepComponentTwo = ({
                 }
               }}
               label={t('phoneNumber')}
-              keyFilter='int'
-              spanClassName='c-small-field r-10'
+              keyFilter={/^[0-9+]*$/}
+              spanClassName='c-small-field r-m-10'
             />
             <DropdownWrapper
               name={`guardians[${index}].guardian_type_id`}

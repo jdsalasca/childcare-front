@@ -11,6 +11,9 @@ import i18n from './utils/i18n';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import RouterLayout from './RouterLayout';
 
+/**
+ *  React Query is a powerful data fetching and caching library for React. It provides a simple and flexible API for fetching, caching, and updating server-side data in your React applications.
+ */
 // Create a client for React Query
 const queryClient = new QueryClient();
 

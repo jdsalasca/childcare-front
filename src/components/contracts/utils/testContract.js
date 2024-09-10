@@ -90,9 +90,9 @@ export const contractFake= {
       {
         "name": "Tet",
         "id": "",
-        "address": "Asdasd",
-        "city": "asdasd",
-        "email": "asdasd",
+        "address": "calle 12",
+        "city": "Tunja",
+        "email": "mother@gmail.com",
         "phone": "1231231",
         "guardianType": "Mother",
         "titular": true
