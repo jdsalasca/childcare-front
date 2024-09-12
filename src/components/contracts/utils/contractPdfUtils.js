@@ -2,7 +2,7 @@
 
 import jsPDF from 'jspdf';
 import { addFonts } from './jsPdfArial';
-import { defaultContractInfo, formatDateToYYYYMMDD } from '../utilsAndConsts';
+import { defaultContractInfo, formatDateToYYYYMMDD } from '../utilsAndConstants';
 import { contractInfo } from './newContractGenerator';
 import { Functions } from '../../../utils/functions';
 

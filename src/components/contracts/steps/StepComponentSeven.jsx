@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import contractGenerator from '../utils/contractPdfUtils';
 import { Button } from 'primereact/button';
-import { defaultContractInfoFinished } from '../utilsAndConsts';
+import { defaultContractInfoFinished } from '../utilsAndConstants';
 import { useTranslation } from 'react-i18next';
 import { Card } from 'primereact/card';
 import Swal from 'sweetalert2';
@@ -12,7 +12,7 @@ import Swal from 'sweetalert2';
  * @param {number} props.setActiveIndex - Callback function to set the active index of the current step.
  * @param {Object} props.contractInformation - Object containing the contract information.
  * @param {Object} props.setContractInformation - Callback function to set the contract information.        
- * @param {Object} props.toast - Toast object from react-toastify.
+ * @param {Object} props.toast - Toast object from primereact/toast.
  * @returns 
  */
 

@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import logger from '../../configs/logger'
 import { ApiModels } from '../../models/ApiModels'
 /**
  * This class provides methods for interpreting toast messages based on the response data.
@@ -37,8 +37,8 @@ export const ToastInterpreterUtils = {
      * ToastInterpreterUtils.toastInterpreter(toast, response, 'success', 'Data saved successfully.');
      */
       toastInterpreter: (toast, severity = 'info',title=severity.charAt(0).toUpperCase() + severity.slice(1), message = '', duration = 3000) => {
-        console.log('toastInterpreter', toast, severity, title, message, duration)
-        
+        logger.info('toastInterpreter', toast, severity, title, message, duration) 
+
         // Validate severity to ensure it matches one of the allowed values
         const allowedSeverities = ['success', 'info', 'warn', 'error',"contrast","secondary"];
         if (!allowedSeverities.includes(severity)) {

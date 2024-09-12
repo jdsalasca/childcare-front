@@ -1,15 +1,15 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import 'primeicons/primeicons.css';
+import 'primereact/resources/primereact.min.css';
+import 'primereact/resources/themes/saga-blue/theme.css'; // Choose the theme you prefer
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { I18nextProvider } from 'react-i18next';
+import { AuthProvider } from './context/AuthContext';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
-import { AuthProvider } from './context/AuthContext';
-import 'primereact/resources/themes/saga-blue/theme.css';  // Choose the theme you prefer
-import 'primereact/resources/primereact.min.css';
-import 'primeicons/primeicons.css';
-import { I18nextProvider } from 'react-i18next';
-import i18n from './utils/i18n';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import RouterLayout from './RouterLayout';
+import i18n from './utils/i18n';
 
 /**
  *  React Query is a powerful data fetching and caching library for React. It provides a simple and flexible API for fetching, caching, and updating server-side data in your React applications.

@@ -3,7 +3,7 @@ import { useForm,  useFieldArray } from 'react-hook-form';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
 import { useTranslation } from 'react-i18next';
-import { calculateAge, calculateWeeksOld, capitalizeFirstLetter, determineProgram} from '../utilsAndConsts';
+import { calculateAge, calculateWeeksOld, capitalizeFirstLetter, determineProgram} from '../utilsAndConstants';
 import ChildrenAPI, { useChildren } from '../../../models/ChildrenAPI';
 import InputTextWrapper from '../../formsComponents/InputTextWrapper';
 import CalendarWrapper from '../../formsComponents/CalendarWrapper';

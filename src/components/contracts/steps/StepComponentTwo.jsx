@@ -3,7 +3,7 @@ import Swal from 'sweetalert2'
 import { set, useFieldArray, useForm } from 'react-hook-form'
 import { Dropdown } from 'primereact/dropdown'
 import { Button } from 'primereact/button'
-import {defaultGuardian } from '../utilsAndConsts'
+import {defaultGuardian } from '../utilsAndConstants.js'
 import { useTranslation } from 'react-i18next'
 import useGuardianOptions from '../../../utils/customHooks/useGuardianOptions.js'
 import InputTextWrapper from '../../formsComponents/InputTextWrapper'
@@ -221,7 +221,8 @@ export const StepComponentTwo = ({
       const contractResponseParent = await ContractService.createContract(
         children,
         guardians,
-        t
+        t,
+        contractInformation
       )
       const contractResponse = contractResponseParent.guardianChildren
       setLoadingInfo({
@@ -261,8 +262,8 @@ export const StepComponentTwo = ({
           guardians: guardians,
           contract_number:
             contractResponseParent?.contractInfo?.response?.contract_number ??
-            0,
-          contract_id: contractResponseParent?.contractInfo?.response?.id ?? 0
+            contractInformation.contract_number,
+          contract_id: contractResponseParent?.contractInfo?.response?.id ?? contractInformation.contract_id
         })
 
         ToastInterpreterUtils.toastInterpreter(

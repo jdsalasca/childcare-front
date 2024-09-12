@@ -111,7 +111,8 @@ export class ContractService {
   static async createContract (
     children = ContractConstraints.defaultContractModelView.children,
     guardians = ContractConstraints.defaultContractModelView.guardians,
-    t
+    t,
+    contractInformation
   ) {
     const relationships = await this.createChildrenGuardianRelationships(
       children,
@@ -119,9 +120,13 @@ export class ContractService {
       t
     )
     console.log('relationships', relationships)
-    const contractData = await this.createContractBase(guardians);
-    console.log("contractData", contractData)
-    return {guardianChildren:relationships,contractInfo: contractData} 
+    if(contractInformation.contract_id == null){
+      const contractData = await this.createContractBase(guardians);
+      console.log("contractData", contractData)
+      return {guardianChildren:relationships,contractInfo: contractData} 
+    }else{
+      return {guardianChildren:relationships,contractInfo: null} 
+    }
   }
 
   static async createContractSchedule(schedules = [ContractDaySchedule]){ 

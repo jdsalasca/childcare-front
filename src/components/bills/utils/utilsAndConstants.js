@@ -1,4 +1,4 @@
-import { formatDateToYYYYMMDD } from "../../contracts/utilsAndConsts";
+import { formatDateToYYYYMMDD } from "../../contracts/utilsAndConstants";
 
 export const childrenOptions = [
     { born_date: '2014-10-01', names: 'Emily Johnson', status: 'Activo' }, // 9 years old
@@ -31,14 +31,5 @@ export const childrenOptions = [
     check: '',
     date: formatDateToYYYYMMDD(new Date())
   };
-  export const formatDate = (date) => {
-    if(date == null){
-      return;
-    }
-    const month = ('0' + (date.getMonth() + 1)).slice(-2); // Months are 0-based
-    const day = ('0' + date.getDate()).slice(-2);
-    const year = date.getFullYear().toString().slice(-2); // Get last 2 digits of year
   
-    return `${month}/${day}/${year}`;
-  };
   

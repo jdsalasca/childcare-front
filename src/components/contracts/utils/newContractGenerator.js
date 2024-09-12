@@ -4,7 +4,7 @@ import {
   defaultContractInfoFinished,
   fontStyles,
   formatDateToYYYYMMDD
-} from '../utilsAndConsts'
+} from '../utilsAndConstants'
 // FIXME  improve the names delete whitespaces on the names
 export const contractInfo = (contractData = defaultContractInfoFinished) => {
   console.log('====================================')
@@ -25,8 +25,8 @@ export const contractInfo = (contractData = defaultContractInfoFinished) => {
   const fatherEmail =
     contractData.guardians.find(
       g => g.guardian_type_id === FATHER_GUARDIAN_TYPE_ID
-    )?.email || '_________________'
-
+    )?.email || 'No registra'
+    
   const schedule = contractData.schedule
   console.log('schedule', schedule)
   const DAYS = {

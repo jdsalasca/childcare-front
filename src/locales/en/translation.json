@@ -146,6 +146,8 @@
    "program_required":"The program is required",
    "select_program":"Select a program",
   "bills": {
+    "cash_on_hand": "Cash on Hand",
+    "total_not_cash_on_hand": "Total (not cash on hand)",
     "dateRequired": "Date is mandatory",
     "dateRequiredDetails": "The date is mandatory to save payments information",
     "empty":"Empty bill",

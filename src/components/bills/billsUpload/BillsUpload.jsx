@@ -6,7 +6,7 @@ import { InputNumber } from 'primereact/inputnumber';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { useTranslation } from 'react-i18next';
-import { billTypes, programOptions } from '../../contracts/utilsAndConsts';
+import { billTypes, programOptions } from '../../contracts/utilsAndConstants';
 import { Toast } from 'primereact/toast';
 import ChildrenAPI from '../../../models/ChildrenAPI';
 

@@ -6,7 +6,7 @@ import StepComponentTwo from './steps/StepComponentTwo';
 import StepComponentThree from './steps/StepComponentThree';
 import StepComponentSeven from './steps/StepComponentSeven';
 import { Toast } from 'primereact/toast';
-import { defaultContractInfo, validateSchedule } from './utilsAndConsts';
+import { defaultContractInfo, validateSchedule } from './utilsAndConstants';
 import StepComponentFour from './steps/StepComponentFour';
 
 import { useTranslation } from 'react-i18next';
