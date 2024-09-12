@@ -1,8 +1,8 @@
 // Import PrimeReact styles
-@import "~primeicons/primeicons.css"; // PrimeIcons for PrimeReact icons
-@import "~primereact/resources/themes/saga-blue/theme.css"; // Replace with your desired theme
-@import "~primereact/resources/primereact.min.css"; // PrimeReact core styles
-@import "~react-phone-number-input/style.css"; // Styles for the phone number input component
+@import "primeicons/primeicons.css"; // PrimeIcons for PrimeReact icons
+@import "primereact/resources/themes/saga-blue/theme.css"; // Replace with your desired theme
+@import "primereact/resources/primereact.min.css"; // PrimeReact core styles
+@import "react-phone-number-input/style.css"; // Styles for the phone number input component
 @import './ReviewContracts'; // Custom styles for review contracts component
 @import 'HtmlOverrides'; // Custom HTML overrides
 @import 'media'; // Media queries for responsive design
@@ -138,10 +138,10 @@
   }
 }
 .p-menubar .p-menubar-root-list > .p-menuitem.c-logout-item > .p-menuitem-content {
+  background-color: $primary-color ;
   .p-menuitem-text{
     color: $secondary-color;
   }
-  background-color: $primary-color ;
 }
 .layout {
   display: flex;

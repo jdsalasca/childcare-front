@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { useForm,  useFieldArray } from 'react-hook-form';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
+import { useEffect, useState } from 'react';
+import { useFieldArray, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { calculateAge, calculateWeeksOld, capitalizeFirstLetter, determineProgram} from '../utilsAndConstants';
 import ChildrenAPI, { useChildren } from '../../../models/ChildrenAPI';
-import InputTextWrapper from '../../formsComponents/InputTextWrapper';
+import useGenderOptions from '../../../utils/customHooks/useGenderOptions';
+import { Validations } from '../../../utils/validations';
 import CalendarWrapper from '../../formsComponents/CalendarWrapper';
 import DropdownWrapper from '../../formsComponents/DropdownWrapper';
-import useGenderOptions from '../../../utils/customHooks/useGenderOptions';
-import { ContractService } from '../contractModelView';
+import InputTextWrapper from '../../formsComponents/InputTextWrapper';
 import { ToastInterpreterUtils } from '../../utils/ToastInterpreterUtils';
-import { Validations } from '../../../utils/validations';
+import { ContractService } from '../contractModelView';
+import { calculateAge, calculateWeeksOld, determineProgram } from '../utilsAndConstants';
 
 /**
  * 

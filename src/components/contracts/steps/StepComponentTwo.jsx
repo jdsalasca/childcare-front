@@ -1,24 +1,25 @@
-import React, { useEffect, useState } from 'react'
-import Swal from 'sweetalert2'
-import { set, useFieldArray, useForm } from 'react-hook-form'
-import { Dropdown } from 'primereact/dropdown'
 import { Button } from 'primereact/button'
-import {defaultGuardian } from '../utilsAndConstants.js'
+import { Dropdown } from 'primereact/dropdown'
+import { useEffect, useState } from 'react'
+import { useFieldArray, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import useGuardianOptions from '../../../utils/customHooks/useGuardianOptions.js'
-import InputTextWrapper from '../../formsComponents/InputTextWrapper'
-import DropdownWrapper from '../../formsComponents/DropdownWrapper.jsx'
-import CheckboxWrapper from '../../formsComponents/CheckboxWrapper.jsx'
+import Swal from 'sweetalert2'
+import { HeaderProps, LoadingInfo, ToastRules } from '../../../models/AppModels.js'
 import GuardiansAPI from '../../../models/GuardiansAPI.js'
+import useGuardianOptions from '../../../utils/customHooks/useGuardianOptions.js'
 import useGuardianTypeOptions from '../../../utils/customHooks/useGuardianTypeOptions.js'
-import { GuardiansValidations } from '../utils/contractValidations.js'
-import { ContractService } from '../contractModelView.js'
-import { ToastInterpreterUtils } from '../../utils/ToastInterpreterUtils.js'
 import { Validations } from '../../../utils/validations.js'
+import CheckboxWrapper from '../../formsComponents/CheckboxWrapper.jsx'
+import DropdownWrapper from '../../formsComponents/DropdownWrapper.jsx'
+import InputTextWrapper from '../../formsComponents/InputTextWrapper'
+import { ToastInterpreterUtils } from '../../utils/ToastInterpreterUtils.js'
+import { ContractService } from '../contractModelView.js'
+import { GuardiansValidations } from '../utils/contractValidations.js'
+import { defaultGuardian } from '../utilsAndConstants.js'
 /**
  *@param {Object} props
  * @param {number} props.setActiveIndex - The active index of the stepper.
- * @param {Object} props.contractInformation - The contract information object.
+ * @param {C} props.contractInformation - The contract information object.
  * @param {Function} props.setContractInformation - The function to set the contract information.
  * @param {Object} props.setLoadingInfo - The function to set the loading information.
  * @param {Object} props.toast - The toast reference.
@@ -61,7 +62,7 @@ export const StepComponentTwo = ({
       guardians: contractInformation.guardians || []
     }
   })
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append } = useFieldArray({
     control,
     name: 'guardians'
   })
@@ -213,10 +214,14 @@ export const StepComponentTwo = ({
     })
 
     if (response.isConfirmed) {
-      setLoadingInfo({
-        loading: true,
-        loadingMessage: t('weAreSavingContract')
-      })
+      setLoadingInfo({loading: true,loadingMessage: t('weAreSavingContract')})
+      setLoadingInfo( new LoadingInfo(true, t('weAreSavingContract')))
+
+
+      ToastRules.showStandard(); 
+      const header = new HeaderProps(t('contractInformation'), t('childcare'), [])
+console.log(header)
+
 
       const contractResponseParent = await ContractService.createContract(
         children,
@@ -257,6 +262,8 @@ export const StepComponentTwo = ({
           t('contractCreationFailed', { response: message })
         )
       } else {
+
+        
         setContractInformation({
           ...contractInformation,
           guardians: guardians,
@@ -467,14 +474,14 @@ export const StepComponentTwo = ({
               spanClassName='c-small-field r-m-10'
             />
             <DropdownWrapper
-              name={`guardians[${index}].guardian_type_id`}
-              control={control}
               options={getAvailableGuardianTypes(index)}
               optionValue={'id'}
               optionLabel='name'
               label={t('guardianType')}
-              rules={{ required: t('guardianTypeRequired') }}
               spanClassName='c-small-field r-10'
+              name={`guardians[${index}].guardian_type_id`}
+              control={control}
+              rules={{ required: t('guardianTypeRequired') }}
             />
             <CheckboxWrapper
               name={`guardians[${index}].titular`}

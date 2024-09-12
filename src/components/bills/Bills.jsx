@@ -1,14 +1,12 @@
+import { Badge } from 'primereact/badge';
 import { Button } from 'primereact/button';
+import { Calendar } from 'primereact/calendar';
 import { ConfirmDialog } from 'primereact/confirmdialog'; // Import ConfirmDialog
+import { Dropdown } from 'primereact/dropdown';
 import { InputText } from 'primereact/inputtext';
 import { Toast } from 'primereact/toast';
-import React from 'react';
-import { Controller } from 'react-hook-form';
-
-import { Badge } from 'primereact/badge';
-import { Calendar } from 'primereact/calendar';
-import { Dropdown } from 'primereact/dropdown';
 import { Tooltip } from 'primereact/tooltip';
+import { Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { programOptions } from '../contracts/utilsAndConstants';
 import Loader from '../utils/Loader';
@@ -16,7 +14,7 @@ import { BillsContainer } from './components/BillsByNomination';
 import ChildFormField from './components/formComponents/ChildField';
 import { useBillsViewModel } from './viewModels/useBillsViewModel';
 
-const Bills = ({...props}) => {
+const Bills = () => {
 
   let {  control,
     handleSubmit,

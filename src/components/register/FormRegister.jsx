@@ -1,13 +1,15 @@
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
-import { InputTextarea } from 'primereact/inputtextarea';
-import { Password } from 'primereact/password';
-import { ProgressSpinner } from 'primereact/progressspinner';
-import React, { useRef, useState } from 'react';
 import { Message } from 'primereact/message';
+import { Password } from 'primereact/password';
+import React, { useRef, useState } from 'react';
 
-import { Messages } from 'primereact/messages';     
+import { Messages } from 'primereact/messages';
+import { useForm } from 'react-hook-form';
 import { emailRegex } from '../../utils/constants';
+import DropdownWrapper from '../formsComponents/DropdownWrapper';
+import InputTextWrapper from '../formsComponents/InputTextWrapper';
+
 const FormRegister = () => {
 
   const [count, setCount] = useState(0);
@@ -16,6 +18,15 @@ const FormRegister = () => {
   const [textValue3, setTextValue3] = useState("");
   const [textValue4, setTextValue4] = useState("");
   const [emailError, setEmailError] = useState(false);
+  const {getValues, setValue, watch, control, handleSubmit, formState: { errors } } = useForm({
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+    },
+  });
+
+
   const msgs = useRef(null);
 
   const header = (
@@ -49,10 +60,8 @@ const FormRegister = () => {
     <Button icon="pi pi-minus" className="p-button-outlined p-button-rounded" onClick={() => setCount(count -1)}></Button>
     <Button icon="pi pi-times" className="p-button-outlined p-button-rounded p-button-danger" onClick={() => setCount(0)}></Button>
     <form onSubmit={onHandlerSubmit}>
-    <div className='c-component-form'>
-    <label>Nombre</label>
-    <InputText  value={textValue} onChange={(e) => setTextValue(e.target.value)} />
-    </div>
+    <DropdownWrapper control={control} name='city' optionValue='id' optionLabel='name' options={[]} /> 
+    <InputTextWrapper name={`name`} control={control} rules={{ required: "name is Required" }} label={"name"} />
     <div className='c-component-form'>
     <label>Apellido</label>
     <InputText  value={textValue2} onChange={(e) => setTextValue2(e.target.value)} keyfilter={/^[a-zA-Z\sñÑ]*$/}  />

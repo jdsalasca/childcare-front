@@ -1,21 +1,19 @@
-import React, {  useRef, useState } from 'react';
-import { generateContractPdf } from './utils/contractPdfUtils'; // Adjust the path as per your file structure
 import { Steps } from 'primereact/steps';
-import StepComponentOne from './steps/StepComponentOne';
-import StepComponentTwo from './steps/StepComponentTwo';
-import StepComponentThree from './steps/StepComponentThree';
-import StepComponentSeven from './steps/StepComponentSeven';
 import { Toast } from 'primereact/toast';
-import { defaultContractInfo, validateSchedule } from './utilsAndConstants';
+import { useRef, useState } from 'react';
 import StepComponentFour from './steps/StepComponentFour';
+import StepComponentOne from './steps/StepComponentOne';
+import StepComponentSeven from './steps/StepComponentSeven';
+import StepComponentThree from './steps/StepComponentThree';
+import StepComponentTwo from './steps/StepComponentTwo';
+import { defaultContractInfo, validateSchedule } from './utilsAndConstants';
 
 import { useTranslation } from 'react-i18next';
-import StepComponentFive from './steps/StepComponentFive';
-import StepComponentSix from './steps/StepComponentSix';
-import { contractFake } from './utils/testContract';
+import useDays from '../../models/customHooks/useDays';
 import { loadingDefault } from '../../utils/constants';
 import Loader from '../utils/Loader';
-import useDays from '../../models/customHooks/useDays';
+import StepComponentFive from './steps/StepComponentFive';
+import StepComponentSix from './steps/StepComponentSix';
 export const Contracts = () => {
   /**
    * @param setLoadingInfo :: defaultObject loadingDefault
@@ -25,7 +23,7 @@ export const Contracts = () => {
   const { t } = useTranslation();
   const [activeIndex, setActiveIndex] = useState(0);
   const [contractInformation, setContractInformation] = useState(defaultContractInfo);
-  const {laboralDays: daysCache, error, isLoading} = useDays();
+  const {laboralDays: daysCache} = useDays();
   const toast = useRef(null);
 
   // Function to calculate the number of accepted permissions
@@ -77,32 +75,32 @@ export const Contracts = () => {
   const items = [
     {
       label: `${t('children')} (${contractInformation.children.length})`,
-      command: (event) => setActiveIndex(0)
+      command: () => setActiveIndex(0)
     },
     {
       label: `${t('guardians')} (${contractInformation.guardians.length})`,
-      command: (event) => setActiveIndex(1)
+      command: () => setActiveIndex(1)
     },
     {
       label: `${t('permissions')} (${getAcceptedPermissionsCount()})`,
-      command: (event) => setActiveIndex(2)
+      command: () => setActiveIndex(2)
     },
     {
       label: t('contract'),
-      command: (event) => setActiveIndex(3)
+      command: () => setActiveIndex(3)
     },
     {
       label: t('schedule'),
-      command: (event) => setActiveIndex(4)
+      command: () => setActiveIndex(4)
     },
     {
       label: `${t('medicalInformation')} (${countChildrenWithMedicalInfo()}/${contractInformation.children.length})`,
-      command: (event) => setActiveIndex(5),
+      command: () => setActiveIndex(5),
       disabled: contractInformation.children.length === 0 // Disable tab if no children
     },
     {
       label: t('contractGenerator'),
-      command: (event) => setActiveIndex(6)
+      command: () => setActiveIndex(6)
     }
   ];
   

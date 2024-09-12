@@ -1,14 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { useForm, Controller, useFieldArray } from 'react-hook-form';
-import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
-import { classNames } from 'primereact/utils';
-import { Calendar } from 'primereact/calendar';
 import { Dropdown } from 'primereact/dropdown';
+import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
+import React from 'react';
+import { Controller, useForm } from 'react-hook-form';
 
-import { useTranslation } from 'react-i18next';
 import { Checkbox } from 'primereact/checkbox';
+import { useTranslation } from 'react-i18next';
 
 const defaultHealthInfo = {
   childName: '',
@@ -75,17 +73,23 @@ export const StepComponentSix = ({ setActiveIndex, contractInformation, setContr
   }
 
   const onFormSubmit = (data) => {
-    if (data.childName != null && data.childName !== "") {
+    if (data.childName) { // Check if childName is not null or undefined
       const updatedChildren = contractInformation.children.map(child =>
-        child.name === data.childName?.name ?? data.childName
-          ? { ...child, medicalInformation: data }
+        child.name === (data.childName.name || data.childName) // Ensure proper fallback logic
+          ? { ...child, medicalInformation: data } // Update the medical information
           : child
       );
+  
+      // Update contract information with the updated children list
       setContractInformation({
         ...contractInformation,
         children: updatedChildren
       });
-      reset({defaultHealthInfo})
+  
+      // Reset the form with default health information
+      reset(defaultHealthInfo); 
+  
+      // Display success toast notification
       toast.current?.show({ severity: 'success', summary: t('formSubmitted') });
     }
   };

@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
-import { Controller, RegisterOptions } from 'react-hook-form';
 import { Dropdown } from 'primereact/dropdown';
 import { classNames } from 'primereact/utils';
+import { useEffect } from 'react';
+import { Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 /**

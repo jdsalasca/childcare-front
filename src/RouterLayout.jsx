@@ -1,13 +1,11 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Layout from './components/utils/Layout';
-import Login from './components/utils/Login';
-import { Contracts } from './components/contracts/Contracts';
-import HomePage from './components/homepage/HomePage';
+import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import Bills from './components/bills/Bills';
 import { BillsUpload } from './components/bills/billsUpload/BillsUpload';
-import ReviewContracts from './components/contracts/reviewContracts/ReviewContracts';
+import { Contracts } from './components/contracts/Contracts';
+import HomePage from './components/homepage/HomePage';
 import FormRegister from './components/register/FormRegister';
+import Layout from './components/utils/Layout';
+import Login from './components/utils/Login';
 
 function RouterLayout() {
   return (
@@ -20,6 +18,7 @@ function RouterLayout() {
             element={
               <Layout>
                 <Routes>
+                  <Route path="/" element={<HomePage />} />
                   <Route path="/childadmin/admin/" element={<HomePage />} />
                   <Route path="/childadmin/admin/report-payments-by-date" element={<HomePage />} />
                   <Route path="/childadmin/admin/report-teachers" element={<HomePage />} />

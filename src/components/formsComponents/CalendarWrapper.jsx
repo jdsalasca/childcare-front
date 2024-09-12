@@ -1,7 +1,6 @@
-import React from 'react';
-import { Controller, RegisterOptions } from 'react-hook-form';
 import { Calendar } from 'primereact/calendar';
 import { classNames } from 'primereact/utils';
+import { Controller } from 'react-hook-form';
 
 /**
  * Reusable Calendar wrapper for react-hook-form.

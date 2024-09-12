@@ -1,7 +1,7 @@
-import React from 'react';
-import { Controller } from 'react-hook-form';
 import { Checkbox } from 'primereact/checkbox';
 import { classNames } from 'primereact/utils';
+import PropTypes from 'prop-types'; // Import PropTypes
+import { Controller } from 'react-hook-form';
 
 /**
  * Reusable Checkbox wrapper for react-hook-form with customizable label position.
@@ -9,7 +9,7 @@ import { classNames } from 'primereact/utils';
  * @param {Object} props - Component props.
  * @param {string} props.name - Name of the checkbox field in the form (required).
  * @param {Object} props.control - Control object from react-hook-form (required).
- * @param {RegisterOptions} [props.rules] - Validation rules for the checkbox field. Optional.
+ * @param {Object} [props.rules] - Validation rules for the checkbox field. Optional.
  * @param {string} props.label - Label text for the checkbox field (required).
  * @param {boolean} [props.disabled=false] - Whether the checkbox is disabled. Optional.
  * @param {string} [props.spanClassName] - Optional CSS class name(s) to apply to the `<span>` wrapper.
@@ -23,10 +23,9 @@ const CheckboxWrapper = ({
   name,
   control,
   rules,
-  getFormErrorMessage,
   label,
   disabled = false,
-  labelClassName= '',
+  labelClassName = '',
   spanClassName = '',
   labelPosition = 'right',
   ...rest
@@ -37,8 +36,8 @@ const CheckboxWrapper = ({
       control={control}
       rules={rules}
       render={({ field, fieldState: { error } }) => (
-        <span className={` p-float-label ${spanClassName} c-checkbox ${labelPosition === 'left' ? 'label-left' : 'label-right'}`}>
-          {labelPosition === 'left' && <p className={labelClassName}  htmlFor={name}>{label}</p>}
+        <span className={`p-float-label ${spanClassName} c-checkbox ${labelPosition === 'left' ? 'label-left' : 'label-right'}`}>
+          {labelPosition === 'left' && <p className={labelClassName} htmlFor={name}>{label}</p>}
           <Checkbox
             id={name}
             {...field}
@@ -54,6 +53,29 @@ const CheckboxWrapper = ({
       )}
     />
   );
+};
+
+// Prop type validation
+CheckboxWrapper.propTypes = {
+  name: PropTypes.string.isRequired, // Required string for the checkbox name
+  control: PropTypes.object.isRequired, // Control object from react-hook-form
+  rules: PropTypes.object, // Optional validation rules
+  getFormErrorMessage: PropTypes.func, // Function to retrieve form error messages
+  label: PropTypes.string.isRequired, // Required label for the checkbox
+  disabled: PropTypes.bool, // Whether the checkbox is disabled
+  labelClassName: PropTypes.string, // Optional CSS class for the label
+  spanClassName: PropTypes.string, // Optional CSS class for the span wrapper
+  labelPosition: PropTypes.oneOf(['left', 'right']), // Label position can only be 'left' or 'right'
+  rest: PropTypes.object, // Additional props passed to Checkbox
+};
+
+// Default prop values
+CheckboxWrapper.defaultProps = {
+  disabled: false,
+  labelClassName: '',
+  spanClassName: '',
+  labelPosition: 'right',
+  rules: null,
 };
 
 export default CheckboxWrapper;
