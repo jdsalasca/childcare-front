@@ -1,135 +1,176 @@
 @import './constants.scss';
 .c-steps-component {
-    display: flex;
-    gap: 2rem;
+  display: flex;
+  gap: 2rem;
 
-    ol {
-        gap: 2rem;
-        overflow-y: scroll;
-        padding-bottom: 2rem;
-        min-width: 100%;
-    }
+  ol {
+    gap: 2rem;
+    overflow-y: scroll;
+    padding-bottom: 2rem;
+    min-width: 100%;
+  }
 }
-.c-dropdown-field{
-    &.m-r-15{
-        min-width: 15rem;
+.c-dropdown-field {
+  &.m-r-15 {
+    min-width: 15rem;
+  }
+  &.m-r-inherit {
+    min-width: inherit;
+  }
+}
+
+.c-register-card {
+    max-width: 60%;
+    margin: 0 auto;
+  .c-form-register {
+
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 80%;
+    margin: 0 auto;
+    align-items: center;
+    align-self: center;
+    justify-content: center;
+    .p-password {
+      min-width: 100%;
     }
-    &.m-r-inherit{
-        min-width: inherit;
+    #title{
+      text-align: center;
+      margin-bottom: 1rem;
+      margin-top: 0;
     }
+    .c-input-password-field{
+        min-width: 100%;
+        .p-icon-field.p-icon-field-right{
+            min-width: 100%;
+            .p-password-input{
+                min-width: 100%;
+            }
+        }
+    }
+    .c-section-register-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      min-width: 100%;
+      .p-button {
+        min-width: 100%;
+
+      }
+    }
+    .p-float-label {
+      min-width: 100%;
+    }
+  }
 }
 
 // ##region Styles for .c-steps-component
-.c-label-checkbox{
-    min-width: max-content;
-    word-break: break-all;
-    font-size: $font-size-label;
-    &.left{
-        margin-left: 0;
-        margin-right: 1rem;
-    }
-    &.right{
-        margin-right: 0;
-        margin-left: 1rem;
-    }
+.c-label-checkbox {
+  min-width: max-content;
+  word-break: break-all;
+  font-size: $font-size-label;
+  &.left {
+    margin-left: 0;
+    margin-right: 1rem;
+  }
+  &.right {
+    margin-right: 0;
+    margin-left: 1rem;
+  }
 }
 // ##region Styles for .layout
 .c-menubar {
-    z-index: 1000;
+  z-index: 1000;
 }
-
 
 .c-small-field {
-    max-width: 5rem;
-    &.r-6{
-        max-width: 6rem;
-    }
-    &.r-7{
-        max-width: 7rem;
-    }
-    &.r-8{
-        max-width: 8rem;
-    }
-    &.r-9{
-        max-width: 9rem;
-    }
-    &.r-10{
-        max-width: 10rem;
-    }
-    &.r-11{
-        max-width: 11rem;
-    }
-    &.r-m-mw{
-        max-width: max-content;
-    }
-    &.r-m-8{
-        min-width: 8rem;
-    }
-    &.r-m-9{
-        min-width: 9rem;
-    }
-    &.r-m-10{
-        min-width: 10rem;
-    }
-    &.r-m-11{
-        min-width: 11rem;
-    }
-    &.r-m-12{
-        min-width: 12rem;
-    }
-    &.r-m-13{
-        min-width: 13rem;
-    }
-    // Targeting .p-float-label within .c-small-field
-    &.p-float-label {
-        // Targeting label inside .p-float-label
-        label {
-            word-break: break-all;
-            font-size: 0.80rem;
-        }
-    }
-}
-
-
-.c-checkbox {
-    display: flex;
-    align-items: center !important;
-    width: fit-content;
-    justify-content: space-between !important; // Horizontally centers the items
+  max-width: 5rem;
+  &.r-6 {
+    max-width: 6rem;
+  }
+  &.r-7 {
+    max-width: 7rem;
+  }
+  &.r-8 {
+    max-width: 8rem;
+  }
+  &.r-9 {
+    max-width: 9rem;
+  }
+  &.r-10 {
+    max-width: 10rem;
+  }
+  &.r-11 {
+    max-width: 11rem;
+  }
+  &.r-m-mw {
     max-width: max-content;
-
-    &.label-left {
-
-      display: flex;
-      flex-direction: inherit;
-
-      // flex-direction: row-reverse;
-      margin-left: 1rem;
-      
-      // Ensure no extra space between the checkbox and label
-      label {
-        margin-right: 0.5rem; // Controls space between label and checkbox
-
-      }
-    }
-  
-    &.label-right {
-      flex-direction: row;
-      margin-right: 1rem;
-  
-      label {
-        margin-left: 0.5rem; // Controls space between checkbox and label
-      }
-    }
-  
-    // Additional styling for label (this ensures both label positions have consistent spacing)
+  }
+  &.r-m-8 {
+    min-width: 8rem;
+  }
+  &.r-m-9 {
+    min-width: 9rem;
+  }
+  &.r-m-10 {
+    min-width: 10rem;
+  }
+  &.r-m-11 {
+    min-width: 11rem;
+  }
+  &.r-m-12 {
+    min-width: 12rem;
+  }
+  &.r-m-13 {
+    min-width: 13rem;
+  }
+  // Targeting .p-float-label within .c-small-field
+  &.p-float-label {
+    // Targeting label inside .p-float-label
     label {
-      margin: 0; // Ensure there’s no default margin that adds extra space
-      padding: 0;
-    }
-  
-    .p-checkbox {
-      margin: 0; // Remove any default margins from the Checkbox component
+      word-break: break-all;
+      font-size: 0.8rem;
     }
   }
-  
+}
+
+.c-checkbox {
+  display: flex;
+  align-items: center !important;
+  width: fit-content;
+  justify-content: space-between !important; // Horizontally centers the items
+  max-width: max-content;
+
+  &.label-left {
+    display: flex;
+    flex-direction: inherit;
+
+    // flex-direction: row-reverse;
+    margin-left: 1rem;
+
+    // Ensure no extra space between the checkbox and label
+    label {
+      margin-right: 0.5rem; // Controls space between label and checkbox
+    }
+  }
+
+  &.label-right {
+    flex-direction: row;
+    margin-right: 1rem;
+
+    label {
+      margin-left: 0.5rem; // Controls space between checkbox and label
+    }
+  }
+
+  // Additional styling for label (this ensures both label positions have consistent spacing)
+  label {
+    margin: 0; // Ensure there’s no default margin that adds extra space
+    padding: 0;
+  }
+
+  .p-checkbox {
+    margin: 0; // Remove any default margins from the Checkbox component
+  }
+}

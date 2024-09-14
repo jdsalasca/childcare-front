@@ -51,7 +51,8 @@ const CalendarWrapper = ({
         return (
           <span className={`p-float-label ${spanClassName}`}>
             <Calendar
-              mask='MM/DD/YYYY'
+              // mask='MM/DD/YYYY'
+              mask='99/99/9999'
               id={name}
               {...field}
               dateFormat={dateFormat}
@@ -60,6 +61,7 @@ const CalendarWrapper = ({
               showIcon={showIcon}
               maxDate={maxDate}
               icon={icon}
+              
               timeOnly={timeOnly}
               value={value || null} // Ensure value is a Date object or null
               onChange={e => {
@@ -90,7 +92,6 @@ CalendarWrapper.propTypes = {
   control: PropTypes.object.isRequired,
   dateFormat: PropTypes.string,
   rules: PropTypes.object,
-  getFormErrorMessage: PropTypes.func.isRequired,
   label: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   onChangeCustom: PropTypes.func,

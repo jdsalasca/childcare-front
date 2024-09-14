@@ -1,3 +1,4 @@
+
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
 import { useEffect, useState } from 'react';
@@ -262,6 +263,8 @@ export const StepComponentOne = ({ setLoadingInfo, setActiveIndex, contractInfor
               rules={{ required: t('bornDateRequired') }}
               label={t('bornDate')}
              dateFormat="mm/dd/yy"
+             spanClassName="c-small-field r-m-13"
+             
               showIcon
               onChangeCustom={(value) => handleBornDateChange(value, index)}
             />

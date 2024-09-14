@@ -64,13 +64,11 @@ const InputTextWrapper = ({
     />
   );
 };
-
 // Prop type validation
 InputTextWrapper.propTypes = {
   name: PropTypes.string.isRequired, // Required string for the input name
   control: PropTypes.object.isRequired, // Control object from react-hook-form
   rules: PropTypes.object, // Validation rules for react-hook-form
-  getFormErrorMessage: PropTypes.func.isRequired, // Function to get form error messages
   label: PropTypes.string.isRequired, // Label for the input
   disabled: PropTypes.bool, // Whether the input is disabled
   keyFilter: PropTypes.string, // Optional keyFilter for input
@@ -78,15 +76,6 @@ InputTextWrapper.propTypes = {
   placeholder: PropTypes.string, // Optional placeholder text
   spanClassName: PropTypes.string, // Optional class name for the span wrapper
   rest: PropTypes.object, // Additional props passed to InputText
-};
-
-// Default prop values
-InputTextWrapper.defaultProps = {
-  disabled: false,
-  keyFilter: null,
-  onChangeCustom: null,
-  placeholder: '',
-  spanClassName: '',
 };
 
 export default InputTextWrapper;

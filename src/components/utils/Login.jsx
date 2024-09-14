@@ -1,21 +1,24 @@
 // src/components/Login.js
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { InputText } from 'primereact/inputtext';
 import { Password } from 'primereact/password';
-import { Button } from 'primereact/button';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { customLogger } from '../../configs/logger';
+import { useAuth } from '../../context/AuthContext';
 import { login as performLogin } from '../../utils/auth';
 import Loader from './Loader';
 import './Login.scss';
-import { useAuth } from '../../context/AuthContext';
-//import {image} from '../public/login_image.jpg'
+
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const {t} = useTranslation();
   
   const { login } = useAuth();
 
@@ -27,11 +30,12 @@ const Login = () => {
 
     try {
       const token = await performLogin(username, password);
-      console.log("token", token);
+      customLogger.debug("token", token);
       login(token);
       navigate('/');
     } catch (error) {
-      setError('Usuario o contraseña incorrectas');
+      customLogger.error("error on login",error);
+      setError('Usuario o contraseña incorrectas', error);
     } finally {
       setLoading(false);
     }
@@ -57,7 +61,10 @@ const Login = () => {
                onChange={(e) => setPassword(e.target.value)} feedback={false} toggleMask className="rounded-input password-field" />
             </div>
             {error && <div className="error">{error}</div>}
+            <section className="c-section-login-actions">
             <Button type="submit" label="Login" className="login-button" />
+            <Button type="submit" label={t('signUp')} className="login-button" onClick={() => navigate('/childadmin/admin/register')} />
+              </section>
           </form>
         </Card>
       </div>

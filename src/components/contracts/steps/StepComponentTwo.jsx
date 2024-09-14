@@ -1,9 +1,11 @@
+/* eslint-disable no-unused-vars */
 import { Button } from 'primereact/button'
 import { Dropdown } from 'primereact/dropdown'
 import { useEffect, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import Swal from 'sweetalert2'
+import { customLogger } from '../../../configs/logger.js'
 import { HeaderProps, LoadingInfo, ToastRules } from '../../../models/AppModels.js'
 import GuardiansAPI from '../../../models/GuardiansAPI.js'
 import useGuardianOptions from '../../../utils/customHooks/useGuardianOptions.js'
@@ -370,9 +372,10 @@ console.log(header)
     const existingGuardianIndex = fields.findIndex(
       guardian => guardian.email === selectedGuardianObject.email
     )
-    console.log('existingGuardianIndex', existingGuardianIndex)
-    console.log('fields', fields)
-    console.log('selectedGuardian', selectedGuardian)
+    customLogger.debug('existingGuardianIndex', existingGuardianIndex)
+    customLogger.debug('fields', fields)
+    customLogger.debug('selectedGuardian', selectedGuardian)
+    customLogger.debug('selectedGuardianObject', selectedGuardianObject)
     if (existingGuardianIndex === -1) {
       ToastInterpreterUtils.toastInterpreter(
         toast,
@@ -493,7 +496,7 @@ console.log(header)
             <Button
               icon='pi pi-trash'
               className='p-button-danger p-button-text p-ml-2'
-              onClick={() => removeGuardian(index)}
+              onClick={e => { e.preventDefault(), e.stopPropagation(), removeGuardian(index)}}
             />
           </div>
         ))}
@@ -518,7 +521,7 @@ console.log(header)
           <Button
             label={t('returnToPreviousStep')}
             className='p-button-secondary p-ml-2'
-            onClick={e => {
+            onClick={() => {
               setActiveIndex(0)
             }}
           />

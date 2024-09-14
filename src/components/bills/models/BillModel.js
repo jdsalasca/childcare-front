@@ -20,10 +20,7 @@ export class BillsModel {
         this.toast = toast;
         this.t = t;
     }
-    get t(){
-        return this._t;
-    }
-
+   
     
     // FIXME review why the toast is not working here
     /**

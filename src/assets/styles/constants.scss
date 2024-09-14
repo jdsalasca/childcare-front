@@ -3,7 +3,12 @@ $color-institutional-yellow: #ffd400;
 $color-institutional-blue: #0071ba;
 $color-institutional-red: #de0d1d;
 $color-institutional-green: #00af5e;
-
+$color-institutional-orange: #ff7f00;
+$color-institutional-blue-light: #00b4d8;
+$color-institutional-gray: #5152536c;
+$color-text: #333;
+$color-label-errors: $color-institutional-gray;
+$color-message-error: $color-institutional-red;
 // Variables
 $primary-color: #be1622;
 $secondary-color: #f8f9fa;
@@ -22,7 +27,7 @@ $font-size-label: 12px;
 $color-primary: $primary-color;
 $color-secondary: #333;
 $color-background: $secondary-color;
-$color-text: #333;
+
 
 
 // buttons colors because you know...
@@ -35,6 +40,7 @@ $color-hover2: #0071ba;
 $color-hover3: #de0d1d;
 $color-hover4: #00af5e;
 
+
 // Global styles
 body {
   font-family: $font-stack;
@@ -42,6 +48,9 @@ body {
   margin: 0;
   padding: 0;
   color: $color-text;
+}
+input{
+  font-family: $font-stack;
 }
 
 h1 {
@@ -63,6 +72,7 @@ h4 {
   font-size: $font-size-h4;
   color: $color-primary;
 }
+
 
 h5 {
   font-size: $font-size-h5;

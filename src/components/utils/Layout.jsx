@@ -1,12 +1,13 @@
 
 // src/Layout.js
-import React from 'react';
 import { Menubar } from 'primereact/menubar';
+import PropTypes from 'prop-types'; // Import PropTypes
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import useCustomNavigate from '../../utils/customHooks/useCustomNavigate';
+import { LayoutModels } from './LayoutModels';
 
-const Layout = ({ children }) => {
+const Layout = ({  children,insideAuthApplication = false }) => {
   const navigate = useCustomNavigate()
   const { logout } = useAuth();
   const { t, i18n } = useTranslation();
@@ -19,24 +20,15 @@ const Layout = ({ children }) => {
     i18n.changeLanguage(lang);
   };
 
+  const basicItems = [
+    LayoutModels.iconModel,
+    LayoutModels.languageModel(handleLanguageChange, t),
+  ]
   const items = [
 
-    {
-      label: (
-        <div className="logo-container">
-          <img src={`${process.env.PUBLIC_URL}/educando_dashboard_logo.png`} alt="Cover" />
-        </div>
-      ),
-      className: 'home-item',
-    },
-    {
-      label: <div onClick={handleHomeClick} className="home-item"><i className="pi pi-home"></i></div>,
-      className: 'home-item',
-    },
-    // {
-    //   label: t('boxes'),
-    //   items: []
-    // },
+    LayoutModels.iconModel,
+    LayoutModels.homeModel(handleHomeClick),
+
     {
       label: <span className="menu-item-contracts">{t('contracts')}</span>,
       items: [
@@ -48,7 +40,6 @@ const Layout = ({ children }) => {
       label: <span className="menu-item-deposits">{t('deposits')}</span>,
       items: [
         { label: <span className="menu-item-deposits">{t('manageBills')}</span>, command: () => navigate('/bills') },
-       
         // { label: t('uploadInvoices'), command: () => navigate('/bills-upload') }
       ]
     },
@@ -60,24 +51,23 @@ const Layout = ({ children }) => {
         navigate('/login');
       }
     },
-    {
-      label:  t('language'),
-      className: 'c-logout-item',
-      items: [
-        { label: 'English', command: () => handleLanguageChange('en') },
-        { label: 'Español', command: () => handleLanguageChange('es') },
-      ]
-    }
+    LayoutModels.languageModel(handleLanguageChange, t)
   ];
 
   return (
     <div className="layout">
-      <Menubar model={items} style={{ justifyContent: 'center', zIndex:"1000" }} className='c-menubar' />
+      <Menubar model={insideAuthApplication? items : basicItems } style={{ justifyContent: 'center', zIndex:"1000" }} className='c-menubar' />
       <div className="main-content">
         {children}
       </div>
     </div>
   );
 };
+
+Layout.propTypes = {
+  children: PropTypes.node.isRequired,
+  insideAuthApplication: PropTypes.bool,
+  
+};  
 
 export default Layout;

@@ -48,9 +48,13 @@
     background-color: $color-buttons-success;
     color: white;
   }
-  
+  .p-float-label > .p-invalid + label{
+    color: $color-label-errors;
+  }
+
+
   .p-error {
-    color: gray;
+    color:$color-message-error;
     font-size: 0.75rem;
     margin-top: 0.25rem;
   }
