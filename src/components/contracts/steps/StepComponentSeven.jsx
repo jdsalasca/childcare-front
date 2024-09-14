@@ -1,36 +1,44 @@
+/* eslint-disable no-unreachable */
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
-import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Swal from 'sweetalert2';
 import { customLogger } from '../../../configs/logger';
 import contractGenerator from '../utils/contractPdfUtils';
 import { defaultContractInfoFinished } from '../utilsAndConstants';
+import useGenerateContract from '../viewModels/useGenerateContract';
 
 /**
- * TThis component renders the StepComponentSeven component which is responsible for handling the contract generation.
+ * This component renders the StepComponentSeven component which is responsible for handling the contract generation.
  * @param {Object} props - Component props.
- * @param {number} props.setActiveIndex - Callback function to set the active index of the current step.
+ * @param {Function} props.setActiveIndex - Callback function to set the active index of the current step.
  * @param {Object} props.contractInformation - Object containing the contract information.
- * @param {Object} props.setContractInformation - Callback function to set the contract information.        
+ * @param {Function} props.setContractInformation - Callback function to set the contract information.
  * @param {Object} props.toast - Toast object from primereact/toast.
  * @returns 
  */
-
-//TODO improve children management on contract generation
-// TODO define a default contract for the pages 3-6
-// FIXME  improve the contract generation
-const StepComponentSeven = ({ setActiveIndex, contractInformation = defaultContractInfoFinished, setContractInformation, toast, ...props }) => {
+const StepComponentSeven = ({
+    contractInformation = defaultContractInfoFinished,
+    toast,
+}) => {
     const { t } = useTranslation();
     const [receiptBase64, setReceiptBase64] = useState(undefined);
     const [errorMessage, setErrorMessage] = useState(null);
 
+    let {contractBuilder}  = useGenerateContract({
+        contractInformation : defaultContractInfoFinished,
+        toast: toast
+    });
     useEffect(() => {
         handleLanguageSelection();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleLanguageSelection = async () => {
+        handleDownloadPdf('en');
+        return;
         let language = 'en';
         const result = await Swal.fire({
             title: t('selectLanguageContract'),
@@ -42,28 +50,24 @@ const StepComponentSeven = ({ setActiveIndex, contractInformation = defaultContr
         });
 
         if (result.isConfirmed) {
-            language='en';
+            language = 'en';
             handleDownloadPdf(language);
         } else if (result.dismiss === Swal.DismissReason.cancel) {
-            language='es';
+            language = 'es';
             handleDownloadPdf(language);
         }
     };
 
-    /**
-     * Method to handle the download of the contract PDF
-     * @param {*} language 
-     */
-    //#region handleDownloadPdf
     const handleDownloadPdf = (language = 'en') => {
-        customLogger.debug("contractInformation", contractInformation);
-        
+        contractInformation = contractBuilder();
+        customLogger.info('language', language);
+        customLogger.debug('contractInformation', contractInformation);
         const { guardians, children, total_to_pay, payment_method_id, start_date, end_date } = contractInformation;
 
-        if (!guardians || guardians.length === 0 || guardians[0].name ==null || guardians[0].name === "" ) {
+        if (!guardians || guardians.length === 0 || guardians[0].name == null || guardians[0].name === '') {
             setErrorMessage(t('noGuardians'));
             toast.current.show({ severity: 'info', summary: t('ups'), detail: t('noGuardians'), life: 3000 });
-        } else if (!children || children.length === 0  || children[0].first_name ==null || children[0].first_name === "") {
+        } else if (!children || children.length === 0 || children[0].first_name == null || children[0].first_name === '') {
             setErrorMessage(t('noChildren'));
             toast.current.show({ severity: 'info', summary: t('ups'), detail: t('noChildren'), life: 3000 });
         } else if (!total_to_pay) {
@@ -102,7 +106,7 @@ const StepComponentSeven = ({ setActiveIndex, contractInformation = defaultContr
                     </Card>
                 </div>
             ) : (
-                <iframe src={receiptBase64 + '#page=1'} width="100%" height="500px" title="PDF Preview"></iframe>
+                <iframe src={receiptBase64 + '#page=9'} width="100%" height="500px" title="PDF Preview"></iframe>
             )}
             <div className="p-d-flex p-jc-center">
                 <Button
@@ -114,6 +118,30 @@ const StepComponentSeven = ({ setActiveIndex, contractInformation = defaultContr
             </div>
         </>
     );
+};
+
+StepComponentSeven.propTypes = {
+    setActiveIndex: PropTypes.func.isRequired,
+    contractInformation: PropTypes.shape({
+        guardians: PropTypes.arrayOf(
+            PropTypes.shape({
+                name: PropTypes.string,
+            })
+        ),
+        children: PropTypes.arrayOf(
+            PropTypes.shape({
+                first_name: PropTypes.string,
+            })
+        ),
+        total_to_pay: PropTypes.number,
+        payment_method_id: PropTypes.number,
+        start_date: PropTypes.string,
+        end_date: PropTypes.string,
+    }).isRequired,
+    setContractInformation: PropTypes.func.isRequired,
+    toast: PropTypes.shape({
+        current: PropTypes.object,
+    }).isRequired,
 };
 
 export default StepComponentSeven;

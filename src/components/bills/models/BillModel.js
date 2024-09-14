@@ -12,13 +12,16 @@ export class BillsModel {
      * @param {Function} toast - Function to show notifications or alerts.
      * @param {Function} t - Function to translate the messages.
      */
-    _toast;
-    _getValues;
-    _t;
+    _t
+    _toast
+    _getValues
     constructor(getValues, toast,t) {
         this.getValues = getValues;
         this.toast = toast;
         this.t = t;
+    }
+    get t(){
+        return this._t;
     }
 
     
@@ -28,14 +31,14 @@ export class BillsModel {
      * @param {CashOnHandByDyModel} cash_on_hand - The cash on hand by day model
      * @returns 
      */
-    async onProcessCashData(cash_on_hand = new CashOnHandByDyModel()){
+    async onProcessCashData(cash_on_hand = new CashOnHandByDyModel(), t){
       
     try {
         await CashOnHandByDyAPI.processCashOnHandByDay(cash_on_hand)
       }catch(error){
         customLogger.info('print toast here',this.toast)
           customLogger.error('Error on process cash data Bills.jsx', error,)
-        ToastInterpreterUtils.toastInterpreter(this.toast,'error',this.t('cashOnHand.errorMessage'),this.t('cashOnHand.errorMessageDetails'))
+        ToastInterpreterUtils.toastInterpreter(this.toast,'error', t('cashOnHand.errorMessage'), t('cashOnHand.errorMessageDetails'))
         return error;
       }
     }
@@ -58,8 +61,7 @@ export class BillsModel {
                 childName: `${child.first_name} ${child.last_name}`
             }));
         } catch (err) {
-            console.error("Error fetching children:", err);
-            this.toast("Error fetching children"); // Notify the user of the error
+            customLogger.error("Error fetching children:", err);
             return []; // Return an empty array if there is an error
         }
     }

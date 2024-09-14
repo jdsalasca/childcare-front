@@ -1,5 +1,8 @@
-import { defaultContractInfo, fontStyles, formatDateToYYYYMMDD } from "../utilsAndConsts"
+/* eslint-disable no-unused-vars */
+import { defaultContractInfo, fontStyles, formatDateToYYYYMMDD } from "../utilsAndConsts";
 
+
+// TODO check if here is the contract
 export const contractInfo = (contractData = defaultContractInfo) => {
     console.log('====================================');
     console.log("contractData", contractData);
@@ -39,6 +42,7 @@ export const contractInfo = (contractData = defaultContractInfo) => {
             parr10: `\n\nFirma y Nombre de Padres: _____________________________  Fecha: ${todayDate}`,
             parr11: `\nFirma de Educando Childcare Center: _____________________________  Fecha: ${todayDate}`
         },
+
         page3: {
             title: {text: `<i>Manual de Padres de Educando Childcare Center</i>`, fontStyle: fontStyles.ITALIC},
             separator: true,

@@ -45,6 +45,59 @@ export class HeaderProps{
         this.menuItems = menuItems;
     }
 }
+/**
+ * This class represents the toast interpreter model
+ * @property {Object} _toast - The toast object
+ * @property {string} _summary - The summary of the toast message
+ * @property {string} _detail - The detail of the toast message
+ * @property {string} _severity - The severity of the toast message 
+ */
+export class ToastInterpreterModel{
+    _toast = null;
+    _summary = ''
+    _detail = ''
+    _severity = ''
+    _duration = ''    
+    constructor(toast, summary, detail, severity, duration){
+        this._toast = toast;
+        this._summary = summary;
+        this._detail = detail;
+        this._severity = severity;
+        this._duration = duration;
+    }
+    set toast(toast){
+        this._toast = toast;
+    }
+    set summary(summary){
+        this._summary = summary;
+    }
+    set detail(detail){
+        this._detail = detail;
+    }
+    set severity(severity){
+        this._severity = severity;
+    }
+    set duration(duration){
+        this._duration = duration;
+    }       
+    get toast(){
+        return this._toast;
+    }
+    get summary(){
+        return this._summary;
+    }
+    get detail(){
+        return this._detail;
+    }
+    get severity(){
+        return this._severity;
+    }
+    get duration(){
+        return this._duration;
+    }
+
+}
+
 
 export class ToastRules{
     static info(message){

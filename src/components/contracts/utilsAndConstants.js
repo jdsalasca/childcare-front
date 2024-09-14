@@ -1,4 +1,3 @@
-import { customLogger } from "../../configs/logger";
 
 export const programOptions = [
     { label: 'Infant', value: 'Infant', minWeek: 0, maxWeek: 78 }, // 6 weeks to 18 months (78 weeks)
@@ -37,8 +36,7 @@ export const calculateAge = (bornDate) => {
     return age;
   };
 
-  export 
-  const calculateWeeksOld = (bornDate) => {
+  export const calculateWeeksOld = (bornDate) => {
     const today = new Date();
     const birthDate = new Date(bornDate);
     const diffTime = Math.abs(today - birthDate);
@@ -46,37 +44,7 @@ export const calculateAge = (bornDate) => {
     return diffWeeks;
   };
 
-  export const paymentMethods = [
-    { label: 'Cash', value: 'cash' },
-    { label: 'Programa de Subsidio', value: 'programa_de_subsidio' },
-    { label: 'Co-pay Mensual', value: 'co_pay_mensual' }
-  ];
   
-  
-
-  export const formatDateToYYYYMMDD = (dateInput) => {
-    let date;
-
-    // Check if the input is a Date object
-    if (dateInput instanceof Date) {
-        date = dateInput;
-    } 
-    // Check if the input is a string that can be parsed by Date
-    else if (typeof dateInput === 'string') {
-        date = new Date(dateInput);
-    } 
-    // If the input is neither of the above, return an empty string or handle it as needed
-    else {
-        return '';
-    }
-
-    // Format the date as yyyy-mm-dd
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-    const day = String(date.getDate()).padStart(2, '0');
-
-    return `${year}-${month}-${day}`;
-};
 
 export const defaultContractInfoFinished = {
   "todayDate": "2024-09-10T04:16:56.132Z",
@@ -123,7 +91,8 @@ export const defaultContractInfoFinished = {
       "created_at": "2024-09-10T03:32:35.000000Z",
       "updated_at": "2024-09-10T04:27:18.000000Z",
       "email": "putin@gmail.com",
-      "status": "Active"
+      "status": "Active",
+      "titular": true
     },
     {
       "id": 11,
@@ -136,7 +105,8 @@ export const defaultContractInfoFinished = {
       "created_at": "2024-09-07T05:21:07.000000Z",
       "updated_at": "2024-09-10T04:27:18.000000Z",
       "email": "jdsalasc@unal.edu.co",
-      "status": "Active"
+      "status": "Active",
+      "titular": false
     }
   ],
   "schedule": [
@@ -217,6 +187,14 @@ export const defaultContractInfo = {
 
     ],
     guardians: [
+        {
+            name: 'Juan',
+            address: 'Calle 123',
+            city: 'Ciudad de México',
+            phone: '123456789',
+            guardianType: 'Titular',
+            titular: true
+        }
 
     ],
     schedule:  undefined,
@@ -285,7 +263,6 @@ export const defaultChild = {
 
 
 export const validateSchedule = (schedule, days) => {
-  customLogger.info("days on validateSchedule", days)
   
   if(days == null || schedule==null) return false;
   let isValid = true;

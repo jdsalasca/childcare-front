@@ -1,4 +1,3 @@
-/* eslint-disable no-unreachable */
 import { confirmDialog } from "primereact/confirmdialog"
 import { useEffect, useRef, useState } from "react"
 import { useFieldArray, useForm } from "react-hook-form"

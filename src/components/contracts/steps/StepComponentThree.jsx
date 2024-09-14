@@ -40,7 +40,7 @@ export const StepComponentThree = ({
 
     const permissionsCreated = await ContractPermissionsAPI.createContractPermissions(termsRegistry)
     if (permissionsCreated.httpStatus !== 200) {
-      ToastInterpreterUtils.toastInterpreter(
+      ToastInterpreterUtils.toastInterpreter( 
         toast,
         'error',
         t('permissionsCreationFailed'),

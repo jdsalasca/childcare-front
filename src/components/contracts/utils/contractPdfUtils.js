@@ -1,18 +1,31 @@
+/* eslint-disable no-unused-vars */
 // contractPdfUtils.js
 
 import jsPDF from 'jspdf';
-import { addFonts } from './jsPdfArial';
-import { defaultContractInfo, formatDateToYYYYMMDD } from '../utilsAndConstants';
-import { contractInfo } from './newContractGenerator';
+import { customLogger } from '../../../configs/logger';
 import { Functions } from '../../../utils/functions';
+import { defaultContractInfo, defaultContractInfoFinished } from '../utilsAndConstants';
+import { addFonts } from './jsPdfArial';
+import { contractInfo } from './newContractGenerator';
 
 // Function to add the header
 const initialYposition  = 12.7 + 10;
-const addPageContent = (doc = new jsPDF(), contractInfo, options, pageName,createPage =false) => {
+/**
+ * This function adds the content of a page to the jsPDF object.
+ * @param {jsPDF} doc - The jsPDF object
+ * @param {Object} contractInfo - The contract information object
+ * @param {Object} options - The options object
+ * @param {string} pageName - The name of the page to add
+ * @param {boolean} createPage - Whether to create a new page
+ * @param {Object} contractInformation - The contract information object
+ * @returns {jsPDF}  The updated jsPDF object
+ */
+const addPageContent = (doc = new jsPDF(), contractInfo, options, pageName,createPage =false, contractInformation = defaultContractInfoFinished) => {
   if (contractInfo[pageName]) {
     Object.keys(contractInfo[pageName]).forEach(key => {
+
       let content = contractInfo[pageName][key];
-      if (key === 'separator') {
+      if (key.startsWith('separator')) {
         // Add a separator line
         addSeparator(doc, options);
       } else if (key === 'title' || key === 'subtitle') {
@@ -21,9 +34,13 @@ const addPageContent = (doc = new jsPDF(), contractInfo, options, pageName,creat
       } else if (key.startsWith('parr')) {
         // Add body text
         addBodyText(doc, content, options);
-      }else if (key.startsWith("signSection")){
-        addSignSpaces(doc, content, options)
-
+        
+      }else if(key.startsWith("yPlus")){
+        customLogger.debug('yPlus', content)
+        options.yPosition += content
+    }else if (key.startsWith("signSection")){
+        customLogger.debug('signSection', content)
+        addSignSpaces(doc, contractInfo, options,contractInformation)
       }
     });
     // Reset the yPosition to the initial value after adding the content
@@ -94,23 +111,148 @@ lines.forEach(line => {
 };
 
 
-const addSignSpaces  =(doc, text, options) => {
-  // Preprocess the text to handle HTML tags and line breaks
-  text = preprocessText(text);
-  
-  const lines = doc.splitTextToSize(text, options.contentWidth);
+/**
+ * This function adds the sign spaces to the contract
+ * @param {jsPDF} doc - The jsPDF object
+ * @param {Object} text - The text object
+ * @param {Object} options - The options object
+ * @param {Object} contractInformation - The contract information object  
+ */
+//#region  sign space
+const addSignSpaces  =(doc = new jsPDF(), text, options, contractInformation) => {
+  customLogger.debug('addSignSpaces params',contractInformation, text, options)
+  const titularName = contractInformation.titularName
+  const totalWidth = options.contentWidth; // Total width of the content area
+  const nameFieldWidth = totalWidth * 0.3; // 30% of the total width
+  const signatureFieldWidth = totalWidth * 0.4; // 40% of the total width
+  const dateFieldWidth = totalWidth * 0.2; // 20% of the total width
+
+  // Split the text to fit within the name field width
+  const nameLines = doc.splitTextToSize(titularName, nameFieldWidth);
+
   doc.setFontSize(12);
-  
-  lines.forEach(line => {
-    if (options.yPosition + 10 > options.pageHeight - options.marginBottom) {
+
+  // Render "Nombre de padres/Guardian" field (wrapped text)
+  nameLines.forEach((line, index) => {
+    if (options.yPosition + 15 > options.pageHeight - options.marginBottom) {
       doc.addPage();
       options.yPosition = options.marginTop;
     }
-    //renderFormattedLine(doc,line, options)
-    doc.text(line, options.marginLeft, options.yPosition);
-    options.yPosition += 5; // Adjust the line height as needed
+    customLogger.debug('line', line, index)  
+    doc.text(line, options.marginLeft, options.yPosition + ((index === 0)?12 :index* 5)) ; // Adjust line height if needed
   });
-  };
+
+  // Adjust yPosition after rendering the name field
+  options.yPosition += nameLines.length * 5 + 5; // Adjust for spacing
+
+  // Render the horizontal lines for each field (no boxes, just lines)
+  const lineYPosition = options.yPosition + 5; // Adjust to where the line should appear
+
+  // "Nombre de padres/Guardian" line (30% width)
+  doc.line(
+    options.marginLeft,
+    lineYPosition,
+    options.marginLeft + nameFieldWidth,
+    lineYPosition
+  );
+
+  // "Firma" line (40% width)
+  doc.line(
+    options.marginLeft + nameFieldWidth + 5, // Small gap between name and signature line
+    lineYPosition,
+    options.marginLeft + nameFieldWidth + signatureFieldWidth,
+    lineYPosition
+  );
+
+  // "Fecha" line (20% width)
+  doc.line(
+    options.marginLeft + nameFieldWidth + signatureFieldWidth + 10, // Gap between signature and date
+    lineYPosition,
+    options.marginLeft + nameFieldWidth + signatureFieldWidth + dateFieldWidth,
+    lineYPosition
+  );
+  // Optionally, add labels for each field above the lines
+  // doc.text('Firma', options.marginLeft + nameFieldWidth + 5, lineYPosition + 5); // firma not needed cuz is put by the user
+  doc.text(Functions.formatDateToMMDDYY(new Date()), options.marginLeft + nameFieldWidth + signatureFieldWidth + 10, lineYPosition - 2);
+  // Optionally, add labels for each field above the lines
+  doc.text("Nombre", options.marginLeft, lineYPosition + 5);
+  doc.text('Firma', options.marginLeft + nameFieldWidth + 5, lineYPosition + 5);
+  doc.text('Fecha', options.marginLeft + nameFieldWidth + signatureFieldWidth + 10, lineYPosition + 5);
+};
+
+
+
+/**
+ * This function adds the sign spaces to the contract
+ * @param {jsPDF} doc - The jsPDF object
+ * @param {Object} text - The text object
+ * @param {Object} options - The options object
+ * @param {Object} contractInformation - The contract information object  
+ */
+//#region  sign space
+const specialSignSpace  =(doc = new jsPDF(), text, options, contractInformation) => {
+  customLogger.debug('addSignSpaces params',contractInformation, text, options)
+  const titularName = contractInformation.titularName
+  const totalWidth = options.contentWidth; // Total width of the content area
+  const nameFieldWidth = totalWidth * 0.3; // 30% of the total width
+  const signatureFieldWidth = totalWidth * 0.4; // 40% of the total width
+  const dateFieldWidth = totalWidth * 0.2; // 20% of the total width
+
+  // Split the text to fit within the name field width
+  const nameLines = doc.splitTextToSize(titularName, nameFieldWidth);
+
+  doc.setFontSize(12);
+
+  // Render "Nombre de padres/Guardian" field (wrapped text)
+  nameLines.forEach((line, index) => {
+    if (options.yPosition + 15 > options.pageHeight - options.marginBottom) {
+      doc.addPage();
+      options.yPosition = options.marginTop;
+    }
+    customLogger.debug('line', line, index)  
+    doc.text(line, options.marginLeft, options.yPosition + ((index === 0)?12 :index* 5)) ; // Adjust line height if needed
+  });
+
+  // Adjust yPosition after rendering the name field
+  options.yPosition += nameLines.length * 5 + 5; // Adjust for spacing
+
+  // Render the horizontal lines for each field (no boxes, just lines)
+  const lineYPosition = options.yPosition + 5; // Adjust to where the line should appear
+
+  // "Nombre de padres/Guardian" line (30% width)
+  doc.line(
+    options.marginLeft,
+    lineYPosition,
+    options.marginLeft + nameFieldWidth,
+    lineYPosition
+  );
+
+  // "Firma" line (40% width)
+  doc.line(
+    options.marginLeft + nameFieldWidth + 5, // Small gap between name and signature line
+    lineYPosition,
+    options.marginLeft + nameFieldWidth + signatureFieldWidth,
+    lineYPosition
+  );
+
+  // "Fecha" line (20% width)
+  doc.line(
+    options.marginLeft + nameFieldWidth + signatureFieldWidth + 10, // Gap between signature and date
+    lineYPosition,
+    options.marginLeft + nameFieldWidth + signatureFieldWidth + dateFieldWidth,
+    lineYPosition
+  );
+  // Optionally, add labels for each field above the lines
+  // doc.text('Firma', options.marginLeft + nameFieldWidth + 5, lineYPosition + 5); // firma not needed cuz is put by the user
+  doc.text(Functions.formatDateToMMDDYY(new Date()), options.marginLeft + nameFieldWidth + signatureFieldWidth + 10, lineYPosition - 2);
+  // Optionally, add labels for each field above the lines
+  doc.text("Nombre", options.marginLeft, lineYPosition + 5);
+  doc.text('Firma', options.marginLeft + nameFieldWidth + 5, lineYPosition + 5);
+  doc.text('Fecha', options.marginLeft + nameFieldWidth + signatureFieldWidth + 10, lineYPosition + 5);
+};
+
+
+
   
 const preprocessText = (text) => {
 // Replace HTML tags with appropriate formatting
@@ -141,8 +283,7 @@ const renderFormattedLine = (doc, line, options, centerText = false) => {
         // Toggle bold font style
         doc.setFont(undefined, doc.getFont().fontStyle === 'bold' ? 'normal' : 'bold');
         break;
-      case '__':
-      case '_':
+      case '$':
         // Toggle italic font style
         doc.setFont(undefined, doc.getFont().fontStyle === 'italic' ? 'normal' : 'italic');
         break;
@@ -228,9 +369,18 @@ const contractGenerator = (contractInformation =defaultContractInfo) => {
   // Adding pages to the document
   addFirstPage(doc, pageOptions,contractBase,contractInformation);
   addPageContent(doc, contractBase, pageOptions, 'page2', true);
-  addPageContent(doc, contractBase, pageOptions, 'page3',true);
-  addContractTerms(doc, contractBase, pageOptions)
-  addContractMutualTerms(doc, contractBase, pageOptions)
+  addPageContent(doc, contractBase, pageOptions, 'page3',true,contractInformation);
+  addPageContent(doc, contractBase, pageOptions, 'page4',true,contractInformation);
+  addPageContent(doc, contractBase, pageOptions, 'page5',true,contractInformation);
+  addPageContent(doc, contractBase, pageOptions, 'page6',true,contractInformation);
+  addPageContent(doc, contractBase, pageOptions, 'page7',true,contractInformation);
+  addPageContent(doc, contractBase, pageOptions, 'page8',true,contractInformation);
+  addPageContent(doc, contractBase, pageOptions, 'page9',true,contractInformation);
+  addPageContent(doc, contractBase, pageOptions, 'page10',true,contractInformation);
+  addPageContent(doc, contractBase, pageOptions, 'page11',true,contractInformation);
+  addPageContent(doc, contractBase, pageOptions, 'page12',true,contractInformation);
+  // addContractTerms(doc, contractBase, pageOptions)
+  // addContractMutualTerms(doc, contractBase, pageOptions)
   // addPageContent(doc, contractBase, pageOptions, 'page5',true);
   // addPageContent(doc, contractBase, pageOptions, 'page6',true);
   // addPageContent(doc, contractBase, pageOptions, 'page7',true);
