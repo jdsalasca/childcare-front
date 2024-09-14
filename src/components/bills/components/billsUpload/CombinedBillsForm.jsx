@@ -1,24 +1,22 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useForm, Controller, useFieldArray } from 'react-hook-form';
-import { Toast } from 'primereact/toast';
+import { Badge } from 'primereact/badge';
 import { Button } from 'primereact/button';
-import { InputText } from 'primereact/inputtext';
 import { Calendar } from 'primereact/calendar';
 import { Dropdown } from 'primereact/dropdown';
-import { InputNumber } from 'primereact/inputnumber';
-import { Badge } from 'primereact/badge';
+import { InputText } from 'primereact/inputtext';
+import { Toast } from 'primereact/toast';
 import { classNames } from 'primereact/utils';
+import { useEffect, useRef, useState } from 'react';
+import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 //import { exportToPDF } from './billsPdf';
-import ChildrenAPI from '../../../models/childrens';
-import { childrenOptions } from '../utils/utilsAndConstants';
 import { billTypes, programOptions } from '../../contracts/utilsAndConsts';
+import { childrenOptions } from '../utils/utilsAndConstants';
 
 const CombinedBillsForm = () => {
   const { t } = useTranslation();
   const toast = useRef(null);
 
-  const { control, handleSubmit, formState: { errors }, reset, getValues, watch } = useForm({
+  const { control, handleSubmit, formState: { errors } } = useForm({
     defaultValues: {
       bills: childrenOptions.map((child, index) => ({
         originalIndex: index,
@@ -40,7 +38,7 @@ const CombinedBillsForm = () => {
     }
   });
 
-  const { fields: childFields, append: appendChild, remove: removeChild, update: updateChild } = useFieldArray({
+  const { fields: childFields, update: updateChild } = useFieldArray({
     control,
     name: 'bills'
   });
@@ -73,6 +71,8 @@ const CombinedBillsForm = () => {
 
   useEffect(() => {
     recalculateFields();
+    
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [childFields]);
 
   const recalculateFields = (newFields = childFields) => {
@@ -89,6 +89,8 @@ const CombinedBillsForm = () => {
     setTotalSum(sum);
   }, [billFields]);
 
+  
+  // eslint-disable-next-line no-unused-vars
   const handleAmountChange = (index, value) => {
     const amount = parseFloat(value) || 0;
     const billValue = billFields[index].value;
@@ -112,6 +114,7 @@ const CombinedBillsForm = () => {
   };
 
   const calculateSums = () => {
+    
     return childFields.reduce((acc, bill) => {
       acc.cash += Number(bill.cash) || 0;
       acc.check += Number(bill.check) || 0;
@@ -189,7 +192,7 @@ const CombinedBillsForm = () => {
           </span>
         </div>
 
-        {filteredFields.map((bill, index) => (
+        {filteredFields.map((bill) => (
           <div key={bill.id} className="child-form">
             <Controller
               name={`bills[${bill.originalIndex}].names`}

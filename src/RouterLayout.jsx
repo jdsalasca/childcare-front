@@ -1,6 +1,5 @@
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import Bills from './components/bills/Bills';
-import { BillsUpload } from './components/bills/billsUpload/BillsUpload';
 import { Contracts } from './components/contracts/Contracts';
 import HomePage from './components/homepage/HomePage';
 import FormRegister from './components/register/FormRegister';
@@ -26,7 +25,7 @@ function RouterLayout() {
                   <Route path="/childadmin/admin/contracts" element={<Contracts />} />
                   <Route path="/childadmin/admin/review-contracts" element={<FormRegister />} />
                   <Route path="/childadmin/admin/bills" element={<Bills />} />
-                  <Route path="/childadmin/admin/bills-upload" element={<BillsUpload />} />
+                  {/* <Route path="/childadmin/admin/bills-upload" element={<BillsUpload />} /> */}
                   <Route path="/childadmin/admin/active-users-report" element={<HomePage />} />
                   <Route path="/childadmin/admin/manage-guardians" element={<HomePage />} />
                   <Route path="/childadmin/admin/new-contract" element={<HomePage />} />

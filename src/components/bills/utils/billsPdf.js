@@ -1,6 +1,6 @@
 import jsPDF from 'jspdf';
-import { logoImg } from './logoimg';
-import { addFonts } from '../contracts/utils/jsPdfArial';
+import { addFonts } from '../../contracts/utils/jsPdfArial';
+import { logoImg } from './assets/logoimg';
 
 
 export const exportToPDF = (bills) => {
@@ -16,7 +16,7 @@ export const exportToPDF = (bills) => {
   const maxBillsPerPage = 4;
   let billIndex = 0;
 
-  bills.forEach((bill, index) => {
+  bills.forEach((bill) => {
     if((bill.cash == null || bill.cash ==="" || bill.cash ===0) && (bill.check == null || bill.check ===""|| bill.check ===0) ){
       return;
     }
@@ -55,7 +55,7 @@ const drawGrayLine = (doc, yPos, pageWidth) => {
 
 const logoImage = 'data:image/png;base64,' + logoImg; // Replace with base64 of the logo
 
-const renderLeftContent = (doc, startX, startY, lineHeight, bill, pageWidth, pageHeight) => {
+const renderLeftContent = (doc, startX, startY, lineHeight, bill, pageWidth) => {
   const leftContent = [
     { text: 'DEPOSIT TICKET', style: { bold: true, color: 'black', drawColor: 'gray' } },
     { text: 'EDUCANDO CHILDCARE CENTER INC', style: { bold: true, color: 'black'} }, // Set drawColor to gray for this line

@@ -1,3 +1,5 @@
+
+import { log } from '../configs/logger';
 import API, { BASE_URL } from './API';
 
 const CashAPI = {
@@ -7,7 +9,10 @@ const CashAPI = {
       const response = await API.get(BASE_URL, `/daily_cash/details_by_date`, { params: { date } });
       return response;
     } catch (error) {
-      console.log('Error fetching daily cash details by date:', error);
+      log.debug('API request successful:', error);
+      log.debug('This is a debug message');
+      log.error('This is an error message');
+      log.info('Error fetching daily cash details by date:', error);
       return error;
     }
   },
@@ -26,3 +31,4 @@ const CashAPI = {
 };
 
 export { CashAPI };
+

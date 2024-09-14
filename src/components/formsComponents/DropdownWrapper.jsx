@@ -1,12 +1,14 @@
 import { Dropdown } from 'primereact/dropdown';
 import { classNames } from 'primereact/utils';
+import PropTypes from 'prop-types';
 import { useEffect } from 'react';
 import { Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 /**
- * Reusable Dropdown wrapper for react-hook-form
- * @param {Object} props
+ * Reusable Dropdown wrapper for react-hook-form.
+ * 
+ * @param {Object} props - Component properties.
  * @param {string} props.name - Name of the dropdown field in the form.
  * @param {Object} props.control - Control object from react-hook-form.
  * @param {Array} props.options - Array of dropdown options.
@@ -20,7 +22,6 @@ import { useTranslation } from 'react-i18next';
  * @param {string} [props.placeholder] - Optional placeholder text for the dropdown.
  * @param {string} [props.spanClassName] - Optional CSS class name(s) to apply to the `<span>` wrapper element.
  * @param {Object} props.rest - Any additional props for Dropdown.
- * 
  */
 const DropdownWrapper = ({
   name,
@@ -29,7 +30,6 @@ const DropdownWrapper = ({
   optionLabel,
   optionValue,
   rules,
-  getFormErrorMessage,
   label,
   disabled = false,
   filter = false,
@@ -37,19 +37,17 @@ const DropdownWrapper = ({
   spanClassName = '',
   ...rest
 }) => {
+  const { t } = useTranslation();
 
-  	let {t} = useTranslation();
-  
-    // Ensure options are filtered to remove any that have null or undefined values for optionValue
-    const validLabel = options.filter(option => option[optionValue] != null);
-    useEffect(() => {
-      if (options !=null&& options.length > 0 && validLabel.length === 0) {
-        console.log(options);
+  // Validate that all options have a valid value
+  useEffect(() => {
+    if (options && options.length > 0) {
+      const invalidOptions = options.filter(option => option[optionValue] == null);
+      if (invalidOptions.length > 0) {
         console.error(`Dropdown options must have a value for ${optionValue}`);
-      } else {
       }
-    }, [optionValue, validLabel]);
-  
+    }
+  }, [options, optionValue]);
 
   return (
     <Controller
@@ -62,7 +60,7 @@ const DropdownWrapper = ({
             id={name}
             {...field}
             options={options}
-            filter = {filter}
+            filter={filter}
             emptyMessage={t('dropdownEmptyMessage')}
             optionLabel={optionLabel}
             optionValue={optionValue}
@@ -73,12 +71,28 @@ const DropdownWrapper = ({
           />
           <label htmlFor={name}>{label}</label>
           {error && <small className="p-error">{error.message}</small>}
-
+          {/* Uncomment if needed for additional error message */}
           {/* {getFormErrorMessage(name)} */}
         </span>
       )}
     />
   );
+};
+
+// Adding PropTypes for validation
+DropdownWrapper.propTypes = {
+  name: PropTypes.string.isRequired,
+  control: PropTypes.object.isRequired,
+  options: PropTypes.arrayOf(PropTypes.object).isRequired,
+  optionLabel: PropTypes.string.isRequired,
+  optionValue: PropTypes.string.isRequired,
+  rules: PropTypes.object,
+  getFormErrorMessage: PropTypes.func.isRequired,
+  label: PropTypes.string.isRequired,
+  disabled: PropTypes.bool,
+  filter: PropTypes.bool,
+  placeholder: PropTypes.string,
+  spanClassName: PropTypes.string,
 };
 
 export default DropdownWrapper;

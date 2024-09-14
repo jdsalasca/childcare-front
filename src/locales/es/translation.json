@@ -145,8 +145,11 @@
   "hourQuotaExceededMessage":"Se pueden tomar un máximo de 9 horas por dia.",
   "program_required":"Se requiere un programa",
   "select_program":"Selecciona un programa",
+  "noTotalMoneyOnHandMessage": "No hay dinero en mano para la fecha",
+  "totalMoneyOnHand": "Dinero en caja importado",
   "bills": {
     "dateRequired": "La fecha es obligatoria",
+    "blockContent": "Contenido bloqueado, primero selecciona una fecha para continuar",
     "dateRequiredDetails": "La fecha es obligatoria para poder guardar la información de pagos",
     "cash_on_hand": "Efectivo en mano",
     "total_not_cash_on_hand": "Total (no efectivo en mano)",

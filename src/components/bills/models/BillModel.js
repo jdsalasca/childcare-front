@@ -1,4 +1,7 @@
+import { customLogger } from "../../../configs/logger";
+import { CashOnHandByDyAPI, CashOnHandByDyModel } from "../../../models/CashOnHandByDyAPI";
 import ChildrenAPI from "../../../models/ChildrenAPI";
+import { ToastInterpreterUtils } from "../../utils/ToastInterpreterUtils";
 
 /**
  * This class provides the communication between the Bills component and the backend of the childcare API.
@@ -7,10 +10,34 @@ export class BillsModel {
     /**
      * @param {Function} getValues - Function to retrieve values from somewhere.
      * @param {Function} toast - Function to show notifications or alerts.
+     * @param {Function} t - Function to translate the messages.
      */
-    constructor(getValues, toast) {
+    _toast;
+    _getValues;
+    _t;
+    constructor(getValues, toast,t) {
         this.getValues = getValues;
         this.toast = toast;
+        this.t = t;
+    }
+
+    
+    // FIXME review why the toast is not working here
+    /**
+     * Method to process the cash on hand by day
+     * @param {CashOnHandByDyModel} cash_on_hand - The cash on hand by day model
+     * @returns 
+     */
+    async onProcessCashData(cash_on_hand = new CashOnHandByDyModel()){
+      
+    try {
+        await CashOnHandByDyAPI.processCashOnHandByDay(cash_on_hand)
+      }catch(error){
+        customLogger.info('print toast here',this.toast)
+          customLogger.error('Error on process cash data Bills.jsx', error,)
+        ToastInterpreterUtils.toastInterpreter(this.toast,'error',this.t('cashOnHand.errorMessage'),this.t('cashOnHand.errorMessageDetails'))
+        return error;
+      }
     }
 
     /**

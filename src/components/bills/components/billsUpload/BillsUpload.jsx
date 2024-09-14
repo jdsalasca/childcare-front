@@ -1,16 +1,17 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useForm, Controller, useFieldArray } from 'react-hook-form';
+import { Button } from 'primereact/button';
 import { Calendar } from 'primereact/calendar';
 import { Dropdown } from 'primereact/dropdown';
 import { InputNumber } from 'primereact/inputnumber';
 import { InputText } from 'primereact/inputtext';
-import { Button } from 'primereact/button';
-import { useTranslation } from 'react-i18next';
-import { billTypes, programOptions } from '../../contracts/utilsAndConstants';
 import { Toast } from 'primereact/toast';
-import ChildrenAPI from '../../../models/ChildrenAPI';
+import { useEffect, useRef, useState } from 'react';
+import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { customLogger } from '../../../../configs/logger';
+import ChildrenAPI from '../../../../models/ChildrenAPI';
+import { billTypes, programOptions } from '../../../contracts/utilsAndConstants';
 
-export const BillsUpload = () => {
+const BillsUpload = () => {
   const toast = useRef(null)
     const { control, handleSubmit, watch, formState: { errors } } = useForm({
       defaultValues: {
@@ -53,6 +54,7 @@ export const BillsUpload = () => {
           console.log('====================================');
           // setChildren(response);
         } catch (err) {
+          customLogger.error('Error fetching children:', err);
           // setError(err);
         } finally {
           // setLoading(false);
@@ -185,3 +187,5 @@ export const BillsUpload = () => {
       </form>
     );
   };
+
+  export default BillsUpload;

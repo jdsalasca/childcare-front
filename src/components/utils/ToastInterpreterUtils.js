@@ -1,9 +1,18 @@
-import logger from '../../configs/logger'
-import { ApiModels } from '../../models/ApiModels'
+import { ApiModels } from '../../models/ApiModels';
 /**
  * This class provides methods for interpreting toast messages based on the response data.
  */
 export const ToastInterpreterUtils = {
+
+
+  /**
+   * This method is used to interpret the toast messages based on the response data from the backend.
+   * @param {Object} toast - The toast object
+   * @param {ApiResponseModel} response - The response object
+   * @param {string} okMessage - The message to display if the response is successful
+   * @param {string} errorMessage - The message to display if the response is not successful
+   * @returns {void}
+   */
   toastBackendInterpreter: (
     toast,
     response = ApiModels.defaultResponseModel,
@@ -19,8 +28,8 @@ export const ToastInterpreterUtils = {
       })
     } else {
       toast.current.show({
-        severity: 'error',
-        summary: 'Error',
+        severity: 'info',
+        summary: 'Info',
         detail: errorMessage,
         life: 3000
       })
@@ -37,7 +46,7 @@ export const ToastInterpreterUtils = {
      * ToastInterpreterUtils.toastInterpreter(toast, response, 'success', 'Data saved successfully.');
      */
       toastInterpreter: (toast, severity = 'info',title=severity.charAt(0).toUpperCase() + severity.slice(1), message = '', duration = 3000) => {
-        logger.info('toastInterpreter', toast, severity, title, message, duration) 
+
 
         // Validate severity to ensure it matches one of the allowed values
         const allowedSeverities = ['success', 'info', 'warn', 'error',"contrast","secondary"];
@@ -49,11 +58,11 @@ export const ToastInterpreterUtils = {
         // Show toast message based on the provided severity and message
         toast.current.show({
             severity: severity,
-            summary: severity.charAt(0).toUpperCase() + severity.slice(1), // Capitalize first letter
+            summary: title, // Capitalize first letter
             detail: message,
             life: duration
         });
-    }
+    },
 
-  
+    
 }

@@ -6,6 +6,7 @@ export class Functions {
 
     /**
      * Formats a date to the format yyyy-mm-dd.
+     * This is the standard format used by the application to the backend communication.
      * 
      * @param {Date|string} dateInput - The date to be formatted. Can be a Date object or a string that can be parsed by Date.
      * @returns {string} The formatted date in the format yyyy-mm-dd.

@@ -1,17 +1,22 @@
+/* eslint-disable no-unreachable */
 import { confirmDialog } from "primereact/confirmdialog"
 import { useEffect, useRef, useState } from "react"
 import { useFieldArray, useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
-import { AppModels } from "../../../models/AppModels"
+import { customLogger } from "../../../configs/logger"
+import { AppModels, LoadingInfo } from "../../../models/AppModels"
 import { useBillTypesByCurrencyCode } from "../../../models/BillTypeAPI"
 import { CashAPI } from "../../../models/CashAPI"
+import { CashOnHandByDyAPI, CashOnHandByDyModel } from "../../../models/CashOnHandByDyAPI"
 import { useChildren } from "../../../models/ChildrenAPI"
 import { Functions } from "../../../utils/functions"
 import { ToastInterpreterUtils } from "../../utils/ToastInterpreterUtils"
-import { exportToPDF } from "../billsPdf"
 import { BillsModel } from "../models/BillModel"
+import { exportToPDF } from "../utils/billsPdf"
 import { exportBoxesToPDF } from "../utils/boxesPdf"
 
+
+// FIXME  improve the rerender of this module cuz Im  rerendering the bills component so many times
 export const useBillsViewModel = () => {
   const { t } = useTranslation() // Initialize translation hook
   
@@ -23,12 +28,14 @@ export const useBillsViewModel = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [searchedProgram, SetSearchedProgram] = useState(null)
   const toast = useRef(null)
+  const [blockContent, setBlockContent] = useState(true)
   
   const {
     control,
     handleSubmit,
     formState: { errors },
     reset,
+    setValue,
     getValues,
     watch
   } = useForm({
@@ -48,10 +55,11 @@ export const useBillsViewModel = () => {
         value: billType.value,
         total: 0
       })),
-      date: null
+      date: null,
+      cashOnHand: 0.0
     }
   })
-  
+  const billModel = new BillsModel(getValues, toast, t)
   const { fields, append, remove, update } = useFieldArray({
     control,
     name: 'bills'
@@ -61,19 +69,28 @@ export const useBillsViewModel = () => {
     control,
     name: 'billTypes'
   })
+
+
   const fetchChildren = async () => {
     try {
-      const response = children.response
-      //const response = await ChildrenAPI.getChildren();
+      const response = children.response; // Replace with actual API call if needed
+      // const response = await ChildrenAPI.getChildren();
+      if (!response) {
+        customLogger.warn('No response received when fetching children.');
+        return [];
+      }
+  
       const students = response?.map(child => ({
         ...child,
-        childName: child.first_name + ' ' + child.last_name
-      }))
-      return students
+        childName: `${child.first_name} ${child.last_name}`
+      }));
+      
+      return students;
     } catch (err) {
-    } finally {
+      customLogger.error('Error fetching children:', err);
+      return []; // Return an empty array if an error occurs
     }
-  }
+  };
 
   
   /**
@@ -85,9 +102,7 @@ export const useBillsViewModel = () => {
    */
   const onRecalculateAll = async (index = 0, bill = null) => {
     if (bill.id == null || bill.originalIndex == null || index == null) {
-      console.error(
-        "Error on onRecalculateAll usage. You're sending an empty data object "
-      )
+      customLogger.error( "Error on onRecalculateAll usage. You're sending an empty data object ");
     }
     const data = getValues('bills')
     update(bill.originalIndex, {
@@ -161,20 +176,25 @@ export const useBillsViewModel = () => {
         id: billType.id,
         billTypeId: billType.id
       })),
-      date: getValues('date')
+      date: getValues('date'),
+      cashOnHand: getValues('cashOnHand')
     })
   }
   //#region method to calculate sums
   const calculateSums = () => {
-    return fields.reduce(
+    const total = fields.reduce(
       (acc, bill) => {
+        acc.cash_on_hand = Number(getValues("cashOnHand")) || 0
         acc.cash += Number(bill.cash) || 0
         acc.check += Number(bill.check) || 0
         acc.total += Number(bill.total) || 0
+        acc.total_cash_on_hand =acc.total_cash_on_hand = acc.cash - (parseFloat(getValues("cashOnHand")) || 0);
         return acc
       },
-      { cash: 0, check: 0, total: 0 }
+      { cash_on_hand:0,cash: 0, check: 0, total: 0,total_cash_on_hand: 0 }
     )
+    customLogger.info('total', total)
+    return total;
   }
   //#endregion
   const sums = calculateSums()
@@ -209,11 +229,24 @@ export const useBillsViewModel = () => {
 
     }
   }
+  const onGetCashOnHandByBills = (listOfBills = [])=>{
+    const totalOfCashOnBills = listOfBills.reduce((acc, bill) => {
+      return acc + Number(bill.cash)
+    }, 0)
+    customLogger.info('totalOfCashOnBills', totalOfCashOnBills)
+    return totalOfCashOnBills;
+  }
+
 
   
+
   //#region  method to send information
   const onSubmit = async data => {
-    data.bills.forEach((bill, index) => {
+    const totalCashOnBills = onGetCashOnHandByBills(data.bills)
+    customLogger.info('totalCashOnBills', totalCashOnBills)
+    billModel.onProcessCashData(new CashOnHandByDyModel(data.date, totalCashOnBills, new Date()))
+
+    data?.bills?.forEach((bill, index) => {
       update(index, { ...bill, total: Number(bill.cash) + Number(bill.check) })
     })
     if (data.date == null) {
@@ -233,7 +266,6 @@ export const useBillsViewModel = () => {
           (student.check != null && student.check > 0)
       )
     }
-    //#endregion
 
     console.log('information', fields, dataFormatted)
     confirmDialog({
@@ -250,25 +282,32 @@ export const useBillsViewModel = () => {
     })
   }
 
-  
+  const onHandlerSetCashOnHand = async date => {
+    const totalCashOnMoney = await CashOnHandByDyAPI.getMoneyUntilDate(date)
+    ToastInterpreterUtils.toastBackendInterpreter(toast, totalCashOnMoney, t('totalMoneyOnHand'), t('noTotalMoneyOnHandMessage'))
+    customLogger.info('totalCashOnMoney', totalCashOnMoney)
+    customLogger.info('date information', date)
+    const totalCashOnMoneyUnWrapped = (totalCashOnMoney.httpStatus !== 200)? 0.0 : totalCashOnMoney?.response?.totalAmountUntilNow?? 0.0
+    setValue('cashOnHand', totalCashOnMoneyUnWrapped)
+  }
+  // FIXME review the way that dates are being handled to avoid unncessary rerenders dub to onHandlerDateChanged
+  //#region Date change
   const onHandlerDateChanged = async date => {
+    customLogger.info('onHandlerDateChanged', date)
     if (isFetching.current) return
 
     isFetching.current = true
     const formattedDate = Functions.formatDateToYYYYMMDD(date)
     const formattedDateUSA = Functions.formatDateToMMDDYY(date)
     try {
-      setLoadingInfo({
-        loading: true,
-        loadingMessage: t('lookingForPaymentInfo', {
-          date: Functions.formatDateToMMDDYY(getValues('date'))
-        })
-      })
+      setLoadingInfo(new LoadingInfo(true, t('lookingForPaymentInfo', {date: Functions.formatDateToMMDDYY(getValues('date'))})))
       const dayInformation = await CashAPI.getDetailsByDate(formattedDate)
-
+      onHandlerSetCashOnHand(date)
       if (dayInformation?.httpStatus === 200) {
         await onStartForm()
         ToastInterpreterUtils.toastInterpreter(
+          toast,
+          "info",
           t('informationFound'),
           t('dataAddedForPickedDay', { date: formattedDateUSA })
         )
@@ -294,6 +333,7 @@ export const useBillsViewModel = () => {
             total: matchedBillDetail?.total || ''
           }
         })
+        setBlockContent(false)
 
         reset({
           bills: updatedChildren,
@@ -301,20 +341,27 @@ export const useBillsViewModel = () => {
           date: date
         })
       } else {
+        setBlockContent(false)
+        customLogger.info('No information found for the day:', dayInformation)
         await onStartForm()
-        ToastInterpreterUtils.toastInterpreter(toast, t('noInformationFound'), t('noDataForPickedDay', { date: formattedDateUSA }))
+        ToastInterpreterUtils.toastInterpreter(toast,"info", t('noInformationFound'), t('noDataForPickedDay', { date: formattedDateUSA }))
       }
 
       setLoadingInfo(AppModels.defaultLoadingInfo)
     } catch (error) {
+      customLogger.info('Error processing daily cash data:', error);
       setLoadingInfo(AppModels.defaultLoadingInfo)
     } finally {
       isFetching.current = false // Reset the flag when done
     }
   }
+
+
+  // TODO I have to review the quantity of rerenders in this component ASAP** customLogger.warn('FIXME REPORT:::  AUDIT fields', fields)
   const filteredFields = fields.filter(
+
     field =>
-      field.names.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      field.names?.toLowerCase().includes(searchTerm.toLowerCase()) &&
       (searchedProgram
         ? field.classroom?.toLowerCase().includes(searchedProgram.toLowerCase())
         : true)
@@ -372,7 +419,8 @@ export const useBillsViewModel = () => {
     onSubmit,
     billTypesController,
     sums,
-    handleAmountChange
+    handleAmountChange,
+    blockContent
   }
 
 

@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { customLogger } from '../../configs/logger';
 import { useGendersCache } from '../../models/GenderAPI';
 
 const useGenderOptions = () => {
@@ -7,7 +8,7 @@ const useGenderOptions = () => {
 
   useEffect(() => {
     if (genders && !isLoading) {
-        console.log("genders", genders);
+         customLogger.debug("genders ", genders);
         
       setGenderOptions(genders.response.map(gender => ({
         ...gender,

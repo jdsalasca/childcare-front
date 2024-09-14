@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import contractGenerator from '../utils/contractPdfUtils';
 import { Button } from 'primereact/button';
-import { defaultContractInfoFinished } from '../utilsAndConstants';
-import { useTranslation } from 'react-i18next';
 import { Card } from 'primereact/card';
+import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Swal from 'sweetalert2';
+import { customLogger } from '../../../configs/logger';
+import contractGenerator from '../utils/contractPdfUtils';
+import { defaultContractInfoFinished } from '../utilsAndConstants';
 
 /**
  * TThis component renders the StepComponentSeven component which is responsible for handling the contract generation.
@@ -55,7 +56,7 @@ const StepComponentSeven = ({ setActiveIndex, contractInformation = defaultContr
      */
     //#region handleDownloadPdf
     const handleDownloadPdf = (language = 'en') => {
-        console.log("contractInformation", contractInformation);
+        customLogger.debug("contractInformation", contractInformation);
         
         const { guardians, children, total_to_pay, payment_method_id, start_date, end_date } = contractInformation;
 

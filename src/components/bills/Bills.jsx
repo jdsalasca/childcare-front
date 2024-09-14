@@ -14,6 +14,8 @@ import { BillsContainer } from './components/BillsByNomination';
 import ChildFormField from './components/formComponents/ChildField';
 import { useBillsViewModel } from './viewModels/useBillsViewModel';
 
+// FIXME REVIEW ALERTS ON DATE CHANGE
+// FIXME REVIEW UTC DATE CONVERTION TO AVOID THE -5 UTC DIFFERENCE
 const Bills = () => {
 
   let {  control,
@@ -35,7 +37,8 @@ const Bills = () => {
   billTypesController,
   sums,
   filteredFields,
-  handleAmountChange
+  handleAmountChange,
+  blockContent,
   
 } = useBillsViewModel();
 const { t } = useTranslation() // Initialize translation hook
@@ -91,6 +94,7 @@ const { t } = useTranslation() // Initialize translation hook
           <span className='p-float-label'>
             <Controller
               name='program'
+              
               control={control}
               //  rules={{ required: t('program_required') }}
               render={({ field }) => (
@@ -128,8 +132,13 @@ const { t } = useTranslation() // Initialize translation hook
                     field.onChange(e.value)
                     onHandlerDateChanged(e.value)
                   }}
+                  // onBlur={e => {
+                  //   field.onChange(e.value)
+                  //   onHandlerDateChanged(e.value)
+                  // }}
                   showIcon
                   dateFormat='mm/dd/yy'
+                  // placeholder='mm/dd/yyyy'
                   mask='99/99/9999'
                   // Disable focus-triggered popup
                   showOnFocus={false}
@@ -148,7 +157,9 @@ const { t } = useTranslation() // Initialize translation hook
           key={bill.id}
           bill={bill}
           index={index}
+          blockContent={blockContent}
           control={control}
+          toast={toast}
           errors={errors}
           t={t}
           onRecalculateAll={onRecalculateAll}
@@ -206,9 +217,10 @@ const { t } = useTranslation() // Initialize translation hook
           <span className='p-float-label'>
             <InputText
               id='total-total'
-              value={((sums?.cash + sums?.check)- (sums?.cash_on_hand || 0))?.toFixed(2) || 0 }
+              value={(sums.total_cash_on_hand).toFixed(2)}
               readOnly
               className='p-disabled'
+              
             />
             <label htmlFor='total-total'>{t('bills.total_not_cash_on_hand')}</label>
           </span>

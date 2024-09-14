@@ -1,3 +1,5 @@
+import { customLogger } from "../../configs/logger";
+
 export const programOptions = [
     { label: 'Infant', value: 'Infant', minWeek: 0, maxWeek: 78 }, // 6 weeks to 18 months (78 weeks)
     { label: 'Toddler', value: 'Toddler', minWeek: 78, maxWeek: 156 }, // 18 months to 3 years (156 weeks)
@@ -283,7 +285,7 @@ export const defaultChild = {
 
 
 export const validateSchedule = (schedule, days) => {
-  console.log("days on validateSchedule", days)
+  customLogger.info("days on validateSchedule", days)
   
   if(days == null || schedule==null) return false;
   let isValid = true;

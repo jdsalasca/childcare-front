@@ -145,8 +145,12 @@
    "hourQuotaExceededMessage":"the maximum quota allowed of hours per day is 9.",
    "program_required":"The program is required",
    "select_program":"Select a program",
+   "noTotalMoneyOnHandMessage": "No money on hand for the day",
+   "totalMoneyOnHand": "Total money on hand found",
   "bills": {
     "cash_on_hand": "Cash on Hand",
+    "blockContent": "Content blocked, first pick a date to continue",
+
     "total_not_cash_on_hand": "Total (not cash on hand)",
     "dateRequired": "Date is mandatory",
     "dateRequiredDetails": "The date is mandatory to save payments information",

@@ -1,3 +1,5 @@
+import { Functions } from "../utils/functions";
+
 export class AppModels {
 
     /**
@@ -8,6 +10,14 @@ export class AppModels {
         loading: false,
         loadingMessage: ''
     }
+    static defaultChild = {
+        names: '',
+        disabled:false,
+        cash: '',
+        check: '',
+        date: Functions.formatDateToYYYYMMDD(new Date())
+      };
+      
 
 
 
