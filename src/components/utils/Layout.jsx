@@ -56,7 +56,7 @@ const Layout = ({  children,insideAuthApplication = false }) => {
 
   return (
     <div className="layout">
-      <Menubar model={insideAuthApplication? items : basicItems } style={{ justifyContent: 'center', zIndex:"1000" }} className='c-menubar' />
+      <Menubar model={insideAuthApplication? items : basicItems } className='justify-center z-10' />
       <div className="main-content">
         {children}
       </div>

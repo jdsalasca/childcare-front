@@ -1,12 +1,15 @@
-// Import PrimeReact styles
-@import "primeicons/primeicons.css"; // PrimeIcons for PrimeReact icons
-@import "primereact/resources/themes/saga-blue/theme.css"; // Replace with your desired theme
-@import "primereact/resources/primereact.min.css"; // PrimeReact core styles
+// // Import PrimeReact styles
+// @import "primeicons/primeicons.css"; // PrimeIcons for PrimeReact icons
+// @import "primereact/resources/themes/saga-blue/theme.css"; // Replace with your desired theme
+// @import "primereact/resources/primereact.min.css"; // PrimeReact core styles
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 @import "react-phone-number-input/style.css"; // Styles for the phone number input component
 @import './ReviewContracts'; // Custom styles for review contracts component
 @import 'HtmlOverrides'; // Custom HTML overrides
-@import 'media'; // Media queries for responsive design
-@import 'themes/theme-default.scss'; // Default theme styles
+// @import 'media'; // Media queries for responsive design
+// @import 'themes/theme-default.scss'; // Default theme styles
 @import 'constants.scss'; // Application constants (e.g., colors, fonts)
 @import 'homePage.scss'; // Styles for the homepage
 @import 'primeReactOverrides.scss'; // Custom overrides for PrimeReact components
@@ -14,23 +17,35 @@
 @import 'scrollCustomization.scss'; // Custom scrollbar styles
 @import 'phone-input-wrapper-custom.scss'; // Custom styles for phone input wrapper
 
-// ## start region styles 
-.layout {
-  background-color: $background-color;
-  color: $text-color;
 
-  &.theme-dark {
-    @import './themes/_theme-dark';
-    background-color: $background-color;
-    color: $text-color;
-  }
+@layer tailwind-base, primereact, tailwind-utilities;
 
-  &.theme-light {
-    @import './themes/_theme-light';
-    background-color: $background-color;
-    color: $text-color;
-  }
+@layer tailwind-base {
+  @tailwind base;
 }
+
+@layer tailwind-utilities {
+  @tailwind components;
+  @tailwind utilities;
+}
+
+// ## start region styles 
+// .layout {
+//   background-color: $background-color;
+//   color: $text-color;
+
+//   &.theme-dark {
+//     @import './themes/_theme-dark';
+//     background-color: $background-color;
+//     color: $text-color;
+//   }
+
+//   &.theme-light {
+//     @import './themes/_theme-light';
+//     background-color: $background-color;
+//     color: $text-color;
+//   }
+// }
 
 
 

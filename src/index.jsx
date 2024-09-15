@@ -1,3 +1,4 @@
+import { NextUIProvider } from '@nextui-org/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import 'primeicons/primeicons.css';
 import 'primereact/resources/primereact.min.css';
@@ -15,22 +16,26 @@ import i18n from './utils/i18n';
  *  React Query is a powerful data fetching and caching library for React. It provides a simple and flexible API for fetching, caching, and updating server-side data in your React applications.
  */
 // Create a client for React Query
-const queryClient = new QueryClient();
+const queryClient = new QueryClient()
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById('root'))
 root.render(
   <React.StrictMode>
     <AuthProvider>
       <I18nextProvider i18n={i18n}>
         <QueryClientProvider client={queryClient}>
-          <RouterLayout />
+        <NextUIProvider>
+          {/* <PrimeReactProvider value={{ unstyled: true, pt: Tailwind,  }}> */}
+            <RouterLayout />
+            </NextUIProvider>
+          {/* </PrimeReactProvider> */}
         </QueryClientProvider>
       </I18nextProvider>
     </AuthProvider>
   </React.StrictMode>
-);
+)
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+reportWebVitals()

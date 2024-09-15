@@ -20,6 +20,11 @@ function RouterLayout () {
               </Layout>
             }
           />
+
+<Route
+                  path='/childadmin/admin/register'
+                  element={<FormRegister />}
+                />
           <Route
             path='*'
             element={
@@ -27,10 +32,7 @@ function RouterLayout () {
                 <Routes>
                   <Route path='/' element={<HomePage />} />
                   <Route path='/childadmin/admin/' element={<HomePage />} />
-                  <Route
-                  path='/childadmin/admin/register'
-                  element={<FormRegister />}
-                />
+            
 
                   <Route
                     path='/childadmin/admin/report-payments-by-date'

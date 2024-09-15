@@ -1,9 +1,12 @@
+import { nextui } from '@nextui-org/react';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
+
 
 export default defineConfig({
   plugins: [
     react(),
+    nextui()
   ],
   logLevel: 'warn',
   resolve: {

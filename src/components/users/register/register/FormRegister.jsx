@@ -4,7 +4,7 @@ import { Button } from 'primereact/button'
 import { Card } from 'primereact/card'
 import { Messages } from 'primereact/messages'
 import CalendarWrapper from '../../../formsComponents/CalendarWrapper'
-import InputTextWrapper from '../../../formsComponents/InputTextWrapper'
+import InputTextWrapper from '../../../formsComponents/next-ui/InputTextWrapper'
 import PasswordWrapper from '../../../formsComponents/PasswordWrapper'
 import useRegisterViewModelForm from '../../modelView/useRegisterViewModelForm'
 
@@ -13,17 +13,22 @@ const FormRegister = () => {
     useRegisterViewModelForm()
 
   return (
-    <Card className='c-register-card'>
+    <Card className='container shadow-lg rounded-lg m-auto p-4 max-w-screen-m !bg-red-400'>
       <Messages ref={toast} />
-      <form onSubmit={handleSubmit(onSubmit)} className='c-form-register'>
-        <h3 id="title"> {t('registerForm')}</h3>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className='container flex  p-8 flex-col gap-3 justify-center max-w-screen-sm mx-auto'
+      >
+        <h3 className='mb-5'> {t('registerForm')}</h3>
         <InputTextWrapper
           name={`userName`}
           control={control}
           rules={{ required: t('username_is_required') }}
           label={t('userName')}
+          className=' !w-full'
         />
 
+      
         <InputTextWrapper
           name={`first_name`}
           control={control}
@@ -64,12 +69,17 @@ const FormRegister = () => {
           rules={{ required: t('password_is_required') }}
           label={t('password')}
         />
-        <div className='c-section-register-actions'>
-          <Button label='Submit' type='submit' className='p-button-success' />
+        <div className='flex flex-col min-w-full'>
+          <Button
+            label='Submit'
+            type='submit'
+            className='ml-auto text-white max-h-3'
+          />
           <Button
             label={t('return')}
             onClick={() => navigate('/childadmin/admin/login')}
             severity='secondary'
+            className='ml-auto text-white max-h-3'
           />
         </div>
       </form>
