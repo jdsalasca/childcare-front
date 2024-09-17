@@ -1,11 +1,9 @@
 /* eslint-disable no-unused-vars */
 import log from 'loglevel';
 import prefix from 'loglevel-plugin-prefix';
-
 // Function to dynamically set the log level based on the environment
 const setLogLevel = () => {
   const env = import.meta.env.VITE_ENV;
-
   switch (env) {
     case 'development':
       console.log('🚧 Development mode: Setting log level to DEBUG');
@@ -25,22 +23,21 @@ const setLogLevel = () => {
       break;
   }
 };
-
 // Helper function to extract the calling file and line number
 const getCallerInfo = () => {
   try {
     const stack = new Error().stack;
     const callerLine = stack.split('\n')[3]; // The third line of the stack trace
     const match = callerLine.match(/(?:\()([^()]+)\)?/); // Regex to extract file, line, and column info
-    return match ? match[1] : 'Unknown location';
+    console.log("match", match);
+    return match ? match[1] : '';
+    // Example output: 'src/utils/logger.js:123:45'
   } catch (error) {
-    return 'Unknown location';
+    return '';
   }
 };
-
 // Set the log level based on the environment
 setLogLevel();
-
 // Configure prefix options
 prefix.reg(log);
 prefix.apply(log, {
@@ -67,15 +64,14 @@ prefix.apply(log, {
     error: { color: 'red' }
   }
 });
-
 // Custom template for including file and line info
 prefix.apply(log, {
   format(level, name, timestamp) {
-    const callerInfo = getCallerInfo(); // Get file and line info
-    return `[${timestamp}] ${level.toUpperCase()} ${name || 'Global'} (${callerInfo}):`;
+    // const callerInfo = getCallerInfo(); // Get file and line info
+    // return `[${timestamp}] ${level.toUpperCase()} ${name || 'Global'} (${callerInfo}):`;
+    return `[${timestamp}] ${level.toUpperCase()} ${name || 'Global'}`;
   }
 });
-
 // Optionally, set up multiple custom loggers
 const customLogger = log.getLogger('myCustomLogger');
 customLogger.setLevel('debug'); // Custom logger with different level

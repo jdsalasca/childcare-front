@@ -1,6 +1,6 @@
-
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
+import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -15,15 +15,20 @@ import { ContractService } from '../contractModelView';
 import { calculateAge, calculateWeeksOld, determineProgram } from '../utilsAndConstants';
 
 /**
- * 
- * @param {setLoadingInfo}  setLoadingInfo :: Arg used to set an error message
+ * @param {Object} props
+ * @param {Function} props.setLoadingInfo - Function to set loading state and message
+ * @param {Function} props.setActiveIndex - Function to set the active step index
+ * @param {Object} props.contractInformation - Contract information object
+ * @param {Function} props.setContractInformation - Function to update contract information
+ * @param {Object} props.toast - Toast object for showing messages
  * @returns 
  */
-export const StepComponentOne = ({ setLoadingInfo, setActiveIndex, contractInformation, setContractInformation, toast, ...props }) => {
+export const StepComponentOne = ({ setLoadingInfo, setActiveIndex, contractInformation, setContractInformation, toast }) => {
   const { t } = useTranslation();
   const [childrenOptions, setChildrenOptions] = useState([]);
   const { genderOptions } = useGenderOptions();
   const { data: children } = useChildren();
+
   useEffect(() => {
     if (children?.response != null && children?.httpStatus === 200) {
       setChildrenOptions(
@@ -37,23 +42,17 @@ export const StepComponentOne = ({ setLoadingInfo, setActiveIndex, contractInfor
         loadingMessage: ""
       })
     }
-    return () => {
-    };
+    return () => {};
   }, [children, setLoadingInfo]);
 
-  /**
-   * Component Initialization
-   */
   useEffect(() => {
     setLoadingInfo({
       loading: children == null,
       loadingMessage: t("weAreLookingForChildrenInformation")
     })
-    return () => {
+    return () => {};
+  }, [t, setLoadingInfo, children]);
 
-    };
-
-  }, []);
   const { control, handleSubmit, formState: { errors }, setValue } = useForm({
     defaultValues: {
       children: contractInformation.children || []
@@ -63,91 +62,69 @@ export const StepComponentOne = ({ setLoadingInfo, setActiveIndex, contractInfor
     control,
     name: 'children'
   });
-  const onCreateChild =async (data) => {
+
+  const onCreateChild = async (data) => {
     return await ChildrenAPI.createChild(data).then(response => {
-      console.log("response", response);
       if (response.httpStatus === 200) {
-        //toast.current.show({ severity: 'success', summary: 'Success', detail: t('childrenInfoSaved'), life: 3000 });
         return response.response;
       }
     });
-
   };
+
   const onUpdateChild = async (data) => {
     return await ChildrenAPI.updateChild(data.id, data).then(response => {
       if (response.httpStatus === 200) {
-        //toast.current.show({ severity: 'success', summary: 'Success', detail: t('childrenInfoSaved'), life: 3000 });
         return response.response;
       }
     });
   };
+
   const onHandlerChildBackendAsync = async (data) => {
-    // Map over the children to create an array of promises
     setLoadingInfo({
       loading: true,
       loadingMessage: t("weAreSavingChildrenInformation")
-    })
+    });
     const promises = data.children.map(child => {
       if (child.id == null) {
-        // Create child if ID is null
-        return onCreateChild(child); // Return the promise from onCreateChild
+        return onCreateChild(child);
       } else {
-        // Update child if ID is present
-        return onUpdateChild(child); // Return the promise from onUpdateChild
+        return onUpdateChild(child);
       }
     });
-  
+
     try {
-      // Wait for all promises to resolve
       const responses = await Promise.all(promises);
       setLoadingInfo({
         loading: false,
         loadingMessage: ""
-      })
-      // Handle the resolved responses as needed
-      console.log("All responses received", responses);
-      
-      // Return or process the responses as needed
+      });
       return responses;
-  
     } catch (error) {
       setLoadingInfo({
         loading: false,
         loadingMessage: ""
-      })
+      });
       console.error('Error processing children data', error);
-      // Handle the error as needed
-      throw error; // Optionally re-throw the error to be handled by the caller
+      throw error;
     }
   };
-  
-  //#region  onSubmit method
-  const onSubmit = async(data) => {
-    if (ContractService.isInvalidFormDataChildren(data)) {
-      ToastInterpreterUtils.toastInterpreter(toast,'info',t('info'),t('addAtLeastOneGuardianAndAtLeastOneChild'),3000)
-      return
-    }
- 
-  try {
-    console.log("data", data);
-    
-    const childrenAsync = await onHandlerChildBackendAsync(data);
-    console.log("responses", childrenAsync);
 
-    // Update parent component with the new children data
-    setContractInformation({ ...contractInformation, children: childrenAsync });
-    
-    // Show success toast message
-    toast.current.show({ severity: 'success', summary: 'Success', detail: t('childrenInfoSaved'), life: 3000 });
-    
-    // Optionally update active index or handle other logic
-    setActiveIndex(1);
-  } catch (error) {
-    console.error('Error processing children data', error);
-    // Show error toast or handle error as needed
-    toast.current.show({ severity: 'error', summary: 'Error', detail: t('childrenInfoSaveFailed'), life: 3000 });
-  }
-};
+  const onSubmit = async (data) => {
+    if (ContractService.isInvalidFormDataChildren(data)) {
+      ToastInterpreterUtils.toastInterpreter(toast, 'info', t('info'), t('addAtLeastOneGuardianAndAtLeastOneChild'), 3000);
+      return;
+    }
+
+    try {
+      const childrenAsync = await onHandlerChildBackendAsync(data);
+      setContractInformation({ ...contractInformation, children: childrenAsync });
+      toast.current.show({ severity: 'success', summary: 'Success', detail: t('childrenInfoSaved'), life: 3000 });
+      setActiveIndex(1);
+    } catch (error) {
+      console.error('Error processing children data', error);
+      toast.current.show({ severity: 'error', summary: 'Error', detail: t('childrenInfoSaveFailed'), life: 3000 });
+    }
+  };
 
   const addChild = () => {
     append({ name: '', age: '', bornDate: null, program: '' });
@@ -157,60 +134,40 @@ export const StepComponentOne = ({ setLoadingInfo, setActiveIndex, contractInfor
     remove(index);
   };
 
-  /**
-   * This function is called when the user changes the born date of a child
-   * @param {*} date 
-   * @param {*} index 
-   * @returns 
-   */
-  //#region handleBornDateChange
   const handleBornDateChange = (date, index) => {
-    console.log("date", date);
-    console.log("index", index);
-
     const weeksOld = calculateWeeksOld(date);
-    console.log("weeksOld", weeksOld);
-
     const program = determineProgram(weeksOld);
     let age = calculateAge(date);
-    console.log("program", program);
-    console.log("age", age);
-    if(age === 0){ age = "0" }
+    if (age === 0) { age = "0" }
 
-    // Ensure that the age value is being set correctly, including 0
     setValue(`children[${index}].program`, program);
     setValue(`children[${index}].age`, age);
     return date;
-};
+  };
 
   const handleChildSelect = (e) => {
     const selectedChild = e.value;
-    console.log("selectedChild", selectedChild);
 
     toast.current.show({ severity: 'success', summary: 'Success', detail: t('childrenInfoLoaded'), life: 3000 });
 
-    // Check if the child already exists in the fields
     const existingChildIndex = fields.findIndex(child => child.fullName === selectedChild.fullName);
 
     if (existingChildIndex === -1) {
-      // If the child does not exist, add it to the fields
       append({
         ...selectedChild,
         name: selectedChild.first_name || selectedChild.name,
-        last_name	: selectedChild.last_name || selectedChild.lastName,
+        last_name: selectedChild.last_name || selectedChild.lastName,
         age: calculateAge(selectedChild.born_date),
-        born_date: new Date(selectedChild.born_date), 
+        born_date: new Date(selectedChild.born_date),
         program: determineProgram(calculateWeeksOld(selectedChild.born_date))
       });
     } else {
-      // If the child exists, populate the form with the child's data
       setValue(`children[${existingChildIndex}].born_date`, new Date(selectedChild.born_date));
     }
   };
-  //#region  form
+
   return (
     <div className="form-container">
-
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="field p-float-label" style={{ marginBottom: "30px", maxWidth: "15rem" }}>
           <Dropdown
@@ -219,7 +176,6 @@ export const StepComponentOne = ({ setLoadingInfo, setActiveIndex, contractInfor
             options={childrenOptions}
             onChange={handleChildSelect}
             optionLabel="fullName"
-
           />
           <label htmlFor="names-dropdown-child" style={{ paddingTop: "0px" }}>{t('pickAChild')}</label>
         </div>
@@ -236,7 +192,6 @@ export const StepComponentOne = ({ setLoadingInfo, setActiveIndex, contractInfor
               placeholder={t('selectGender')}
               spanClassName="c-small-field"
             />
-
             <InputTextWrapper
               name={`children[${index}].first_name`}
               control={control}
@@ -246,7 +201,6 @@ export const StepComponentOne = ({ setLoadingInfo, setActiveIndex, contractInfor
               onChangeCustom={(value) => Validations.capitalizeFirstLetter(value)}
               errors={errors}
             />
-            
             <InputTextWrapper
               name={`children[${index}].last_name`}
               control={control}
@@ -254,7 +208,6 @@ export const StepComponentOne = ({ setLoadingInfo, setActiveIndex, contractInfor
               label={t('childLastName')}
               keyFilter={/^[a-zA-ZñÑ.,\s]*$/}
               onChangeCustom={(value) => Validations.capitalizeFirstLetter(value)}
-
             />
             <CalendarWrapper
               name={`children[${index}].born_date`}
@@ -262,9 +215,8 @@ export const StepComponentOne = ({ setLoadingInfo, setActiveIndex, contractInfor
               maxDate={new Date()}
               rules={{ required: t('bornDateRequired') }}
               label={t('bornDate')}
-             dateFormat="mm/dd/yy"
-             spanClassName="c-small-field r-m-13"
-             
+              dateFormat="mm/dd/yy"
+              spanClassName="c-small-field r-m-13"
               showIcon
               onChangeCustom={(value) => handleBornDateChange(value, index)}
             />
@@ -277,25 +229,6 @@ export const StepComponentOne = ({ setLoadingInfo, setActiveIndex, contractInfor
               label={t('childAge')}
               spanClassName="c-small-field r-m-9"
             />
-
-            {/* <Controller
-              name={`children[${index}].program`}
-              control={control}
-              render={({ field }) => (
-                <span className="p-float-label">
-                  <Dropdown
-                    style={{ minWidth: "10rem" }}
-                    id={`child-program-${index}`}
-                    {...field}
-                    options={programOptions}
-                    className={classNames({ 'p-invalid': errors.children && errors.children[index] && errors.children[index].program })}
-                    disabled
-                  />
-                  <label htmlFor={`child-program-${index}`}>{t('program')}</label>
-                </span>
-              )}
-            /> */}
-
             <Button
               icon="pi pi-trash"
               className="p-button-danger p-button-text p-ml-2"
@@ -314,11 +247,31 @@ export const StepComponentOne = ({ setLoadingInfo, setActiveIndex, contractInfor
             }}
           />
           <Button type="submit" label={t('save')} className="p-button-primary p-ml-2" />
-          {/* <Button label={!validForm ? t('fillTheForm') : t('next')} className="p-button-secondary p-ml-2" onClick={goToNextStep} disabled={!validForm} /> */}
         </div>
       </form>
     </div>
   );
+};
+
+// Define prop types for StepComponentOne
+StepComponentOne.propTypes = {
+  setLoadingInfo: PropTypes.func.isRequired,
+  setActiveIndex: PropTypes.func.isRequired,
+  contractInformation: PropTypes.shape({
+    children: PropTypes.arrayOf(PropTypes.shape({
+      id: PropTypes.string,
+      name: PropTypes.string,
+      age: PropTypes.string,
+      bornDate: PropTypes.instanceOf(Date),
+      program: PropTypes.string,
+    })),
+  }).isRequired,
+  setContractInformation: PropTypes.func.isRequired,
+  toast: PropTypes.shape({
+    current: PropTypes.shape({
+      show: PropTypes.func.isRequired,
+    }).isRequired,
+  }).isRequired,
 };
 
 export default StepComponentOne;

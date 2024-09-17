@@ -42,7 +42,7 @@ const PasswordWrapper = ({
             id={name}
             {...field}
             value={field.value || ''}
-            className={classNames({ 'p-invalid': error  }) + "c-input-password-field"}
+            className={classNames({ 'p-invalid': error  }) + " c-input-password-field"}
             disabled={disabled}
             toggleMask
             header = {header}

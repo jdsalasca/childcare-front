@@ -2,8 +2,6 @@ import axios from 'axios';
 export const BASE_URL = 'http://localhost:8000/childadmin';  // Replace with your actual API base URL
 //export const BASE_URL = 'https://www.educandochildcare.com/childadmin';  // Replace with your actual API base URL
 //export const BASE_URL = 'http://192.168.1.20:8000/childadmin';  // Replace with your actual API base URL
-
-
 const makeRequest = async (url, method, endpoint, headers = {}, body, options = {}, withPayload = false) => {
   // Create headers for the request
   const myHeaders = {
@@ -16,16 +14,16 @@ const makeRequest = async (url, method, endpoint, headers = {}, body, options = 
 
   const requestOptions = {
     ...options,
-    mode: 'cors',
     method: method,
     headers: myHeaders,
     url: `${url}${endpoint}`,
+    params: options.params,  // Include params in the request options
     data: method === 'GET' && !withPayload ? null : body,
   };
 
   try {
     const response = await axios(requestOptions);
-    
+
     if (response.status === 401) {
       window.location = '/info/session-expired';
       return { response: null, httpStatus: 401 };
@@ -61,12 +59,12 @@ const makeRequest = async (url, method, endpoint, headers = {}, body, options = 
 
 
 const API = {
-  get(url, endpoint, options, withPayload = false) {
+  get(url, endpoint, options = {}, withPayload = false) {
     return makeRequest(url, 'GET', endpoint, null, {}, options, withPayload);
   },
 
   post(url, endpoint, body, options) {
-    return  makeRequest(url, 'POST', endpoint, null, body, options, false);
+    return makeRequest(url, 'POST', endpoint, null, body, options, false);
   },
 
   put(url, endpoint, body, options) {

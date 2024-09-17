@@ -106,7 +106,7 @@ const StepComponentSeven = ({
                     </Card>
                 </div>
             ) : (
-                <iframe src={receiptBase64 + '#page=9'} width="100%" height="500px" title="PDF Preview"></iframe>
+                <iframe src={receiptBase64 + '#page=18'} width="100%" height="500px" title="PDF Preview"></iframe>
             )}
             <div className="p-d-flex p-jc-center">
                 <Button

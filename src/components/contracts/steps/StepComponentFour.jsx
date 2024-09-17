@@ -38,8 +38,10 @@ export const StepComponentFour = ({
     control,
     handleSubmit,
     watch,
+    getValues,
     setError,
     clearErrors,
+    setValue,
     formState: { errors }
   } = useForm({
     defaultValues: {
@@ -56,7 +58,7 @@ export const StepComponentFour = ({
 
   useEffect(() => {
     if (endDate && startDate && new Date(endDate) <= new Date(startDate)) {
-      setError('endDate', {
+      setError('end_date', {
         type: 'manual',
         message: t('endDateAfterStartDate')
       });
@@ -64,7 +66,6 @@ export const StepComponentFour = ({
       clearErrors('endDate');
     }
   }, [startDate, endDate, setError, clearErrors, t]);
-
   const onSubmit = async (data) => {
     if (data.total_to_pay) {
       data.total_to_pay = parseFloat(data.total_to_pay).toFixed(2);
@@ -73,13 +74,30 @@ export const StepComponentFour = ({
       ToastInterpreterUtils.toastInterpreter(toast, 'info', 'info', t('contractInformationRequiredMessage'), 3000);
       return;
     }
-
     setContractInformation({ ...contractInformation, ...data });
      await ContractAPI.updateContractPaymentDetails(data);
     ToastInterpreterUtils.toastInterpreter(toast, 'success', t('success'), t('termsUpdated'));
 
     setActiveIndex(4); // Move to the next step or handle as needed
   };
+  // Function to format the value to 2 decimal places
+  const formatValue = (event) => {
+    const value = getValues('total_to_pay');
+    // Remove any non-numeric characters except for decimal point
+    const cleanValue = value?.replace(/[^0-9.]/g, '');
+    // Convert to number
+    const numberValue = parseFloat(cleanValue);
+
+    // If the number is NaN, return an empty string
+    if (isNaN(numberValue)) {
+      return '';
+    }
+    const formattedValue = numberValue.toFixed(2).replace(/\.00$/, '');
+    setValue('total_to_pay', formattedValue);
+    // Format the number to 2 decimal places if needed
+     
+  };
+
 
   return (
     <div className="form-container terms">
@@ -119,6 +137,7 @@ export const StepComponentFour = ({
           rules={{ required: t('totalAmountRequired'), min: { value: 0, message: t('totalAmountRequired') } }}
           label={t('totalAmount')}
           keyFilter={/^[0-9.]*$/}
+          onBlur={formatValue}
           spanClassName="p-float-label"
         />
         <div className="button-group">

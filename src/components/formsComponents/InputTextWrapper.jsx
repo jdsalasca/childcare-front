@@ -17,6 +17,7 @@ import { Controller } from 'react-hook-form';
  * @param {string} [props.keyFilter] - The keyfilter pattern for the input. Optional.
  * @param {Function} [props.onChangeCustom] - Custom onChange handler if needed. Optional.
  * @param {string} [props.placeholder] - Optional placeholder text for the input.
+ * @param {Function} [props.onBlur] - Optional onBlur handler for the input.
  * @param {string} [props.spanClassName] - Optional CSS class name(s) to apply to the `<span>` wrapper element.
  * @param {Object} [props.rest] - Any additional props for the `InputText` component.
  * 
@@ -29,6 +30,7 @@ const InputTextWrapper = ({
   label,
   disabled = false,
   keyFilter,
+  onBlur,
   onChangeCustom,
   placeholder,
   spanClassName = '',
@@ -44,6 +46,7 @@ const InputTextWrapper = ({
           <InputText
             id={name}
             {...field}
+            onBlur={onBlur}
             value={field.value || ''}
             className={classNames({ 'p-invalid': error })}
             disabled={disabled}
@@ -71,8 +74,10 @@ InputTextWrapper.propTypes = {
   rules: PropTypes.object, // Validation rules for react-hook-form
   label: PropTypes.string.isRequired, // Label for the input
   disabled: PropTypes.bool, // Whether the input is disabled
-  keyFilter: PropTypes.string, // Optional keyFilter for input
+  valueFormatter: PropTypes.func, // Optional value formatter function
+  keyFilter: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(RegExp)]),
   onChangeCustom: PropTypes.func, // Optional custom onChange handler
+  onBlur: PropTypes.func, // Optional onBlur handler
   placeholder: PropTypes.string, // Optional placeholder text
   spanClassName: PropTypes.string, // Optional class name for the span wrapper
   rest: PropTypes.object, // Additional props passed to InputText

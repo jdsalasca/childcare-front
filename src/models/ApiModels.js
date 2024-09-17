@@ -1,3 +1,5 @@
+import { Functions } from "../utils/functions";
+
 /**
  * Class representing an API response model.
  */
@@ -13,17 +15,6 @@ export class ApiResponseModel {
         this.response = response;
     }
 }
-/**
- * Provides default response models for API calls.
- */
-export const ApiModels = {
-    /**
-     * The default response model for API calls from the API.
-     * 
-     * @type {ApiResponseModel}
-     */
-    defaultResponseModel: new ApiResponseModel()
-};
 
 export class paymentMethod {
     constructor(method, status, translationLabel) {
@@ -33,6 +24,51 @@ export class paymentMethod {
     }
 }   
 
+export class UserBuilder {
+
+    static USER_STATUS_CREATED = 1;
+    constructor(birth_date, email, first_name, last_name, password, phone_number, role, username, user_status_id) {
+        this.birth_date = birth_date;
+        this.email = email;
+        this.first_name = first_name;
+        this.last_name = last_name;
+        this.password = password;
+        this.phone_number = phone_number;
+        this.role = role;
+        this.username = username;
+        this.user_status_id = user_status_id;
+    }
+
+    /**
+     * Builds a user object from the instance properties.
+     * 
+     * @returns {Object} - A user object.
+     */
+    build() {
+        return {
+            first_name: this.first_name,
+            last_name: this.last_name,
+            email: this.email,
+            birth_date: Functions.formatDateToYYYYMMDD(this.birth_date),
+            password: this.password,
+            phone_number: this.phone_number,
+            username: this.username,
+            user_status_id: this.user_status_id ?? UserBuilder.USER_STATUS_CREATED,
+        };
+    }
+
+    /**
+     * Static method to create and build a user object from provided data.
+     * 
+     * @param {Object} data - The user data.
+     * @returns {Object} - A formatted user object.
+     */
+    static build(data) {
+        const { birth_date, email, first_name, last_name, password, phone_number, role, username } = data;
+        const userBuilder = new UserBuilder(birth_date, email, first_name, last_name, password, phone_number, role, username);
+        return userBuilder.build();
+    }
+}
 
 export class ChildrenGuardiansBuilder {
     constructor(children, guardians) {
@@ -89,3 +125,23 @@ export class ContractDaySchedule {
         return contractDaySchedules;
     }
 }   
+
+
+/**
+ * Provides default response models for API calls.
+ */
+export const ApiModels = {
+    /**
+     * The default response model for API calls from the API.
+     * 
+     * @type {ApiResponseModel}
+     */
+    defaultResponseModel: new ApiResponseModel(),
+      /**
+     * UserBuilder for creating user objects.
+     * 
+     * @type {UserBuilder}
+     */
+      UserBuilder: UserBuilder
+
+};

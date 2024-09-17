@@ -26,4 +26,4 @@ export const useGendersCache = () => {
   });
 };
 
-export {GenderAPI};
+export { GenderAPI };

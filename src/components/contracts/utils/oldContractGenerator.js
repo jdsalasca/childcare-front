@@ -1,4 +1,5 @@
-import { defaultContractInfo, fontStyles, formatDateToYYYYMMDD } from "../utilsAndConsts"
+/* eslint-disable no-unused-vars */
+import { defaultContractInfo, fontStyles, formatDateToYYYYMMDD } from "../utilsAndConsts";
 
 
 

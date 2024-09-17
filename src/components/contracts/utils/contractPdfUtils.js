@@ -2,9 +2,11 @@
 // contractPdfUtils.js
 
 import jsPDF from 'jspdf';
+import { PDFDocument } from 'pdf-lib';
 import { customLogger } from '../../../configs/logger';
 import { Functions } from '../../../utils/functions';
 import { defaultContractInfo, defaultContractInfoFinished } from '../utilsAndConstants';
+import { ContractUtils } from './contractUtils/contractUtils';
 import { addFonts } from './jsPdfArial';
 import { contractInfo } from './newContractGenerator';
 
@@ -256,7 +258,7 @@ const specialSignSpace  =(doc = new jsPDF(), text, options, contractInformation)
   
 const preprocessText = (text) => {
 // Replace HTML tags with appropriate formatting
-text = text.replace(/<em>/g, '_');  // Replace <em> with _ (or any placeholder you prefer)
+text = text.replace(/<em>/g, ' ');  // Replace <em> with _ (or any placeholder you prefer)
 text = text.replace(/<\/em>/g, '');  // Replace </em> with _ (or any placeholder you prefer)
 text = text.replace(/<strong>/g, '**');  // Replace <strong> with ** (or any placeholder you prefer)
 text = text.replace(/<\/strong>/g, '**');  // Replace </strong> with ** (or any placeholder you prefer)
@@ -324,7 +326,10 @@ export function compressPDF(pdf = new jsPDF(), options) {
 
 	// Set the compression algorithm
 	options.compression = "gzip";
-	options.compress = 1;
+	options.compress = 5;
+	options.removeUnusedFonts  = true
+	options.removeUnusedImages = true
+	
 	// Reduce the resolution of the PDF
 	if (options.resolution) {
 		options.resolution = 150;
@@ -335,13 +340,19 @@ export function compressPDF(pdf = new jsPDF(), options) {
 		options.removeUnusedFonts = true;
 		options.removeUnusedImages = true;
 	}
+	
+	// Adjust resolution if specified
+	if (options.resolution) {
+		options.resolution = Math.max(72, options.resolution); // Ensure a minimum resolution of 72
+	}
+
 
 	// Output the compressed PDF
 	return pdf.output("datauristring", options);
 }
 
 
-const contractGenerator = (contractInformation =defaultContractInfo) => {
+const contractGenerator = async (contractInformation =defaultContractInfo) => {
   const contractBase = contractInfo(contractInformation);
   const doc = new jsPDF({
     filters: ["ASCIIHexEncode"], 
@@ -379,19 +390,36 @@ const contractGenerator = (contractInformation =defaultContractInfo) => {
   addPageContent(doc, contractBase, pageOptions, 'page10',true,contractInformation);
   addPageContent(doc, contractBase, pageOptions, 'page11',true,contractInformation);
   addPageContent(doc, contractBase, pageOptions, 'page12',true,contractInformation);
-  // addContractTerms(doc, contractBase, pageOptions)
-  // addContractMutualTerms(doc, contractBase, pageOptions)
-  // addPageContent(doc, contractBase, pageOptions, 'page5',true);
-  // addPageContent(doc, contractBase, pageOptions, 'page6',true);
-  // addPageContent(doc, contractBase, pageOptions, 'page7',true);
-
-  // Save the document
-  //doc.save("contract.pdf");
+  addContractTerms(doc, contractBase, pageOptions)
+  await addFormGob(doc, contractBase, pageOptions);
 
   const pdfBase64 = compressPDF(doc);
   return pdfBase64; 
 };
+const addFormGob = async (doc) => {
+  // Load the external PDF as a PDFDocument from pdf-lib
+  const externalPdfBytes = await ContractUtils.formGobAsBits(); // Fetch PDF as ArrayBuffer or Uint8Array
 
+   // Use pdf-lib to handle the PDF loading
+   const externalPdf = await PDFDocument.load(externalPdfBytes);
+
+   // Get all pages of the external PDF
+   const externalPages = await externalPdf.getPages();
+ 
+   // For each page in the external PDF, convert it to an image and add to jsPDF
+   for (let i = 0; i < externalPages.length; i++) {
+     if (i > 0) {
+       doc.addPage(); // Add a new page for each page of the external PDF
+     }
+     const page = externalPages[i];
+     
+     // Convert the page to an image (e.g., PNG or JPEG)
+     const imgData = await page.render({ scale: 1 }).then(canvas => canvas.toDataURL('image/jpeg'));
+     
+     // Add the image to the jsPDF document
+     doc.addImage(imgData, 'JPEG', 0, 0, doc.internal.pageSize.getWidth(), doc.internal.pageSize.getHeight());
+   }
+ };
   // Function to add the first page
   const addFirstPage = (doc, options,contractInfo,contractInformation = defaultContractInfo ) => {
     options.yPosition = options.yPosition - 10
@@ -419,13 +447,13 @@ const addContractMutualTerms = (doc,contractBase, pageOptions) => {
 }
 
 const addContractTerms =(doc,contractBase, pageOptions) => {
-  addPageContent(doc, contractBase, pageOptions, 'page4',true);
-  addPageContent(doc, contractBase, pageOptions, 'page5',true);
-  addPageContent(doc, contractBase, pageOptions, 'page6',true);
-  addPageContent(doc, contractBase, pageOptions, 'page7',true);
-  addPageContent(doc, contractBase, pageOptions, 'page8',true);
-  addPageContent(doc, contractBase, pageOptions, 'page9',true);
-  addPageContent(doc, contractBase, pageOptions, 'page10',true);
+  addPageContent(doc, contractBase, pageOptions, 'page13',true);
+  addPageContent(doc, contractBase, pageOptions, 'page14',true);
+  addPageContent(doc, contractBase, pageOptions, 'page15',true);
+  addPageContent(doc, contractBase, pageOptions, 'page16',true);
+  addPageContent(doc, contractBase, pageOptions, 'page17',true);
+  addPageContent(doc, contractBase, pageOptions, 'page18',true);
+  addPageContent(doc, contractBase, pageOptions, 'page19',true);
 
 
 
