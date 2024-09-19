@@ -1,3 +1,4 @@
+/* eslint-disable no-case-declarations */
 import { Steps } from 'primereact/steps';
 import { Toast } from 'primereact/toast';
 import { useRef, useState } from 'react';

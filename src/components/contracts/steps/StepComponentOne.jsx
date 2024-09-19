@@ -269,9 +269,9 @@ StepComponentOne.propTypes = {
   setContractInformation: PropTypes.func.isRequired,
   toast: PropTypes.shape({
     current: PropTypes.shape({
-      show: PropTypes.func.isRequired,
-    }).isRequired,
-  }).isRequired,
+      show: PropTypes.func,
+    }),
+  }),
 };
 
 export default StepComponentOne;

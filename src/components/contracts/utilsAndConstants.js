@@ -46,137 +46,151 @@ export const calculateAge = (bornDate) => {
 
   
 
-export const defaultContractInfoFinished = {
-  "todayDate": "2024-09-10T04:16:56.132Z",
-  "startDate": "2024-09-10T04:16:56.132Z",
-  "endDate": "2024-09-10T04:16:56.132Z",
+export const defaultContractInfoFinished ={
+  "todayDate": "2024-09-18T02:50:50.256Z",
+  "startDate": "2024-09-18T02:50:50.256Z",
+  "endDate": "2024-09-18T02:50:50.256Z",
   "children": [
-    {
-      "id": 382,
-      "child_id": 7,
-      "born_date": "2018-02-16T23:00:00.000000Z",
-      "first_name": "Emmanuel",
-      "status": "Active",
-      "created_at": "2024-09-07T11:28:24.000000Z",
-      "updated_at": "2024-09-07T11:28:24.000000Z",
-      "last_name": "Banderas Lemus",
-      "middle_initial": "B",
-      "identification_number": null,
-      "gender_id": 2,
-      "classroom": "School Age 003580 Dinosaurus",
-      "age": 6
-    },
-    {
-      "first_name": "El Niño De Las ",
-      "born_date": "2024-09-07T22:00:00.000000Z",
-      "gender_id": 1,
-      "last_name": "Camille",
-      "middle_initial": "C",
-      "child_id": 0,
-      "updated_at": "2024-09-10T04:24:01.000000Z",
-      "created_at": "2024-09-10T04:24:01.000000Z",
-      "id": 544,
-      "age": 0
-    }
+     {
+        "id": 382,
+        "child_id": 7,
+        "born_date": "2018-02-16T23:00:00.000000Z",
+        "first_name": "test",
+        "status": "Active",
+        "created_at": "2024-09-07T05:28:24.000000Z",
+        "updated_at": "2024-09-12T17:37:03.000000Z",
+        "last_name": "qweqLemus",
+        "middle_initial": "B",
+        "identification_number": null,
+        "gender_id": 2,
+        "classroom": "qweqwe",
+        "age": 6
+     },
+     {
+        "id": 386,
+        "child_id": 11,
+        "born_date": "2020-09-09T22:00:00.000000Z",
+        "first_name": "123123",
+        "status": "Active",
+        "created_at": "2024-09-07T09:28:24.000000Z",
+        "updated_at": "2024-09-12T19:37:03.000000Z",
+        "last_name": "ad",
+        "middle_initial": "F",
+        "identification_number": null,
+        "gender_id": 1,
+        "classroom": "asdasd",
+        "age": 4
+     }
   ],
   "guardians": [
-    {
-      "id": 14,
-      "name": "Vladimir Putin",
-      "last_name": "Valhalla",
-      "address": "El Kremlin",
-      "city": "Moscu",
-      "phone": "+1123123312",
-      "guardian_type_id": 1,
-      "created_at": "2024-09-10T03:32:35.000000Z",
-      "updated_at": "2024-09-10T04:27:18.000000Z",
-      "email": "putin@gmail.com",
-      "status": "Active",
-      "titular": true
-    },
-    {
-      "id": 11,
-      "name": "Osama",
-      "last_name": "Bin Ladin",
-      "address": "Avenida Siempre Viva",
-      "city": "Tunja",
-      "phone": "3211233211",
-      "guardian_type_id": 3,
-      "created_at": "2024-09-07T05:21:07.000000Z",
-      "updated_at": "2024-09-10T04:27:18.000000Z",
-      "email": "jdsalasc@unal.edu.co",
-      "status": "Active",
-      "titular": false
-    }
+     {
+        "id": 15,
+        "name": "Juan",
+        "last_name": "Salas",
+        "address": "Calle 123",
+        "city": "Ciudad de México",
+        "phone": "123456789",
+        "guardian_type_id": 3,
+        "created_at": "2024-09-16T22:17:12.000000Z",
+        "updated_at": "2024-09-16T22:17:12.000000Z",
+        "email": "salasdavid@gmail.com",
+        "status": "Active"
+     },
+     {
+        "id": 12,
+        "name": "Kamala",
+        "last_name": "Harris",
+        "address": "Sidney",
+        "city": "Sidney",
+        "phone": "321123321",
+        "guardian_type_id": 2,
+        "created_at": "2024-09-07T06:02:02.000000Z",
+        "updated_at": "2024-09-10T03:38:52.000000Z",
+        "email": "camilo@gmail.com",
+        "status": "Active"
+     },
+     {
+        "id": 11,
+        "name": "Osama",
+        "last_name": "Bin Ladin",
+        "address": "Avenida Siempre Viva",
+        "city": "Tunja",
+        "phone": "3211233211",
+        "guardian_type_id": 1,
+        "created_at": "2024-09-07T05:21:07.000000Z",
+        "updated_at": "2024-09-10T06:14:08.000000Z",
+        "email": "jdsalasca@unal.edu.co",
+        "status": "Active"
+     }
   ],
   "schedule": [
-    {
-      "contract_id": 26,
-      "day_id": 1,
-      "check_in": "08:00",
-      "check_out": "17:00",
-      "updated_at": "2024-09-10T04:40:34.000000Z",
-      "created_at": "2024-09-10T04:40:34.000000Z",
-      "id": 14
-    },
-    {
-      "contract_id": 26,
-      "day_id": 2,
-      "check_in": "08:00",
-      "check_out": "17:00",
-      "updated_at": "2024-09-10T04:40:34.000000Z",
-      "created_at": "2024-09-10T04:40:34.000000Z",
-      "id": 15
-    },
-    {
-      "contract_id": 26,
-      "day_id": 3,
-      "check_in": "08:00",
-      "check_out": "17:00",
-      "updated_at": "2024-09-10T04:40:34.000000Z",
-      "created_at": "2024-09-10T04:40:34.000000Z",
-      "id": 13
-    },
-    {
-      "contract_id": 26,
-      "day_id": 4,
-      "check_in": "08:00",
-      "check_out": "17:00",
-      "updated_at": "2024-09-10T04:40:34.000000Z",
-      "created_at": "2024-09-10T04:40:34.000000Z",
-      "id": 12
-    },
-    {
-      "contract_id": 26,
-      "day_id": 5,
-      "check_in": "08:00",
-      "check_out": "17:00",
-      "updated_at": "2024-09-10T04:40:34.000000Z",
-      "created_at": "2024-09-10T04:40:34.000000Z",
-      "id": 11
-    }
+     {
+        "contract_id": 32,
+        "day_id": 1,
+        "check_in": "10:00",
+        "check_out": "17:00",
+        "updated_at": "2024-09-18T02:55:21.000000Z",
+        "created_at": "2024-09-18T02:55:21.000000Z",
+        "id": 21
+     },
+     {
+        "contract_id": 32,
+        "day_id": 2,
+        "check_in": "08:00",
+        "check_out": "15:48",
+        "updated_at": "2024-09-18T02:55:21.000000Z",
+        "created_at": "2024-09-18T02:55:21.000000Z",
+        "id": 22
+     },
+     {
+        "contract_id": 32,
+        "day_id": 3,
+        "check_in": "06:00",
+        "check_out": "19:00",
+        "updated_at": "2024-09-18T02:55:21.000000Z",
+        "created_at": "2024-09-18T02:55:21.000000Z",
+        "id": 23
+     },
+     {
+        "contract_id": 32,
+        "day_id": 4,
+        "check_in": "08:00",
+        "check_out": "17:00",
+        "updated_at": "2024-09-18T02:55:21.000000Z",
+        "created_at": "2024-09-18T02:55:21.000000Z",
+        "id": 24
+     },
+     {
+        "contract_id": 32,
+        "day_id": 5,
+        "check_in": "08:00",
+        "check_out": "17:00",
+        "updated_at": "2024-09-18T02:55:21.000000Z",
+        "created_at": "2024-09-18T02:55:21.000000Z",
+        "id": 25
+     }
   ],
   "terms": {
-    "id": 8,
-    "contract_id": 26,
-    "share_media_with_families": true,
-    "allow_other_parents": false,
-    "use_for_art_and_activities": false,
-    "promote_childcare": false,
-    "walk_around_neighborhood": false,
-    "walk_to_park_or_transport": true,
-    "walk_in_school": true,
-    "guardian_received_manual": false,
-    "created_at": "2024-09-10T04:29:03.000000Z",
-    "updated_at": "2024-09-10T04:29:03.000000Z"
+     "contract_id": 32,
+     "share_photos_with_families": true,
+     "allow_other_parents_to_take_photos": true,
+     "use_photos_for_art_and_activities": true,
+     "use_photos_for_promotion": true,
+     "walk_around_neighborhood": true,
+     "walk_to_park_or_transport": true,
+     "walk_in_school": true,
+     "guardian_received_manual": true,
+     "updated_at": "2024-09-18T02:54:09.000000Z",
+     "created_at": "2024-09-18T02:54:09.000000Z",
+     "id": 1
   },
-  "contract_number": "ChildCare.10.7560",
-  "contract_id": 26,
-  "start_date": "2024-09-03T05:00:00.000Z",
-  "end_date": "2024-09-11T05:00:00.000Z",
-  "payment_method_id": 1,
+  "contract_number": "ChildCare.10.3801",
+  "contract_id": 32,
+  "start_date": "2024-09-09T05:00:00.000Z",
+  "end_date": "2024-09-15T05:00:00.000Z",
+  "payment_method_id": 2,
   "totalAmount": "",
-  "total_to_pay": "12.00"
+  "total_to_pay": "300.12"
 }
 
 export const defaultContractInfo = {
@@ -199,14 +213,6 @@ export const defaultContractInfo = {
     ],
     schedule:  undefined,
     terms: {
-        walkAroundNeighborhood: false,
-        walkToThePark: false,
-        walkAroundSchool: false,
-        receiveManual: false,
-        allowPhotos: false,
-        allowExternalPhotos: false,
-        specialExternalUsage: false,
-        externalUsageAllowed: false
     }
 };
 

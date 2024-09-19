@@ -63,10 +63,13 @@ export const StepComponentThree = ({
     <div className='form-container'>
       <form onSubmit={handleSubmit(onSubmit)}>
         {[
+          'share_photos_with_families',
+          'allow_other_parents_to_take_photos',
+          'use_photos_for_art_and_activities',
+          'use_photos_for_promotion',
           'walk_around_neighborhood',
           'walk_to_park_or_transport',
           'walk_in_school',
-          'share_media_with_families',
           'guardian_received_manual'
         ].map((term) => (
           <CheckboxWrapper

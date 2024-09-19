@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { customLogger } from "../../configs/logger";
 import { useDaysCache } from "../DaysAPI";
 
 const useDays = () => {
@@ -8,7 +7,7 @@ const useDays = () => {
   const { data: days, error, isLoading } = useDaysCache();
   
   useEffect(() => {
-    customLogger.debug("days", days);
+    // customLogger.debug("days", days);
     
     if (days && !isLoading) {
       // Set all days

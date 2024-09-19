@@ -303,7 +303,7 @@ export const contractInfo = (contractData = defaultContractInfoFinished) => {
       parr3: '\n_____ Caminar alrededor del vecindario de Educando Childcare.',
       parr4:
         '\n_____ Caminar hacia parque del vecindario o quizás ir en el transporte de la guardería.',
-      parr5: '\n_____ Caminar en la escuela del vecindario.',
+      parr5: `\n _____ Caminar en la escuela del vecindario.`,
       parr6:
         '\nAutorizo a Educando Childcare llevar a mi(s) niño(s) a los paseos mencionados y que yo marque más arriba.',
       parr7:
