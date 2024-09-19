@@ -99,4 +99,44 @@ export const useContractsCache = () => {
   });
 };
 
-export {ContractAPI};   
+
+class ContractModel{
+  /**
+   * This are the currents permissions used on the contract
+   * this has to be updated with the information of @class ContractPermissionsAPI
+   */
+  static CONTRACT_PERMISSIONS =[
+    'share_photos_with_families',
+    'allow_other_parents_to_take_photos',
+    'use_photos_for_art_and_activities',
+    'use_photos_for_promotion',
+    'walk_around_neighborhood',
+    'walk_to_park_or_transport',
+    'walk_in_school',
+    'guardian_received_manual'
+  ]
+
+}
+/**
+ * Contact factory class for creating contracts
+ */
+class ContractBuilder {
+  constructor(guardians) {
+    this.guardians = guardians;
+  }
+  build() {
+    // Ensure guardians array is not empty and has a titular guardian
+    const titularGuardian = this.guardians.find(g => g.titular);
+    if (!titularGuardian) {
+      throw new Error('No titular guardian found');
+    }
+
+    return {
+      guardian_id_titular: titularGuardian.id,
+    };
+  }
+}
+
+
+export { ContractAPI, ContractBuilder, ContractModel };
+

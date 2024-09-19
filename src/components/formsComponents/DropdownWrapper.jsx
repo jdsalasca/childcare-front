@@ -15,7 +15,6 @@ import { useTranslation } from 'react-i18next';
  * @param {string} props.optionLabel - The label field for the dropdown options.
  * @param {string} props.optionValue - The value field for the dropdown options.
  * @param {RegisterOptions} [props.rules] - Validation rules for the dropdown field.
- * @param {Function} props.getFormErrorMessage - Function to retrieve the error message for the field.
  * @param {string} props.label - Label text for the dropdown field.
  * @param {boolean} props.disabled - Whether the dropdown is disabled.
  * @param {boolean} props.filter - Whether to filter the dropdown options based on the input value.
@@ -87,7 +86,6 @@ DropdownWrapper.propTypes = {
   optionLabel: PropTypes.string.isRequired,
   optionValue: PropTypes.string.isRequired,
   rules: PropTypes.object,
-  getFormErrorMessage: PropTypes.func.isRequired,
   label: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   filter: PropTypes.bool,

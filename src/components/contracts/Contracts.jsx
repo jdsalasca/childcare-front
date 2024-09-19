@@ -10,11 +10,15 @@ import StepComponentTwo from './steps/StepComponentTwo';
 import { defaultContractInfo, validateSchedule } from './utilsAndConstants';
 
 import { useTranslation } from 'react-i18next';
+import { customLogger } from '../../configs/logger';
+import { ContractModel } from '../../models/ContractAPI';
 import useDays from '../../models/customHooks/useDays';
 import { loadingDefault } from '../../utils/constants';
 import Loader from '../utils/Loader';
 import StepComponentFive from './steps/StepComponentFive';
 import StepComponentSix from './steps/StepComponentSix';
+
+
 export const Contracts = () => {
   /**
    * @param setLoadingInfo :: defaultObject loadingDefault
@@ -29,17 +33,16 @@ export const Contracts = () => {
 
   // Function to calculate the number of accepted permissions
   const getAcceptedPermissionsCount = () => {
+    customLogger.debug('contractInformation', contractInformation)
     const permissions = contractInformation?.terms;
     if (!permissions) {
-      return '0/10';
+      return  `0/${ContractModel.CONTRACT_PERMISSIONS.length}`;
     }
-    const totalPermissions = Object.keys(permissions).length;
+    const totalPermissions = ContractModel.CONTRACT_PERMISSIONS.length;
     const acceptedPermissions = Object.values(permissions).filter(value => value).length;
     return `${acceptedPermissions}/${totalPermissions}`;
   };
-
- 
-
+  
   const countChildrenWithMedicalInfo = () => {
     //contractInformation?.children.forEach(child => console.log("child", child))
     return contractInformation?.children.filter(child => 
@@ -50,17 +53,17 @@ export const Contracts = () => {
     ).length;
   };
   
-
   const getStepClass = (stepIndex) => {
     switch (stepIndex) {
       case 0:
-        return contractInformation.children[0]?.name ? 'step-valid' : 'step-invalid';
+        return contractInformation.children[0]?.first_name ? 'step-valid' : 'step-invalid';
       case 1:
         return contractInformation.guardians[0]?.name ? 'step-valid' : 'step-invalid';
       case 2:
-        const permissions = contractInformation.terms;
-        const allPermissionsAccepted = Object.values(permissions)?.every(value => value);
-        return allPermissionsAccepted ? 'step-valid' : 'step-default';
+
+        const acceptedPermissions = contractInformation.terms;
+        const allPermissionsAccepted = Object.values(acceptedPermissions)?.every(value => value);
+        return  (allPermissionsAccepted > 1) ? 'step-valid' : 'step-invalid';
       case 3:
         const { totalAmount, paymentMethod, startDate, endDate } = contractInformation;
         const isStep3Valid = (totalAmount && paymentMethod && startDate && endDate) && startDate < endDate;

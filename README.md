@@ -10,21 +10,9 @@
     -Create form to create guardians into application
     
 ### `September`
-    -Create form to update children into application
-    
-    -Create form to update guardians into application
-    
-    -Create form to delete children into application
-    
-    -Create form to delete guardians into application
-    
-    -Create form to get all children into application
-    
-    -Create form to get all guardians into application
-    
-    -Create form to get all contracts into application
-    
-    -Create form to get all children-guardians into application
+    -Reformed module to generate bills
+    -Create module to management of bills
+    -Created register form
 
 ### `October`
     -Create form to create contracts into application
@@ -35,7 +23,6 @@
 ### `December`
     -Create form to delete contracts into application   
 
-    -Do you remembeeer?? 
     
 In the project directory, you can run:
 

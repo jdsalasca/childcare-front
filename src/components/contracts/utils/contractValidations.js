@@ -60,7 +60,7 @@ contractOutdoorPermissionsModel:{
  * @property {Date} updated_at - The timestamp when the record was last updated.
  * @property {string} email - The email address of the guardian.
  */
-guardianModel: {
+guardianDefault: {
     id: 1,
     name: 'John',
     last_name: 'Doe',

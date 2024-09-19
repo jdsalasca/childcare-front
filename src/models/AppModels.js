@@ -1,6 +1,12 @@
 import { Functions } from "../utils/functions";
 
 export class AppModels {
+    static DEFAULT_CACHE_TIME_30_SECONDS = 1000 * 60 * 1;
+    static DEFAULT_CACHE_TIME_1_MINUTES = 1000 * 60 * 1;
+    static DEFAULT_CACHE_TIME_5_MINUTES = 1000 * 60 * 5;
+    static DEFAULT_CACHE_TIME_10_MINUTES = 1000 * 60 * 10;
+    static DEFAULT_CACHE_TIME_20_MINUTES = 1000 * 60 * 20;
+    static DEFAULT_CACHE_TIME_30_MINUTES = 1000 * 60 * 30;
 
     /**
      * Default loading info object
@@ -36,6 +42,7 @@ export class LoadingInfo{
         this.loading = loading;
         this.loadingMessage = loadingMessage;
     }
+    static DEFAULT_MESSAGE = new LoadingInfo(false, '')
 }
 
 export class HeaderProps{

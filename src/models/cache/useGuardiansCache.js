@@ -1,12 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { AppModels } from "../AppModels";
 import GuardiansAPI from "../GuardiansAPI";
 
 export const useGuardiansCache = () => {
   return useQuery({
     queryKey: ['guardians'], // Unique key for caching
     queryFn: GuardiansAPI.getGuardians, // API function
-    staleTime: 1000 * 60 * 20, // Cache time in milliseconds (20 minutes)
-    cacheTime: 1000 * 60 * 30, // Cache time in milliseconds (30 minutes)
+    staleTime: AppModels.DEFAULT_CACHE_TIME_30_SECONDS, // Cache time in milliseconds (20 minutes)
+    cacheTime: AppModels.DEFAULT_CACHE_TIME_30_SECONDS, // Cache time in milliseconds (30 minutes)
   });
 };
 

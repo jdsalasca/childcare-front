@@ -69,13 +69,5 @@ CheckboxWrapper.propTypes = {
   rest: PropTypes.object, // Additional props passed to Checkbox
 };
 
-// Default prop values
-CheckboxWrapper.defaultProps = {
-  disabled: false,
-  labelClassName: '',
-  spanClassName: '',
-  labelPosition: 'right',
-  rules: null,
-};
 
 export default CheckboxWrapper;

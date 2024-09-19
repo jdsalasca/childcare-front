@@ -1,11 +1,12 @@
 /* eslint-disable react/no-is-mounted */
+import { customLogger } from '../../configs/logger'
 import {
   ApiResponseModel,
   ChildrenGuardiansBuilder,
   ContractDaySchedule
 } from '../../models/ApiModels'
 import { ChildrenGuardiansAPI } from '../../models/ChildrenGuardiansAPI'
-import { ContractAPI } from '../../models/ContractAPI'
+import { ContractAPI, ContractBuilder } from '../../models/ContractAPI'
 import {
   ChildrenValidations,
   ContractConstraints,
@@ -94,16 +95,6 @@ export class ContractService {
   }
 
   /**
-   * Creates a new contract base in the system.
-   *
-   * @param {Object} contract - The contract data to be created.
-   * @returns {Promise<Object>} - Returns a promise with the result of the API call.
-   */
-  static async createContractBase (contract) {
-    return await ContractAPI.createContract(contract)
-  }
-
-  /**
    * Creates a full contract, including relationships between children and guardians.
    *
    * @param {Object} contract - The contract object, defaulting to an empty model
@@ -120,10 +111,14 @@ export class ContractService {
       guardians,
       t
     )
-    console.log('relationships', relationships)
     if(contractInformation.contract_id == null){
-      const contractData = await this.createContractBase(guardians);
-      console.log("contractData", contractData)
+      customLogger.debug('contractInformation', contractInformation)
+      customLogger.debug('children', children)
+      customLogger.debug('guardians', guardians)
+      const contractBuild = new ContractBuilder(guardians).build()
+
+      console.log("contractData",contractBuild)
+      const contractData = await ContractAPI.createContract(contractBuild);
       return {guardianChildren:relationships,contractInfo: contractData} 
     }else{
       return {guardianChildren:relationships,contractInfo: null} 

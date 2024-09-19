@@ -17,8 +17,6 @@ export const programOptions = [
     { label: '$5,00', value: 5 },
     { label: '$1,00', value: 1 }
 ];
-
-  
 export const determineProgram = (weeksOld) => {
     return programOptions.find(program => weeksOld >= program.minWeek && weeksOld <= program.maxWeek)?.value || '';
   };
@@ -27,12 +25,11 @@ export const calculateAge = (bornDate) => {
     const birthDate = new Date(bornDate);
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDifference = today.getMonth() - birthDate.getMonth();
-  
     // If the current month is before the birth month or it's the birth month but the current day is before the birth day, subtract 1 from age
     if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
       age--;
     }
-  
+
     return age;
   };
 
@@ -200,17 +197,7 @@ export const defaultContractInfo = {
     children: [
 
     ],
-    guardians: [
-        {
-            name: 'Juan',
-            address: 'Calle 123',
-            city: 'Ciudad de México',
-            phone: '123456789',
-            guardianType: 'Titular',
-            titular: true
-        }
-
-    ],
+    guardians: [],
     schedule:  undefined,
     terms: {
     }

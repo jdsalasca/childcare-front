@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+/* eslint-disable no-unused-vars */
+import { useEffect, useState } from 'react';
 import { useGuardiansCache } from '../../models/cache/useGuardiansCache';
 
 const useGuardianOptions = () => {
@@ -11,10 +12,10 @@ const useGuardianOptions = () => {
       // Filter guardians if necessary (e.g., active status or specific criteria)
       // Assuming you have a status or similar field; adjust as needed
       const activeGuardians = guardians?.response.filter(guardian => guardian.status === 'Active');
-      console.log("guardians", guardians, activeGuardians);
       
       setGuardianOptions(guardians?.response.map(guardian => ({
         ...guardian,
+        id_static:guardian.id,
         label: guardian.name + ' - ' + guardian.last_name, // Adjust according to your data structure
         value: guardian.id      // Adjust according to your data structure
       })));

@@ -1,4 +1,3 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import API, { BASE_URL } from "./API";
 
 const GuardiansAPI = {
@@ -58,4 +57,28 @@ const GuardiansAPI = {
   }
 };
 
-export default GuardiansAPI;
+class GuardiansModel{
+
+}
+class GuardiansFactory{
+  static createGuardiansAllWithTitularStatus(guardians){
+    return guardians.map(guardian => {
+      return{
+        ...guardian,
+        titular: true
+      }
+    })
+  }
+  static mergeAndCreateWithTitularStatus (targetList, sourceList){
+    return targetList.map(guardian => {
+
+      return{
+        ...guardian,
+        titular: sourceList.some(g => g.id === guardian.id && g.titular)
+      }
+    })
+
+}
+}
+  export { GuardiansAPI, GuardiansFactory, GuardiansModel };
+

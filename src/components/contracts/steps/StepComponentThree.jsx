@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { customLogger } from '../../../configs/logger.js'
+import { ContractModel } from '../../../models/ContractAPI.js'
 import { ContractPermissionsAPI } from '../../../models/ContractPermissionsAPI.js'
 import CheckboxWrapper from '../../formsComponents/CheckboxWrapper'
 import { ToastInterpreterUtils } from '../../utils/ToastInterpreterUtils.js'
@@ -62,16 +63,7 @@ export const StepComponentThree = ({
   return (
     <div className='form-container'>
       <form onSubmit={handleSubmit(onSubmit)}>
-        {[
-          'share_photos_with_families',
-          'allow_other_parents_to_take_photos',
-          'use_photos_for_art_and_activities',
-          'use_photos_for_promotion',
-          'walk_around_neighborhood',
-          'walk_to_park_or_transport',
-          'walk_in_school',
-          'guardian_received_manual'
-        ].map((term) => (
+        {ContractModel.CONTRACT_PERMISSIONS.map((term) => (
           <CheckboxWrapper
             key={term}
             name={`terms.${term}`}
