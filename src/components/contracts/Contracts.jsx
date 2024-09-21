@@ -71,9 +71,13 @@ export const Contracts = () => {
       case 4:
         return validateSchedule(contractInformation?.schedule,daysCache) ? 'step-valid' : 'step-invalid';
       case 5:
-        return  countChildrenWithMedicalInfo() === contractInformation.children.length  ? 'step-default' : 'step-default'; // Disable if no children
-      default:
-        return 'step-default';
+        return  countChildrenWithMedicalInfo() === contractInformation.children.length  ? 'step-default block' : 'step-default block'; // Disable if no children
+        case 6:
+        return  validateSchedule(contractInformation?.schedule,daysCache) ? 'step-valid' : 'step-default'; // Disable if no children
+      
+        default:
+      
+      return 'step-default';
     }
   };
   const items = [

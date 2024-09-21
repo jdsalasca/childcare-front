@@ -1,11 +1,13 @@
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom'
 import Bills from './components/bills/Bills'
+import { MigrateBills } from './components/bills/components/migrateBills/migrateBills'
 import { Contracts } from './components/contracts/Contracts'
 import HomePage from './components/homepage/HomePage'
 import FormRegister from './components/users/register/register/FormRegister'
 import Layout from './components/utils/Layout'
 import Login from './components/utils/Login'
 import SessionExpired from './components/utils/SessionExpired'
+import { UnderConstruction } from './components/utils/UnderConstruction'
 function RouterLayout() {
   return (
     <Router>
@@ -29,8 +31,9 @@ function RouterLayout() {
             <Route path="childadmin/admin/report-teachers" element={<HomePage />} />
             <Route path="childadmin/admin/report-students" element={<HomePage />} />
             <Route path="childadmin/admin/contracts" element={<Contracts />} />
-            <Route path="childadmin/admin/review-contracts" element={<FormRegister />} />
-            <Route path="childadmin/admin/bills" element={<Bills />} />
+            <Route path="childadmin/admin/review-contracts" element={<UnderConstruction />} />
+            <Route path="childadmin/admin/bills"  element={<Bills />} />
+            <Route path="childadmin/admin/migrate/bills" element={<MigrateBills />}  />
             <Route path="childadmin/admin/active-users-report" element={<HomePage />} />
             <Route path="childadmin/admin/manage-guardians" element={<HomePage />} />
             <Route path="childadmin/admin/new-contract" element={<HomePage />} />

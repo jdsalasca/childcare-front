@@ -5,11 +5,11 @@ import 'primereact/resources/themes/saga-blue/theme.css'; // Choose the theme yo
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { I18nextProvider } from 'react-i18next';
+import i18n from './configs/i18n';
 import { AuthProvider } from './context/AuthContext';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
 import RouterLayout from './RouterLayout';
-import i18n from './utils/i18n';
 
 /**
  *  React Query is a powerful data fetching and caching library for React. It provides a simple and flexible API for fetching, caching, and updating server-side data in your React applications.

@@ -242,5 +242,17 @@
   "teethingMedicine": "Teething Medicine",
   "sunscreen": "Sunscreen",
   "insectRepellent": "Insect Repellent",
-  "other": "Other"
+  "migrateBills": "Migrate Bills",
+  "requestMigration": "Request Migration",
+  "initialDay": "Initial Day",
+  "other": "Other",
+  "totalCashInitialDay" : "Total Cash Initial Day",
+  "totalCheckInitialDay" : "Total Check Initial Day",
+  "totalCashTargetDay" : "Total Cash Target Day",
+  "totalCheckTargetDay" : "Total Check Target Day",
+
+  "under_construction": {
+    "title": "Under Construction",
+    "message": "This feature is currently being developed. Stay tuned for updates!"
+  }
 }

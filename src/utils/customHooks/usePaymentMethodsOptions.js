@@ -9,7 +9,7 @@ const usePaymentMethodsOptions = () => {
         console.log("paymentMethods", paymentMethods)
         
         if (paymentMethods && !isLoading) {
-            setPaymentMethodsOptions(paymentMethods?.response.map(paymentMethod => ({
+            setPaymentMethodsOptions(paymentMethods?.response?.map(paymentMethod => ({
                 ...paymentMethod,
                 label: paymentMethod.translationLabel, // Adjust according to your data structure
                 value: paymentMethod.id      // Adjust according to your data structure

@@ -7,7 +7,7 @@ export class LayoutModels{
     static iconModel = {
         label: (
         <div className="logo-container">
-          <img src={`${import.meta.env.PUBLIC_URL}/educando_dashboard_logo.png`} alt="Cover" />
+          <img src={`/schildadmin/admin/educando_dashboard_logo.png`} alt="Cover" />
         </div>
       ),
       className: 'home-item',

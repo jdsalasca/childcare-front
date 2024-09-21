@@ -241,5 +241,15 @@
   "teethingMedicine": "Medicamento para Dentición",
   "sunscreen": "Protector Solar",
   "insectRepellent": "Repelente de Insectos",
-  "other": "Otro"
+  "migrateBills": "Migrar Facturas",
+  "requestMigration": "Solicitar Migración",
+  "other": "Otro",
+  "totalCashInitialDay" :"Dinero total",
+  "totalCheckInitialDay" :"Cheque total",
+  "totalCashTargetDay" :"Dinero total",
+  "totalCheckTargetDay" :"Cheque total",
+  "under_construction": {
+    "title": "En Construcción",
+    "message": "Esta función se encuentra actualmente en construcción. ¡Mantente al tanto de las actualizaciones!"
+  }
 }

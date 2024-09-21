@@ -36,9 +36,12 @@ const addPageContent = (doc = new jsPDF(), contractInfo, options, pageName,creat
         
       }else if(key.startsWith("yPlus")){
         options.yPosition += content
+    }      else if (key.startsWith("signSectionEducando")){
+      addSignSpaces(doc, contractInfo, options,contractInformation, {showParentName:false, showEducandoName:true})
     }else if (key.startsWith("signSection")){
         addSignSpaces(doc, contractInfo, options,contractInformation)
       }
+
     });
     // Reset the yPosition to the initial value after adding the content
     options.yPosition = options.initialY;
@@ -112,7 +115,11 @@ lines.forEach(line => {
  * @param {Object} contractInformation - The contract information object  
  */
 //#region  sign space
-const addSignSpaces  =(doc = new jsPDF(), text, options, contractInformation) => {
+const DefaultSignOptions = {
+  showParentName: true,
+  showEducandoName: false,
+}
+const addSignSpaces  =(doc = new jsPDF(), text, options, contractInformation, signOptions = DefaultSignOptions) => {
   const titularName = contractInformation.titularName
   const totalWidth = options.contentWidth; // Total width of the content area
   const nameFieldWidth = totalWidth * 0.3; // 30% of the total width
@@ -124,21 +131,24 @@ const addSignSpaces  =(doc = new jsPDF(), text, options, contractInformation) =>
 
   doc.setFontSize(12);
 
+  if(signOptions.showParentName){
+    nameLines.forEach((line, index) => {
+      if (options.yPosition + 15 > options.pageHeight - options.marginBottom) {
+        doc.addPage();
+        options.yPosition = options.marginTop;
+      }
+      doc.text(line, options.marginLeft, options.yPosition + ((index === 0)?12 :index* 5)) ; // Adjust line height if needed
+    });
+  }
   // Render "Nombre de padres/Guardian" field (wrapped text)
-  nameLines.forEach((line, index) => {
-    if (options.yPosition + 15 > options.pageHeight - options.marginBottom) {
-      doc.addPage();
-      options.yPosition = options.marginTop;
-    }
-    doc.text(line, options.marginLeft, options.yPosition + ((index === 0)?12 :index* 5)) ; // Adjust line height if needed
-  });
+
 
   // Adjust yPosition after rendering the name field
   options.yPosition += nameLines.length * 5 + 5; // Adjust for spacing
 
   // Render the horizontal lines for each field (no boxes, just lines)
   const lineYPosition = options.yPosition + 5; // Adjust to where the line should appear
-
+  if(signOptions.showParentName){
   // "Nombre de padres/Guardian" line (30% width)
   doc.line(
     options.marginLeft,
@@ -147,6 +157,7 @@ const addSignSpaces  =(doc = new jsPDF(), text, options, contractInformation) =>
     lineYPosition
   );
 
+  
   // "Firma" line (40% width)
   doc.line(
     options.marginLeft + nameFieldWidth + 5, // Small gap between name and signature line
@@ -154,21 +165,47 @@ const addSignSpaces  =(doc = new jsPDF(), text, options, contractInformation) =>
     options.marginLeft + nameFieldWidth + signatureFieldWidth,
     lineYPosition
   );
-
-  // "Fecha" line (20% width)
-  doc.line(
-    options.marginLeft + nameFieldWidth + signatureFieldWidth + 10, // Gap between signature and date
-    lineYPosition,
-    options.marginLeft + nameFieldWidth + signatureFieldWidth + dateFieldWidth,
-    lineYPosition
-  );
+    // "Fecha" line (20% width)
+    doc.line(
+      options.marginLeft + nameFieldWidth + signatureFieldWidth + 10, // Gap between signature and date
+      lineYPosition,
+      options.marginLeft + nameFieldWidth + signatureFieldWidth + dateFieldWidth,
+      lineYPosition
+    );
+}else if(signOptions.showEducandoName){
+    // "Firma" line (40% width)
+    doc.line(
+      options.marginLeft,
+      lineYPosition,
+      options.marginLeft + nameFieldWidth + 20,
+      lineYPosition
+    );
+     // "Fecha" line (20% width)
+  // doc.line(
+  //   options.marginLeft + nameFieldWidth + 20 + 10, // Gap between signature and date
+  //   lineYPosition,
+  //   options.marginLeft + nameFieldWidth + 20 + dateFieldWidth,
+  //   lineYPosition
+  // );
+}
+ 
   // Optionally, add labels for each field above the lines
   // doc.text('Firma', options.marginLeft + nameFieldWidth + 5, lineYPosition + 5); // firma not needed cuz is put by the user
-  doc.text(Functions.formatDateToMMDDYY(new Date()), options.marginLeft + nameFieldWidth + signatureFieldWidth + 10, lineYPosition - 2);
+  if(signOptions.showParentName){
+    doc.text(Functions.formatDateToMMDDYY(new Date()), options.marginLeft + nameFieldWidth + signatureFieldWidth + 10, lineYPosition - 2);
+    doc.text('Fecha', options.marginLeft + nameFieldWidth + signatureFieldWidth + 10, lineYPosition + 5);
+  }else if(signOptions.showEducandoName){
+    // doc.text(Functions.formatDateToMMDDYY(new Date()), options.marginLeft + nameFieldWidth + 20 + 10, lineYPosition - 2);
+    // doc.text('Fecha', options.marginLeft + nameFieldWidth + 20 + 10, lineYPosition + 5);
+  }
+
   // Optionally, add labels for each field above the lines
-  doc.text("Nombre", options.marginLeft, lineYPosition + 5);
-  doc.text('Firma', options.marginLeft + nameFieldWidth + 5, lineYPosition + 5);
-  doc.text('Fecha', options.marginLeft + nameFieldWidth + signatureFieldWidth + 10, lineYPosition + 5);
+  if(signOptions.showParentName){
+    doc.text("Nombre", options.marginLeft, lineYPosition + 5);
+    doc.text('Firma', options.marginLeft + nameFieldWidth + 5, lineYPosition + 5);
+  }else if (signOptions.showEducandoName){
+    doc.text("Firma de Educando Childcare Center", options.marginLeft, lineYPosition + 5);
+  }
 };
 
 

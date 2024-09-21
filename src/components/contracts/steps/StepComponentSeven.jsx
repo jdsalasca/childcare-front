@@ -221,12 +221,13 @@ const StepComponentSeven = ({
           </Card>
         </div>
       ) : (
-        <iframe
-          src={receiptBase64 + '#page=2'}
-          width='100%'
-          height='500px'
-          title='PDF Preview'
-        ></iframe>
+      <iframe
+        src={receiptBase64 + '#page=3'}
+        width='100%'
+        
+        height='500px'
+        title='PDF Preview'
+      ></iframe>
       )}
       <div className='p-d-flex p-jc-center'>
         <Button

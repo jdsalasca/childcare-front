@@ -116,23 +116,22 @@ export const contractInfo = (contractData = defaultContractInfoFinished) => {
       separator: true,
       parr6: `\nPago por registración: ………………………………………………………………… $25.00`,
       parr7: `\nPago Anual por actividades (Toddlers, Prescolares y escolares) ……………….. $25.00`,
-      parr8: `\nInfant (bebe 6 semanas a 18 meses)  ……………………………………………… $275.00  Total: ${
-        programCounts['Infant'] || 0
-      }`,
-      parr9: `\nToddler (18 meses a 3 años) ………………………………………………………… $250.00  Total: ${
-        programCounts['Toddler'] || 0
-      }`,
-      parr10: `\nPreschool (3 a 5 años) ………………………………………………………………… $225.00  Total: ${
-        programCounts['Preschool'] || 0
-      }`,
-      parr11: `\nSchool (5 a 12 años) …………………………………………………………………… $200.00 Total: ${
-        programCounts['School age'] || 0
-      }`,
-      parr12: `\nTransporte a la escuela (ida y Vuelta por semana) ………………………………….$50.00`,
-      parr13: `\nMarque arriba lo que corresponda para su servicio y a la edad de su(s) niño(s). Su pago será de:`,
-      parr14: `\nPago al momento de la registración: $${totalCost}`,
-      parr15: `\n\n<strong> Pago seminal: …………………………………………………………………… </strong>`,
-      signSection: true
+      parr8: `\nInfant (bebe 6 semanas a 18 meses)  ……………………………………………… $275.00 ____` ,
+      parr9: `\nToddler (18 meses a 3 años) …………………………………………………………$250.00 ____`,
+      parr10: `\nPreschool (3 a 5 años)…………………………………………………………………$225.00 ____`,
+      parr11: `\nSchool (5 a 12 años)……………………………………………………………………$200.00 ____`,
+      // parr8: `\nInfant (bebe 6 semanas a 18 meses)  ……………………………………………… $275.00  Total: ${programCounts['Infant'] || 0}`,
+      // parr9: `\nToddler (18 meses a 3 años) ………………………………………………………… $250.00  Total: ${programCounts['Toddler'] || 0}`,
+      // parr10: `\nPreschool (3 a 5 años) ………………………………………………………………… $225.00  Total: ${programCounts['Preschool'] || 0}`,
+      // parr11: `\nSchool (5 a 12 años) …………………………………………………………………… $200.00 Total: ${programCounts['School age'] || 0}`,
+      parr12: `\nTransporte a la escuela (ida y Vuelta por semana)………………………………….$50.00`,
+      parr13: `\nMarque arriba lo que corresponda para su servicio y a la edad de su(s) niño(s).\nSu pago será de:_________`,
+      // parr14: `\nPago al momento de la registración: $${totalCost}`,
+      parr14: `\nPago al momento de la registración: $_________________`,
+      parr15: `\n<strong> Pago seminal: ____________________ </strong>`,
+      signSection: true,
+      parr16: `\n`,
+      signSectionEducando:true
     },
     page4: {
       parr0: `\n<strong> Información Médica de su niño </strong>`,

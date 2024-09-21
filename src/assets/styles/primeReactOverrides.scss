@@ -71,8 +71,16 @@
   
   .step-default .p-steps-title {
     color: $color-institutional-gray;
+
   }
+  .step-default.block {
+    pointer-events: none; // Disable all pointer interactions
+    user-select: none;    // Prevent text selection
   
+    :focus {
+      outline: none;      // Disable focus outline
+    }
+  }
 .p-field.p-col-4 {
     display: flex;
     flex-direction: column;

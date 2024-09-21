@@ -40,8 +40,10 @@ const Layout = ({ insideAuthApplication = false }) => {
     },
     {
       label: <span className="menu-item-deposits">{t('deposits')}</span>,
-      items: [
+      items: 
+      [
         { label: <span className="menu-item-deposits">{t('manageBills')}</span>, command: () => customNavigate('/bills') },
+        { label: <span className="menu-item-deposits">{t('migrateBills')}</span>, command: () => customNavigate('/migrate/bills') },
         // { label: t('uploadInvoices'), command: () => navigate('/bills-upload') }
       ]
     },
