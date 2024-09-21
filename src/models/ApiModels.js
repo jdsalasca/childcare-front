@@ -145,3 +145,16 @@ export const ApiModels = {
       UserBuilder: UserBuilder
 
 };
+
+/**
+ * Class representing a validator for API responses.
+ */
+export class ApiValidator {
+    static  STATUS_RESPONSE_VALID = [200,201]
+    static validResponse(status = 0) {
+        return status !=null && ApiValidator.STATUS_RESPONSE_VALID.includes(status);
+    } 
+    static invalidResponse(status = 0) {
+        return !ApiValidator.validResponse(status);
+    }
+}

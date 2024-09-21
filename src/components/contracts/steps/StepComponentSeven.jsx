@@ -30,7 +30,7 @@ const StepComponentSeven = ({
   const [errorMessage, setErrorMessage] = useState(null)
 
   let { contractBuilder } = useGenerateContract({
-    contractInformation: defaultContractInfoFinished,
+    contractInformation: contractInformation,
     toast: toast
   })
   useEffect(() => {
@@ -92,7 +92,7 @@ const StepComponentSeven = ({
    
     contractInformation = contractBuilder()
     customLogger.info('language', language)
-    customLogger.debug('contractInformation', contractInformation)
+    customLogger.debug('contractInformation handleDownloadPdf', contractInformation)
     const {
       guardians,
       children,
@@ -222,7 +222,7 @@ const StepComponentSeven = ({
         </div>
       ) : (
         <iframe
-          src={receiptBase64 + '#page=11'}
+          src={receiptBase64 + '#page=2'}
           width='100%'
           height='500px'
           title='PDF Preview'

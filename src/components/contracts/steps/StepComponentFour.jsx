@@ -48,8 +48,8 @@ export const StepComponentFour = ({
       contract_id: contractInformation.contract_id || null,
       start_date: contractInformation.start_date || null,
       end_date: contractInformation.end_date || null,
-      payment_method_id: contractInformation.paymentMethod || '',
-      totalAmount: contractInformation.totalAmount || ''
+      payment_method_id: contractInformation.payment_method_id || '',
+      total_to_pay: contractInformation.total_to_pay || ''
     }
   });
 
@@ -63,9 +63,10 @@ export const StepComponentFour = ({
         message: t('endDateAfterStartDate')
       });
     } else {
-      clearErrors('endDate');
+      clearErrors('end_date');
     }
   }, [startDate, endDate, setError, clearErrors, t]);
+
   const onSubmit = async (data) => {
     if (data.total_to_pay) {
       data.total_to_pay = parseFloat(data.total_to_pay).toFixed(2);
@@ -141,8 +142,8 @@ export const StepComponentFour = ({
           spanClassName="p-float-label"
         />
         <div className="button-group">
-          <Button type="submit" label={t('save')} className="p-button-primary rounded-button" />
-          <Button label={t('returnToPreviousStep')} className="p-button-secondary rounded-button" onClick={() => setActiveIndex(2)} />
+          <Button type="submit" label={t('save')} className="p-button-primary p-ml-2" />
+          <Button label={t('returnToPreviousStep')} className="p-button-secondary p-ml-2" onClick={() => setActiveIndex(2)} />
         </div>
       </form>
     </div>
@@ -154,10 +155,10 @@ StepComponentFour.propTypes = {
   setActiveIndex: PropTypes.func.isRequired, // Function to set active index
   contractInformation: PropTypes.shape({ // Object containing contract information
     contract_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    start_date: PropTypes.string,
-    end_date: PropTypes.string,
-    paymentMethod: PropTypes.string,
-    totalAmount: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    start_date: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
+    end_date: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
+    payment_method_id: PropTypes.string,
+    total_to_pay: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
   }).isRequired,
   setContractInformation: PropTypes.func.isRequired, // Function to set contract information
   toast: PropTypes.object.isRequired // Toast object for notifications

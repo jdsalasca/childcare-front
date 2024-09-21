@@ -188,8 +188,6 @@ const useViewModelStepGuardians = ({toast, setActiveIndex,
         )
         const contractResponse = contractResponseParent.guardianChildren
         setLoadingInfo(LoadingInfo.DEFAULT_MESSAGE)
-        console.log('contract', contractResponseParent)
-        console.log('contractResponse', contractResponse)
         let error
         if (Array.isArray(contractResponse)) {
           error = contractResponse.some(response => response.httpStatus !== 200)
@@ -221,7 +219,10 @@ const useViewModelStepGuardians = ({toast, setActiveIndex,
             contract_number:
               contractResponseParent?.contractInfo?.response?.contract_number ??
               contractInformation.contract_number,
-            contract_id: contractResponseParent?.contractInfo?.response?.id ?? contractInformation.contract_id
+            contract_id: contractResponseParent?.contractInfo?.response?.id ?? contractInformation.contract_id,
+            guardian_id_titular: 
+            contractResponseParent?.contractInfo?.response?.guardian_id_titular ??
+            contractInformation.guardian_id_titular,
           })
   
           ToastInterpreterUtils.toastInterpreter(
@@ -256,7 +257,6 @@ const useViewModelStepGuardians = ({toast, setActiveIndex,
       }
 
       try {
-        console.log('data', data)
         if (!(await onProcessGuardiansValidation(data))) {
           return
         } 

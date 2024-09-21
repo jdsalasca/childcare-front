@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { customLogger } from '../../../configs/logger.js'
+import { ApiValidator } from '../../../models/ApiModels.js'
 import { ContractModel } from '../../../models/ContractAPI.js'
 import { ContractPermissionsAPI } from '../../../models/ContractPermissionsAPI.js'
 import CheckboxWrapper from '../../formsComponents/CheckboxWrapper'
@@ -40,7 +41,7 @@ export const StepComponentThree = ({
     console.log('termsRegistry', termsRegistry)
 
     const permissionsCreated = await ContractPermissionsAPI.createContractPermissions(termsRegistry)
-    if (permissionsCreated.httpStatus !== 200) {
+    if (ApiValidator.invalidResponse(permissionsCreated.httpStatus)) {
       ToastInterpreterUtils.toastInterpreter( 
         toast,
         'error',
@@ -77,11 +78,11 @@ export const StepComponentThree = ({
           <Button
             type='submit'
             label={t('save')}
-            className='p-button-primary rounded-button'
+            className='p-button-primary p-ml-2'
           />
           <Button
             label={t('returnToPreviousStep')}
-            className='p-button-secondary rounded-button'
+            className='p-button-secondary p-ml-2'
             onClick={() => setActiveIndex(1)}
           />
         </div>

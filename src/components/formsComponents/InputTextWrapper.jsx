@@ -18,6 +18,7 @@ import { Controller } from 'react-hook-form';
  * @param {Function} [props.onChangeCustom] - Custom onChange handler if needed. Optional.
  * @param {string} [props.placeholder] - Optional placeholder text for the input.
  * @param {Function} [props.onBlur] - Optional onBlur handler for the input.
+ * @param {boolean} [props.readOnly] - Whether the input is read-only. Optional, defaults to false.
  * @param {string} [props.spanClassName] - Optional CSS class name(s) to apply to the `<span>` wrapper element.
  * @param {Object} [props.rest] - Any additional props for the `InputText` component.
  * 
@@ -27,6 +28,7 @@ const InputTextWrapper = ({
   name,
   control,
   rules,
+  readOnly,
   label,
   disabled = false,
   keyFilter,
@@ -50,6 +52,7 @@ const InputTextWrapper = ({
             value={field.value || ''}
             className={classNames({ 'p-invalid': error })}
             disabled={disabled}
+            readOnly={readOnly}
             keyfilter={keyFilter}
             placeholder={placeholder}
             onChange={(e) => {
@@ -79,6 +82,7 @@ InputTextWrapper.propTypes = {
   onChangeCustom: PropTypes.func, // Optional custom onChange handler
   onBlur: PropTypes.func, // Optional onBlur handler
   placeholder: PropTypes.string, // Optional placeholder text
+  readOnly : PropTypes.bool,
   spanClassName: PropTypes.string, // Optional class name for the span wrapper
   rest: PropTypes.object, // Additional props passed to InputText
 };

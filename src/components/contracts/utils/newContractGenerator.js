@@ -116,13 +116,13 @@ export const contractInfo = (contractData = defaultContractInfoFinished) => {
       separator: true,
       parr6: `\nPago por registración: ………………………………………………………………… $25.00`,
       parr7: `\nPago Anual por actividades (Toddlers, Prescolares y escolares) ……………….. $25.00`,
-      parr8: `\nInfant (bebe 6 semanas a 18 meses)  ……………………………………………… $275.00 Total: ${
+      parr8: `\nInfant (bebe 6 semanas a 18 meses)  ……………………………………………… $275.00  Total: ${
         programCounts['Infant'] || 0
       }`,
-      parr9: `\nToddler (18 meses a 3 años) ………………………………………………………… $250.00 Total: ${
+      parr9: `\nToddler (18 meses a 3 años) ………………………………………………………… $250.00  Total: ${
         programCounts['Toddler'] || 0
       }`,
-      parr10: `\nPreschool (3 a 5 años) ………………………………………………………………… $225.00 Total: ${
+      parr10: `\nPreschool (3 a 5 años) ………………………………………………………………… $225.00  Total: ${
         programCounts['Preschool'] || 0
       }`,
       parr11: `\nSchool (5 a 12 años) …………………………………………………………………… $200.00 Total: ${

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable no-case-declarations */
 import { Steps } from 'primereact/steps';
 import { Toast } from 'primereact/toast';
@@ -12,6 +13,7 @@ import { defaultContractInfo, validateSchedule } from './utilsAndConstants';
 import { useTranslation } from 'react-i18next';
 import { customLogger } from '../../configs/logger';
 import { ContractModel } from '../../models/ContractAPI';
+import { ContractPermissionsValidator } from '../../models/ContractPermissionsAPI';
 import useDays from '../../models/customHooks/useDays';
 import { loadingDefault } from '../../utils/constants';
 import Loader from '../utils/Loader';
@@ -33,14 +35,14 @@ export const Contracts = () => {
 
   // Function to calculate the number of accepted permissions
   const getAcceptedPermissionsCount = () => {
-    customLogger.debug('contractInformation', contractInformation)
+    customLogger.debug('contractInformation on getAcceptedPermissionsCount', contractInformation)
     const permissions = contractInformation?.terms;
     if (!permissions) {
       return  `0/${ContractModel.CONTRACT_PERMISSIONS.length}`;
     }
+
     const totalPermissions = ContractModel.CONTRACT_PERMISSIONS.length;
-    const acceptedPermissions = Object.values(permissions).filter(value => value).length;
-    return `${acceptedPermissions}/${totalPermissions}`;
+    return `${ContractPermissionsValidator.getValidContractPermissions(permissions)}/${totalPermissions}`;
   };
   
   const countChildrenWithMedicalInfo = () => {
@@ -60,18 +62,16 @@ export const Contracts = () => {
       case 1:
         return contractInformation.guardians[0]?.name ? 'step-valid' : 'step-invalid';
       case 2:
-
-        const acceptedPermissions = contractInformation.terms;
-        const allPermissionsAccepted = Object.values(acceptedPermissions)?.every(value => value);
-        return  (allPermissionsAccepted > 1) ? 'step-valid' : 'step-invalid';
+        return  (ContractPermissionsValidator.getValidContractPermissions(contractInformation.terms) > 1) ? 'step-valid' : 'step-invalid';
       case 3:
-        const { totalAmount, paymentMethod, startDate, endDate } = contractInformation;
-        const isStep3Valid = (totalAmount && paymentMethod && startDate && endDate) && startDate < endDate;
+        const { total_to_pay, payment_method_id, start_date, end_date } = contractInformation;
+
+        const isStep3Valid = (total_to_pay && payment_method_id && start_date && end_date) && start_date < end_date;
         return isStep3Valid ? 'step-valid' : 'step-invalid';
       case 4:
         return validateSchedule(contractInformation?.schedule,daysCache) ? 'step-valid' : 'step-invalid';
       case 5:
-        return  countChildrenWithMedicalInfo() === contractInformation.children.length  ? 'step-valid' : 'step-invalid'; // Disable if no children
+        return  countChildrenWithMedicalInfo() === contractInformation.children.length  ? 'step-default' : 'step-default'; // Disable if no children
       default:
         return 'step-default';
     }
@@ -124,7 +124,6 @@ export const Contracts = () => {
         return <StepComponentSix setLoadingInfo={setLoadingInfo} toast={toast} setActiveIndex={setActiveIndex} contractInformation={contractInformation} setContractInformation={setContractInformation} />;
       case 6:
         return <StepComponentSeven setLoadingInfo={setLoadingInfo} toast={toast} setActiveIndex={setActiveIndex} 
-        // contractInformation={contractInformation} 
          contractInformation={contractInformation}
         setContractInformation={setContractInformation} />;
       default:

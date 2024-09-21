@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AppModels } from "../AppModels";
-import GuardiansAPI from "../GuardiansAPI";
+import { GuardiansAPI } from "../GuardiansAPI";
 
 export const useGuardiansCache = () => {
   return useQuery({

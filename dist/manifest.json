@@ -1,0 +1,11 @@
+{
+  "short_name": "Educando report's Side",
+  "name": "App created to provide of reports and children management to the School of Educando",
+  "icons": [
+
+  ],
+  "start_url": "https://www.educandochildcare.com/childadmin/admin/login",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}

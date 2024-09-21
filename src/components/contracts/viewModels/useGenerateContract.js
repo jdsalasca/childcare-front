@@ -15,8 +15,10 @@ const useGenerateContract = ({contractInformation = defaultContractInfoFinished,
             return
         }
         customLogger.debug('Guardians on contractBuilder', contractInformation.guardians)
+        customLogger.debug('contractInformation on contractBuilder', contractInformation)
         const contractBuilderTemp = contractInformation;
-        contractBuilderTemp.titularName = contractInformation?.guardians?.find(guardian => guardian.titular)?.name ?? "Titular_not_Defined"
+        const titularGuardian = contractInformation?.guardians?.find(guardian => guardian.titular)
+        contractBuilderTemp.titularName =  titularGuardian?  titularGuardian.name + " " + titularGuardian.last_name : "Titular_not_Defined"
         customLogger.debug('dataSaver', contractBuilderTemp)
         return contractBuilderTemp;
 

@@ -223,6 +223,7 @@ export const StepComponentOne = ({ setLoadingInfo, setActiveIndex, contractInfor
             <InputTextWrapper
               name={`children[${index}].age`}
               control={control}
+              readOnly={true}
               rules={{
                 min: { value: 0, message: t('ageMustBeGreaterThanZero') }
               }}

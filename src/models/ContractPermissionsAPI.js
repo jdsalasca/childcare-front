@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import API, { BASE_URL } from "./API";
+import { ContractModel } from "./ContractAPI";
 
 export const ContractPermissionsAPI = {
     createContractPermissions: async (contractPermission) => {
@@ -76,4 +77,16 @@ export const useContractPermissionsCache = () => {
     staleTime: 1000 * 60 * 20,  // Cache time in milliseconds (20 minutes)
     cacheTime: 1000 * 60 * 30, // Cache time in milliseconds (30 minutes)
   });
-};      
+}; 
+
+export class ContractPermissionsValidator {
+  /**
+   * 
+   * @param {*} permissions 
+   * @returns returns the number of accepted permissions
+   */
+  static getValidContractPermissions(permissions) {
+    const permissionValidKeys = Object.keys(permissions).filter(key => permissions[key] === true && ContractModel.CONTRACT_PERMISSIONS.includes(key));
+    return Object.values(permissionValidKeys).filter(value => value).length;
+}
+}

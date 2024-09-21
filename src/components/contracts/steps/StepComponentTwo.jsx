@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { Button } from 'primereact/button'
 import { Dropdown } from 'primereact/dropdown'
 import PropTypes from 'prop-types'
@@ -55,7 +54,7 @@ export const StepComponentTwo = ({
             <InputTextWrapper
               name={`guardians[${index}].name`}
               control={control}
-              rules={{ required: t('guardianNameRequired') }}
+              rules={{ required: t('guardianNameRequired')}}
               label={t('guardianName')}
               onChangeCustom={value => Validations.capitalizeFirstLetter(value)}
             />
@@ -97,6 +96,7 @@ export const StepComponentTwo = ({
               name={`guardians[${index}].phone`}
               control={control}
               rules={{
+                
                 required: t('phoneNumberRequired'),
                 pattern: {
                   value: /^[+]?[\d]+$/,

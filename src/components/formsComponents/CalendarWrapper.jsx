@@ -51,8 +51,7 @@ const CalendarWrapper = ({
         return (
           <span className={`p-float-label ${spanClassName}`}>
             <Calendar
-              // mask='MM/DD/YYYY'
-              mask='99/99/9999'
+              mask= {timeOnly? null : '99/99/9999'}
               id={name}
               {...field}
               dateFormat={dateFormat}

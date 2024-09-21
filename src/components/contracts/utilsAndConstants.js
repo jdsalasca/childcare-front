@@ -20,7 +20,7 @@ export const programOptions = [
 export const determineProgram = (weeksOld) => {
     return programOptions.find(program => weeksOld >= program.minWeek && weeksOld <= program.maxWeek)?.value || '';
   };
-export const calculateAge = (bornDate) => {
+export const calculateAge = (bornDate ) => {
     const today = new Date();
     const birthDate = new Date(bornDate);
     let age = today.getFullYear() - birthDate.getFullYear();
@@ -186,7 +186,7 @@ export const defaultContractInfoFinished ={
   "start_date": "2024-09-09T05:00:00.000Z",
   "end_date": "2024-09-15T05:00:00.000Z",
   "payment_method_id": 2,
-  "totalAmount": "",
+  
   "total_to_pay": "300.12"
 }
 
@@ -194,6 +194,7 @@ export const defaultContractInfo = {
     todayDate: new Date(),
     startDate: new Date(),
     endDate: new Date(),
+    guardian_id_titular: null,
     children: [
 
     ],
