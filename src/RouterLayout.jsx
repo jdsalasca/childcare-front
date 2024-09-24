@@ -1,5 +1,5 @@
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom'
-import Bills from './components/bills/Bills'
+import { Bills } from './components/bills/Bills'
 import { MigrateBills } from './components/bills/components/migrateBills/migrateBills'
 import { Contracts } from './components/contracts/Contracts'
 import HomePage from './components/homepage/HomePage'

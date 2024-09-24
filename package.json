@@ -4,6 +4,7 @@
   "private": true,
   "homepage": "/childadmin/admin",
   "type": "module",
+  "license": "MIT",
   "dependencies": {
     "@fontsource/luckiest-guy": "^5.0.19",
     "@tanstack/react-query": "^5.51.23",

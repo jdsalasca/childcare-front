@@ -77,6 +77,7 @@
   "multipleTitularsAlertText": "You cannot have more than one titular guardian by contract.",
   "titularRequiredAlertText": "Please select a titular guardian for the contract",
   "bornDate": "Born Date",
+  "childrenHaveName" : "All children must have a name",
   "bornDateRequired": "Born date is required",
   "childAge": "Child's Age",
   "childAgeRequired": "Child age is required",

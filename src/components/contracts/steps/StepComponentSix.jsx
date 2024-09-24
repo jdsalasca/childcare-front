@@ -2,7 +2,6 @@ import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
 import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
-import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
 import { Checkbox } from 'primereact/checkbox';

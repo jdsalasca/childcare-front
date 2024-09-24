@@ -26,6 +26,7 @@
   "userName": "nickname",
   "first_name": "primer nombre",
   "last_name": "apellido",
+  "childrenHaveName" : "Todos los niños deben tener un nombre",
   "email": "email",
   "birth_date": "fecha de nacimiento",
   "password": "contraseña",

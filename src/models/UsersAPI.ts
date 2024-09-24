@@ -1,0 +1,89 @@
+import API, { ApiResponse, BASE_URL } from "./API";
+
+interface User {
+  id: string; // Adjust based on your API response
+  username: string; // Adjust based on your API response
+  email: string; // Adjust based on your API response
+  // Add other relevant properties as needed
+}
+
+interface CreateUserData {
+  username: string;
+  email: string;
+  password: string;
+  // Add other relevant fields for user registration
+}
+
+interface AuthUserData {
+  username: string;
+  password: string;
+}
+
+const UsersAPI = {
+  // Get all users
+  getUsers: async (): Promise<ApiResponse<User[]>> => {
+    try {
+      const response = await API.get<User[]>(BASE_URL, '/users');
+      return response;
+    } catch (error) {
+      console.error('Error getUsers:', error);
+      throw error; // Throw error for better error handling
+    }
+  },
+
+  // Get user by nickname
+  getUserByNickname: async (username: string):  Promise<ApiResponse<User>> => {
+    try {
+      const response = await API.get<User>(BASE_URL, '/users/username', { params: { username } });
+      return response;
+    } catch (error) {
+      console.error('Error getUserByNickname:', error);
+      throw error;
+    }
+  },
+
+  // Create a new user
+  createUser: async (data: CreateUserData): Promise<ApiResponse<User>> => {
+    try {
+      const response = await API.post<User>(BASE_URL, '/users/register', data);
+      return response;
+    } catch (error) {
+      console.error('Error createUser:', error);
+      throw error;
+    }
+  },
+
+  // Authenticate user
+  authUser: async (data: AuthUserData): Promise<ApiResponse<User>> => {
+    try {
+      const response = await API.post<User>(BASE_URL, '/users/login', data);
+      return response;
+    } catch (error) {
+      console.error('Error authUser:', error);
+      throw error;
+    }
+  },
+
+  // Get user by email
+  getUserByEmail: async (email: string):Promise<ApiResponse<User>> => {
+    try {
+      const response = await API.get<User>(BASE_URL, '/users/email', { params: { email } });
+      return response;
+    } catch (error) {
+      console.error('Error getUserByEmail:', error);
+      throw error;
+    }
+  }
+};
+
+export default UsersAPI;
+
+// Uncomment if you want to use the custom hook
+// export const useUsersCache = () => {
+//   return useQuery({
+//     queryKey: ['users'],  // Unique key for caching
+//     queryFn: () => UsersAPI.getUsers(),  // API function
+//     staleTime: 1000 * 60 * 20,  // Cache time in milliseconds (20 minutes)
+//     cacheTime: 1000 * 60 * 30, // Cache time in milliseconds (30 minutes)
+//   });
+// };
