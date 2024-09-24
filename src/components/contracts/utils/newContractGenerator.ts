@@ -1,8 +1,8 @@
 /* eslint-disable no-unused-vars */
 import { Functions } from '../../../utils/functions';
-import { ContractInfo, defaultContractInfoFinished } from '../types/ContractInfo';
+import { ContractInfo, defaultContractInfoFinished, Language } from '../types/ContractInfo';
 import { fontStyles } from '../utilsAndConstants';
-export const contractInfo = (contractData: ContractInfo= defaultContractInfoFinished) => {
+export const contractInfo = (contractData: ContractInfo= defaultContractInfoFinished, language:Language = Language.English) => {
   const todayDate = Functions.formatDateToMMDDYY(contractData.todayDate);
   const startDate = Functions.formatDateToMMDDYY(contractData.start_date!);
   const endDate = Functions.formatDateToMMDDYY(contractData.end_date!);
@@ -70,7 +70,7 @@ export const contractInfo = (contractData: ContractInfo= defaultContractInfoFini
       return sum + programPrice * programCount;
     }, 0);
 
-  return {
+  const contractSpanish = {
     page1: {
       parr2: `Email de Mama: ${motherEmail} Email de Papa: ${fatherEmail}`,
       parr3: `\nHorarios en que vendrá(n) los Nino(s):                                          `,
@@ -360,7 +360,298 @@ export const contractInfo = (contractData: ContractInfo= defaultContractInfoFini
       parr2: `\n\n<strong>Llegada y Recogida de niños</strong>\n\nPor motivos de seguridad, al llegar a Educando Childcare, recomendamos a los Padres sacar a sus niños, apagar el motor de sus vehículos, asegurar los artículos de valor y asegurar sus puertas.\n\nPor favor registre el ingreso de su niño en las pantallas digitales que se encuentran en el hall de ingreso antes de entregar a su niño a su maestra encargada de su salón.\n\nAl final del día, no olvide coordinar con la maestra encargada si su niño necesita algo en el daycare o para saber cómo le fue en el día. No olvide registrar la salida de su niño en la pantalla digital y recuerde no dejarlos desatendidos en ningún momento. Todos los niños deberán salir acompañados de sus Padres <strong> o una persona adulta autorizada por ellos.</strong>\n\nNingún niño será entregado a otra persona que no sean los Padres, a no ser que sean los autorizados por los Padres por escrito y si fuera el caso deberán presentar un ID con foto al momento de recoger al niño.`,
       parr3: `\n\n<strong>Custodia</strong>\n\nNuestro deber es entregar a los niños a sus Padres biológicos y a las personas autorizadas por ellos.<strong> Solo si hay un documento con orden del juez</strong> dejaremos de entregar a los niños a alguno o ambos Padres biológicos. Si ese fuera el caso por favor déjenos saber cuál es el caso y entregarnos una copia del documento.`
      }
-
-    // #region add medical information
   }
+  const contractEnglish = {
+    page1: {
+      parr2: `Mother's Email: ${motherEmail} Father's Email: ${fatherEmail}`,
+      parr3: `\nSchedules when the Child(ren) will come:                                          `,
+      parr4: `\nMonday: ${scheduleFormatted['monday.check_in']} to ${scheduleFormatted['monday.check_out']}     Tuesday: ${scheduleFormatted['tuesday.check_in']} to ${scheduleFormatted['tuesday.check_out']}    Wednesday: ${scheduleFormatted['wednesday.check_in']} to ${scheduleFormatted['wednesday.check_out']}`,
+      parr5: `\nThursday: ${scheduleFormatted['thursday.check_in']} to ${scheduleFormatted['thursday.check_out']}    Friday: ${scheduleFormatted['friday.check_in']} to ${scheduleFormatted['friday.check_out']}`,
+      parr6: `\nThis Childcare Service Contract, between the Parents/Guardians of the children and Educando Childcare Center, is made under the following terms and conditions:`,
+      parr7: `\nThe service will begin on the aforementioned date and will end 5 days after the notice of non-continuation of the service by either party with the corresponding payment until that date.`,
+      parr8: `\nThe Mother/Guardian who comes in person to contract the childcare service for their child(ren) is the one who signs the following Contract and policies.`,
+      parr9: `\nThe name of the child(ren) for whom Educando Childcare will provide childcare service is/are:\n\n${children}`,
+      parr10: `\nThe service will be for 5 days a week, from Monday to Friday, with attendance of no less than 4 days and a maximum of 9 hours per day, thus ensuring the space for their child(ren) at Educando Childcare Center.`,
+      parr11: `\nThe service on Saturdays is additional to the payment for weekly attendance. However, if desired, you can change one day of the week (from Monday to Friday) for Saturday. Every Thursday ends the registration for Saturdays.`,
+      parr12: `\n<strong>WE do NOT accept</strong> part-time children and/or attendance of few days or few hours for the well-being of your child(ren) and the other children. This is to help them get used to and easily recognize their peers, their teachers, and adjust to the daily schedules and routines.`
+    },
+    page2: {
+      parr1: `\nAs meal times, naptime, potty training, and learning activities as part of their development.`,
+      parr2: `\nEducando Childcare provides a quality childcare and teaching service, helping in the development and learning during the early childhood years. For this, we have qualified staff who are constantly trained and professionally growing according to the regulations of the Department of Education and the Department of Health and Human Services of Nebraska (DHHS).`,
+      parr3: `\nAdditionally, we provide healthy and nutritious meals prepared daily under the regulations of the Department of Health's Food Program and the DHHS.`,
+      parr4: `\nThe corresponding feeding and schedules will depend on what is agreed upon by the Food Program (please complete the meal form). Parents will fill out the form in case of food allergies or anything else. In the case of babies starting to eat, parents will additionally indicate what type of food they are ready to eat according to their Pediatrician's instructions (fill out the form).`,
+      parr5: `\nChildren and their families are very important to Educando Childcare, but so is our qualified staff, who have families waiting for them at home. Therefore, the childcare service for each child will NOT exceed 9 hours a day. After their hours, additional costs will be charged to the parents, whether their payment is through the Subsidy Program or Title 20 or not.`,
+      parr6: `\nAdditionally, if applicable, the subsidy program may see irregularities in your hours and reduce the approved hours or withdraw that benefit from your child.`,
+      parr7: `\nAfter the pickup time for your child, it is considered tardiness; however, we will have a tolerance of 15 minutes. After that time, the payment for tardiness will be:`,
+      parr8: `\n\n   -After 15 minutes of tardiness, the payment will be $8/hour within operating hours, and after the daycare closes, it will be $30/hour.`,
+      parr9: `\nPayments are made at the end of each week. If you are unable to make the payment, please request to discuss this before charging you the tardiness fee of $20 per day.`,
+      parr10: `\nIf parents have to pay a copay for the Subsidy program or Title 20, payment will be made to the daycare during the first 5 days of each month. After this time, there will be a charge of $10 for each day late.`,
+     
+    },
+    page3: {
+   parr2: `\nEducando Childcare Center will dedicate the necessary time for the registration of your child(ren), entering all their information and that of your child(ren) into our specialized program, thus providing technological facilities for the daily check-in and check-out of your child(ren), communication and daily information about your child(ren), in case of emergencies, and facilitating your payments.`,
+      parr3: `\nAt Educando Childcare, we maintain a calendar of activities and festivities with the children both outside and inside our facilities, which will have a symbolic cost of $25 per year per Toddler, Preschool, and School-aged child. Infants up to 2 years old are not included.`,
+      parr4: `\n<strong>                                                              OUR RATES </strong>`,
+      parr5: `\nOur rates are updated according to the DHHS regulations of the State of Nebraska for all childcare services and are as follows:`,
+      separator: true,
+      parr6: `\nRegistration fee: …………………………………………………………………… $25.00`,
+      parr7: `\nAnnual fee for activities (Toddlers, Preschool, and School-aged) ……………….. $25.00`,
+      parr8: `\nInfant (6 weeks to 18 months)  ……………………………………………… $275.00 ____`,
+      parr9: `\nToddler (18 months to 3 years) ………………………………………………$250.00 ____`,
+      parr10: `\nPreschool (3 to 5 years)……………………………………………………… $225.00 ____`,
+      parr11: `\nSchool (5 to 12 years)………………………………………………………… $200.00 ____`,
+      parr12: `\nTransportation to school (round trip per week)…………………………………….$50.00`,
+      parr13: `\nMark above what corresponds to your service and the age of your child(ren).\nYour payment will be:_________`,
+      parr14: `\nPayment at the time of registration: $_________________`,
+      parr15: `\n<strong> Seminal payment: ____________________ </strong>`,
+      signSection: true,
+      parr16: `\n`,
+      signSectionEducando: true
+    },
+    page4: {
+      parr0: `\n<strong> Medical Information of your child </strong>`,
+      separator: true,
+      parr1:
+        '\n<strong>Child’s name ____________________________  </strong> . Current health status of your child or something we should know about: ________________________________________',
+      'parr2.1':
+        '\nIs your child undergoing any treatment? What?: ____________________________________________',
+      parr3:
+        '\nDoes your child have any allergies and/or intolerances to any food, insect bites, diaper rash cream, insect repellent, sunscreen, or anything else that triggers an allergic reaction? _________________________________________________',
+      parr4:
+        '\nPlease give us clear instructions on how to help your child if the case arises: _______________________________________________________________________________________________________________________________________',
+      parr6:
+        '\nI certify that the information provided is correct and based on my knowledge.',
+      signSection: true,
+      yPlus: 12,
+      separator2: true,
+      parr8:
+        '\nChild’s name: _______________________________. Current health status of your child or something we should know about: ________________________________________',
+      parr9:
+        '\nIs your child undergoing any treatment? What?: ____________________________________________',
+      parr10:
+        '\nDoes your child have any allergies and/or intolerances to any food, insect bites, diaper rash cream, insect repellent, sunscreen, or anything else that triggers an allergic reaction?',
+      parr11:
+        '\nPlease give us clear instructions on how to help your child if the case arises: _______________________________________________________________________________________________________________________________________',
+      parr13:
+        '\nI certify that the information provided is correct and based on my knowledge.',
+      signSection2: true
+    },
+    page5: {
+      parr0: `\n<strong> Baby Formula and Meal Schedule </strong>`,
+      separator: true,
+      parr1:
+        '\nChild’s name: _______________________________ Date of Birth: ________',
+      parr2:
+        '\n<strong>                                                              Instructions  </strong>',
+      parr3:
+        '\no Breast milk or formula: _____________________________________________________',
+      parr4:
+        '\no Approximate meal times: _________   _________    _________    _______',
+      parr5:
+        '\no Maximum time between bottles: _______________Minimum (if applicable): ________',
+      parr6: '\no Approximate amount (ounces): _______________',
+      parr7:
+        '\no Instructions for feeding: ________________________________________________________________________________________________________________________',
+      parr8:
+        '\no Other food information (cereal, baby food, prepared food, juices, etc.) \n_____________________________________________________________________________________________________________________________________________________',
+      parr9:
+        '\no Allergies to any food or any food that should not be eaten: ________________________________________________________________________________________________',
+      parr10:
+        '\no Follows the Meals Program for children and adults: (circle one)',
+      parr11:
+        '\n                  Yes                                           No',
+      signSection2: true
+    },
+    page6: {
+      parr0:
+        '\n<strong> Permission for Administration of Certain Products </strong>',
+      separator: true,
+      parr1:
+        '\nI give my permission to Educando Childcare to administer the following to my child:',
+      parr2: '\n(Check with a checkmark)',
+      parr3: '\no Liquid or bar hand soap',
+      parr4: '\no Hand sanitizer',
+      parr5: '\no Diaper rash cream',
+      parr6: '\no Teething medication',
+      parr7: '\no Sunscreen',
+      parr8: '\no Insect repellent',
+      parr9: '\no Others: ________________________________',
+      signSection2: true
+    },
+    page7: {
+      parr0: '\n<strong> Transportation Agreement </strong>',
+      separator: true,
+      parr1:
+        '\nWe provide transportation services for children following safety regulations for transporting children in Nebraska. We use seats according to regulations based on the child’s weight and age. Children under 40 lb or under 4 years old will be placed in a seat approved and provided by their Parents or Guardians.',
+      parr2:
+        '\nWe provide transportation service from Educando Childcare Center to your child’s school for round trips as established in the Contract.',
+      parr3:
+        '\nAlso, based on the activities prepared for the children on days when there are no classes or they are on vacation, we transport the children to activities outside of Educando Childcare according to the schedule (Children’s Museum, Zoo, Library, Water and/or sand park, a bounce place, Pumpkin Patch, etc.). Toddlers, Preschool, and School-aged children attend these activities.',
+      parr4: '\nThe schools my child(ren) attend are:',
+      parr5:
+        '\nChild’s name: __________________________ to School _____________________',
+      parr6:
+        '\nChild’s name: __________________________ to School _____________________',
+      parr7:
+        '\nChild’s name: __________________________ to School _____________________',
+      parr8:
+        '\nChild’s name: __________________________ to School _____________________',
+      parr9:
+        '\nI, _______________________________________ authorize my child(ren) to travel in the authorized vehicle of Educando Childcare Center.',
+      signSection2: true
+    },
+    page8: {
+      parr0: '\n<strong> Exclusion of Sick Children </strong>',
+      separator: true,
+      parr1:
+        '\nParents with a sick child must keep them at home if they are not feeling well or may infect other children.',
+      parr2:
+        '\nEducando Childcare reserves the right not to provide service to a child if it believes the child is sick or may infect others.',
+      parr3:
+        '\nIf a child begins to feel ill during their day at daycare, Parents will be notified to pick up their child as soon as possible.',
+      parr4:
+        '\nIf the child becomes sick, hurt, or has an accident and efforts to contact the Parents are unsuccessful, the emergency doctor will be contacted.',
+      parr5:
+        '\nParents may sign a consent form for their child’s doctor in case emergency treatment is needed.',
+      parr6:
+        '\n<strong> Symptoms of illness for which Parents will be contacted to pick up their child immediately:</strong>',
+      parr7:
+        '\n- High temperature of 100 degrees; depending on the child’s situation, Parents will be notified if the child has a temperature of 99 degrees to prevent the child from collapsing and becoming unconscious if the temperature rises too quickly.',
+      parr8:
+        '\n- If the child vomits or has diarrhea for the second time on the same day.',
+      parr9:
+        '\n- If the child shows symptoms of infections such as: mumps, chickenpox, measles, eye infections, and lice.',
+      parr10:
+        '\nIn all these cases, a doctor’s note stating that the child is healthy enough to return to daycare will be required.',
+      signSection: true
+    },
+    page9: {
+      parr0: '\n<strong> Termination of Educando Services </strong>',
+      separator: true,
+      parr1:
+        '\nService at Educando may be terminated by either party, by the Parents, guardian, or by Educando Childcare, with a prior notice of 10 days. Payment for those 10 days will be made immediately after the notice is given.',
+      parr2:
+        '\nEducando Childcare may terminate its services for the following reasons:',
+      parr3:
+        '\n- If the child does not adjust, continues to be upset, or cries continuously, after efforts have been made with the Parents or guardian for the child to attend daily during full-day hours to help the child adjust.',
+      parr4:
+        '\n- If the child is constantly hitting themselves or other children at Educando Childcare or its employees.',
+      parr5:
+        '\n- If the child has ongoing behavioral issues, despite attempts to help them change.',
+      parr6:
+        '\n- If the Parents do not respect the hours and schedules agreed upon in the Contract.',
+      parr7:
+        '\n- If the Parents or Guardians are not up to date or are not punctual with payments to Educando for their child’s service, including the Co-payment of the Subsidy Program or Title 20 if applicable.',
+      parr8:
+        '\n- If the Parents or Guardians of child(ren) display inappropriate behavior, yelling, insults, mistreatment, or attacks toward employees, the director of Educando, or other Parents or children in Educando’s service.',
+      parr9:
+        '\n- If the Parents or guardians do not work with Educando Childcare to provide the child with consistent discipline, do not practice the same potty training methods at home, do not provide changes of clothes, diapers, milk for their baby, and everything necessary for the good health of their child, or do not attend meetings or conferences with the Director or teacher responsible for their child to work together for their child’s well-being.',
+      parr10:
+        '\n- If the Parents do not comply with the policies and procedures established by Educando Childcare and the Nebraska Department of Human Services, including those established by the previously known Subsidy Program Title 20 and Meals Program.',
+      parr11:
+        '\nUpon notification of termination of service to the child by Educando Childcare, both parties will agree on what the last day of service will be and the final payment due to daycare.',
+      signSection: true
+    },
+    page10: {
+      parr0: '\n<strong> Authorization for Use of Photographs and Media </strong>',
+      separator: true,
+      parr1:
+        '\nI, _______________________________ Mother/Father or Guardian of my child(ren) named ___________________________________________, agree that Educando Childcare: (Please mark what you wish)',
+      parr2:
+        '\n____ Share photos, videos, media with my child(ren) there with other families of children registered at the daycare for family and personal purposes only (via email, group photo, Christmas Event, Thanksgiving, Field trip, or classroom activity outings, or photo printing).',
+      parr3:
+        '\n____ Permission for other Parents of children registered at Educando Childcare to take photographs, videos, and media with my children there, if other Parents agree, for personal and family use only such as Birthday celebrations, festivities held at the daycare.',
+      parr4:
+        '\n____ Use of photographs of my child for arts and crafts projects and activities for families of children registered at the daycare.',
+      parr5:
+        '\n____ Use of photographs, videos, media with my child there to promote Educando Childcare Center. I give my consent by signing below:',
+      signSection: true
+    },
+    page11: {
+      parr0: '\n<strong> Authorization to Go for Walks </strong>',
+      separator: true,
+      parr1:
+        '\nAs part of the Educando Childcare program, some walks outside our facilities are included as part of the stimulation in contact with nature, the community, and healthy physical development. Children will be held by the hand with safety straps and accompanied by their teachers and responsible staff.',
+      parr2:
+        '\nTypical places for walks may include, but are not limited to:',
+      parr3: '\n_____ Walking around the Educando Childcare neighborhood.',
+      parr4:
+        '\n_____ Walking to the neighborhood park or perhaps taking the daycare transportation.',
+      parr5: `\n_____ Walking at the neighborhood school.`,
+      parr6:
+        '\nI authorize Educando Childcare to take my child(ren) on the walks mentioned above.',
+      parr7:
+        '\nI understand that for other walks, I will be given a schedule of days, times, and places to visit outside the daycare as part of my child(ren)’s educational enrichment program.',
+      signSection: true
+    },
+    page12: {
+      parr0:
+        '\n<strong> RECEIPT OF THE PARENT MANUAL OF EDUCANDO CHILDCARE </strong>',
+      separator: true,
+      parr1:
+        '\nI confirm that I have received a copy of the Parent/Guardian Manual of Educando Childcare Center, according to the rules of the Nebraska Department of Health and Human Services, the procedures, and the expectations of the daycare that I will read, understand, and comply with for the benefit of my child(ren).',
+      parr2:
+        '\nI understand that these Policies and regulations are subject to change, of which I will be informed and will implement.',
+      signSection: true
+    },
+    //region Contract starts here
+    page13: {
+      title: {
+        text: `<i>Parent Manual of Educando Childcare Center</i>`,
+        fontStyle: fontStyles.ITALIC
+      },
+      separator: true,
+      subtitle: { text: `Our Program`, fontStyle: fontStyles.BOLD },
+      parr1: `We believe that children learn through play and exploration, which is why we create a fun learning environment where children are encouraged to participate in learning activities that aid their development. We know it is important to work with Parents, and our mutual communication is essential in raising healthy and happy children.`,
+      parr2: `/nOur Program promotes Emotional, Cognitive, and Learning, Social and Physical Development. We achieve this through various fun learning activities, always seeking to involve the child in discovery and exploration as important tools for learning.`,
+      parr3: `/n<strong>In Emotional Development</strong>, we encourage children to do things for themselves and promote self-esteem through group learning activities. Helping them deal with their intense emotions is key to self-regulation. Healthy emotional development allows them to feel secure and be part of a group, learning to work with it, thus facilitating their integration into the real world that begins at school.`,
+      parr4: `/n<strong>In Cognitive and Learning Development</strong>, various exploration and creativity activities will initiate experiences that will form the knowledge base children will apply when facing future challenges.`,
+      parr5: `/n<strong>Social Development</strong>: the interaction of activities with other children will help them develop empathy and friendships, share, give, and receive. All of this is necessary for the healthy development of the child. As a guide for interaction among children, positive attitudes, respect, love, and good manners will be practiced.`,
+      parr6: `/n<strong>Physical Development</strong>: opportunities for movement activities help them develop fine motor skills, which are essential for school. They will learn to follow instructions, pay attention, hold a pencil, etc.`,
+      parr7: `/n Activities such as jumping, running, swinging, and sliding help stretch and strengthen their muscles for healthy growth, and develop coordination, strength, and dexterity skills. Additionally, gradual movement, speed, or slowness will help them manage their emotions. Dance and music will help them develop coordination, as well as in language learning, writing, and positive behavior.`
+    },
+    page14: {
+      title: {
+        text: `Educando Childcare Center`,
+        fontStyle: fontStyles.ITALIC
+      },
+      separator: true,
+      parr1: `\n<em>#<strong>Mission</strong>##</em>\n\nWe are committed to providing the highest level of education and childcare, ensuring academic success and good development, and a promising future./n/nEverything within a safe, comfortable environment surrounded by love while we look after the physical and emotional health of our children.`,
+      parr2: `\n<em>#<strong>Vision</strong>##</em>\n\nWe ensure the promotion of early learning through fun educational activities that will aid in the various stages of child development. The practice of values and good customs, always carried out with love, are part of our service.`,
+      parr3: `\n<em>#<strong>Objectives</strong>##</em>\n\nOur goal is to elevate the level of early childhood care and education in our community, providing the service that children deserve in a safe and comfortable environment, ensuring their good academic development.`
+    },
+    page15: {
+      title: {
+        text: `Educando Childcare Center - Policies`,
+        fontStyle: fontStyles.ITALIC
+      },
+      separator: true,
+      parr1: `\n\n\n<strong>Inclusion</strong>\n\nOur Program welcomes all children. And since we are all unique just like our families, we embrace them regardless of gender, race, color, religion, nationality, or the diverse composition of families or guardians.\n\nFollowing the regulations of the Department of Education and DHHS, children will work on multiculturalism, sharing their customs and learning from others.\n\nDue to family diversity, it is necessary to work together with parents or guardians in constant communication to adequately assist their child with any changes or discomforts at home that may directly affect them and monitor their behavior.`,
+      parr2: `\n\n\n<strong>Confidentiality</strong>\n\nAll information provided to us is treated with special attention, respect, and total discretion. This means that we will not share your information with third parties or any institution unless there is a legal document obligating us to do so.`,
+      parr3: `\n\n\n<strong>Professional Ethics</strong>\n\nOur service is based on respect for children and their families. We value and respect their ideas and opinions, and our staff will only offer suggestions when requested by parents or guardians, always treated with respect and confidentiality.`,
+      parr4: `\n\n\n<strong>Nap Time</strong>\n\nNap time is one of the important routines for the child's health and rest, helping to prevent stress-related illnesses. Thus, nap time is after lunchtime (approximately 11:30) until 2 PM.`
+    },
+    page16: {
+      parr1: `<strong>Nutrition</strong>\n\n\n\nChildren receive nutritious and healthy meals, prepared daily under the regulations of the Child Nutrition Program of the U.S. Department of Agriculture and the Nebraska Department of Health and Human Services for Daycares and Elderly Care Centers. Parents or guardians must sign a request for their children to participate at no extra charge.\n\nChildren will receive balanced meals, including their favorites, but prepared healthily. Therefore, we ask parents or guardians to maintain their Contract schedules so that their children have the meals they need at home before coming to daycare, ensuring they do not bring food from home, to avoid cases where other children may desire or provoke, and perhaps be allergic to that food. If your child is allergic to any food, medication, or anything else, please fill out the allergy form.\n\nAll children will be served food and encouraged to eat, as we know that proper and timely nutrition is essential for their health and growth. Parents will be notified if their child does not eat well each day.`,
+      parr2: `\n\n<strong>Positive Discipline</strong>\n\n\n\nWe believe in praise that encourages the child to behave positively and develop better. Part of our goal is to help the child in self-control and respect for themselves and others, including other children and adults.\n\nOur staff will only use positive techniques for discipline. This includes redirection, anticipation, natural consequences, and teaching children to resolve conflicts appropriately. The “time-out” will be 1 minute for each year of the child's age and will count from the moment the child is calm enough to understand what we discuss with them about what they did.\n\nAfter some of these disciplinary measures, we hug and smile at the child to show them they are still a loved child, and we always praise their good behavior.\n\nTo discipline, we need to be in communication with the parents or guardians to ensure we use the same techniques to avoid confusion for the child. If the behavior of the child does not improve, it will be necessary to have conferences to see how we can help the child. If there is still no improvement, it may be best for the child to coordinate a change with them to another childcare.`
+    },
+    page17: {
+      parr1: `<strong>Toilet Training</strong>\n\nIt is necessary to work in coordination with the parents to implement the same toilet training approach for their child at daycare as at home, so the child does not get confused and it becomes as natural as possible, without feeling that going to the bathroom is a drama because they will be alone. If your child has any accidents in the bathroom, such as soiling themselves because they still do not know, they will not be punished in any way. For toilet training, please bring an extra set of appropriate clothing for the weather and pull-ups or special diapers every day.`,
+      parr2: `\n<strong>Diaper Changing</strong>\n\nThe diaper changing procedure according to DHHS regulations is:\n\n         -   Diapers are checked frequently and regularly. If they are wet or soiled, they are changed immediately using disposable wipes.\n         -   Wet and soiled diapers are stored and disposed of properly.\n         -   Surfaces for changing diapers are cleaned and disinfected after each change.\n         -   Proper handwashing is performed for both the child and the caregiver after each diaper change, and the child is assisted in going to the bathroom.`,
+      parr3: `\n<strong>Handwashing</strong>\n\nIllnesses and infections are often transmitted through hands. Therefore, it is essential to wash hands with soap regularly, especially before eating any food and after using the bathroom. We ask parents or guardians to follow the same handwashing procedures at home as at daycare, so their child gets used to doing it by themselves, helping us keep them healthy.`,
+      parr4: `\n<strong>Holidays</strong>\n\nEducando Childcare will observe the following national holidays: New Year's Day, July 4th, Memorial Day, Labor Day, Thanksgiving Day, and Christmas. On December 24th, we will close at 12 PM. To find out if we will open or not the day before or after the holiday, we will ask parents to determine if there will be a sufficient number of children attending.`,
+      parr5: `\n<strong>Inclement Weather</strong>\n\nFor the safety of your children and our staff, in case of severe weather, we will keep an eye on local news to notify parents via Procare if we will not open, close early, or perhaps open late.`
+    },
+    page18: {
+      parr1: `<strong>Disaster Preparedness Plan</strong>\n\nIn the event of a disaster: fire, tornado, flood, or other natural or man-made disaster, we will evacuate the daycare and move to a safe location with all the children for reunification with their parents. That location will be <strong>“Supermercado Nuestra Familia,” located at the corner of 36th Street and Q, Omaha, NE 68107.</strong>\n\nWe will ensure that no child is left inside the daycare, and children with special needs will be assisted at all times during the evacuation process.\n\nOnce at the evacuation site, we will contact parents to coordinate reunification with their children. If parents cannot be found, we will contact the individuals authorized by them. If it is not possible to locate them, or if cell phones do not work, we will contact the police.`,
+      parr2: `\n\n<strong>Arrival and Pickup of Children</strong>\n\nFor safety reasons, upon arriving at Educando Childcare, we recommend that parents turn off their vehicle engines, secure valuables, and lock their doors when picking up their children.\n\nPlease register your child's arrival on the digital screens located in the entrance hall before handing them over to their assigned teacher.\n\nAt the end of the day, do not forget to coordinate with the assigned teacher if your child needs anything at daycare or to find out how their day went. Remember to register your child's departure on the digital screen, and do not leave them unattended at any time. All children must leave accompanied by their parents <strong>or an adult authorized by them.</strong>\n\nNo child will be released to anyone other than their parents, unless authorized in writing by the parents, and in such cases, they must present a photo ID at the time of pickup.`,
+      parr3: `\n\n<strong>Custody</strong>\n\nOur duty is to deliver children to their biological parents and individuals authorized by them. <strong>Only if there is a court order will we stop delivering children to one or both biological parents.</strong> If this is the case, please let us know the situation and provide us with a copy of the document.`
+    },
+    
+    
+  };
+
+  const contract = language === Language.English ? contractEnglish : contractSpanish;
+
+  return contract;
 }

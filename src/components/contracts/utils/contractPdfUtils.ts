@@ -1,6 +1,6 @@
 import jsPDF from 'jspdf';
 import { Functions } from '../../../utils/functions';
-import { ContractInfo, defaultContractInfoFinished } from '../types/ContractInfo';
+import { ContractInfo, defaultContractInfoFinished, Language } from '../types/ContractInfo';
 import { addFonts } from './jsPdfArial';
 import { contractInfo } from './newContractGenerator';
 
@@ -258,8 +258,8 @@ export function compressPDF(pdf = new jsPDF(), options:any = {}) {
 }
 
 export class ContractPdf {
-  static contractBuilder = (contractInformation: ContractInfo = defaultContractInfoFinished, language: "en" | "es" = 'en') => {
-    const contractBase = contractInfo(contractInformation);
+  static contractBuilder = (contractInformation: ContractInfo = defaultContractInfoFinished, language:Language = Language.English) => {
+    const contractBase = contractInfo(contractInformation,language);
     const doc = new jsPDF({
       filters: ["ASCIIHexEncode"],
       format: 'letter'
@@ -280,7 +280,7 @@ export class ContractPdf {
     options.contentWidth = options.pageWidth - options.marginLeft * 2;
     options.contentHeight = options.pageHeight - options.marginTop - options.marginBottom;
     addFonts(doc)
-    addFirstPage(doc, options,contractBase,contractInformation);
+    addFirstPage(doc, options,contractBase,contractInformation, language);
     addPageContent(doc, contractBase, options, 'page2', true);
     addPageContent(doc, contractBase, options, 'page3',true,contractInformation);
     addPageContent(doc, contractBase, options, 'page4',true,contractInformation);
@@ -300,14 +300,15 @@ export class ContractPdf {
 
 
   // Function to add the first page
-  const addFirstPage = (doc: jsPDF, options: Options,contractInfo :any ,contractInformation :ContractInfo ) => {
+  const addFirstPage = (doc: jsPDF, options: Options,contractInfo :any ,contractInformation :ContractInfo, language : Language) => {
     options.yPosition = options.yPosition - 10
+    const contractLabel: string = language === Language.English ? "Contract" : "Contrato"
+    const startDate: string = language === Language.English ? `Start Date ${Functions.formatDateToMMDDYY(contractInformation.start_date!)}` : `Fecha de Comienzo ${Functions.formatDateToMMDDYY(contractInformation.start_date!)}`
     addHeader(doc, "Educando Childcare Center", options,"title");
-    addHeader(doc, "Contrato", options,"title");
-    addDateOnContract(doc,`Fecha de Comienzo ${Functions.formatDateToMMDDYY(contractInformation.start_date!)}`,options)
+    addHeader(doc, contractLabel, options,"title");
+    addDateOnContract(doc,startDate,options)
     addPageContent(doc, contractInfo, options, 'page1');
     options.yPosition = options.initialY
-    
     doc.addPage();
   };
 

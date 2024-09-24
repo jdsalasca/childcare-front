@@ -4,8 +4,9 @@ import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import Swal from 'sweetalert2';
 import { customLogger } from '../../../configs/logger';
-import { ContractInfo, defaultContractInfoFinished } from '../types/ContractInfo';
+import { ContractInfo, defaultContractInfoFinished, Language } from '../types/ContractInfo';
 import { FormGob } from '../types/formGob';
 import { ContractPdf } from '../utils/contractPdfUtils';
 import useGenerateContract from '../viewModels/useGenerateContract';
@@ -38,13 +39,26 @@ const StepComponentSeven: React.FC<StepComponentSevenProps> = ({
   }, []);
 
   const handleLanguageSelection = async () => {
-    handleDownloadPdf('en');
-  };
+    const result = await Swal.fire({
+      title: t('selectLanguageContract'),
+      text: t('selectLanguageContractMessage'),
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: t('english'),
+      cancelButtonText: t('spanish')
+    })
+    if (result.isConfirmed) {
+      handleDownloadPdf(Language.English)
+    } else if (result.dismiss === Swal.DismissReason.cancel) {
+      handleDownloadPdf(Language.Spanish)
+    }
+  }
 
-  const onGenerateContractWithGob = async (contractInformation: ContractInfo) => {
+
+  const onGenerateContractWithGob = async (contractInformation: ContractInfo, language : Language) => {
     customLogger.debug('onGenerateContractWithGob');
 
-    const contractWi = await ContractPdf.contractBuilder(contractInformation).output("arraybuffer");
+    const contractWi = await ContractPdf.contractBuilder(contractInformation, language).output("arraybuffer");
     customLogger.debug('contractWi', contractWi);
     const jsPdfDocument = await PDFDocument.load(contractWi);
     customLogger.debug('jsPdfDocument', jsPdfDocument);
@@ -66,7 +80,7 @@ const StepComponentSeven: React.FC<StepComponentSevenProps> = ({
     return jsPdfDocument.save();
   };
 
-  const handleDownloadPdf = async (language: string = 'en') => {
+  const handleDownloadPdf = async (language: Language) => {
     const contractInfo = contractBuilder();
     customLogger.info('language', language);
     customLogger.debug('contractInformation handleDownloadPdf', contractInfo);
@@ -131,7 +145,7 @@ const StepComponentSeven: React.FC<StepComponentSevenProps> = ({
       });
     } else {
       setErrorMessage(null);
-      onGenerateContractWithGob(contractInfo);
+      onGenerateContractWithGob(contractInfo, language);
     }
   };
 
@@ -182,7 +196,7 @@ const StepComponentSeven: React.FC<StepComponentSevenProps> = ({
         </div>
       ) : (
         <iframe
-          src={`${receiptBase64}#page=5`}
+          src={`${receiptBase64}#page=1`}
           width="100%"
           height="800px"
           title="PDF Preview"
@@ -193,7 +207,7 @@ const StepComponentSeven: React.FC<StepComponentSevenProps> = ({
           label={t('downloadContractPdf')}
           icon="pi pi-download"
           className="p-button-primary button-form-pdf"
-          onClick={() => handleDownloadPdf('en')}
+          onClick={() => handleDownloadPdf(Language.English)}
         />
       </div>
     </>

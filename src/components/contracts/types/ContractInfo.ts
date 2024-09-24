@@ -121,4 +121,7 @@ export const defaultContractInfoFinished: ContractInfo = {
     created_at: string; // ISO date string
   }
   
- 
+  export enum Language {
+    English = "en",
+    Spanish = "es"
+  }
