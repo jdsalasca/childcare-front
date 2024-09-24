@@ -62,8 +62,10 @@ export const StepComponentFive: React.FC<StepComponentFiveProps> = ({
         }, {} as ScheduleFormValues);
         reset(initialValues);
       } else {
+        customLogger.debug('contractInformation.schedule', contractInformation.schedule);
+        customLogger.debug('daysCache', daysCache);
         const formattedSchedule = contractInformation.schedule.reduce((acc, entry) => {
-          const day = daysCache.find((day) => day.id === String(entry.day_id)); // Convert day_id to string
+          const day = daysCache.find((day) => day.id == String(entry.day_id));
           if (day) {
             const [checkInHours, checkInMinutes] = entry.check_in.split(':').map(Number);
             const [checkOutHours, checkOutMinutes] = entry.check_out.split(':').map(Number);
@@ -79,6 +81,7 @@ export const StepComponentFive: React.FC<StepComponentFiveProps> = ({
           }
           return acc;
         }, {} as ScheduleFormValues);
+        customLogger.debug('formattedSchedule', formattedSchedule);
         reset(formattedSchedule);
       }
     }

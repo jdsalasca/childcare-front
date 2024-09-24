@@ -26,7 +26,8 @@ const addPageContent = (
   options: Options,
   pageName: string,
   createPage: boolean = false,
-  contractInformation: any = defaultContractInfoFinished
+  contractInformation?: ContractInfo,
+  language?: Language
 ): jsPDF => {
 
   if (contractProcessed[pageName]) {
@@ -41,9 +42,9 @@ const addPageContent = (
       } else if (key.startsWith("yPlus")) {
         options.yPosition += content;
       } else if (key.startsWith("signSectionEducando")) {
-        addSignSpaces(doc, contractProcessed, options, contractInformation, { showParentName: false, showEducandoName: true });
+        addSignSpaces(doc, contractProcessed, options, contractInformation, { showParentName: false, showEducandoName: true },language);
       } else if (key.startsWith("signSection")) {
-        addSignSpaces(doc, contractProcessed, options, contractInformation);
+        addSignSpaces(doc, contractProcessed, options, contractInformation,{ showParentName: true, showEducandoName: false },language);
       }
     });
     options.yPosition = options.initialY;
@@ -110,7 +111,8 @@ const DefaultSignOptions = {
 };
 
 
-const addSignSpaces = (doc: jsPDF = new jsPDF(), text: any, options: Options, contractInformation: any, signOptions: any = DefaultSignOptions) => {
+const addSignSpaces = (doc: jsPDF = new jsPDF(), text: any, options: Options, contractInformation: any, 
+signOptions: any = DefaultSignOptions, language : Language = Language.Spanish) => {
   const titularName = contractInformation.titularName;
   const totalWidth = options.contentWidth;
   const nameFieldWidth = totalWidth * 0.3;
@@ -164,18 +166,22 @@ const addSignSpaces = (doc: jsPDF = new jsPDF(), text: any, options: Options, co
     );
   }
 
+  const dateLabel = language === Language.Spanish ? "Fecha" : "Date";
+  const nameLabel = language === Language.Spanish ? "Nombre" : "Name";
+  const signLabel = language === Language.Spanish ? "Firma" : "Signature";
+  const signEducandoLabel = language === Language.Spanish ? "Firma de Educando Childcare Center" : "Educando Childcare Center Signature";
   if (signOptions.showParentName) {
     doc.text(Functions.formatDateToMMDDYY(new Date()), options.marginLeft + nameFieldWidth + signatureFieldWidth + 10, lineYPosition - 2);
-    doc.text('Fecha', options.marginLeft + nameFieldWidth + signatureFieldWidth + 10, lineYPosition + 5);
+    doc.text(dateLabel, options.marginLeft + nameFieldWidth + signatureFieldWidth + 10, lineYPosition + 5);
   } else if (signOptions.showEducandoName) {
     // Optional: Add date label for Educando if needed
   }
 
   if (signOptions.showParentName) {
-    doc.text("Nombre", options.marginLeft, lineYPosition + 5);
-    doc.text('Firma', options.marginLeft + nameFieldWidth + 5, lineYPosition + 5);
+    doc.text(nameLabel, options.marginLeft, lineYPosition + 5);
+    doc.text(signLabel, options.marginLeft + nameFieldWidth + 5, lineYPosition + 5);
   } else if (signOptions.showEducandoName) {
-    doc.text("Firma de Educando Childcare Center", options.marginLeft, lineYPosition + 5);
+    doc.text(signEducandoLabel, options.marginLeft, lineYPosition + 5);
   }
 };
 
@@ -281,18 +287,18 @@ export class ContractPdf {
     options.contentHeight = options.pageHeight - options.marginTop - options.marginBottom;
     addFonts(doc)
     addFirstPage(doc, options,contractBase,contractInformation, language);
-    addPageContent(doc, contractBase, options, 'page2', true);
-    addPageContent(doc, contractBase, options, 'page3',true,contractInformation);
-    addPageContent(doc, contractBase, options, 'page4',true,contractInformation);
-    addPageContent(doc, contractBase, options, 'page5',true,contractInformation);
-    addPageContent(doc, contractBase, options, 'page6',true,contractInformation);
-    addPageContent(doc, contractBase, options, 'page7',true,contractInformation);
-    addPageContent(doc, contractBase, options, 'page8',true,contractInformation);
-    addPageContent(doc, contractBase, options, 'page9',true,contractInformation);
-    addPageContent(doc, contractBase, options, 'page10',true,contractInformation);
-    addPageContent(doc, contractBase, options, 'page11',true,contractInformation);
-    addPageContent(doc, contractBase, options, 'page12',true,contractInformation); 
-    addContractTerms(doc, contractBase, options)
+    addPageContent(doc, contractBase, options, 'page2', true, contractInformation, language);
+    addPageContent(doc, contractBase, options, 'page3',true,contractInformation,language);
+    addPageContent(doc, contractBase, options, 'page4',true,contractInformation,language);
+    addPageContent(doc, contractBase, options, 'page5',true,contractInformation,language);
+    addPageContent(doc, contractBase, options, 'page6',true,contractInformation,language);
+    addPageContent(doc, contractBase, options, 'page7',true,contractInformation,language);
+    addPageContent(doc, contractBase, options, 'page8',true,contractInformation,language);
+    addPageContent(doc, contractBase, options, 'page9',true,contractInformation,language);
+    addPageContent(doc, contractBase, options, 'page10',true,contractInformation,language);
+    addPageContent(doc, contractBase, options, 'page11',true,contractInformation,language);
+    addPageContent(doc, contractBase, options, 'page12',true,contractInformation,language); 
+    addContractTerms(doc, contractBase, options, language)
 
     return doc;
   };
@@ -307,7 +313,7 @@ export class ContractPdf {
     addHeader(doc, "Educando Childcare Center", options,"title");
     addHeader(doc, contractLabel, options,"title");
     addDateOnContract(doc,startDate,options)
-    addPageContent(doc, contractInfo, options, 'page1');
+    addPageContent(doc, contractInfo, options, 'page1',false,undefined,language);
     options.yPosition = options.initialY
     doc.addPage();
   };
@@ -322,13 +328,13 @@ const addDateOnContract = (doc : jsPDF, text: string, options: Options) => {
   options.yPosition += 10; // Adjust the line height as needed
 };
 
-const addContractTerms =(doc : jsPDF, contractBase: any, options: Options) => {
-  addPageContent(doc, contractBase, options, 'page13',true);
-  addPageContent(doc, contractBase, options, 'page14',true);
-  addPageContent(doc, contractBase, options, 'page15',true);
-  addPageContent(doc, contractBase, options, 'page16',true);
-  addPageContent(doc, contractBase, options, 'page17',true);
-  addPageContent(doc, contractBase, options, 'page18',false);
+const addContractTerms =(doc : jsPDF, contractBase: any, options: Options, language : Language) => {
+  addPageContent(doc, contractBase, options, 'page13',true,undefined, language );
+  addPageContent(doc, contractBase, options, 'page14',true,undefined, language);
+  addPageContent(doc, contractBase, options, 'page15',true,undefined, language);
+  addPageContent(doc, contractBase, options, 'page16',true,undefined, language);
+  addPageContent(doc, contractBase, options, 'page17',true,undefined, language);
+  addPageContent(doc, contractBase, options, 'page18',false,undefined, language);
 
 
 }
