@@ -4,7 +4,6 @@ import { fileURLToPath } from 'url';
 import { defineConfig } from 'vite';
 // Simulate __dirname in ES modules
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
 export default defineConfig({
   plugins: [
     react(),
@@ -19,6 +18,11 @@ export default defineConfig({
       'types': path.resolve(__dirname, './src/types'),  // This resolves "types" to "src/types"
       'configs': path.resolve(__dirname, './src/configs'),  // This resolves "config" to "src/configs"
       "components": path.resolve(__dirname, "./src/components"),
+      "models": path.resolve(__dirname, "./src/models"),
+      "@models": path.resolve(__dirname, "./src/models"),
+      "@components": path.resolve(__dirname, "./src/components"),
+      "@utils": path.resolve(__dirname, "./src/utils"),
+      "utils": path.resolve(__dirname, "./src/utils"),
     },
   },
   define: {

@@ -19,7 +19,7 @@ const Layout: React.FC<LayoutProps> = ({ insideAuthApplication = false }) => {
   const { t, i18n } = useTranslation();
 
   const handleHomeClick = () => {
-    navigate('/');
+    customNavigate('/homepage');
   };
 
   const handleLanguageChange = (lang: string) => {
@@ -54,7 +54,7 @@ const Layout: React.FC<LayoutProps> = ({ insideAuthApplication = false }) => {
       command: () => {
         // TODO active when auth is actived
         // logout();
-        navigate('auth/childadmin/admin/login');
+        navigate('/childadmin/admin');
       },
     },
     LayoutModels.languageModel(handleLanguageChange, t),

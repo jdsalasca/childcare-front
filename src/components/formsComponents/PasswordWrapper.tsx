@@ -9,6 +9,8 @@ interface PasswordWrapperProps extends Omit<PasswordProps, 'onChange' | 'value'>
   control: Control<any>;
   rules?: RegisterOptions;
   label: string;
+  addFooter?: boolean;
+  addHeader?: boolean;
   disabled?: boolean;
   keyFilter?: KeyFilterType;
   onChangeCustom?: (value: string) => string;
@@ -24,6 +26,8 @@ const PasswordWrapper: React.FC<PasswordWrapperProps> = ({
   label,
   disabled = false,
   keyFilter,
+  addFooter,
+  addHeader,
   onChangeCustom,
   placeholder,
   spanClassName = '',
@@ -52,14 +56,15 @@ const PasswordWrapper: React.FC<PasswordWrapperProps> = ({
         <span className={`p-float-label ${spanClassName}`}>
           <Password
             id={name}
-            {...field}
             value={field.value || ''}
             className={classNames({ 'p-invalid': error }) + " c-input-password-field"}
             disabled={disabled}
             toggleMask
-            header={header}
-            footer={footer}
+            feedback={addHeader || addFooter} 
+            header={addHeader && header}
+            footer={addFooter &&footer}
             keyfilter={keyFilter}
+            
             placeholder={placeholder}
             onChange={(e) => {
               const value = e.target.value;

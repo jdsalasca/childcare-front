@@ -15,7 +15,7 @@ export class LayoutModels {
   static homeModel = (handleHomeClick: () => void) : MenuItem=> {
     return {
       template: (
-        <div onClick={handleHomeClick} className="home-item">
+        <div onClick={handleHomeClick} className="c-home-item">
           <i className="pi pi-home"></i>
         </div>
       ),

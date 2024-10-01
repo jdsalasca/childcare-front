@@ -1,4 +1,5 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import { SecurityService } from 'configs/storageUtils';
 
 // Define the base URL for the API
 //export const BASE_URL = 'https://www.educandochildcare.com/childadmin';
@@ -9,10 +10,12 @@ type RequestOptions = {
     params?: Record<string, any>; // Define as needed
     [key: string]: any; // Allow other options
 };
+
 export interface ApiResponse<T> {
   httpStatus: number;
   response: T;
 }
+
 export class ApiResponseModel<T = any> implements ApiResponse<T> {
     httpStatus: number;
     response: T;
@@ -66,7 +69,7 @@ const makeRequest = async <T>(
     // Create headers for the request
     const myHeaders: Record<string, string | undefined> = {
         ...headers,
-        Authorization: endpoint !== 'get-public-key' ? `Bearer ${localStorage.getItem('token')}` : undefined,
+        Authorization: endpoint !== 'get-public-key' ? `Bearer ${ SecurityService.getInstance().getDecryptedItem("token")}` : undefined,
         'Content-Type': body instanceof FormData ? undefined : 'application/json',
     };
 
@@ -85,7 +88,7 @@ const makeRequest = async <T>(
         const response: AxiosResponse<T> = await axios(requestOptions);
 
         if (response.status === 401) {
-            window.location.href = '/info/session-expired';
+            window.location.href = '/childadmin/admin/info/session-expired';
             return { response: null, httpStatus: 401 } as ApiResponse<T>;
         }
 
@@ -100,7 +103,7 @@ const makeRequest = async <T>(
                 console.error('Record not found:', error.response.data);
                 errorData.response = error.response.data; // Error data for 404
             } else if (error.response.status === 401) {
-                window.location.href = '/info/session-expired';
+                window.location.href = '/childadmin/admin/session-expired ';
                 return { response: null, httpStatus: 401 } as ApiResponse<T>;
             } else {
                 console.error(`Error ${error.response.status}:`, error.response.data);

@@ -264,21 +264,12 @@ const billsFields = fields as Array<Bill>;
   }
 
   const onGetCashOnHandByBills = (listOfBills: Bill[]): number => {
-    const totalOfCashOnBills = listOfBills.reduce((acc, bill) => acc + Number(bill.cash), 0)
-    customLogger.info('totalOfCashOnBills', totalOfCashOnBills)
-    return totalOfCashOnBills
-  }
-
+    const totalOfCashOnBills = listOfBills.reduce((acc, bill) => acc + (Number(bill.cash) || 0), 0);
+    customLogger.info('totalOfCashOnBills', totalOfCashOnBills);
+    return totalOfCashOnBills;
+  };
   const onSubmit = async (data: FormValues) => {
-    const totalCashOnBills = onGetCashOnHandByBills(data.bills);
-    customLogger.info('totalCashOnBills', totalCashOnBills);
-    billModel.onProcessCashData(new CashOnHandByDyModel(data.date!, totalCashOnBills, new Date()));
-  
-    data?.bills?.forEach((bill, index) => {
-      update(index, { ...bill, total: Number(bill.cash) + Number(bill.check) });
-    });
-  
-    if (!data.date) {
+    if (data.date == null) {
       toast.current.show({
         severity: 'info',
         summary: t('bills.dateRequired'),
@@ -287,6 +278,15 @@ const billsFields = fields as Array<Bill>;
       return;
     }
   
+    const totalCashOnBills = onGetCashOnHandByBills(data.bills);
+    customLogger.info('totalCashOnBills', totalCashOnBills);
+    billModel.onProcessCashData(new CashOnHandByDyModel(data.date, totalCashOnBills, new Date()));
+  
+    data?.bills?.forEach((bill, index) => {
+      update(index, { ...bill, total: Number(bill.cash) + Number(bill.check) });
+    });
+  
+
     const dataFormatted = {
       ...data,
       date: Functions.formatDateToMMDDYY(data.date),
@@ -388,7 +388,7 @@ const onHandlerDateChanged = async (date: Date |null) => {
     setLoadingInfo(new LoadingInfo(true, t('lookingForPaymentInfo', { date: Functions.formatDateToMMDDYY(getValues('date')!) })));
     const dayInformation = await CashAPI.getDetailsByDate(formattedDate);
     
-
+    setBlockContent(false);
     if (dayInformation?.httpStatus === 200) {
       await onStartForm();
       ToastInterpreterUtils.toastInterpreter(
@@ -418,7 +418,7 @@ const onHandlerDateChanged = async (date: Date |null) => {
         };
       });
 
-      setBlockContent(false);
+      
 
       reset({
         bills: updatedChildren,
@@ -429,7 +429,7 @@ const onHandlerDateChanged = async (date: Date |null) => {
       });
     } else {
       onHandlerSetCashOnHand(date);
-      setBlockContent(false);
+      
       customLogger.info('No information found for the day:', dayInformation);
       await onStartForm();
       ToastInterpreterUtils.toastInterpreter(toast, "info", t('noInformationFound'), t('noDataForPickedDay', { date: formattedDateUSA }));

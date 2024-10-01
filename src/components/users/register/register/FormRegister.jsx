@@ -106,6 +106,8 @@ const FormRegister = () => {
           {/* Password */}
           <PasswordWrapper
             name={`password`}
+            addFooter
+            addHeader
             control={control}
             rules={{
               required: t("password_is_required"),
@@ -134,7 +136,7 @@ const FormRegister = () => {
             <Button label="Submit" type="submit" className="p-button-success" />
             <Button
               label={t("return")}
-              onClick={() => navigate("/auth/childadmin/admin/login")}
+              onClick={() => navigate("/childadmin/admin")}
               severity="secondary"
             />
           </div>

@@ -1,3 +1,4 @@
+
 import { InputText } from 'primereact/inputtext';
 import { KeyFilterType } from 'primereact/keyfilter';
 import { classNames } from 'primereact/utils';
@@ -42,8 +43,8 @@ const InputTextWrapper: React.FC<InputTextWrapperProps> = ({
         <span className={`p-float-label ${spanClassName}`}>
           <InputText
             id={name}
-            // value={field.value || ''}
             {...field}
+            value={field.value || ''}
             onBlur={(event) => {
               if (onBlur) {
                 onBlur(event); // Call the onBlur function with the event

@@ -12,12 +12,12 @@
     display: flex;
     justify-content: center; /* Center horizontally */
     align-items: center; /* Center vertically */
-    padding: 2rem;
+    padding:  0 2rem;
     height: fit-content;
     
     .login-card {
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      padding: 2rem;
+      padding:  0 2rem;
       width: 100%;
       gap: 4rem;
       max-width: 400px;

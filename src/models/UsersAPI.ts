@@ -1,6 +1,9 @@
 import API, { ApiResponse, BASE_URL } from "./API";
 
-interface User {
+export interface User {
+  token?: string; // Adjust based on your API response
+  errorType?: string; // Adjust based on your API response
+  error?: string; // Adjust based on your API response
   id: string; // Adjust based on your API response
   username: string; // Adjust based on your API response
   email: string; // Adjust based on your API response
@@ -14,6 +17,11 @@ interface CreateUserData {
   // Add other relevant fields for user registration
 }
 
+/**
+ * Interface for authentication data
+ * @param username - Username or email
+ * @param password - Password
+ */
 interface AuthUserData {
   username: string;
   password: string;

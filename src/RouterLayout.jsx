@@ -19,13 +19,16 @@ function RouterLayout() {
             <Route path="childadmin/admin/register" element={<FormRegister />} />
           </Route>
           <Route path="info/*" element={<Layout insideAuthApplication={false} />}>
-            <Route path="session-expired" element={<SessionExpired />} />
           </Route>
+          <Route path="*"  element={<Layout insideAuthApplication={false} />}>
+            <Route path="childadmin/admin/session-expired/" element={<SessionExpired />} />
+          <Route path="childadmin/admin/" element={<Login />} />
 
+          </Route>
           {/* Main Application Routes */}
           <Route path="*" element={<Layout insideAuthApplication={true} />}>
             {/* <Route path="/" element={<HomePage />} /> */}
-            <Route path="childadmin/admin/" element={<HomePage />} />
+            <Route path="childadmin/admin/homepage" element={<HomePage />} />
             
             <Route path="childadmin/admin/report-payments-by-date" element={<HomePage />} />
             <Route path="childadmin/admin/report-teachers" element={<HomePage />} />

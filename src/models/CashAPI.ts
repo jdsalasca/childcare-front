@@ -26,7 +26,7 @@ const CashAPI = {
   // Get Daily Cash Record details by date
   getDetailsByDate: async (date: string): Promise<ApiResponse<CashByDay>> => {
     try {
-      const response = await API.get<CashByDay>(BASE_URL, `/daily_cash/details_by_date`, { params: { date } });
+      const response = await API.get<CashByDay>(BASE_URL, `/daily-cash/details_by_date`, { params: { date } });
       return response;
     } catch (error) {
       console.error('Error fetching cash details by date:', error);
@@ -38,7 +38,7 @@ const CashAPI = {
   // Process Daily Cash Data
   processCashData: async (cashData: FormValues): Promise<ApiResponse<CashRecordDetails>> => {
     try {
-      const response = await API.post<CashRecordDetails>(BASE_URL, '/daily_cash/process', cashData);
+      const response = await API.post<CashRecordDetails>(BASE_URL, '/daily-cash/process', cashData);
       return response;
     } catch (error) {
       console.error('Error processing daily cash data:', error);
