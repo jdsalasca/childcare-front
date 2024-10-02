@@ -13,6 +13,7 @@
   "first_name": "first name",
   "last_name": "last name",
   "email": "email",
+  "targetDay": "Target Day",
   "notDataForTargetDay": "No data for target day",
   "notDataForTargetDayTitle": "Not data",
   "migrationModes": "Migration Modes",

@@ -10,7 +10,7 @@ import SessionExpired from './components/utils/SessionExpired'
 import { UnderConstruction } from './components/utils/UnderConstruction'
 function RouterLayout() {
   return (
-    <Router>
+    <Router >
       <div className="App">
         <Routes>
           {/* Authentication Routes */}
