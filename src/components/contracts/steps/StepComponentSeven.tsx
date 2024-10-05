@@ -57,6 +57,7 @@ const StepComponentSeven: React.FC<StepComponentSevenProps> = ({
 
   const onGenerateContractWithGob = async (contractInformation: ContractInfo, language : Language) => {
     customLogger.debug('onGenerateContractWithGob');
+    defaultContractInfoFinished
 
     const contractWi = await ContractPdf.contractBuilder(contractInformation, language).output("arraybuffer");
     customLogger.debug('contractWi', contractWi);
@@ -196,7 +197,7 @@ const StepComponentSeven: React.FC<StepComponentSevenProps> = ({
         </div>
       ) : (
         <iframe
-          src={`${receiptBase64}#page=1`}
+          src={`${receiptBase64}#page=19`}
           width="100%"
           height="800px"
           title="PDF Preview"

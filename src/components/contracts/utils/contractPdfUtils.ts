@@ -312,7 +312,7 @@ export class ContractPdf {
     const startDate: string = language === Language.English ? `Start Date ${Functions.formatDateToMMDDYY(contractInformation.start_date!)}` : `Fecha de Comienzo ${Functions.formatDateToMMDDYY(contractInformation.start_date!)}`
     addHeader(doc, "Educando Childcare Center", options,"title");
     addHeader(doc, contractLabel, options,"title");
-    addDateOnContract(doc,startDate,options)
+    // addDateOnContract(doc,startDate,options)
     addPageContent(doc, contractInfo, options, 'page1',false,undefined,language);
     options.yPosition = options.initialY
     doc.addPage();
@@ -334,7 +334,8 @@ const addContractTerms =(doc : jsPDF, contractBase: any, options: Options, langu
   addPageContent(doc, contractBase, options, 'page15',true,undefined, language);
   addPageContent(doc, contractBase, options, 'page16',true,undefined, language);
   addPageContent(doc, contractBase, options, 'page17',true,undefined, language);
-  addPageContent(doc, contractBase, options, 'page18',false,undefined, language);
+  addPageContent(doc, contractBase, options, 'page18',true,undefined, language);
+  addPageContent(doc, contractBase, options, 'page19',false,undefined, language);
 
 
 }

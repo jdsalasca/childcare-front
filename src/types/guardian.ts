@@ -6,12 +6,12 @@ export interface Guardian {
   city:             string;
   phone:            string;
   guardian_type_id: number;
-  created_at:       Date;
-  updated_at:       Date;
+  created_at:       Date|string;
+  updated_at:       Date|string;
   email:            string;
   status:           'Active' | 'Inactive';
-  id_static: string;
-  value: number;
+  id_static?: string;
+  value?: number;
   titular:          boolean;
 }
 

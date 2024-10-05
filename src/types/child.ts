@@ -6,11 +6,9 @@ export interface ChildType {
     first_name: string;
     last_name: string;
     classroom: string | null;
-    name: string | null;
     age: number | null;
     born_date: Date | string;
     program?: string;
-    fullName: string | null;
     child_id?: number;
     middle_initial?: string;
     identification_number?: string;
@@ -28,18 +26,15 @@ export const defaultChild: ChildType = {
     first_name: '',
     last_name: '',
     classroom: null,
-    name: null,
     age: null,
     born_date: "",
     program: "test",
-    fullName: null,
     status: "Active",
     // Add other properties with defaults as needed
 };
 
 
 export const defaultChildMedical:ChildType = {
-    name: '',
     age: 0,
     id: '',
     program: '',
@@ -48,7 +43,6 @@ export const defaultChildMedical:ChildType = {
     born_date: "",
     status: "Active",
     classroom: null,
-    fullName: null,
     medicalInformation: {
       childName: '',
       healthStatus: '',

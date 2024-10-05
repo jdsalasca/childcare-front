@@ -128,7 +128,9 @@ const billsFields = fields as Array<Bill>;
     if (!bill?.id || bill.originalIndex == null || index == null) {
       customLogger.error("Error on onRecalculateAll usage. You're sending an empty data object")
       return
+      
     }
+    calculateSums(true)
     const data = getValues('bills')
     update(bill.originalIndex, {
       ...getValues(`bills.${bill.originalIndex}`),
@@ -218,7 +220,9 @@ const billsFields = fields as Array<Bill>;
     });
   };
 
-  const calculateSums = (): {
+  
+
+  const calculateSums = (setValues: boolean = false): {
     cash_on_hand: number;
     cash: number;
     check: number;
@@ -236,12 +240,18 @@ const billsFields = fields as Array<Bill>;
       },
       { cash_on_hand: 0, cash: 0, check: 0, total: 0, total_cash_on_hand: 0 }
     )
+    setValues && setSums(total)
     customLogger.info('total', total)
     return total
   }
+  const [sums, setSums] = useState(calculateSums())
+  // const sums = calculateSums()
 
-  const sums = calculateSums()
-
+  // Trigger recalculation on component mount or when billsFields change
+  useEffect(() => {
+    const newSums = calculateSums(true);
+    setSums(newSums); // Update sums state
+  }, [billsFields]); // Recalculate whenever billsFields change
 
   const saveInformation = async (data: FormValues): Promise<void> => {
     setLoadingInfo({
@@ -440,6 +450,7 @@ const onHandlerDateChanged = async (date: Date |null) => {
     customLogger.info('Error processing daily cash data:', error);
     setLoadingInfo(AppModels.defaultLoadingInfo);
   } finally {
+    
     isFetching.current = false; // Reset the flag when done
   }
 };
@@ -491,7 +502,8 @@ const addNewBill = (): void => {
     formState: { errors },
     onHandlerDateChanged,
     filteredBills,
-    addNewBill
+    addNewBill,
+    getValues
     
   }
 

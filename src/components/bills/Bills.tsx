@@ -37,7 +37,8 @@ export const Bills: React.FC = () => {
     sums,
     filteredBills,
     blockContent,
-    addNewBill
+    addNewBill,
+    getValues
   } = useBillsViewModel();
 
   const { t } = useTranslation(); // Initialize translation hook
@@ -162,7 +163,8 @@ export const Bills: React.FC = () => {
           <span className='p-float-label'>
             <InputText
               id='cash-total'
-              value={sums.cash_on_hand?.toFixed(2) || '0.00'}
+              value={getValues('cashOnHand')+""}
+              // value={sums.cash_on_hand?.toFixed(2) || '0.00'}
               readOnly
               className='p-disabled'
             />
