@@ -89,7 +89,7 @@ export const StepComponentOne: React.FC<StepComponentOneProps> = ({
   const onCreateChild = async (data: ChildType): Promise<ChildType | undefined> => {
     const response = await ChildrenAPI.createChild(data);
     if (response.httpStatus === 200) {
-      return response.response[0];
+      return response.response;
     }
   };
 

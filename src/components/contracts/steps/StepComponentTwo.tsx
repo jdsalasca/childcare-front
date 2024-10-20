@@ -55,9 +55,10 @@ export const StepComponentTwo: FC<StepComponentTwoProps> = ({
           </label>
         </div>
         {fields.map((guardian: GuardianType, index: number) => (
-          <div key={index} className='child-form'>
+          <div key={guardian.id} className='child-form'>
             <InputTextWrapper
               name={`guardians[${index}].name`}
+              keyFilter={/^[a-zA-ZñÑ.,\s]*$/}
               control={control}
               rules={{ required: t('guardianNameRequired') }}
               label={t('guardianName')}
@@ -66,6 +67,7 @@ export const StepComponentTwo: FC<StepComponentTwoProps> = ({
             <InputTextWrapper
               name={`guardians[${index}].last_name`}
               control={control}
+              keyFilter={/^[a-zA-ZñÑ.,\s]*$/}
               rules={{ required: t('guardianLastNameRequired') }}
               label={t('guardianLastName')}
               onChangeCustom={value => Validations.capitalizeFirstLetter(value)}
@@ -112,6 +114,8 @@ export const StepComponentTwo: FC<StepComponentTwoProps> = ({
               spanClassName='c-small-field r-m-10'
             />
             <DropdownWrapper
+              
+            rules={{ required: t('guardianTypeRequired') }}
               options={getAvailableGuardianTypes(index)}
               optionValue={'id'}
               optionLabel='name'
@@ -119,7 +123,6 @@ export const StepComponentTwo: FC<StepComponentTwoProps> = ({
               spanClassName='c-small-field r-10'
               name={`guardians[${index}].guardian_type_id`}
               control={control}
-              rules={{ required: t('guardianTypeRequired') }}
             />
             <CheckboxWrapper
               name={`guardians[${index}].titular`}

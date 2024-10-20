@@ -5,7 +5,7 @@
   "childNameRequired": "Child name is required",
   "childLastNameRequired": "Child last name is required",
   "childLastName": "Child last name",
-  
+  "cannotRemoveAllGuardians": "You cannot remove all guardians",
   "gender": "Gender",
   "signUp": "Sign Up",
   "signIn": "Sign In",

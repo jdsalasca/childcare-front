@@ -1,12 +1,8 @@
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import { FormValues } from '../viewModels/useBillsViewModel';
+import { educando } from './assets/educando_logo';
 
-interface Bill {
-    names: string;
-    cash: number | string;
-    check: number | string;
-}
 
 interface BillType {
     bill: string;
@@ -35,12 +31,12 @@ export const exportBoxesToPDF = (data: FormValues): void => {
     doc.setFontSize(14);
     doc.text("EDUCANDO CHILDCARE CASH REGISTER", pageWidth / 2, margin, { align: 'center' });
     doc.setFontSize(12);
-    doc.text(data.date, pageWidth / 2, margin + 10, { align: 'center' });
+    doc.text(data.date!, pageWidth / 2, margin + 10, { align: 'center' });
 
     let currentY = margin + 20;
 
     // Generate Children Information Table
-    currentY = generateChildrenTable(doc, data.bills, currentY, pageHeight, margin);
+    currentY = generateChildrenTable(doc, data.bills!, currentY, pageHeight, margin);
 
     // Cash on Hand, Total Deposit, and TOTAL fields
     currentY = generateCashOnHandSection(doc, data, currentY, pageHeight, margin);
@@ -58,6 +54,15 @@ export const exportBoxesToPDF = (data: FormValues): void => {
 
     // Notes and Scanned Date, QuickBooks, Signature on the right side
     generateNotesSection(doc, data, currentY, currentY, halfPageWidth, pageHeight, margin);
+       // Iterate over each child and generate a receipt on a new page
+       data.bills!.forEach((bill, index) => {
+        
+            doc.addPage();  // New page for each child
+
+        // Call the receipt generation function for the current child
+        generateReceiptForChild(doc, bill, data.date!);
+    });
+
 
     doc.save('deposit_ticket.pdf');
 };
@@ -73,7 +78,7 @@ const generateChildrenTable = (doc: jsPDF, bills: Bill[], startY: number, pageHe
         if (cash > 0 || check > 0) {
             const total = cash + check;
             rows.push([
-                bill.names,
+                bill.names!,
                 cash > 0 ? `$${cash}` : "",
                 check > 0 ? `$${check}` : "",
                 `$${total}`
@@ -105,6 +110,82 @@ doc.autoTable({
 
     return doc.autoTable.previous.finalY + 10;  // Return the new Y position after the table
 };
+const generateReceiptForChild = (doc: jsPDF, bill: Bill, date: string): void => {
+    const margin = 10;
+    const pageWidth = doc.internal.pageSize.getWidth(); // Get the width of the page
+    const pageHeight = doc.internal.pageSize.getHeight(); // Get the height of the page
+  
+    let currentY = margin;
+
+    // Title: "RECEIPT"
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`RECEIPT`, (pageWidth/2)-15, currentY);  
+    currentY += 15;
+
+    // Reset to regular font and size
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+
+    // Date
+    doc.text(`Date: ${date}`, margin, currentY);
+    currentY += 10;
+
+    // Payment received by
+    doc.text(`Payment received by: ____________________________`, margin, currentY);
+    currentY += 10;
+
+    // Child's Name
+    doc.text(`For Child: ${bill.names}`, margin, currentY);
+    currentY += 10;
+
+    // Line for the child's name
+    doc.line(margin, currentY, margin + 180, currentY);
+    currentY += 20;
+
+    // Amount section
+    const amount = `$${(Number(bill.cash) || 0) + (Number(bill.check) || 0)}`;
+    doc.text(`Amount: ${amount}`, margin, currentY);
+    currentY += 10;
+
+    // Services provided for the weeks section
+    doc.text(`Services provided for the weeks of: ____________ to ____________`, margin, currentY);
+    currentY += 10;
+
+    // Days and options
+    doc.text(`________ days`, margin, currentY);
+    currentY += 10;
+
+    doc.text(`1 week                               $ _________ Still due        $ ___________ Credit.`, margin, currentY);
+    currentY += 10;
+
+    doc.text(`2 weeks`, margin, currentY);
+    currentY += 10;
+
+    doc.text(`Transportation`, margin, currentY);
+    currentY += 10;
+
+    doc.text(`Enrollment fee`, margin, currentY);
+    currentY += 10;
+
+    doc.text(`Copay for month: ____________`, margin, currentY);
+    currentY += 20;
+
+    // Employee signature, right-aligned
+    const employeeSignatureText = "Employee signature: _______________________";
+    const textWidth = doc.getTextWidth(employeeSignatureText); // Measure the text width
+    doc.text(employeeSignatureText, pageWidth - margin - textWidth, currentY); // Right-align the signature line
+     // Add the base64 image as a footer at the bottom of the page
+     const footerHeight = 50;
+    
+    //const base64Image = 'data:image/png;base64,'+educando; // Your base64 image string
+
+    doc.addImage(educando, 'PNG', margin, pageHeight - footerHeight - 50, pageWidth - 2 * margin, footerHeight); // Adjust width and height as necessary
+
+
+}
+;
+
 
 const generateCashOnHandSection = (doc: jsPDF, data: FormValues, startY: number, pageHeight: number, margin: number): number => {
     const { cashOnHand = "0.00", totalDeposit = "0.00", totalOverall = "0.00" } = data;

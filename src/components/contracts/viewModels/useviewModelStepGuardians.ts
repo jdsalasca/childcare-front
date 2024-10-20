@@ -1,6 +1,5 @@
-import { customLogger } from "configs/logger"
 import { ApiResponse } from "models/API"
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Control, FieldArrayWithId, useFieldArray, useForm, UseFormGetValues, UseFormReturn } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 import Swal from "sweetalert2"
@@ -30,7 +29,7 @@ interface UseViewModelStepGuardiansReturn {
   errors: Record<string, any>
   removeGuardian: (index: number) => void
   getAvailableGuardianTypes: (index: number) => any[]
-  handleGuardianSelect: (e: any) => void
+  handleGuardianSelect: (e: { value: number }) => void  
   t: (key: string, options?: any) => string
   guardianOptions: Guardian[]
   control: Control<any>
@@ -74,7 +73,7 @@ const useViewModelStepGuardians = ({
     }
   })
 
-  const { fields, append } = useFieldArray({
+  const { fields, append, remove } = useFieldArray({
     control,
     name: 'guardians'
   })
@@ -248,6 +247,7 @@ const useViewModelStepGuardians = ({
     }
   }
 
+
   const onSubmit = async (data: any): Promise<void> => {
     if (ContractService.isInvalidFormData(data, contractInformation)) {
       ToastInterpreterUtils.toastInterpreter(
@@ -259,15 +259,33 @@ const useViewModelStepGuardians = ({
       )
       return
     }
-
+  
     try {
       if (!(await onProcessGuardiansValidation(data))) {
         return
       }
+  
+      // Create or update guardians first
+      let updatedGuardians: Guardian[]
+      try {
+        updatedGuardians = await onHandlerGuardianBackendAsync(data)
+      } catch (error) {
+        console.error("Error creating/updating guardians:", error)
+        ToastInterpreterUtils.toastInterpreter(
+          toast,
+          'error',
+          t('error'),
+          t('failedToSaveGuardians'),
+          3000
+        )
+        return // Stop the process here if guardian creation/update fails
+      }
+  
+      // If guardian creation/update is successful, proceed with contract creation
       await onCreateContract(
         contractInformation.children,
         GuardiansFactory.mergeAndCreateWithTitularStatus(
-          await onHandlerGuardianBackendAsync(data),
+          updatedGuardians,
           GuardiansFactory.createGuardiansAllWithTitularStatus(data?.guardians)
         )
       )
@@ -288,9 +306,7 @@ const useViewModelStepGuardians = ({
   }
 
   const removeGuardian = (index: number) => {
-    const guardianList = getValues('guardians')
-
-    if (guardianList?.length === 1) {
+    if (fields.length === 1) {
       ToastInterpreterUtils.toastInterpreter(
         toast,
         'error',
@@ -300,25 +316,22 @@ const useViewModelStepGuardians = ({
       )
       return
     }
-    guardianList.splice(index, 1)
-    setValue('guardians', guardianList)
+    remove(index)
   }
 
-  const getAvailableGuardianTypes = (index: number) => {
+  const getAvailableGuardianTypes = React.useCallback((index: number) => {
     const guardians = getValues('guardians')
     return GuardiansValidations.availableGuardianTypes(guardianTypeOptions, guardians, index)
-  }
+  }, [getValues, guardianTypeOptions])
 
-  const handleGuardianSelect = (e : any) => {
-    const selectedGuardian = e.value
+  const handleGuardianSelect = (e: { value: number }) => {
     const selectedGuardianObject = guardianOptions.find(g => g.id === e.value)
-    // TODO is secure to use email as key?????
-    // Check if the guardian already exists in the fields
+    if (!selectedGuardianObject) return
+  
     const existingGuardianIndex = fields.findIndex(
-      guardian => guardian.id_static === selectedGuardianObject?.id_static
+      guardian => guardian.id_static === selectedGuardianObject.id_static
     )
-    customLogger.debug("existingGuardianIndex", selectedGuardianObject)
-
+  
     if (existingGuardianIndex === -1) {
       ToastInterpreterUtils.toastInterpreter(
         toast,
@@ -327,9 +340,15 @@ const useViewModelStepGuardians = ({
         t('guardianInfoLoaded'),
         3000
       )
-      append({
-        ...selectedGuardianObject!
-      })
+      append(selectedGuardianObject)
+    } else {
+      ToastInterpreterUtils.toastInterpreter(
+        toast,
+        'info',
+        t('info'),
+        t('guardianAlreadyAdded'),
+        3000
+      )
     }
   }
   return {

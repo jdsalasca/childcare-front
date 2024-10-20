@@ -14,9 +14,9 @@ interface CreateChildData {
 const ChildrenAPI = {
     // Create a new child
     // FIXME Reviwes why im waitting for DATA instead of the response
-    createChild: async (childData: CreateChildData): Promise<ApiResponse<ChildType[]>> => {
+    createChild: async (childData: CreateChildData): Promise<ApiResponse<ChildType>> => {
         try {
-            const response = await API.post<ChildType[]>(BASE_URL, '/children', childData);
+            const response = await API.post<ChildType>(BASE_URL, '/children', childData);
             return response; // Ensure you return the correct data structure
         } catch (error) {
             console.error('Error creating child:', error);
@@ -69,7 +69,7 @@ getChildren: async (): Promise<ApiResponse<ChildType[]>> => {  // Change the res
     }
 };
 
-export const useChildren = (): UseQueryResult<ChildType[], Error> => {
+export const useChildren = (): UseQueryResult<ChildType[], Error> => {  
     const childrenQuery = useQuery<ApiResponse<ChildType[]>, Error>({
         queryKey: ['children'], // Unique key for caching
         queryFn: ChildrenAPI.getChildren, // Function to fetch children

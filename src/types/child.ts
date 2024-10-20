@@ -5,6 +5,8 @@ export interface ChildType {
     id?: string;
     first_name: string;
     last_name: string;
+    name?: string;
+    fullName?: string;
     classroom: string | null;
     age: number | null;
     born_date: Date | string;

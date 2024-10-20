@@ -197,7 +197,7 @@ const StepComponentSeven: React.FC<StepComponentSevenProps> = ({
         </div>
       ) : (
         <iframe
-          src={`${receiptBase64}#page=19`}
+          src={`${receiptBase64}#page=1`}
           width="100%"
           height="800px"
           title="PDF Preview"

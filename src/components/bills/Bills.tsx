@@ -6,6 +6,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { InputText } from 'primereact/inputtext';
 import { Toast } from 'primereact/toast';
 import { Tooltip } from 'primereact/tooltip';
+import React from 'react';
 import { Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { programOptions } from '../contracts/utilsAndConstants';
@@ -54,6 +55,7 @@ export const Bills: React.FC = () => {
     return getFormErrorMessage(name as keyof Bill, defaultIndex);
   };
   
+  const MemoizedChildFormField = React.memo(ChildFormField);
 
   //#region  Component Return
   return (
@@ -144,7 +146,8 @@ export const Bills: React.FC = () => {
       </div>
       <form onSubmit={handleSubmit(onSubmit)}>
         {filteredBills.map((bill, index) => (
-          <ChildFormField
+          
+          <MemoizedChildFormField
             key={bill.id}
             bill={bill}
             index={index}

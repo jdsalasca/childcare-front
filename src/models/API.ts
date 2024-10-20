@@ -1,9 +1,10 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { SecurityService } from 'configs/storageUtils';
 
+export const BASE_URL = import.meta.env.VITE_BASE_URL;
 // Define the base URL for the API
 //export const BASE_URL = 'https://www.educandochildcare.com/childadmin';
- export const BASE_URL = 'http://localhost:8000/childadmin';  // Replace with your actual API base URL
+//export const BASE_URL = 'http://localhost:8000/childadmin';  // Replace with your actual API base URL
 // Define the types for the makeRequest function parameters
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 type RequestOptions = {
