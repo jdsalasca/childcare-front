@@ -73,8 +73,8 @@ export const contractInfo = (contractData: ContractInfo= defaultContractInfoFini
    
   const contractSpanish = {
     page1: {
-      parr2: `<strong>Email de Mama: ${motherEmail}          Email de Papa: ${fatherEmail}</strong>`,
-      parr3: `\n<strong>Horarios en que vendrá(n) los Nino(s):                          ${startDateLabel}</strong>   `,
+      parr2: `<strong>Email de Mama: ${motherEmail}               Email de Papa: ${fatherEmail}</strong>`,
+      parr3: `\n<strong>Horarios en que vendrá(n) los Niño(s):                          ${startDateLabel}</strong>   `,
       parr4: `\nLunes: ${scheduleFormatted['monday.check_in']} a ${scheduleFormatted['monday.check_out']}     Martes: ${scheduleFormatted['tuesday.check_in']} a ${scheduleFormatted['tuesday.check_out']}    Miércoles: ${scheduleFormatted['wednesday.check_in']} a ${scheduleFormatted['wednesday.check_out']}`,
       parr5: `\nJueves: ${scheduleFormatted['thursday.check_in']} a ${scheduleFormatted['thursday.check_out']}    Viernes: ${scheduleFormatted['friday.check_in']} a ${scheduleFormatted['friday.check_out']}`,
       parr6: `\nEl presente Contrato de servicio de guardería, entre los Padres/Apoderado de los niños y Educando Childcare Center, se realiza bajo los siguientes términos y condiciones:`,
@@ -122,7 +122,7 @@ export const contractInfo = (contractData: ContractInfo= defaultContractInfoFini
     ,
     
       "page4": {
-        "parr0": "\n<strong> Información Médica de su niño </strong>",
+    "parr0": "\n<strong> Información Médica de su niño </strong>",
         "separator": true,
         "parr1": "\n<strong>Nombre del niño ____________________________  </strong> . Estado actual de salud de su niño o algo que debamos saber al respecto: _________________________________________________",
         "parr2.1": "\n¿Está teniendo algún tratamiento? ¿Cuál?: ________________________________________________________",

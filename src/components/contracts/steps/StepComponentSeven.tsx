@@ -1,6 +1,5 @@
 import { LoadingInfo } from '@models/AppModels';
 import { PDFDocument } from 'pdf-lib';
-import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -151,68 +150,37 @@ const StepComponentSeven: React.FC<StepComponentSevenProps> = ({
   };
 
   return (
-    <>
+    <div className="step-component-seven">
       {errorMessage ? (
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '100%',
-          }}
-        >
+        <div className="error-container">
           <Card
             title={t('ups')}
-            style={{
-              width: '100%',
-              marginBottom: '2em',
-              marginTop: '5em',
-              maxWidth: '50%',
-            }}
+            className="error-card"
           >
             <p>{errorMessage}</p>
           </Card>
         </div>
       ) : receiptBase64 === undefined ? (
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '100%',
-            
-          }}
-        >
+        <div className="waiting-container">
           <Card
             title={t('waitingForDecision')}
-            style={{
-              width: '100%',
-              marginBottom: '2em',
-              marginTop: '5em',
-              maxWidth: '50%',
-            }}
+            className="waiting-card"
           >
             <p>{t('waitingForDecisionMessage')}</p>
           </Card>
         </div>
       ) : (
-        <iframe
-          src={`${receiptBase64}#page=1`}
-          width="100%"
-          height="800px"
-          title="PDF Preview"
-        />
+        <div className="pdf-container">
+          <iframe
+            src={`${receiptBase64}#page=1`}
+            className="pdf-iframe"
+            title="PDF Preview"
+          />
+        </div>
       )}
-      <div className="p-d-flex p-jc-center">
-        <Button
-          label={t('downloadContractPdf')}
-          icon="pi pi-download"
-          className="p-button-primary button-form-pdf"
-          onClick={() => handleDownloadPdf(Language.English)}
-        />
-      </div>
-    </>
+    </div>
   );
 };
 
 export default StepComponentSeven;
+

@@ -1,3 +1,4 @@
+@use "sass:color";
 .logo-container {
     z-index: 1000;
     margin-left: 0px;
@@ -29,5 +30,5 @@
   /* Optional: Define styles for hover or active states if needed */
   .menu-item-contracts:hover,
   .menu-item-deposits:hover {
-    color: darken(#ffd300, 10%); /* Adjust as needed */
+      color: color.adjust(#ffd300, $lightness: -10%);
   }

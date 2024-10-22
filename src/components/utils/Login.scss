@@ -1,10 +1,10 @@
-@import '../../assets/styles/general.scss';
-
+@use '../../assets/styles/general.scss' as g;
+@use '../../assets/styles/constants.scss' as c;
 .login-container {
   display: flex;
   height: 100vh;
   justify-content: center; /* Center horizontally */
-  background-color: #f9f9f9;
+  background-color: c.$color-background;
   margin-top: 2rem;
 
   .login-form-container {
@@ -21,7 +21,7 @@
       width: 100%;
       gap: 4rem;
       max-width: 400px;
-      background: linear-gradient(135deg, #fff, #f3f4f6);
+      background: linear-gradient(135deg, #fff, c.$color-background);
       border-radius: 10px;
     }
     .p-card-content form{

@@ -1,6 +1,6 @@
-@import 'constants.scss';
+@use 'constants.scss' as c;
 .p-button-icon-only{
-    background-color: $color-buttons;
+    background-color: c.$color-buttons;
 }
 // Common styles for buttons on tables
 @mixin button-common-styles {
@@ -15,13 +15,13 @@
   }
   
   .p-button-primary {
-    background-color: $color-buttons;
+    background-color: c.$color-buttons;
     color: white;
   }
   
   .p-button-secondary {
-    background-color: $color-institutional-gray;
-    border-color: $color-institutional-gray;
+    background-color: c.$color-institutional-gray;
+    border-color: c.$color-institutional-gray;
     color: white;
   }
 
@@ -37,40 +37,40 @@
 // Apply the mixin to buttons
 .p-button-danger {
   @include button-common-styles;
-  background-color: $color-buttons-danger;
+  background-color: c.$color-buttons-danger;
 }
 
 .p-button-success {
   @include button-common-styles;
-  background-color: $color-buttons-success;
+  background-color: c.$color-buttons-success;
 }
 
   .p-button-success {
-    background-color: $color-buttons-success;
+    background-color: c.$color-buttons-success;
     color: white;
   }
   .p-float-label > .p-invalid + label{
-    color: $color-label-errors;
+    color: c.$color-label-errors;
   }
 
 
   .p-error {
-    color:$color-message-error;
+    color:c.$color-message-error;
     font-size: 0.75rem;
     margin-top: 0.25rem;
   }
   
 // Add the following CSS to your stylesheet (e.g., src/App.css or src/Contracts.css)
 .step-valid .p-steps-title {
-    color: $color-institutional-green;
+    color: c.$color-institutional-green;
   }
 
   .step-invalid .p-steps-title {
-    color: $color-institutional-red;
+    color: c.$color-institutional-red;
   }
   
   .step-default .p-steps-title {
-    color: $color-institutional-gray;
+    color: c.$color-institutional-gray;
 
   }
   .step-default.block {

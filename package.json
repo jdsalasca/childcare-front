@@ -67,7 +67,7 @@
     "vite": "^5.4.1"
   },
   "scripts": {
-    "dev": "vite ",
+    "dev": "echo 'Starting Vite development server...' && vite",
     "build": "vite build --mode production",
     "build:prod": "vite build --mode production",
     "lint": "eslint .",
@@ -91,5 +91,6 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "packageManager": "yarn@4.5.1"
 }

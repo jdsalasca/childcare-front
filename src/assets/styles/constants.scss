@@ -1,3 +1,4 @@
+@use "sass:color";
 //##Color palette
 $color-institutional-yellow: #ffd400;
 $color-institutional-blue: #0071ba;
@@ -13,9 +14,7 @@ $color-message-error: $color-institutional-red;
 $primary-color: #be1622;
 $secondary-color: #f8f9fa;
 $font-stack: "Helvetica Neue", sans-serif;
-
-$scroll-color:  darken($color-institutional-blue, 15%); // $color-institutional-blue;
-// Constants
+$scroll-color: color.adjust($color-institutional-blue, $lightness: -15%);// Constants
 $font-size-h1: 24px;
 $font-size-h2: 20px;
 $font-size-h3: 18px;

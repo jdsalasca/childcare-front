@@ -1,8 +1,7 @@
-@import "@fontsource/luckiest-guy"; // Defaults to weight 400
+@use "@fontsource/luckiest-guy" as luckiest-guy; // Defaults to weight 400
 @import "@fontsource/luckiest-guy/400.css"; // Specify weight
-//@import "@fontsource/luckiest-guy/400-italic.css"; // Specify weight and style
+// @import "@fontsource/luckiest-guy/400-italic.css"; // Specify weight and style
 
-p,a,span, h1,h2, h3, h4,h5,h6, label{
+p, a, span, h1, h2, h3, h4, h5, h6, label {
     font-family: "Luckiest Guy";
-
 }

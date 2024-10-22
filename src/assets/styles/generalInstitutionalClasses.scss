@@ -1,4 +1,4 @@
-@import './constants.scss';
+@use './constants.scss' as c;
 .c-steps-component {
   display: flex;
   gap: 2rem;
@@ -154,7 +154,7 @@
 .c-label-checkbox {
   min-width: max-content;
   word-break: break-all;
-  font-size: $font-size-label;
+  font-size: c.$font-size-label;
   &.left {
     margin-left: 0;
     margin-right: 1rem;

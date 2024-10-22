@@ -7,6 +7,7 @@ export interface ContractInfo {
     children: ChildType[];
     guardians: Guardian[];
     schedule: Schedule[];
+    weeklyPayment?: string;
     terms?: ContractPermission;
     contract_number?: string;
     contract_id?: number;

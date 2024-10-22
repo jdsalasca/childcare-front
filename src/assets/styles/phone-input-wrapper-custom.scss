@@ -1,4 +1,4 @@
-@import 'constants.scss';
+@use 'constants.scss' as c;
 .phone-input-wrapper {
     position: relative;
     display: flex;
@@ -17,7 +17,7 @@
   }
   
   .phone-input-wrapper .phone-input.p-invalid {
-    border-color: $color-institutional-red;
+    border-color: c.$color-institutional-red;
     background-color: #fff3f3;
   }
   
@@ -37,7 +37,7 @@
     top: 0;
     left: .75rem;
     font-size: .75rem;
-    color: $color-institutional-blue;
+    color: c.$color-institutional-blue;
   }
   
   
