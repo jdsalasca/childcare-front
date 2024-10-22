@@ -45,6 +45,8 @@ const addPageContent = (
         addSignSpaces(doc, contractProcessed, options, contractInformation, { showParentName: false, showEducandoName: true },language);
       } else if (key.startsWith("signSection")) {
         addSignSpaces(doc, contractProcessed, options, contractInformation,{ showParentName: true, showEducandoName: false },language);
+      }else if (key.startsWith("input")) {
+        addInputField(doc, content, options, contractInformation!);
       }
     });
     options.yPosition = options.initialY;
@@ -57,7 +59,13 @@ const addPageContent = (
   }
   return doc;
 };
-
+const addInputField = (doc: jsPDF, content: string, options: Options, contractInformation: ContractInfo) => {
+  const inputValue = contractInformation.weeklyPayment || '';
+  doc.setFontSize(12);
+  doc.text(content, options.marginLeft, options.yPosition);
+  doc.text(inputValue, options.marginLeft + doc.getTextWidth(content) + 5, options.yPosition);
+  options.yPosition += 10;
+};
 const addHeaderFontStyle = (textObject: any, type: string): string => {
   if (typeof textObject === "string") {
     return type === 'title' ? 'bold' : 'italic';
