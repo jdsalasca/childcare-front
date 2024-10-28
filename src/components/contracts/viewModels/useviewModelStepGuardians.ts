@@ -51,15 +51,35 @@ const useViewModelStepGuardians = ({
   const { guardianOptions: guardians } = useGuardianOptions()
 
   useEffect(() => {
-    if (guardians?.length > 0) {
+    handlerGetGuardians()
+   /*  if (guardians?.length > 0) {
       const guardiansRe = guardians.map(guardian => ({
         ...guardian,
         label: guardian.name,
         value: guardian.id!
       }))
       setGuardianOptions(guardiansRe)
+    } */
+  }, [])
+
+  const handlerGetGuardians = async () => {
+    setLoadingInfo({
+      loading: true,
+      loadingMessage: t('weAreLoadingGuardiansInformation')
+    });
+    const response = await GuardiansAPI.getGuardians()
+    setLoadingInfo(LoadingInfo.DEFAULT_MESSAGE)
+    console.log('response', response);
+    if (response?.response?.length > 0) {
+      const guardiansRe = response.response.map(guardian => ({
+        ...guardian,
+        label: guardian.name,
+        value: guardian.id!
+      }))
+      setGuardianOptions(guardiansRe)
     }
-  }, [guardians])
+    return response.response
+  }
 
   const {
     control,
@@ -249,6 +269,7 @@ const useViewModelStepGuardians = ({
 
 
   const onSubmit = async (data: any): Promise<void> => {
+   
     if (ContractService.isInvalidFormData(data, contractInformation)) {
       ToastInterpreterUtils.toastInterpreter(
         toast,
@@ -278,6 +299,7 @@ const useViewModelStepGuardians = ({
           t('failedToSaveGuardians'),
           3000
         )
+        setLoadingInfo(LoadingInfo.DEFAULT_MESSAGE)
         return // Stop the process here if guardian creation/update fails
       }
   

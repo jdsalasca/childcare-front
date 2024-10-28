@@ -3,7 +3,7 @@ import { Functions } from '../../../utils/functions';
 import { ContractInfo, defaultContractInfoFinished, Language } from '../types/ContractInfo';
 import { addFonts } from './jsPdfArial';
 import { contractInfo } from './newContractGenerator';
-
+import { AcroFormTextField } from 'jspdf';
 const initialYposition = 12.7 + 10;
 
 
@@ -32,13 +32,14 @@ const addPageContent = (
 
   if (contractProcessed[pageName]) {
     Object.keys(contractProcessed[pageName]).forEach(key => {
+      const isEditable = key.includes('input') || key.includes('editable');
       let content = contractProcessed[pageName][key];
       if (key.startsWith('separator')) {
         addSeparator(doc, options);
       } else if (key === 'title' || key === 'subtitle') {
         addHeader(doc, content, options, key);
       } else if (key.startsWith('parr')) {
-        addBodyText(doc, content, options);
+        addBodyText(doc, content, options, isEditable);
       } else if (key.startsWith("yPlus")) {
         options.yPosition += content;
       } else if (key.startsWith("signSectionEducando")) {
@@ -98,22 +99,37 @@ const addSeparator = (doc: jsPDF, options: Options) => {
   doc.setLineWidth(0.2);
 };
 
-
-const addBodyText = (doc: jsPDF, text: string, options: Options) => {
+const addBodyText = (doc: jsPDF, text: string, options: Options, editable: boolean = false) => {
   text = preprocessText(text);
   const lines = doc.splitTextToSize(text, options.contentWidth);
   doc.setFontSize(12);
 
-  lines.forEach((line: string) => { // Explicitly type 'line' as string
+  lines.forEach((line: string) => {
     if (options.yPosition + 10 > options.pageHeight - options.marginBottom) {
       doc.addPage();
       options.yPosition = options.marginTop;
     }
-    renderFormattedLine(doc, line, options);
+    
+    if (editable) {
+      // Create text field for editable content
+      const field = new AcroFormTextField();
+      field.x = options.marginLeft;
+      field.y = options.yPosition - 10;
+      field.width = options.contentWidth;
+      field.height = 12;
+      field.multiline = true;
+      field.fieldName = `field_${Math.random().toString(36).substr(2, 9)}`;
+      field.fontSize = 12;
+      field.value = line;
+      
+      doc.addField(field);
+    } else {
+      renderFormattedLine(doc, line, options);
+    }
+    
     options.yPosition += 5;
   });
 };
-
 const DefaultSignOptions = {
   showParentName: true,
   showEducandoName: false,
@@ -196,6 +212,21 @@ signOptions: any = DefaultSignOptions, language : Language = Language.Spanish) =
 
   
 const preprocessText = (text:string) => {
+
+   // Extract input fields with their properties
+   const inputRegex = /<input[^>]*>/g;
+   const inputs: {text: string, width?: number}[] = [];
+   
+   text = text.replace(inputRegex, (match) => {
+     // Extract width if specified
+     const widthMatch = match.match(/width="([^"]*)"/);
+     const width = widthMatch ? parseInt(widthMatch[1]) : 50;
+     
+     // Add placeholder for input
+     inputs.push({text: '', width});
+     return '{{INPUT}}';
+   });
+   
   // Replace HTML tags with appropriate formatting
   text = text.replace(/<em>/g, ' ');  // Replace <em> with _ (or any placeholder you prefer)
   text = text.replace(/<\/em>/g, '');  // Replace </em> with _ (or any placeholder you prefer)
@@ -273,13 +304,34 @@ export function compressPDF(pdf = new jsPDF(), options:any = {}) {
 }
 
 export class ContractPdf {
+  
   static contractBuilder = (contractInformation: ContractInfo = defaultContractInfoFinished, language:Language = Language.English) => {
     const contractBase = contractInfo(contractInformation,language);
     const doc = new jsPDF({
       filters: ["ASCIIHexEncode"],
-      format: 'letter'
+      format: 'letter',
+      putOnlyUsedFonts: true,
+      floatPrecision:16
     });
+    const form = doc.AcroForm;
+   
+    form.Appearance = () => ({
+     needAppearances: true,
+     SigFlags: 0,
+     TextField: () => new AcroFormTextField()
+    })
+    
+    doc.setProperties({
+      title: 'Contract',
+      author: 'Educando Childcare Center',
+      subject: 'Contract',
+      keywords: 'Contract',
+      creator: 'Educando Childcare Center',
+      
+    });
+
     addFonts(doc);
+
     const options: Options = {
       marginLeft: 20,
       marginLeftTitles: 20,
@@ -295,6 +347,8 @@ export class ContractPdf {
     options.contentWidth = options.pageWidth - options.marginLeft * 2;
     options.contentHeight = options.pageHeight - options.marginTop - options.marginBottom;
     addFonts(doc)
+
+
     addFirstPage(doc, options,contractBase,contractInformation, language);
     addPageContent(doc, contractBase, options, 'page2', true, contractInformation, language);
     addPageContent(doc, contractBase, options, 'page3',true,contractInformation,language);
@@ -313,7 +367,38 @@ export class ContractPdf {
   };
 }
 
-
+const addFormField = (doc: jsPDF, x: number, y: number, width: number = 50) => {
+  try {
+    const field = new AcroFormTextField();
+    
+    field.x = x;
+    field.y = y - 10;
+    field.width = width;
+    field.height = 10;
+    field.fieldName = `field_${Math.random().toString(36).substr(2, 9)}`;
+    field.fontSize = 12;
+    field.value = '';
+    field.readOnly = false;
+    
+    // Add visible borders and background
+  /*   field.borderStyle = 'solid';
+    field.borderWidth = 1;
+    field.backgroundColor = [0.9, 0.9, 0.9];  // Light gray background
+    field.textColor = [0, 0, 0]; */
+    
+    doc.addField(field);
+    
+    // Draw a visible rectangle around the field
+    doc.setDrawColor(0);
+    doc.setLineWidth(0.1);
+    doc.rect(x, y - 10, width, 10);
+    
+    return width + 2;
+  } catch (error) {
+    console.error('Error adding form field:', error);
+    return width + 2;
+  }
+};
   // Function to add the first page
   const addFirstPage = (doc: jsPDF, options: Options,contractInfo :any ,contractInformation :ContractInfo, language : Language) => {
     options.yPosition = options.yPosition - 10

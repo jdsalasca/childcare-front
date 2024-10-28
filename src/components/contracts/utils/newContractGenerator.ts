@@ -7,6 +7,7 @@ export const contractInfo = (contractData: ContractInfo= defaultContractInfoFini
   const startDate = Functions.formatDateToMMDDYY(contractData.start_date!);
   const endDate = Functions.formatDateToMMDDYY(contractData.end_date!);
   const FATHER_GUARDIAN_TYPE_ID = 1;
+  let {weekly_payment} = contractData
   const MOTHER_GUARDIAN_TYPE_ID = 2;
   const GUARDIAN_TYPE_ID = 3;
 
@@ -44,6 +45,14 @@ export const contractInfo = (contractData: ContractInfo= defaultContractInfoFini
       Language.Spanish === language ? `- Nombre del niño: ${child.first_name} ${child.last_name}, fecha de nacimiento: ${Functions.formatDateToMMDDYY(child.born_date)}` : `- Child's name: ${child.first_name} ${child.last_name}, birth date: ${Functions.formatDateToMMDDYY(child.born_date)}`
     )
     .join('\n');
+    const transportChildren = contractData.children
+  .map(child =>
+    Language.Spanish === language 
+      ? `\nNombre del niño: ${child.first_name} ${child.last_name} al salón ${child.classroom || '_________________'}`
+      : `\nChild's name: ${child.first_name} ${child.last_name} to classroom ${child.classroom || '_________________'}`
+  )
+  .join('\n');
+
 
   const programCounts = contractData.children.reduce<Record<string, number>>((acc, child) => {
     acc[child.program!] = (acc[child.program!] || 0) + 1;
@@ -114,8 +123,8 @@ export const contractInfo = (contractData: ContractInfo= defaultContractInfoFini
         "parr12": "\nTransporte a la escuela (ida y Vuelta por semana)………………………………….$50.00  ____",
         // "parr13": "\nMarque lo que corresponda para su servicio y a la edad de su(s) niño(s).\nSu pago será de:_________",
         "parr14": "\n                                 Pago al momento de la registración: $________________________",
-        "parr15": "\n                                                                           <strong>Pago semanal: ____________________ </strong>",
-        "signSection": true,
+        "parr15": `\n                                                                                                    <strong>Pago semanal: $ ${weekly_payment} </strong>`,
+        "signSection": true,  
         "parr16": "\n",
         "signSectionEducando": true
       }
@@ -182,11 +191,8 @@ export const contractInfo = (contractData: ContractInfo= defaultContractInfoFini
           "parr2": "\nBrindamos el servicio de transporte desde Educando Childcare Center hacia la escuela de su niño de ida/vuelta según establecido en el Contrato.",
           "parr3": "\nTambién basados en las actividades preparadas para los niños en días en que no hayan clases en la escuela o que estén de vacaciones, transportamos a los niños a actividades fuera de Educando Childcare según programación (Museo de niños, Zoo, Librería, Parque de Agua y/o arena, algún lugar de brincolines, Pumpkin Pach, etc.). A estas actividades asisten Toddlers, Prescolares y escolares.",
           "parr4": "\nLas escuelas las que van mis niño(s) son:",
-          "parr5": "\nNombre del niño: __________________________ a la Escuela _____________________",
-          "parr6": "\nNombre del niño: __________________________ a la Escuela _____________________",
-          "parr7": "\nNombre del niño: __________________________ a la Escuela _____________________",
-          "parr8": "\nNombre del niño: __________________________ a la Escuela _____________________",
-          "parr9": "\nYo, _______________________________________ autorizo a mi niño(s) a viajar en el vehículo de Educando Childcare Center autorizado.",
+          "parr5": transportChildren,
+          "parr9": `\nYo, ${contractData.titularName} autorizo a mi niño(s) a viajar en el vehículo de Educando Childcare Center autorizado.`,
           "signSection2": true
         
       },
@@ -228,32 +234,29 @@ export const contractInfo = (contractData: ContractInfo= defaultContractInfoFini
           },
         
           
-            "page10": {
-              "parr0": "\n<strong> Autorización de Uso de Fotografía y Media </strong>",
-              "separator": true,
-              "parr1": "\nYo, _______________________________ Madre/Padre o Apoderado de mi niño(s) llamado(s) ___________________________________________, estoy de acuerdo que Educando Childcare: (Por favor marque lo que desee)",
-              "parr2": "\n____ Comparta fotos, videos, media con mi niño(s) allí con otras familias de niños registrados en el daycare para propósito solo familiar y personal <strong>(vía email, foto de grupo, Evento de Navidad, Thanksgiving, Field trip o paseos de actividades de su aula o impresión de fotos)</strong>.",
-              "parr3": "\n____ Permiso a otros Padres de los niños registrados en Educando Childcare para tomar fotografías, videos y media con mis niños allí, si están de acuerdo otros Padres para uso solamente personal y familiar como  <strong> Celebraciones de cumpleaños, festividades celebradas en el daycare.</strong>",
-              "parr4": "\n____ Uso de fotografías de mi niño para <strong>trabajos de artes manuales y actividades para familias de niños registrados en el daycare.</strong>",
-              "parr5": "\n____ Uso de fotografías, video, media con mi niño allí para promover Educando Childcare Center. Yo doy mi consentimiento firmando abajo:",
-              "signSection": true
-            },
-          
-          
-            
-              "page11": {
-                "parr0": "\n<strong> Autorización para Salir a Caminar </strong>",
-                "separator": true,
-                "parr1": "\nComo parte del programa de Educando Childcare, incluye algunos paseos fuera de nuestras instalaciones como parte de la estimulación en contacto con la naturaleza, la Comunidad y el sano desarrollo físico. Los niños serán llevados de la mano con cintas de seguridad y acompañados de sus maestras y personal a cargo.",
-                "parr2": "\nLos lugares típicos para caminar podrían incluir, pero no limitarse a:",
-                "parr3": "\n_____ Caminar alrededor del vecindario de Educando Childcare.",
-                "parr4": "\n_____ Caminar hacia el parque del vecindario o quizás ir en el transporte de la guardería.",
-                "parr5": "\n_____ Caminar en la escuela del vecindario.",
-                "parr6": "\nAutorizo a Educando Childcare llevar a mi(s) niño(s) a los paseos mencionados y que yo marque más arriba.",
-                "parr7": "\nComprendo que para otros paseos se me dará un calendario de días y horas y lugares a visitar fuera del daycare como parte del programa de enriquecimiento educativo de mi(s) niño(s).",
-                "signSection": true
-              },
-            
+"page10": {
+  "parr0": "\n<strong> Autorización de Uso de Fotografía y Media </strong>",
+  "separator": true,
+  "parr1": `\nYo, ${contractData.titularName} Madre/Padre o Apoderado de mi niño(s) llamado(s) ${contractData.children.map(child => child.first_name + ' ' + child.last_name).join(', ')}, estoy de acuerdo que Educando Childcare: (Por favor marque lo que desee)`,
+  "parr2": `\n${contractData.terms?.share_photos_with_families ? 'Apruebo' : 'Desapruebo'} Comparta fotos, videos, media con mi niño(s) allí con otras familias de niños registrados en el daycare para propósito solo familiar y personal <strong>(vía email, foto de grupo, Evento de Navidad, Thanksgiving, Field trip o paseos de actividades de su aula o impresión de fotos)</strong>.`,
+  "parr3": `\n${contractData.terms?.allow_other_parents_to_take_photos ? 'Apruebo' : 'Desapruebo'} Permiso a otros Padres de los niños registrados en Educando Childcare para tomar fotografías, videos y media con mis niños allí, si están de acuerdo otros Padres para uso solamente personal y familiar como <strong>Celebraciones de cumpleaños, festividades celebradas en el daycare.</strong>`,
+  "parr4": `\n${contractData.terms?.use_photos_for_art_and_activities ? 'Apruebo' : 'Desapruebo'} Uso de fotografías de mi niño para <strong>trabajos de artes manuales y actividades para familias de niños registrados en el daycare.</strong>`,
+  "parr5": `\n${contractData.terms?.use_photos_for_promotion ? 'Apruebo' : 'Desapruebo'} Uso de fotografías, video, media con mi niño allí para promover Educando Childcare Center.`,
+  "signSection": true
+},
+
+"page11": {
+  "parr0": "\n<strong> Autorización para Salir a Caminar </strong>",
+  "separator": true,
+  "parr1": "\nComo parte del programa de Educando Childcare, incluye algunos paseos fuera de nuestras instalaciones como parte de la estimulación en contacto con la naturaleza, la Comunidad y el sano desarrollo físico. Los niños serán llevados de la mano con cintas de seguridad y acompañados de sus maestras y personal a cargo.",
+  "parr2": "\nLos lugares típicos para caminar podrían incluir, pero no limitarse a:",
+  "parr3": `\n${contractData.terms?.walk_in_school ? 'Apruebo' : 'Desapruebo'} Caminar alrededor del vecindario de Educando Childcare.`,
+  "parr4": `\n${contractData.terms?.walk_to_park_or_transport ? 'Apruebo' : 'Desapruebo'} Caminar hacia el parque del vecindario o quizás ir en el transporte de la guardería.`,
+  "parr5": `\n${contractData.terms?.walk_around_neighborhood ? 'Apruebo' : 'Desapruebo'} Caminar en la escuela del vecindario.`,
+  "parr6": "\nAutorizo a Educando Childcare llevar a mi(s) niño(s) a los paseos mencionados y que yo marque más arriba.",
+  "parr7": "\nComprendo que para otros paseos se me dará un calendario de días y horas y lugares a visitar fuera del daycare como parte del programa de enriquecimiento educativo de mi(s) niño(s).",
+  "signSection": true
+},
             
               
                 "page12": {
@@ -378,7 +381,7 @@ page3: {
     parr10: `\nSchool (5 – 12 years old): .....................................................................................$200.00____`,
     parr11: `\nSchool Transportation (2 ways): ............................................................................. $50.00____`,
     parr12: `\n                                                Your payment at registration time: $______________________`,
-    parr121: `\n                                                                            Weekly payment: $_____________________\n\n`,
+    parr121: `\n                                                                                             Weekly payment: $ ${weekly_payment}\n\n`,
     signSection: true,
     parr16: "\n",
     signSectionEducando: true
@@ -441,12 +444,8 @@ page5: {
       parr2: `\nWe provide transportation service from Educando Childcare Center to/from your child’s school as established in the Contract.`,
       parr3: `\nAlso based on the activities prepared for the children on days when there are no classes at school or when they are on vacation, we transport the children to activities outside of Educando Childcare according to the schedule (Children’s Museum, Zoo, Library, Water Park and/or sand, some bounce house, Pumpkin Patch, etc.). Toddlers, Preschoolers, and School children attend these activities.`,
       parr4: `\nThe school that my child(ren) attend is/are:`,
-      parr5: `\nChild’s Name: ____________________________ To the school: ___________________`,
-      parr6: `\nChild’s Name: ____________________________ To the school: ___________________`,
-      parr7: `\nChild’s Name: ____________________________ To the school: ___________________`,
-      parr8: `\nChild’s Name: ____________________________ To the school: ___________________`,
-      parr9: `\nChild’s Name: ____________________________ To the school: ___________________`,
-      parr10: `\nI, ___________________________________ authorize that my child(ren) travel in the authorized Educando Childcare Center vehicle.`,
+      parr5: transportChildren,
+      parr10: `\nI, ${contractData.titularName} authorize that my child(ren) travel in the authorized Educando Childcare Center vehicle.`,
       signSection: true,
   },  
   page8: {
@@ -481,15 +480,15 @@ page9: {
   parr11: `\nAt the time of the notification of termination of the service to the child, both parties will agree on what will be the last day of service and the final payment corresponding to the daycare.`,
   signSection: true,
 },
-
+    
 page10: {
   parr0: '\n<strong>Authorization for use of Photography and Media</strong>',
   separator: true,
-  parr1: `\nI, _____________________________________ Mother/Father or Guardian of my child(ren) ____________________________________________________, I agree that Educando Childcare Center: (Please check what you want)`,
-  parr2: `\n________ Share photos, videos, media with my child(ren) there with other families of children registered in daycare for family and personal purposes only <strong>(via email, group photo, Christmas Event, Thanksgiving, Field trip activities from your child(ren) classroom or \nphoto printing)</strong>.`,
-  parr3: `\n________ Permission to other Parents of children registered in Educando Childcare to take photographs, videos and media with my children there, if other Parents agree for personal and family use only <strong>such as birthday celebrations, festivities celebrated in the daycare</strong>.`,
-  parr4: `\n________ Using photographs of my child <strong>for crafts and activities for families of children enrolled in daycare</strong>.`,
-  parr5: `\n_________ Use of photographs, video, media with my child there to promote Educando Childcare Center.`,
+  parr1: `\nI, ${contractData.titularName} Mother/Father or Guardian of my child(ren) ${contractData.children.map(child => child.first_name + ' ' + child.last_name).join(', ')}, I agree that Educando Childcare Center: (Please check what you want)`,
+  parr2: `\n${contractData.terms?.share_photos_with_families ? 'Approve' : 'Disapprove'} Share photos, videos, media with my child(ren) there with other families of children registered in daycare for family and personal purposes only <strong>(via email, group photo, Christmas Event, Thanksgiving, Field trip activities from your child(ren) classroom or \nphoto printing)</strong>.`,
+  parr3: `\n${contractData.terms?.allow_other_parents_to_take_photos ? 'Approve' : 'Disapprove'} Permission to other Parents of children registered in Educando Childcare to take photographs, videos and media with my children there, if other Parents agree for personal and family use only <strong>such as birthday celebrations, festivities celebrated in the daycare</strong>.`,
+  parr4: `\n${contractData.terms?.use_photos_for_art_and_activities ? 'Approve' : 'Disapprove'} Using photographs of my child <strong>for crafts and activities for families of children enrolled in daycare</strong>.`,
+  parr5: `\n${contractData.terms?.use_photos_for_promotion ? 'Approve' : 'Disapprove'} Use of photographs, video, media with my child there to promote Educando Childcare Center.`,
   parr6: `\nI give my consent by signing below:`,
   signSection: true,
 },
@@ -499,11 +498,11 @@ page11: {
   parr1: `\nAs part of the Educando Childcare center program, it includes some walks outside our facilities as part of stimulation in contact with nature, the Community and healthy physical development.`,
   parr12: `\nChildren will be led by the hand with safety belts and accompanied by their teachers and staff in charge.`,
   parr2: `\nTypical walking locations could include, but are not limited to:`,
-  parr3: `\n________ Walk around the Educando Childcare neighborhood.`,
-  parr4: `\n________ Walk to a neighborhood park or maybe ride the daycare transportation.`,
-  parr5: `\n________ Walk to the neighborhood school.`,
+  parr3: `\n${contractData.terms?.walk_in_school ? 'Approve' : 'Disapprove'} Walk around the Educando Childcare neighborhood.`,
+  parr4: `\n${contractData.terms?.walk_to_park_or_transport ? 'Approve' : 'Disapprove'} Walk to a neighborhood park or maybe ride the daycare transportation.`,
+  parr5: `\n${contractData.terms?.walk_around_neighborhood ? 'Approve' : 'Disapprove'} Walk to the neighborhood school.`,
   parr6: `\nI authorize Educando Childcare center to take my child(ren) on the field trip mentioned and that I check above.`,
-  parr7: `\nI understand that for other field trips I will be given a schedule of days and times and places to visit outside of daycare as part of my child(ren)’s educational enrichment program.`,
+  parr7: `\nI understand that for other field trips I will be given a schedule of days and times and places to visit outside of daycare as part of my child(ren)'s educational enrichment program.`,
   signSection: true,
 },
 page12: {

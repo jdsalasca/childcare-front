@@ -16,7 +16,7 @@ import { ContractPermissionsValidator } from '../../models/ContractPermissionsAP
 import useDays from '../../models/customHooks/useDays';
 import Loader from '../utils/Loader';
 import StepComponentFive from './steps/StepComponentFive';
-import { ContractInfo, defaultContractInfo } from './types/ContractInfo';
+import { contractDone, ContractInfo, defaultContractInfo, defaultContractInfoFinished } from './types/ContractInfo';
 
 // Define the props type for the component
 type ContractsProps = {
@@ -120,7 +120,7 @@ export const Contracts: React.FC<ContractsProps> = () => {
       case 5:
         // return <StepComponentSix setLoadingInfo={setLoadingInfo} toast={toast} setActiveIndex={setActiveIndex} contractInformation={contractInformation} setContractInformation={setContractInformation} />;
       case 6:
-        return <StepComponentSeven setLoadingInfo={setLoadingInfo} toast={toast} setActiveIndex={setActiveIndex} contractInformation={contractInformation} setContractInformation={setContractInformation} />;
+        return <StepComponentSeven setLoadingInfo={setLoadingInfo} toast={toast} setActiveIndex={setActiveIndex} contractInformation={defaultContractInfoFinished} setContractInformation={setContractInformation} />;
       default:
         return null;
     }

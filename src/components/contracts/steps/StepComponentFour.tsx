@@ -141,6 +141,15 @@ const StepComponentFour: React.FC<StepComponentFourProps> = ({
           onBlur={formatValue}
           spanClassName="p-float-label"
         />
+                <InputTextWrapper
+          name="weekly_payment"
+          control={control}
+          rules={{ required: t('weeklyPaymentRequired'), min: { value: 0, message: t('weeklyPaymentRequired') } }}
+          label={t('weeklyPayment')}
+          keyFilter={/^[0-9.]*$/}
+          onBlur={formatValue}
+          spanClassName="p-float-label"
+        />
         <div className="button-group">
           <Button type="submit" label={t('save')} className="p-button-primary p-ml-2" />
           <Button label={t('returnToPreviousStep')} className="p-button-secondary p-ml-2" onClick={() => setActiveIndex(2)} />

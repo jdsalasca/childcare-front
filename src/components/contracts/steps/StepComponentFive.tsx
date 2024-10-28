@@ -109,13 +109,7 @@ export const StepComponentFive: React.FC<StepComponentFiveProps> = ({
             message: t('checkOutAfterCheckInMessage'),
           });
           formIsValid = false;
-        } else if ((checkOutTime.getTime() - checkInTime.getTime()) / (1000 * 60 * 60) > 9) {
-          setError(`${day.name.toLowerCase()}check_out`, {
-            type: 'manual',
-            message: t('hourQuotaExceededMessage'),
-          });
-          formIsValid = false;
-        } else {
+        }else {
           clearErrors(`${day.name.toLowerCase()}check_out`);
         }
       }

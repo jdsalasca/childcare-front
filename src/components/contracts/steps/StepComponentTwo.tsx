@@ -105,12 +105,12 @@ export const StepComponentTwo: FC<StepComponentTwoProps> = ({
               rules={{
                 required: t('phoneNumberRequired'),
                 pattern: {
-                  value: /^[+]?[\d]+$/,
+                  value: /^[0-9+()-]*$/,
                   message: t('phoneNumberPattern'),
                 },
               }}
               label={t('phoneNumber')}
-              keyFilter={/^[0-9+]*$/}
+              keyFilter={/^[0-9+()-]*$/}
               spanClassName='c-small-field r-m-10'
             />
             <DropdownWrapper

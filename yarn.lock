@@ -2063,7 +2063,7 @@ __metadata:
     globals: "npm:^15.9.0"
     https-browserify: "npm:^1.0.0"
     i18next: "npm:^23.12.2"
-    jspdf: "npm:^2.5.1"
+    jspdf: "npm:^2.5.2"
     jspdf-autotable: "npm:^3.8.2"
     loglevel: "npm:^1.9.2"
     loglevel-plugin-prefix: "npm:^0.8.4"
@@ -4267,7 +4267,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jspdf@npm:^2.5.1":
+"jspdf@npm:^2.5.2":
   version: 2.5.2
   resolution: "jspdf@npm:2.5.2"
   dependencies:
