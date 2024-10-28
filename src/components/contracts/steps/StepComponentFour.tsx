@@ -56,6 +56,7 @@ const StepComponentFour: React.FC<StepComponentFourProps> = ({
       end_date: contractInformation.end_date || null,
       payment_method_id: contractInformation.payment_method_id || '',
       total_to_pay: contractInformation.total_to_pay || '',
+      weekly_payment: contractInformation.weekly_payment || '',
     },
   });
 
@@ -98,6 +99,7 @@ const StepComponentFour: React.FC<StepComponentFourProps> = ({
     }
     const formattedValue = numberValue.toFixed(2).replace(/\.00$/, '');
     setValue('total_to_pay', formattedValue);
+    return formattedValue;
   };
 
   return (
