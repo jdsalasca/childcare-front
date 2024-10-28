@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { Functions } from '../../../utils/functions';
 import { ContractInfo, defaultContractInfoFinished, Language } from '../types/ContractInfo';
-import { fontStyles } from '../utilsAndConstants';
+import { calculateWeeksOld, determineProgram, fontStyles } from '../utilsAndConstants';
 export const contractInfo = (contractData: ContractInfo= defaultContractInfoFinished, language:Language = Language.English) => {
   const todayDate = Functions.formatDateToMMDDYY(contractData.todayDate);
   const startDate = Functions.formatDateToMMDDYY(contractData.start_date!);
@@ -37,6 +37,10 @@ export const contractInfo = (contractData: ContractInfo= defaultContractInfoFini
     const day = DAYS[entry.day_id].name.toLowerCase(); // Get the day name from the DAYS object
     scheduleFormatted[`${day}.check_in`] = entry.check_in;
     scheduleFormatted[`${day}.check_out`] = entry.check_out;
+  });
+  contractData.children.forEach(child => {
+    child.classroom = determineProgram(calculateWeeksOld(child.born_date));
+    child.program = determineProgram(calculateWeeksOld(child.born_date));
   });
 
   const guardians = contractData.guardians.map(g => g.name).join(', ');
