@@ -6,6 +6,7 @@ export interface Guardian {
   city:             string;
   phone:            string;
   guardian_type_id?: number;
+  telephone:        string;
   created_at:       Date|string;
   updated_at:       Date|string;
   email:            string;
@@ -20,6 +21,7 @@ export const defaultGuardian: Guardian = {
   last_name: '',
   address: '',
   city: '',
+  telephone: '',
   phone: '',
   guardian_type_id: undefined, // or another appropriate default value
   created_at: new Date(), // or a specific date if needed

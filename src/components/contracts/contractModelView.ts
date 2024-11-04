@@ -7,8 +7,10 @@ import {
 import { ChildrenGuardiansAPI } from '../../models/ChildrenGuardiansAPI';
 import { ContractAPI, ContractBuilder } from '../../models/ContractAPI';
 import { ChildType, defaultChild } from '../../types/child';
-import { defaultGuardian } from '../../types/guardian';
+import { defaultGuardian, Guardian } from '../../types/guardian';
 import { ChildrenValidations, GuardiansValidations } from './utils/contractValidations';
+import { ContractInfo } from './types/ContractInfo';
+import { GuardiansFactory } from '@models/factories/GuardiansFactory';
 
 
 /**
@@ -97,23 +99,36 @@ export class ContractService {
    * @returns An object containing guardianChildren and contractInfo.
    */
   static async createContract(
-    children: ChildType[] =  Array.of(defaultChild),
-    guardians: any[] =  Array.of(defaultGuardian),
+    children: ChildType[],
+    guardians: Guardian[],
     t: (key: string) => string,
-    contractInformation: any
+    contractInformation: ContractInfo
   ): Promise<{ guardianChildren: any; contractInfo: any }> {
-    const relationships = await this.createChildrenGuardianRelationships(children, guardians, t);
-    if (contractInformation.contract_id == null) {
-      customLogger.debug('contractInformation', contractInformation);
-      customLogger.debug('children', children);
-      customLogger.debug('guardians', guardians);
-      const contractBuild = new ContractBuilder(guardians).build();
-
-      console.log('contractData', contractBuild);
-      const contractData = await ContractAPI.createContract(contractBuild);
-      return { guardianChildren: relationships, contractInfo: contractData };
-    } else {
+    const titularGuardian = GuardiansFactory.getTitularGuardian(guardians);
+    if (!titularGuardian) {
+      throw new Error('No titular guardian found');
+    }
+  
+    try {
+      // Create relationships first
+      const relationships = await this.createChildrenGuardianRelationships(children, guardians, t);
+  
+      // Only create new contract if one doesn't exist
+      if (!contractInformation.contract_id) {
+        const contractBuild = {
+          guardian_id_titular: titularGuardian.id,
+          status: 'Active',
+          // Add any other required contract fields
+        };
+  
+        const contractData = await ContractAPI.createContract(contractBuild);
+        return { guardianChildren: relationships, contractInfo: contractData };
+      }
+  
       return { guardianChildren: relationships, contractInfo: null };
+    } catch (error) {
+      console.error('Error creating contract:', error);
+      throw error;
     }
   }
 

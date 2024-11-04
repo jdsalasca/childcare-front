@@ -4,7 +4,7 @@ import { Control, FieldArrayWithId, useFieldArray, useForm, UseFormGetValues, Us
 import { useTranslation } from "react-i18next"
 import Swal from "sweetalert2"
 import { LoadingInfo } from "../../../models/AppModels"
-import { GuardiansAPI, GuardiansFactory } from "../../../models/GuardiansAPI"
+import { GuardiansAPI } from "../../../models/GuardiansAPI"
 import { defaultGuardian, Guardian } from "../../../types/guardian"
 import useGuardianOptions from "../../../utils/customHooks/useGuardianOptions"
 import useGuardianTypeOptions from "../../../utils/customHooks/useGuardianTypeOptions"
@@ -12,30 +12,40 @@ import { ToastInterpreterUtils } from "../../utils/ToastInterpreterUtils"
 import { ContractService } from "../contractModelView"
 import { ContractInfo } from "../types/ContractInfo"
 import { GuardiansValidations } from "../utils/contractValidations"
+import { log } from "loglevel"
+import { GuardiansFactory } from "@models/factories/GuardiansFactory"
 
+// Improved type definitions
+interface GuardianFormData {
+  guardians: Guardian[];
+}
+interface ExtendedGuardian extends Guardian {
+  label?: string;
+  value?: number;
+}
 
 
 interface UseViewModelStepGuardiansProps {
-  toast: any
-  setActiveIndex: (index: number) => void
-  contractInformation: ContractInfo
-  setContractInformation: (info: ContractInfo) => void
-  setLoadingInfo: (info: LoadingInfo) => void
+  toast: any; // Consider using a specific toast type
+  setActiveIndex: (index: number) => void;
+  contractInformation: ContractInfo;
+  setContractInformation: (info: ContractInfo) => void;
+  setLoadingInfo: (info: LoadingInfo) => void;
 }
 
 interface UseViewModelStepGuardiansReturn {
-  onSubmit: (data: any) => Promise<void>
-  addGuardian: () => void
-  errors: Record<string, any>
-  removeGuardian: (index: number) => void
-  getAvailableGuardianTypes: (index: number) => any[]
-  handleGuardianSelect: (e: { value: number }) => void  
-  t: (key: string, options?: any) => string
-  guardianOptions: Guardian[]
-  control: Control<any>
-  fields:FieldArrayWithId<{ guardians: Guardian[]; }, "guardians", "id">[]
-  getValues: UseFormGetValues<{ guardians: Guardian[]; }>
-  handleSubmit: UseFormReturn['handleSubmit']
+  onSubmit: (data: GuardianFormData) => Promise<void>;
+  addGuardian: () => void;
+  errors: Record<string, any>;
+  removeGuardian: (index: number) => void;
+  getAvailableGuardianTypes: (index: number) => any[];
+  handleGuardianSelect: (e: { value: number }) => void;
+  t: (key: string, options?: any) => string;
+  guardianOptions: Guardian[];
+  control: Control<GuardianFormData>;
+  fields: FieldArrayWithId<GuardianFormData, "guardians", "id">[];
+  getValues: UseFormGetValues<GuardianFormData>;
+  handleSubmit: UseFormReturn<GuardianFormData>['handleSubmit'];
 }
 
 const useViewModelStepGuardians = ({
@@ -45,41 +55,57 @@ const useViewModelStepGuardians = ({
   setContractInformation,
   setLoadingInfo,
 }: UseViewModelStepGuardiansProps): UseViewModelStepGuardiansReturn => {
-  const { t } = useTranslation()
-  const [guardianOptions, setGuardianOptions] = useState<Guardian[]>([])
-  const { guardianTypeOptions } = useGuardianTypeOptions()
-  const { guardianOptions: guardians } = useGuardianOptions()
+  const { t } = useTranslation();
+  const [guardianOptions, setGuardianOptions] = useState<Guardian[]>([]);
+  const { guardianTypeOptions } = useGuardianTypeOptions();
+  const { guardianOptions: guardians } = useGuardianOptions();
+
+  const setLoading = (loading: boolean, message: string = '') => {
+    setLoadingInfo({
+      loading,
+      loadingMessage: message ? t(message) : ''
+    });
+  };
+
+  const showToast = (type: 'success' | 'error' | 'info', titleKey: string, messageKey?: string, duration: number = 3000) => {
+    ToastInterpreterUtils.toastInterpreter(
+      toast,
+      type,
+      t(titleKey),
+      messageKey ? t(messageKey) : undefined,
+      duration
+    );
+  };
+
+  // Update the handlerGetGuardians function
+const handlerGetGuardians = async (): Promise<ExtendedGuardian[]> => {
+  try {
+    setLoading(true, 'weAreLoadingGuardiansInformation');
+    const response = await GuardiansAPI.getGuardians();
+    
+    if (response?.response?.length > 0) {
+      const formattedGuardians: ExtendedGuardian[] = response.response.map(guardian => ({
+        ...guardian,
+        label: guardian.name,
+        value: guardian.id!
+      }));
+      setGuardianOptions(formattedGuardians);
+      return formattedGuardians;
+    }
+    return [];
+  } catch (error) {
+    console.error('Error fetching guardians:', error);
+    showToast('error', 'error', 'failedToLoadGuardians');
+    return [];
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   useEffect(() => {
-    handlerGetGuardians()
-   /*  if (guardians?.length > 0) {
-      const guardiansRe = guardians.map(guardian => ({
-        ...guardian,
-        label: guardian.name,
-        value: guardian.id!
-      }))
-      setGuardianOptions(guardiansRe)
-    } */
-  }, [])
-
-  const handlerGetGuardians = async () => {
-    setLoadingInfo({
-      loading: true,
-      loadingMessage: t('weAreLoadingGuardiansInformation')
-    });
-    const response = await GuardiansAPI.getGuardians()
-    setLoadingInfo(LoadingInfo.DEFAULT_MESSAGE)
-    console.log('response', response);
-    if (response?.response?.length > 0) {
-      const guardiansRe = response.response.map(guardian => ({
-        ...guardian,
-        label: guardian.name,
-        value: guardian.id!
-      }))
-      setGuardianOptions(guardiansRe)
-    }
-    return response.response
-  }
+    handlerGetGuardians();
+  }, []);
 
   const {
     control,
@@ -87,292 +113,219 @@ const useViewModelStepGuardians = ({
     formState: { errors },
     setValue,
     getValues
-  } = useForm({
+  } = useForm<GuardianFormData>({
     defaultValues: {
       guardians: contractInformation.guardians || []
     }
-  })
+  });
 
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'guardians'
-  })
-
-  const onCreateGuardian = async (data: Guardian): Promise<Guardian | undefined> => {
-    try {
-      const response: ApiResponse<Guardian> = await GuardiansAPI.createGuardian(data);
-      if (response.httpStatus === 200) {
-        return response.response; // Extract the Guardian from the response
-      }
-    } catch (error) {
-      console.error('Error creating guardian', error);
-      throw error; // Consider handling the error or returning undefined instead
+  });
+// Update the onCreateGuardian function return type
+const onCreateGuardian = async (data: Guardian): Promise<ExtendedGuardian | undefined> => {
+  try {
+    const response = await GuardiansAPI.createGuardian(data);
+    
+    if (response.httpStatus === 200 && response.response) {
+      return {
+        ...response.response,
+        titular: data.titular,
+        telephone: data.telephone,
+        label: response.response.name,
+        value: response.response.id!
+      };
     }
-    return undefined; // Explicitly return undefined if no valid response
+    throw new Error('Invalid response from create guardian');
+  } catch (error) {
+    console.error('Error creating guardian:', error);
+    throw error;
   }
-  
+};
+
   const onUpdateGuardian = async (id: number, data: Guardian): Promise<Guardian | undefined> => {
     try {
-      const response: ApiResponse<Guardian> = await GuardiansAPI.updateGuardian(id.toString(), data);
-      if (response.httpStatus === 200) {
-        return response.response; // Extract the Guardian from the response
+      const response = await GuardiansAPI.updateGuardian(id.toString(), data);
+      if (response.httpStatus === 200 && response.response) {
+        return response.response;
       }
+      throw new Error('Invalid response from update guardian');
     } catch (error) {
-      console.error('Error updating guardian', error);
-      throw error; // Consider handling the error or returning undefined instead
-    }
-    return undefined; // Explicitly return undefined if no valid response
-  }
-  
-  const onHandlerGuardianBackendAsync = async (data: { guardians: Guardian[] }): Promise<Guardian[]> => {
-    setLoadingInfo({
-      loading: true,
-      loadingMessage: t('weAreSavingGuardiansInformation')
-    });
-  
-    const promises = data.guardians.map(guardian => {
-      if (guardian.id == null) {
-        return onCreateGuardian(guardian);
-      } else {
-        return onUpdateGuardian(guardian.id, guardian);
-      }
-    });
-  
-    try {
-      const responses = await Promise.all(promises);
-      setLoadingInfo({
-        loading: false,
-        loadingMessage: ''
-      });
-      return responses.filter((response): response is Guardian => response != null); // Type guard to filter out undefined
-    } catch (error) {
-      setLoadingInfo({
-        loading: false,
-        loadingMessage: ''
-      });
-      console.error('Error processing guardians data', error);
+      console.error('Error updating guardian:', error);
       throw error;
     }
   };
 
-  const onProcessGuardiansValidation = async (data: { guardians: Guardian[] }): Promise<boolean> => {
-    if (data.guardians.length === 1 && !data.guardians[0].titular) {
-      const result = await Swal.fire({
-        title: t('noTitularAlertTitle'),
-        text: t('noTitularAlertText', {
-          guardian: data.guardians[0].name + ' ' + data.guardians[0].last_name
-        }),
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: t('yes'),
-        cancelButtonText: t('no')
-      })
+  const onHandlerGuardianBackendAsync = async (data: GuardianFormData): Promise<Guardian[]> => {
+    try {
+      setLoading(true, 'weAreSavingGuardiansInformation');
+      
+      const promises = data.guardians.map(guardian => 
+        guardian.id == null ? onCreateGuardian(guardian) : onUpdateGuardian(guardian.id, guardian)
+      );
 
-      if (result.isConfirmed) {
-        await onCreateContract(
-          contractInformation.children,
-          GuardiansFactory.mergeAndCreateWithTitularStatus(
-            await onHandlerGuardianBackendAsync(data),
-            GuardiansFactory.createGuardiansAllWithTitularStatus(data?.guardians)
-          )
-        )
-        return false
-      } else {
-        return false
-      }
-    } else if (!GuardiansValidations.allHaveUniqueGuardianTypes(data.guardians)) {
-      await Swal.fire({
-        title: t('NoMoreThanOneGuardianOfTheSameType'),
-        text: t('NoMoreThanOneGuardianOfTheSameTypeText'),
-        icon: 'warning',
-        confirmButtonText: t('ok')
-      })
-      return false
-    } else if (data.guardians.length > 1) {
-      const titularGuardians = data.guardians.filter(g => g.titular)
-
-      if (titularGuardians.length === 0) {
-        await Swal.fire({
-          title: t('noTitularAlertTitle'),
-          text: t('titularRequiredAlertText'),
-          icon: 'warning',
-          confirmButtonText: t('ok')
-        })
-        return false
-      } else if (titularGuardians.length > 1) {
-        await Swal.fire({
-          title: t('multipleTitularsAlertTitle'),
-          text: t('multipleTitularsAlertText'),
-          icon: 'warning',
-          confirmButtonText: t('ok')
-        })
-        return false
-      }
+      const responses = await Promise.all(promises);
+      return responses.filter((response): response is Guardian => response != null);
+    } catch (error) {
+      console.error('Error processing guardians data:', error);
+      throw error;
+    } finally {
+      setLoading(false);
     }
-    return true
-  }
+  };
 
   const onCreateContract = async (children: any[], guardians: Guardian[]): Promise<any> => {
-    const response = await Swal.fire({
+    try {
+    const result = await Swal.fire({
       title: t('areYouSure'),
       text: t('areYouSureContractCreation'),
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: t('yes'),
       cancelButtonText: t('no')
-    })
-    if (response.isConfirmed) {
-      setLoadingInfo(new LoadingInfo(true, t('weAreSavingContract')))
+    });
+
+    if (!result.isConfirmed) {
+      // Early return if user clicks "No"
+      showToast('info', 'info', 'contractCreationCancelled');
+      return null;
+    }
+
+    
+      setLoading(true, 'weAreSavingContract');
       const contractResponseParent = await ContractService.createContract(
         children,
         guardians,
         t,
         contractInformation
-      )
-      const contractResponse = contractResponseParent.guardianChildren
-      setLoadingInfo(LoadingInfo.DEFAULT_MESSAGE)
+      );
 
-      let error
-      if (Array.isArray(contractResponse)) {
-        error = contractResponse.some(response => response.httpStatus !== 200)
-      } else {
-        error = contractResponse?.httpStatus !== 200
-      }
+      const contractResponse = contractResponseParent.guardianChildren;
+      
+      const hasError = Array.isArray(contractResponse) 
+        ? contractResponse.some(response => response.httpStatus !== 200)
+        : contractResponse?.httpStatus !== 200;
 
-      let message = Array.isArray(contractResponse)
+      const message = Array.isArray(contractResponse)
         ? contractResponse.map(response => response.response?.message).join(', ')
-        : contractResponse?.response?.message ?? contractResponse?.message
+        : contractResponse?.response?.message ?? contractResponse?.message;
 
-      if (error) {
-        ToastInterpreterUtils.toastInterpreter(
-          toast,
-          'error',
-          t('contractCreationFailed'),
-          t('contractCreationFailed', { response: message })
-        )
-      } else {
-        setContractInformation({
-          ...contractInformation,
-          guardians,
-          contract_number: contractResponseParent?.contractInfo?.response?.contract_number ?? contractInformation.contract_number,
-          contract_id: contractResponseParent?.contractInfo?.response?.id ?? contractInformation.contract_id,
-          guardian_id_titular: contractResponseParent?.contractInfo?.response?.guardian_id_titular ?? contractInformation.guardian_id_titular,
-        })
-
-        ToastInterpreterUtils.toastInterpreter(toast, 'success', t('contractCreated'))
-
-        setActiveIndex(2)
+      if (hasError) {
+        showToast('error', 'contractCreationFailed', 'contractCreationFailed');
+        return;
       }
-      return contractResponseParent
-    }
-  }
 
+      setContractInformation({
+        ...contractInformation,
+        guardians,
+        contract_number: contractResponseParent?.contractInfo?.response?.contract_number ?? contractInformation.contract_number,
+        contract_id: contractResponseParent?.contractInfo?.response?.id ?? contractInformation.contract_id,
+        guardian_id_titular: contractResponseParent?.contractInfo?.response?.guardian_id_titular ?? contractInformation.guardian_id_titular,
+      });
 
-  const onSubmit = async (data: any): Promise<void> => {
-   
-    if (ContractService.isInvalidFormData(data, contractInformation)) {
-      ToastInterpreterUtils.toastInterpreter(
-        toast,
-        'info',
-        t('info'),
-        t('addAtLeastOneGuardianAndAtLeastOneChild'),
-        3000
-      )
-      return
+      showToast('success', 'contractCreated');
+      setActiveIndex(2);
+      
+      return contractResponseParent;
+    } finally {
+      setLoading(false);
     }
+  };
+  const validateGuardians = (guardians: Guardian[]): { isValid: boolean; errorKey?: string } => {
+    const titularCount = guardians.filter(g => g.titular ===true).length;
+    const guardianTypeMap = new Map<number, boolean>();
+    
+    // Check duplicate types
+    const hasDuplicateType = guardians.some(guardian => {
+      if (!guardian.guardian_type_id) return false;
+      if (guardianTypeMap.has(guardian.guardian_type_id)) return true;
+      guardianTypeMap.set(guardian.guardian_type_id, true);
+      return false;
+    });
   
+    if (titularCount === 0) return { isValid: false, errorKey: 'noTitularSelected' };
+    if (titularCount > 1) return { isValid: false, errorKey: 'multipleTitularSelected' };
+    if (hasDuplicateType) return { isValid: false, errorKey: 'duplicateGuardianTypeFound' };
+  
+    return { isValid: true };
+  };
+  const onSubmit = async (data: GuardianFormData): Promise<void> => {
     try {
-      if (!(await onProcessGuardiansValidation(data))) {
-        return
+      // Basic validation
+      if (ContractService.isInvalidFormData(data, contractInformation)) {
+        showToast('info', 'info', 'addAtLeastOneGuardianAndAtLeastOneChild');
+        return;
       }
-  
-      // Create or update guardians first
-      let updatedGuardians: Guardian[]
-      try {
-        updatedGuardians = await onHandlerGuardianBackendAsync(data)
-      } catch (error) {
-        console.error("Error creating/updating guardians:", error)
-        ToastInterpreterUtils.toastInterpreter(
-          toast,
-          'error',
-          t('error'),
-          t('failedToSaveGuardians'),
-          3000
-        )
-        setLoadingInfo(LoadingInfo.DEFAULT_MESSAGE)
-        return // Stop the process here if guardian creation/update fails
-      }
-  
-      // If guardian creation/update is successful, proceed with contract creation
-      await onCreateContract(
-        contractInformation.children,
-        GuardiansFactory.mergeAndCreateWithTitularStatus(
-          updatedGuardians,
-          GuardiansFactory.createGuardiansAllWithTitularStatus(data?.guardians)
-        )
-      )
-    } catch (error) {
-      console.error("Error submitting guardians form:", error)
-      ToastInterpreterUtils.toastInterpreter(
-        toast,
-        'error',
-        t('error'),
-        t('failedToSaveGuardians'),
-        3000
-      )
-    }
-  }
 
+      const validation = validateGuardians(data.guardians);
+    if (!validation.isValid) {
+      showToast('error', 'error', validation.errorKey!);
+      return;
+    }
+      setLoading(true, 'weAreSavingGuardiansInformation');
+
+      // Save guardians
+      const updatedGuardians = await onHandlerGuardianBackendAsync(data);
+      if (updatedGuardians.length === 0) {
+        showToast('error', 'error', 'failedToSaveGuardians');
+        return;
+      }
+      console.log('updatedGuardians', updatedGuardians);
+      
+
+      // Create contract
+      const contractResponse = await onCreateContract(
+        contractInformation.children,
+        updatedGuardians
+      );
+      if(contractResponse){
+        showToast('success', 'success', 'contractCreated');
+        setActiveIndex(2);
+      }
+    } catch (error) {
+      console.error("Error in form submission:", error);
+      showToast('error', 'error', error instanceof Error ? error.message : 'failedToSaveGuardians');
+    } finally {
+      setLoading(false);
+    }
+  };
   const addGuardian = () => {
-    append(defaultGuardian)
-  }
+    append(defaultGuardian);
+  };
 
   const removeGuardian = (index: number) => {
     if (fields.length === 1) {
-      ToastInterpreterUtils.toastInterpreter(
-        toast,
-        'error',
-        t('error'),
-        t('cannotRemoveAllGuardians'),
-        3000
-      )
-      return
+      showToast('error', 'error', 'cannotRemoveAllGuardians');
+      return;
     }
-    remove(index)
-  }
+    remove(index);
+  };
 
   const getAvailableGuardianTypes = React.useCallback((index: number) => {
-    const guardians = getValues('guardians')
-    return GuardiansValidations.availableGuardianTypes(guardianTypeOptions, guardians, index)
-  }, [getValues, guardianTypeOptions])
+    const guardians = getValues('guardians');
+    return GuardiansValidations.availableGuardianTypes(guardianTypeOptions, guardians, index);
+  }, [getValues, guardianTypeOptions]);
 
-  const handleGuardianSelect = (e: { value: number }) => {
-    const selectedGuardianObject = guardianOptions.find(g => g.id === e.value)
-    if (!selectedGuardianObject) return
-  
-    const existingGuardianIndex = fields.findIndex(
-      guardian => guardian.id_static === selectedGuardianObject.id_static
-    )
-  
-    if (existingGuardianIndex === -1) {
-      ToastInterpreterUtils.toastInterpreter(
-        toast,
-        'success',
-        t('success'),
-        t('guardianInfoLoaded'),
-        3000
-      )
-      append(selectedGuardianObject)
+  const handleGuardianSelect = (e: { value: number }): void => {
+    const selectedGuardian = guardianOptions.find(g => g.id === e.value);
+    if (!selectedGuardian) return;
+
+    console.log("fields", fields);
+    console.log("selectedGuardian", selectedGuardian);
+    
+    const isGuardianAlreadyAdded = fields.some(
+      guardian => guardian.value === selectedGuardian.id
+    );
+
+    if (!isGuardianAlreadyAdded) {
+      showToast('success', 'success', 'guardianInfoLoaded');
+      append(selectedGuardian);
     } else {
-      ToastInterpreterUtils.toastInterpreter(
-        toast,
-        'info',
-        t('info'),
-        t('guardianAlreadyAdded'),
-        3000
-      )
+      showToast('info', 'info', 'guardianAlreadyAdded');
     }
-  }
+  };
+
   return {
     onSubmit,
     addGuardian,
@@ -386,6 +339,7 @@ const useViewModelStepGuardians = ({
     fields,
     getValues,
     handleSubmit,
-  }
-}
-export default useViewModelStepGuardians
+  };
+};
+
+export default useViewModelStepGuardians;

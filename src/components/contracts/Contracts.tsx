@@ -17,6 +17,7 @@ import useDays from '../../models/customHooks/useDays';
 import Loader from '../utils/Loader';
 import StepComponentFive from './steps/StepComponentFive';
 import { contractDone, ContractInfo, defaultContractInfo, defaultContractInfoFinished } from './types/ContractInfo';
+import { mockContract } from '../../data/mockContract';
 
 // Define the props type for the component
 type ContractsProps = {
@@ -43,6 +44,7 @@ export const Contracts: React.FC<ContractsProps> = () => {
 
   const countChildrenWithMedicalInfo = useMemo(() => {
     return contractInformation?.children.filter(child => 
+      
       child?.medicalInformation?.healthStatus !== '' &&
       child?.medicalInformation?.healthStatus != null &&
       child?.medicalInformation?.instructions !== '' &&

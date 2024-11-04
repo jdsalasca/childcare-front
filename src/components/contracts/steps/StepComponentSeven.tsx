@@ -1,5 +1,5 @@
 import { LoadingInfo } from '@models/AppModels';
-import { PDFDocument } from 'pdf-lib';
+import { PDFDocument, PDFForm, rgb } from 'pdf-lib';
 import { Card } from 'primereact/card';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -9,6 +9,9 @@ import { ContractInfo, defaultContractInfoFinished, Language } from '../types/Co
 import { FormGob } from '../types/formGob';
 import { ContractPdf } from '../utils/contractPdfUtils';
 import useGenerateContract from '../viewModels/useGenerateContract';
+import { Functions } from '@utils/functions';
+import { ChildMedicalInformation } from 'types/childMedicalInformation';
+import { Guardian } from 'types/guardian';
 
 
 
@@ -52,34 +55,123 @@ const StepComponentSeven: React.FC<StepComponentSevenProps> = ({
       handleDownloadPdf(Language.Spanish)
     }
   }
-
-
-  const onGenerateContractWithGob = async (contractInformation: ContractInfo, language : Language) => {
+  const fillFormFields = (form: PDFForm, contractInformation: ContractInfo) => {
+    try {
+      // Children Information
+      const allChildrenNames = contractInformation.children
+        ?.map(child => `${child.first_name} ${child.last_name}`)
+        .join(', ');
+      const allChildrenBirthDates = contractInformation.children
+        ?.map(child => Functions.formatDateToMMDDYY(child.born_date))
+        .join(', ');
+  
+      // Basic Contract Information
+      form.getTextField('Childrens Name')?.setText(allChildrenNames || '');
+      form.getTextField('Birthdates')?.setText(allChildrenBirthDates || '');
+      form.getTextField('Enrollment Date 1')?.setText(Functions.formatDateToMMDDYY(contractInformation.start_date!) || '');
+      form.getTextField('Date Care Ceased')?.setText(Functions.formatDateToMMDDYY(contractInformation.end_date!) || '');
+  
+      fillGuardianInformation(form, contractInformation.guardians);
+      fillDates(form);
+      fillMedicalInformation(form, contractInformation.children?.[0]?.medicalInformation);
+      form.getTextField('I (name)')?.setText(contractInformation.titularName || '');
+      
+      form.flatten();
+    } catch (error) {
+      customLogger.error('Error filling form fields:', error);
+    }
+  };
+  
+  const fillGuardianInformation = (form: PDFForm, guardians?: Guardian[]) => {
+    const father = guardians?.find(g => g.guardian_type_id === 1);
+    if (father) {
+      form.getTextField('Name 1')?.setText(father.name || '');
+      form.getTextField('Address 1')?.setText(father.address || '');
+      form.getTextField('City 1')?.setText(father.city || '');
+      form.getTextField('Phone 1')?.setText(father.phone || '');
+    }
+  
+    const mother = guardians?.find(g => g.guardian_type_id === 2);
+    if (mother) {
+      form.getTextField('Name_2')?.setText(mother.name || '');
+      form.getTextField('Address_2')?.setText(mother.address || '');
+      form.getTextField('City 2')?.setText(mother.city || '');
+      form.getTextField('Phone_2')?.setText(mother.phone || '');
+    }
+  };
+  
+  const fillDates = (form: PDFForm) => {
+    const currentDate = Functions.formatDateToMMDDYY(new Date());
+    form.getTextField('Consent date')?.setText("              "+currentDate || '');
+    form.getTextField('Signature date')?.setText("                     "+currentDate || '');
+    form.getTextField('Date of Signature of Parent or Guardian for form')?.setText("                                    "+currentDate || '');
+  };
+  
+  const fillMedicalInformation = (form: PDFForm, medInfo?: ChildMedicalInformation) => {
+    if (medInfo) {
+      form.getTextField('Health status')?.setText(medInfo.healthStatus || '');
+      form.getTextField('Allergies')?.setText(medInfo.allergies || '');
+      form.getTextField('Special Concerns')?.setText(medInfo.instructions || '');
+    }
+  };
+  
+  const onGenerateContractWithGob = async (contractInformation: ContractInfo, language: Language) => {
     customLogger.debug('onGenerateContractWithGob');
-    defaultContractInfoFinished
-
+  
+    // Generate initial contract
     const contractWi = await ContractPdf.contractBuilder(contractInformation, language).output("arraybuffer");
-    customLogger.debug('contractWi', contractWi);
     const jsPdfDocument = await PDFDocument.load(contractWi);
-    customLogger.debug('jsPdfDocument', jsPdfDocument);
-    const externalPdfBytes = FormGob.contractVersion1;
-    const externalPdf = await PDFDocument.load(externalPdfBytes);
+    
+    // Load and prepare external form
+    const externalPdf = await PDFDocument.load(FormGob.contractVersion1);
+    const form = externalPdf.getForm();
+      // Get page 3
+  const pages = externalPdf.getPages();
+  const page3 = pages[2]; // 0-based index, so page 3 is at index 2
+  
+  // Prepare the text
+  const allChildrenNames = contractInformation.children
+    ?.map(child => `${child.first_name} ${child.last_name}`)
+    .join(', ');
+  
+  const guardianNames = contractInformation.guardians
+    ?.map(guardian => guardian.name + " " + guardian.last_name)
+    .join(', ');
 
-    const copiedPages = await jsPdfDocument.copyPages(
-      externalPdf,
-      externalPdf.getPageIndices()
-    );
+  // Add text to page 3
+  // You'll need to adjust these coordinates based on your PDF
+  const { width, height } = page3.getSize();
+  
+  // Add children names (adjust x and y coordinates as needed)
+  page3.drawText(allChildrenNames || '', {
+    x: 200, // Adjust this value
+    y: height - 657, // Adjust this value
+    size: 12,
+    color: rgb(0, 0, 0),
+  });
+
+  // Add guardian names (adjust x and y coordinates as needed)
+  page3.drawText(guardianNames || '', {
+    x: 200, // Adjust this value
+    y: height - 697, // Adjust this value
+    size: 12,
+    color: rgb(0, 0, 0),
+  });
+  
+    // Fill form fields
+    fillFormFields(form, contractInformation);
     
-    copiedPages.forEach(page => {
-      jsPdfDocument.addPage(page);
-    });
+    // Merge documents
+    const copiedPages = await jsPdfDocument.copyPages(externalPdf, externalPdf.getPageIndices());
+    copiedPages.forEach(page => jsPdfDocument.addPage(page));
     
+    // Save and return result
     const mergedPdfBytes = await jsPdfDocument.saveAsBase64({ dataUri: true });
-    customLogger.debug('mergedPdfBytes', mergedPdfBytes);
     setReceiptBase64(mergedPdfBytes);
     return jsPdfDocument.save();
   };
 
+  
   const handleDownloadPdf = async (language: Language) => {
     const contractInfo = contractBuilder();
     customLogger.info('language', language);

@@ -29,37 +29,34 @@ const addPageContent = (
   contractInformation?: ContractInfo,
   language?: Language
 ): jsPDF => {
+  if (!contractProcessed[pageName]) {
+    console.warn(`Page name "${pageName}" not found in contractInfo.`);
+    return doc;
+  }
 
-  if (contractProcessed[pageName]) {
-    Object.keys(contractProcessed[pageName]).forEach(key => {
-      const isEditable = key.includes('input') || key.includes('editable');
-      let content = contractProcessed[pageName][key];
-      if (key.startsWith('separator')) {
-        addSeparator(doc, options);
-      } else if (key === 'title' || key === 'subtitle') {
-        addHeader(doc, content, options, key);
-      } else if (key.startsWith('parr')) {
-        addBodyText(doc, content, options, isEditable);
-      } else if (key.startsWith("yPlus")) {
-        options.yPosition += content;
-      } else if (key.startsWith("signSectionEducando")) {
-        addSignSpaces(doc, contractProcessed, options, contractInformation, { showParentName: false, showEducandoName: true },language);
-      } else if (key.startsWith("signSection")) {
-        addSignSpaces(doc, contractProcessed, options, contractInformation,{ showParentName: true, showEducandoName: false },language);
-      }else if (key.startsWith("input")) {
-        addInputField(doc, content, options, contractInformation!);
-      }
-    });
-    options.yPosition = options.initialY;
-    if (createPage) {
+  // Process the page content with child iterations
+  const processedPages = processChildIterations(
+    contractProcessed[pageName],
+    contractInformation?.children || []
+  );
+
+  processedPages.forEach((processedPage, index) => {
+    // Always add a new page for each child iteration except the first one
+    if (index > 0 || (createPage && index === 0)) {
       doc.addPage();
+      options.yPosition = options.initialY;
     }
 
-  } else {
-    console.warn(`Page name "${pageName}" not found in contractInfo.`);
-  }
+    // Process each content item on the page
+    Object.entries(processedPage).forEach(([key, content]) => {
+      processContentItem(doc, key, content, options, contractInformation, language);
+    });
+  });
+
   return doc;
 };
+
+
 const addInputField = (doc: jsPDF, content: string, options: Options, contractInformation: ContractInfo) => {
   const inputValue = contractInformation.weeklyPayment || '';
   doc.setFontSize(12);
@@ -409,7 +406,7 @@ const addFormField = (doc: jsPDF, x: number, y: number, width: number = 50) => {
     // addDateOnContract(doc,startDate,options)
     addPageContent(doc, contractInfo, options, 'page1',false,undefined,language);
     options.yPosition = options.initialY
-    doc.addPage();
+ /*    doc.addPage(); */
   };
 
   // Function to add the header
@@ -433,4 +430,88 @@ const addContractTerms =(doc : jsPDF, contractBase: any, options: Options, langu
 
 
 }
+function processChildIterations(page: PageContent, children: any[]): PageContent[] {
+  // If there's no child iteration content or no children, return original page
+  if (!page.childIteration?.content || !children.length) {
+    return [page];
+  }
 
+  // Create a page for each child
+  return children.map(child => {
+    // Create a deep copy of the page content
+    const processedPage: PageContent = JSON.parse(JSON.stringify({
+      // Copy non-iteration content
+      ...Object.fromEntries(
+        Object.entries(page).filter(([key]) => key !== 'childIteration')
+      ),
+      // Add child iteration content
+      ...page.childIteration.content
+    }));
+
+    // Process all string values to replace child placeholders
+    const processObject = (obj: any) => {
+      Object.entries(obj).forEach(([key, value]) => {
+        if (typeof value === 'string') {
+          obj[key] = value
+            .replace(/{{childName}}/g, `${child.first_name} ${child.last_name}` || '')
+            .replace(/{{childFirstName}}/g, child.first_name || '')
+            .replace(/{{childLastName}}/g, child.last_name || '')
+            .replace(/{{childBornDate}}/g, Functions.formatDateToMMDDYY(child.born_date!) || '')
+            // Add any other child-related placeholders here
+        } else if (typeof value === 'object' && value !== null) {
+          processObject(value);
+        }
+      });
+    };
+
+    processObject(processedPage);
+    return processedPage;
+  });
+}
+// Add these interfaces at the top of the file
+interface IterationMarker {
+  start?: boolean;
+  end?: boolean;
+}
+
+interface PageContent {
+  [key: string]: any;
+  iterateChildren?: IterationMarker;
+}
+
+const processContentItem = (
+  doc: jsPDF,
+  key: string,
+  content: any,
+  options: Options,
+  contractInformation?: ContractInfo,
+  language?: Language
+) => {
+  const isEditable = key.includes('input') || key.includes('editable');
+
+  switch (true) {
+    case key.startsWith('separator'):
+      addSeparator(doc, options);
+      break;
+    case key === 'title' || key === 'subtitle':
+      addHeader(doc, content, options, key);
+      break;
+    case key.startsWith('parr'):
+      addBodyText(doc, content, options, isEditable);
+      break;
+    case key.startsWith('yPlus'):
+      options.yPosition += content;
+      break;
+    case key.startsWith('signSectionEducando'):
+      addSignSpaces(doc, content, options, contractInformation, 
+        { showParentName: false, showEducandoName: true }, language);
+      break;
+    case key.startsWith('signSection'):
+      addSignSpaces(doc, content, options, contractInformation,
+        { showParentName: true, showEducandoName: false }, language);
+      break;
+    case key.startsWith('input'):
+      addInputField(doc, content, options, contractInformation!);
+      break;
+  }
+};

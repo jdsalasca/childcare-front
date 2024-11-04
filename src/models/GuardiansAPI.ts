@@ -59,23 +59,6 @@ const GuardiansAPI = {
 
 class GuardiansModel {
   // Add any properties or methods if needed
-}
-
-class GuardiansFactory {
-  static createGuardiansAllWithTitularStatus(guardians: Guardian[]): Guardian[] {
-    return guardians.map(guardian => ({
-      ...guardian,
-      titular: true,
-    }));
-  }
-
-  static mergeAndCreateWithTitularStatus(targetList: Guardian[], sourceList: Guardian[]): Guardian[] {
-    return targetList.map(guardian => ({
-      ...guardian,
-      titular: sourceList.some(g => g.id === guardian.id && g.titular),
-    }));
-  }
-}
-
-export { GuardiansAPI, GuardiansFactory, GuardiansModel };
+    }
+export { GuardiansAPI, GuardiansModel };
 

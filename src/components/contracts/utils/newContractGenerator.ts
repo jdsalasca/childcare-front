@@ -10,12 +10,12 @@ export const contractInfo = (contractData: ContractInfo= defaultContractInfoFini
   let {weekly_payment} = contractData
   const MOTHER_GUARDIAN_TYPE_ID = 2;
   const GUARDIAN_TYPE_ID = 3;
-
-  const motherEmail =
-    contractData.guardians.find(g => g.guardian_type_id === MOTHER_GUARDIAN_TYPE_ID)?.email || 'No registra';
-  const fatherEmail =
-    contractData.guardians.find(g => g.guardian_type_id === FATHER_GUARDIAN_TYPE_ID)?.email || 'No registra';
-
+const motherEmail =
+contractData.guardians.find(g => g.guardian_type_id === MOTHER_GUARDIAN_TYPE_ID)?.email || 
+(language === Language.English ? 'Not registered' : 'No registra');
+const fatherEmail =
+contractData.guardians.find(g => g.guardian_type_id === FATHER_GUARDIAN_TYPE_ID)?.email || 
+(language === Language.English ? 'Not registered' : 'No registra');
   const schedule = contractData.schedule;
   console.log('schedule', schedule);
   
@@ -134,44 +134,43 @@ export const contractInfo = (contractData: ContractInfo= defaultContractInfoFini
       }
     ,
     
-      "page4": {
-    "parr0": "\n<strong> Información Médica de su niño </strong>",
-        "separator": true,
-        "parr1": "\n<strong>Nombre del niño ____________________________  </strong> . Estado actual de salud de su niño o algo que debamos saber al respecto: _________________________________________________",
-        "parr2.1": "\n¿Está teniendo algún tratamiento? ¿Cuál?: ________________________________________________________",
-        "parr3": "\nTiene alguna alergia y/o intolerancia a alguna comida, picadura de insectos, crema de rozaduras, repelente de insectos, bloqueador solar o cualquier otra cosa que desencadene una reacción alérgica? _________________________________________________",
-        "parr4": "\nFavor de darnos instrucciones claras de cómo ayudar a su niño si se diera el caso: _________________________________________________________________________________",
-        "parr6": "\nYo certifico que la información proporcionada es correcta y basada en mi conocimiento.",
-        "signSection": true,
-        "yPlus": 12,
-        "separator2": true,
-        "parr8": "\nNombre del niño: _______________________________. Estado actual de salud de su niño o algo que debamos saber al respecto: _________________________________________________",
-        "parr9": "\n¿Está teniendo algún tratamiento? ¿Cuál?: ________________________________________________________",
-        "parr10": "\nTiene alguna alergia y/o intolerancia a alguna comida, picadura de insectos, crema de rozaduras, repelente de insectos, bloqueador solar o cualquier otra cosa que desencadene una reacción alérgica?",
-        "parr11": "\nFavor de darnos instrucciones claras de cómo ayudar a su niño si se diera el caso: _________________________________________________________________________________",
-        "parr13": "\nYo certifico que la información proporcionada es correcta y basada en mi conocimiento.",
-        "signSection2": true
-      
+    page4: {
+      parr0: "\n<strong>Información Médica de su niño</strong>",
+      childIteration: {
+        separator: true,
+        start: true,
+        content: {
+          parr1: "\nNombre del niño: {{childName}}. Estado actual de salud de su niño o algo que debamos saber al respecto: _________________________________________________",
+          parr2: "\n¿Está teniendo algún tratamiento? ¿Cuál?: ________________________________________________________",
+          parr3: "\n¿Tiene alguna alergia y/o intolerancia a alguna comida, picadura de insectos, crema de rozaduras, repelente de insectos, bloqueador solar o cualquier otra cosa que desencadene una reacción alérgica? _________________________________________________",
+          parr4: "\nFavor de darnos instrucciones claras de cómo ayudar a su niño si se diera el caso: _________________________________________________________________________________",
+          parr5: "\nYo certifico que la información proporcionada es correcta y basada en mi conocimiento.",
+          signSection: true
+        },
+        end: true
+      }
     },
     
-      "page5": {
-        "parr0": "\n<strong> Fórmula de bebé y horarios de comidas </strong>",
-        "separator": true,
-        "parr1": "\nNombre del niño: __________________________________ Fecha de Nacimiento: ________",
-        "parr2": "\n<strong> Instrucciones </strong>",
-        "parr3": "\no Leche maternal o formula: _____________________________________________________",
-        "parr4": "\no Aproximada horas de comer: ___________   ___________    ___________    _________",
-        "parr5": "\no Máximo tiempo entre botellas: _______________Mínimo (si se diera el caso): _______",
-        "parr6": "\no Cantidad aproximada (onzas): _______________",
-        "parr7": "\no Instrucciones para dar de comer: ___________________________________________________________________________",
-        "parr8": "\no Otra información de comida (cereal, comida de bebe, comida preparada, jugos, etc.) \n_________________________________________________________________________",
-        "parr9": "\no Alergias a alguna comida o alguna comida que no debe comer: ______________________________________________________________________________",
-        "parr10": "\no Sigue el Programa de Comidas de niños y adultos: (póngale un circulo)",
-        "parr11": "\n                  Si                                           No",
-        "signSection2": true
-      
+    page5: {
+      childIteration: {
+        content: {
+          parr0: `\n<strong>Fórmula de bebé y horarios de comidas</strong>`,
+          separator: true,
+          parr1: `\nNombre del niño: {{childName}}                                        Fecha de Nacimiento: {{childBornDate}}`,
+          parr2: `\n<strong>                                                                   Instrucciones</strong>`,
+          parr3: `\no Leche maternal o fórmula: ______________________________________________________________________`,
+          parr4: `\no Horas aproximadas de comer: ________    ________     ________     ________     _______`,
+          parr5: `\no Máximo tiempo entre biberones: _______________ Mínimo (si se diera el caso): _________`,
+          parr6: `\no Cantidad aproximada (onzas): ________________________________`,
+          parr7: `\no Instrucciones para dar de comer: \n __________________________________________________________________________________________________________________________________________________________________________________________________`,
+          parr8: `\no Otra información de comida (cereal, comida de bebé, comida preparada, jugos, etc.): \n___________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________`,
+          parr9: `\no Alergias a alguna comida o alguna comida que no debe comer: \n______________________________________________________________________________________________________________________________________________________`,
+          parr10: `\no Sigue el Programa de Comidas de niños y adultos (póngale un círculo):`,
+          parr11: `\n                  Si                                           No`,
+          signSection: true,
+        }
+      }
     },
-    
       "page6": {
         "parr0": "\n<strong> Permiso para administración de algunos productos </strong>",
         "separator": true,
@@ -390,40 +389,43 @@ page3: {
     parr16: "\n",
     signSectionEducando: true
 },
-
 page4: {
-  parr0: `\n<strong>Your Child’s Medical Information</strong>`,
-  separator: true,
-  parr1: `\nChild’s name: _____________________________________.Your child’s current health status or anything we should know about it:___________________________________________`,
-  parr2: `\nIs he/she under any treatment? Which?: ________________________________________`,
-  parr3: `\nDoes he/she have any allergies and/or intolerance to any food, insect bites, rash cream, insect repellent, sunscreen, or anything else that triggers an allergic reaction?\n ________________________________________________________________________`,
-  parr4: `\nPlease give us clear instructions on how to help your child if the case arises:\n _________________________________________________________________________________________________________________________________________________________________________________________________________________________________`,
-  parr5: `\nI certify that the information provided is correct and based on my knowledge.`,
-  parr6: `\nName: _______________________ Signature: ____________________ Date: ______`,
-  separator2: true,
-  parr7:  `\nChild’s name: _____________________________________.Your child’s current health status or anything we should know about it:___________________________________________`,
-  parr8: `\nIs he/she under any treatment? Which?: ________________________________________`,
-  parr9:  `\nDoes he/she have any allergies and/or intolerance to any food, insect bites, rash cream, insect repellent, sunscreen, or anything else that triggers an allergic reaction?\n ________________________________________________________________________`,
-  parr10: `\nPlease give us clear instructions on how to help your child if the case arises:\n _________________________________________________________________________________________________________________________________________________________________________________________________________________________________`,
- parr11: `\nI certify that the information provided is correct and based on my knowledge.`,
-  parr12: `\nName: _______________________ Signature: ____________________ Date: ______`,
-  signSection: true,
+  parr0: "\n<strong>Medical Information</strong>",
+  childIteration: {
+    separator: true,
+    start: true,
+    content: {
+      parr1: "\nChild's name: {{childName}}. Current health status or anything we should know: _________________________________________________",
+      parr2: "\nIs he/she under any treatment? Which?: ________________________________________________________",
+      parr3: "\nDoes he/she have any allergies and/or intolerance to any food, insect bites, rash cream, insect repellent, sunscreen, or anything else that triggers an allergic reaction? _________________________________________________",
+      parr4: "\nPlease give us clear instructions on how to help your child if the case arises: _________________________________________________________________________________________________________________________________________________________________________________________________________________________________",
+      parr5: "\nI certify that the information provided is correct and based on my knowledge.",
+      signSection: true
+    },
+    end: true
+  }
 },
+
+
 page5: {
-  parr0: `\n<strong>Baby Formula and Meals Time</strong>`,
-  separator: true,
-  parr1: `\nChild’s Name: _______________________________________ Date of Birth: __________`,
-  parr2: `\n<strong>                                                                   Instructions</strong>`,
-  parr3: `\no Breast milk or formula: ______________________________________________________________________`,
-  parr4: `\no Approximate meal times: ________    ________     ________     ________     _______`,
-  parr5: `\no Maximum time between bottles: _______________ Minimum (if applicable): _________`,
-  parr6: `\no Approximate amount (ounces): ________________________________`,
-  parr7: `\no Feeding instructions: \n __________________________________________________________________________________________________________________________________________________________________________________________________`,
-  parr8: `\no Other food information (cereal, baby food, prepared food, juices, etc.): \n___________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________`,
-  parr9: `\no Allergies to any food or anything that the baby should not eat: \n______________________________________________________________________________________________________________________________________________________`,
-  parr10: `\no Follow the Food Program for children and adults (circle):`,
-  parr11: `\n                  Yes        No`,
-  signSection: true,
+  childIteration: {
+    content: {
+      parr0: `\n<strong>Baby Formula and Meals Time</strong>`,
+      separator: true,
+      parr1: `\nChild's Name: {{childName}}                                        Date of Birth: {{childBornDate}}`,
+      parr2: `\n<strong>                                                                   Instructions</strong>`,
+      parr3: `\no Breast milk or formula: ______________________________________________________________________`,
+      parr4: `\no Approximate meal times: ________    ________     ________     ________     _______`,
+      parr5: `\no Maximum time between bottles: _______________ Minimum (if applicable): _________`,
+      parr6: `\no Approximate amount (ounces): ________________________________`,
+      parr7: `\no Feeding instructions: \n __________________________________________________________________________________________________________________________________________________________________________________________________`,
+      parr8: `\no Other food information (cereal, baby food, prepared food, juices, etc.): \n___________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________`,
+      parr9: `\no Allergies to any food or anything that the baby should not eat: \n______________________________________________________________________________________________________________________________________________________`,
+      parr10: `\no Follow the Food Program for children and adults (circle):`,
+      parr11: `\n                  Yes        No`,
+      signSection: true,
+    }
+  }
 }
 ,
     page6: {
@@ -591,4 +593,10 @@ page19: {
   const contract = language === Language.English ? contractEnglish : contractSpanish;
 
   return contract;
+}
+interface ChildIterationMarkers {
+  iterateChildren?: {
+    start: boolean;
+    end: boolean;
+  }
 }
