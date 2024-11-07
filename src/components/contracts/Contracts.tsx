@@ -62,7 +62,7 @@ export const Contracts: React.FC<ContractsProps> = () => {
         return (ContractPermissionsValidator.getValidContractPermissions(contractInformation.terms) > 1) ? 'step-valid' : 'step-invalid';
       case 3:
         const { total_to_pay, payment_method_id, start_date, end_date } = contractInformation;
-        const isStep3Valid = (total_to_pay && payment_method_id && start_date && end_date) && start_date < end_date;
+        const isStep3Valid = (total_to_pay && payment_method_id && start_date);
         return isStep3Valid ? 'step-valid' : 'step-invalid';
       case 4:
         return validateSchedule(contractInformation?.schedule, daysCache) ? 'step-valid' : 'step-invalid';

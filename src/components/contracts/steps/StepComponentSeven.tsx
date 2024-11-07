@@ -219,22 +219,6 @@ const StepComponentSeven: React.FC<StepComponentSevenProps> = ({
         detail: t('startDateRequired'),
         life: 3000,
       });
-    } else if (!end_date) {
-      setErrorMessage(t('endDateRequired'));
-      toast.current.show({
-        severity: 'info',
-        summary: t('ups'),
-        detail: t('endDateRequired'),
-        life: 3000,
-      });
-    } else if (new Date(start_date) >= new Date(end_date)) {
-      setErrorMessage(t('endDateAfterStartDate'));
-      toast.current.show({
-        severity: 'info',
-        summary: t('ups'),
-        detail: t('endDateAfterStartDate'),
-        life: 3000,
-      });
     } else {
       setErrorMessage(null);
       onGenerateContractWithGob(contractInfo, language);
