@@ -116,13 +116,13 @@ export const StepComponentTwo: FC<StepComponentTwoProps> = ({
             <InputTextWrapper
               name={`guardians[${index}].telephone`}
               control={control}
-              rules={{
+             /*  rules={{
                 required: t('telephoneRequired'),
                 pattern: {
                   value: /^[0-9+()-]*$/,
                   message: t('phoneNumberPattern'),
                 },
-              }}
+              }} */
               label={t('telephone')}
               keyFilter={/^[0-9+()-]*$/}
               spanClassName='c-small-field r-m-10'

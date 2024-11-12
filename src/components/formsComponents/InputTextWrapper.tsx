@@ -14,6 +14,7 @@ interface InputTextWrapperProps {
   placeholder?: string;
   onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void; // Updated type
   readOnly?: boolean;
+  className?: string;
   spanClassName?: string;
   [key: string]: any; // For the rest prop
 }
@@ -32,6 +33,7 @@ const InputTextWrapper: React.FC<InputTextWrapperProps> = ({
   onChangeCustom,
   placeholder,
   spanClassName = '',
+  className = '',
   ...rest
 }) => {
   return (
@@ -51,7 +53,7 @@ const InputTextWrapper: React.FC<InputTextWrapperProps> = ({
               }
               field.onBlur(); // Ensure react-hook-form's onBlur is called
             }}
-            className={classNames({ 'p-invalid': error })}
+            className={classNames({ 'p-invalid': error }) + ' ' + className}
             disabled={disabled}
             readOnly={readOnly}
             keyfilter={keyFilter}

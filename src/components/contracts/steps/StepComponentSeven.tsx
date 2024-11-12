@@ -12,6 +12,7 @@ import useGenerateContract from '../viewModels/useGenerateContract';
 import { Functions } from '@utils/functions';
 import { ChildMedicalInformation } from 'types/childMedicalInformation';
 import { Guardian } from 'types/guardian';
+import { MedicalInformation } from 'types/child';
 
 
 
@@ -107,7 +108,7 @@ const StepComponentSeven: React.FC<StepComponentSevenProps> = ({
     form.getTextField('Date of Signature of Parent or Guardian for form')?.setText("                                    "+currentDate || '');
   };
   
-  const fillMedicalInformation = (form: PDFForm, medInfo?: ChildMedicalInformation) => {
+  const fillMedicalInformation = (form: PDFForm, medInfo?: MedicalInformation) => {
     if (medInfo) {
       form.getTextField('Health status')?.setText(medInfo.healthStatus || '');
       form.getTextField('Allergies')?.setText(medInfo.allergies || '');

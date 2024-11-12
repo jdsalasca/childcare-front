@@ -3,23 +3,17 @@ import { classNames } from 'primereact/utils';
 import { Control, Controller, RegisterOptions } from 'react-hook-form';
 
 interface CheckboxWrapperProps {
-  name: string; // Name of the checkbox field in the form (required)
-  control: Control<any>; // Control object from react-hook-form (required)
-  rules?: RegisterOptions; // Validation rules for the checkbox field (optional)
-  label: string; // Label text for the checkbox field (required)
-  disabled?: boolean; // Whether the checkbox is disabled (optional)
-  labelClassName?: string; // Optional CSS class for the label
-  spanClassName?: string; // Optional CSS class for the span wrapper
-  labelPosition?: 'left' | 'right'; // Position of the label (default is 'right')
-  [key: string]: any; // Additional props for the Checkbox component
+  name: string;
+  control: Control<any>;
+  rules?: RegisterOptions;
+  label: string;
+  disabled?: boolean;
+  labelClassName?: string;
+  spanClassName?: string;
+  labelPosition?: 'left' | 'right';
+  [key: string]: any;
 }
 
-/**
- * Reusable Checkbox wrapper for react-hook-form with customizable label position.
- *
- * @param {CheckboxWrapperProps} props - Component props.
- * @returns {React.Element} The rendered CheckboxWrapper component.
- */
 const CheckboxWrapper: React.FC<CheckboxWrapperProps> = ({
   name,
   control,
@@ -37,8 +31,13 @@ const CheckboxWrapper: React.FC<CheckboxWrapperProps> = ({
       control={control}
       rules={rules}
       render={({ field, fieldState: { error } }) => (
-        <span className={`p-float-label ${spanClassName} c-checkbox ${labelPosition === 'left' ? 'label-left' : 'label-right'}`}>
-          {labelPosition === 'left' && <p className={labelClassName}>{label}</p>}
+        <span
+          className={`inline-flex items-center max-w-5 break-words ${spanClassName} ${labelPosition === 'left' ? 'flex-row' : 'flex-row-reverse'}`}
+          style={{ maxWidth: '15rem', wordBreak: 'break-word', overflowWrap: 'break-word', width: '100%' }} // Added max-width style
+        >
+          {labelPosition === 'left' && (
+            <p className={`mr-auto ${labelClassName}`}>{label}</p> // Use mr-auto for left alignment
+          )}
           <Checkbox
             id={name}
             {...field}
@@ -48,7 +47,20 @@ const CheckboxWrapper: React.FC<CheckboxWrapperProps> = ({
             onChange={(e) => field.onChange(e.checked)}
             {...rest}
           />
-          {labelPosition === 'right' && <p className={labelClassName} >{label}</p>}
+      {labelPosition === 'right' && (
+    <p 
+      className={`ml-2 break-all whitespace-normal ${labelClassName}`}
+      style={{ 
+        flexGrow: 1,    // Add this
+        flexShrink: 1,  // Add this
+        minWidth: 0,    // Add this - important for flex items
+        wordBreak: 'break-word',
+        overflowWrap: 'break-word'
+      }}
+    >
+      {label}
+            </p>
+          )}
           {error && <small className="p-error">{error.message}</small>}
         </span>
       )}

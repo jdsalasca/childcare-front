@@ -18,7 +18,38 @@ export interface ChildType {
     status: string;
     created_at?: string; // ISO date string
     updated_at?: string; // ISO date string
-    medicalInformation?: ChildMedicalInformation;
+    medicalInformation?: MedicalInformation;
+  formulaInformation?: FormulaInformation;
+  permissionsInformation?: PermissionsInformation;
+  }
+
+  export interface MedicalInformation {
+    healthStatus: string;
+    treatment: string;
+    allergies: string;
+    instructions: string;
+  }
+  
+  export interface FormulaInformation {
+    formula: string;
+    feedingTimes: string[];
+    maxBottleTime: string;
+    minBottleTime: string;
+    bottleAmount: string;
+    feedingInstructions: string;
+    otherFood: string;
+    foodAllergies: string;
+    followMealProgram: boolean | null;
+  }
+  
+  export interface PermissionsInformation {
+    soap: boolean;
+    sanitizer: boolean;
+    rashCream: boolean;
+    teethingMedicine: boolean;
+    sunscreen: boolean;
+    insectRepellent: boolean;
+    other: string;
   }
   
   
@@ -46,11 +77,12 @@ export const defaultChildMedical:ChildType = {
     status: "Active",
     classroom: null,
     medicalInformation: {
-      childName: '',
       healthStatus: '',
       treatment: '',
       allergies: '',
       instructions: '',
+    },
+    formulaInformation: {
       formula: '',
       feedingTimes: ['', '', '', ''],
       maxBottleTime: '',
@@ -60,17 +92,17 @@ export const defaultChildMedical:ChildType = {
       otherFood: '',
       foodAllergies: '',
       followMealProgram: null,
-      permissions: {
-        soap: false,
+    },
+    permissionsInformation  : {
+      soap: false,
         sanitizer: false,
         rashCream: false,
         teethingMedicine: false,
-        sunscreen: false,
-        insectRepellent: false,
-        other: ''
-      }
+      sunscreen: false,
+      insectRepellent: false,
+      other: ''
     }
-  };
+    }
 
 
 

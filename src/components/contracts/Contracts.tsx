@@ -18,6 +18,10 @@ import Loader from '../utils/Loader';
 import StepComponentFive from './steps/StepComponentFive';
 import { contractDone, ContractInfo, defaultContractInfo, defaultContractInfoFinished } from './types/ContractInfo';
 import { mockContract } from '../../data/mockContract';
+import StepComponentSix from './steps/StepComponentSix';
+import { MedicalInformationForm } from './steps/medical/MedicalInformationForm';
+import { FormulaInformationForm } from './steps/medical/FormulaInformationForm';
+import { PermissionsInformationForm } from './steps/medical/PermissionsInformationForm';
 
 // Define the props type for the component
 type ContractsProps = {
@@ -52,6 +56,20 @@ export const Contracts: React.FC<ContractsProps> = () => {
     ).length;
   }, [contractInformation]);
 
+  const countChildrenWithFormulaInfo = useMemo(() => {
+    return contractInformation?.children.filter(child => 
+      child?.formulaInformation?.formula !== '' &&
+      child?.formulaInformation?.formula != null
+    ).length;
+  }, [contractInformation]);
+
+  const countChildrenWithPermissionsInfo = useMemo(() => {
+    return contractInformation?.children.filter(child => 
+      child?.permissionsInformation?.insectRepellent !== false &&
+      child?.permissionsInformation?.insectRepellent != null
+    ).length;
+  }, [contractInformation]);
+
   const getStepClass = useCallback((stepIndex: number) => {
     switch (stepIndex) {
       case 0:
@@ -67,13 +85,17 @@ export const Contracts: React.FC<ContractsProps> = () => {
       case 4:
         return validateSchedule(contractInformation?.schedule, daysCache) ? 'step-valid' : 'step-invalid';
       case 5:
-        return countChildrenWithMedicalInfo === contractInformation.children.length ? 'step-default block' : 'step-default block';
+        return countChildrenWithMedicalInfo === contractInformation.children.length ? 'step-valid' : 'step-invalid';
       case 6:
-        return validateSchedule(contractInformation?.schedule, daysCache) ? 'step-valid' : 'step-default';
+        return countChildrenWithFormulaInfo === contractInformation.children.length ? 'step-valid' : 'step-invalid';
+      case 7:
+        return countChildrenWithPermissionsInfo === contractInformation.children.length ? 'step-valid' : 'step-invalid';
+      case 8:
+        return validateSchedule(contractInformation?.schedule, daysCache) ? 'step-valid' : 'step-invalid';
       default:
         return 'step-default';
     }
-  }, [contractInformation, daysCache, countChildrenWithMedicalInfo]);
+  }, [contractInformation, daysCache, countChildrenWithMedicalInfo, countChildrenWithFormulaInfo, countChildrenWithPermissionsInfo]);
 
   const items = useMemo(() => [
     {
@@ -99,12 +121,24 @@ export const Contracts: React.FC<ContractsProps> = () => {
     {
       label: `${t('medicalInformation')} (${countChildrenWithMedicalInfo}/${contractInformation.children.length})`,
       command: () => setActiveIndex(5),
-      disabled: contractInformation.children.length === 0,
+      /* disabled: contractInformation.children.length === 0, */
+    },
+    {
+      label: `${t('formulaInformation')} (${countChildrenWithMedicalInfo}/${contractInformation.children.length})`,
+      command: () => setActiveIndex(6),
+      /* disabled: contractInformation.children.length === 0, */
+    },
+    {
+      label: `${t('permissionsInformation')}(${countChildrenWithMedicalInfo}/${contractInformation.children.length})`,
+      command: () => setActiveIndex(7),
+      /* disabled: contractInformation.children.length === 0, */
     },
     {
       label: t('contractGenerator'),
-      command: () => setActiveIndex(6),
+      command: () => setActiveIndex(8),
     },
+   
+  
   ], [contractInformation, t, countChildrenWithMedicalInfo, getAcceptedPermissionsCount]);
 
   const renderContent = useMemo(() => {
@@ -120,8 +154,12 @@ export const Contracts: React.FC<ContractsProps> = () => {
       case 4:
         return <StepComponentFive setLoadingInfo={setLoadingInfo} toast={toast} setActiveIndex={setActiveIndex} contractInformation={contractInformation} setContractInformation={setContractInformation} />;
       case 5:
-        // return <StepComponentSix setLoadingInfo={setLoadingInfo} toast={toast} setActiveIndex={setActiveIndex} contractInformation={contractInformation} setContractInformation={setContractInformation} />;
+         return <MedicalInformationForm setLoadingInfo={setLoadingInfo} toast={toast} setActiveIndex={setActiveIndex} contractInformation={contractInformation} setContractInformation={setContractInformation} />;
       case 6:
+        return <FormulaInformationForm setLoadingInfo={setLoadingInfo} toast={toast} setActiveIndex={setActiveIndex} contractInformation={contractInformation} setContractInformation={setContractInformation} />;
+      case 7:
+        return <PermissionsInformationForm setLoadingInfo={setLoadingInfo} toast={toast} setActiveIndex={setActiveIndex} contractInformation={contractInformation} setContractInformation={setContractInformation} />;
+      case 8:
         return <StepComponentSeven setLoadingInfo={setLoadingInfo} toast={toast} setActiveIndex={setActiveIndex} contractInformation={contractInformation} setContractInformation={setContractInformation} />;
       default:
         return null;
@@ -132,16 +170,25 @@ export const Contracts: React.FC<ContractsProps> = () => {
     <>
       <Toast ref={toast} />
       {loadingInfo.loading && <Loader message={loadingInfo.loadingMessage} />}
-      <Steps
-        model={items.map((item, index) => ({
-          ...item,
-          className: getStepClass(index),
-        }))}
-        className='c-steps-component'
-        activeIndex={activeIndex}
-        readOnly={false}
-        onSelect={(e) => setActiveIndex(e.index)}
-      />
+      <div className="steps-wrapper my-2 px-2">
+        <Steps
+          model={items.map((item, index) => ({
+            ...item,
+            className: `${getStepClass(index)} whitespace-nowrap text-xs`, // Added text-xs
+          }))}
+          className="c-steps-component overflow-x-auto"
+          activeIndex={activeIndex}
+          readOnly={false}
+          onSelect={(e) => setActiveIndex(e.index)}
+          pt={{
+            root: { className: 'border-none' },
+            step: { className: 'min-w-[120px] px-1' }, // Reduced min-width and padding
+            action: { className: 'p-1' }, // Reduced padding
+            label: { className: 'text-xs mt-1' }, // Smaller text size
+            //number: { className: 'text-xs w-5 h-5 leading-5' }, // Smaller number size
+          }}
+        />
+      </div>
       {renderContent}
     </>
   );

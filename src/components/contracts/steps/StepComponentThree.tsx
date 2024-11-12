@@ -75,16 +75,17 @@ const StepComponentThree: React.FC<StepComponentThreeProps> = ({
 
   return (
     <div className='form-container'>
-      <form onSubmit={handleSubmit(onSubmit)}>
+     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 pl-20">
         {ContractModel.CONTRACT_PERMISSIONS.map((term) => (
-          <CheckboxWrapper
-            key={term}
-            name={`terms.${term}`}
-            control={control}
-            label={t(term)}
-            labelClassName='c-label-checkbox right'
-            labelPosition='right'
-          />
+          <div key={term} className="flex w-full">
+            <CheckboxWrapper
+              name={`terms.${term}`}
+              control={control}
+              label={t(term)}
+              labelClassName='c-label-checkbox right '
+              labelPosition='right'
+            />
+          </div>
         ))}
         <div className='button-group'>
           <Button

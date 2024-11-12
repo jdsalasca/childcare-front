@@ -34,6 +34,7 @@ const addPageContent = (
     return doc;
   }
 
+
   // Process the page content with child iterations
   const processedPages = processChildIterations(
     contractProcessed[pageName],
@@ -260,14 +261,27 @@ const renderFormattedLine = (doc : jsPDF, line: string, options: Options, center
         // Center text alignment
         centerText = true;
         break;
-      case '\u2610': // Unicode for checkbox empty
-      case '\u2611': // Unicode for checkbox checked
-        if (centerText) {
-          doc.text(token, options.pageWidth / 2, yPos, { align: "center" });
-        } else {
-          doc.text(token, xPos, yPos);
-          xPos += doc.getTextWidth(token);
-        }
+        case '✓':
+          case '✗':
+          case '○':
+          case '●':
+          case '□':
+          case '■':
+          case '★':
+          case '♥':
+          case '→':
+          case '•':
+            // Temporarily switch to Helvetica for unicode characters
+            const currentFont = doc.getFont();
+            doc.setFont("Helvetica", "normal");
+            if (centerText) {
+              doc.text(token, options.pageWidth / 2, yPos, { align: "center" });
+            } else {
+              doc.text(token, xPos, yPos);
+              xPos += doc.getTextWidth(token);
+            }
+            // Switch back to previous font
+        doc.setFont(currentFont.fontName, currentFont.fontStyle);
         break;
       default:
         // Default text handling
@@ -305,10 +319,14 @@ export class ContractPdf {
   static contractBuilder = (contractInformation: ContractInfo = defaultContractInfoFinished, language:Language = Language.English) => {
     const contractBase = contractInfo(contractInformation,language);
     const doc = new jsPDF({
+      
       filters: ["ASCIIHexEncode"],
       format: 'letter',
       putOnlyUsedFonts: true,
-      floatPrecision:16
+      floatPrecision:16,
+      hotfixes:["px_scaling"],
+
+      
     });
     const form = doc.AcroForm;
    
@@ -350,6 +368,9 @@ export class ContractPdf {
     addPageContent(doc, contractBase, options, 'page2', true, contractInformation, language);
     addPageContent(doc, contractBase, options, 'page3',true,contractInformation,language);
     addPageContent(doc, contractBase, options, 'page4',true,contractInformation,language);
+    (doc as any).internal.unicode = true;
+    doc.setFont("Helvetica", "normal"); // This font supports basic unicode
+
     addPageContent(doc, contractBase, options, 'page5',true,contractInformation,language);
     addPageContent(doc, contractBase, options, 'page6',true,contractInformation,language);
     addPageContent(doc, contractBase, options, 'page7',true,contractInformation,language);
@@ -409,15 +430,7 @@ const addFormField = (doc: jsPDF, x: number, y: number, width: number = 50) => {
  /*    doc.addPage(); */
   };
 
-  // Function to add the header
-const addDateOnContract = (doc : jsPDF, text: string, options: Options) => {
-  doc.setFontSize(12); // Larger font size for header
-  doc.setFont("Arial", "bold");
-  doc.text(text, (options.pageWidth / 2) +50, options.yPosition, { align: "center" });
-  doc.setFont("Arial", "normal");
-  doc.setFontSize(12); // Larger font size for header
-  options.yPosition += 10; // Adjust the line height as needed
-};
+ 
 
 const addContractTerms =(doc : jsPDF, contractBase: any, options: Options, language : Language) => {
   addPageContent(doc, contractBase, options, 'page13',true,undefined, language );
@@ -450,6 +463,13 @@ function processChildIterations(page: PageContent, children: any[]): PageContent
 
     // Process all string values to replace child placeholders
     const processObject = (obj: any) => {
+      const icons = {
+        check: 'X',
+        circle: 'O',
+        // Add more icons as needed
+      };
+    
+      
       Object.entries(obj).forEach(([key, value]) => {
         if (typeof value === 'string') {
           obj[key] = value
@@ -457,6 +477,32 @@ function processChildIterations(page: PageContent, children: any[]): PageContent
             .replace(/{{childFirstName}}/g, child.first_name || '')
             .replace(/{{childLastName}}/g, child.last_name || '')
             .replace(/{{childBornDate}}/g, Functions.formatDateToMMDDYY(child.born_date!) || '')
+            .replace('{{healthStatus}}', child.medicalInformation?.healthStatus || '_________________________________________________')
+            .replace('{{treatment}}', child.medicalInformation?.treatment || '________________________________________________________')
+            .replace('{{allergies}}', child.medicalInformation?.allergies || '_________________________________________________')
+            .replace('{{instructions}}', child.medicalInformation?.instructions || '_________________________________________________________________________________________________________________________________________________________________________________________________________________________________')
+         // Add formula information placeholders
+         .replace('{{formula}}', child.formulaInformation?.formula || '______________________________________________________________________')
+         .replace('{{feedingTimes}}', (child.formulaInformation?.feedingTimes || ['________', '________', '________', '________', '_______']).join('    '))
+         .replace('{{maxBottleTime}}', child.formulaInformation?.maxBottleTime || '_______________')
+         .replace('{{minBottleTime}}', child.formulaInformation?.minBottleTime || '_________')
+         .replace('{{bottleAmount}}', child.formulaInformation?.bottleAmount || '________________________________')
+         .replace('{{feedingInstructions}}', child.formulaInformation?.feedingInstructions || '__________________________________________________________________________________________________________________________________________________________________________________________________')
+         .replace('{{otherFood}}', child.formulaInformation?.otherFood || '___________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________')
+         .replace('{{foodAllergies}}', child.formulaInformation?.foodAllergies || '______________________________________________________________________________________________________________________________________________________')
+         // Follow meal program with unicode support
+         .replace('{{followMealProgramYes}}', child.formulaInformation?.followMealProgram ? icons.check : '')
+         .replace('{{followMealProgramNo}}', child.formulaInformation?.followMealProgram ? '' : icons.circle)
+         .replace('{{soap}}', child.permissionsInformation?.soap ? icons.check : icons.circle)
+         .replace('{{sanitizer}}', child.permissionsInformation?.sanitizer ? icons.check : icons.circle)
+         .replace('{{rashCream}}', child.permissionsInformation?.rashCream ? icons.check : icons.circle)
+         .replace('{{teethingMedicine}}', child.permissionsInformation?.teethingMedicine ? icons.check : icons.circle)
+         .replace('{{sunscreen}}', child.permissionsInformation?.sunscreen ? icons.check : icons.circle)
+         .replace('{{insectRepellent}}', child.permissionsInformation?.insectRepellent ? icons.check : icons.circle)
+         .replace('{{other}}', child.permissionsInformation?.other || '______________________________________________________________________________________________________________________________________________________');
+
+         
+  
             // Add any other child-related placeholders here
         } else if (typeof value === 'object' && value !== null) {
           processObject(value);

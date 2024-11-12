@@ -4,6 +4,7 @@ import { MICR_NORMAL } from './micrenc';
 import { VT_323_REGULAR } from './vt323';
 
 export const addFonts = (doc : jsPDF = new jsPDF()): void => {
+    
     // Register fonts in VFS
     doc.addFileToVFS('ArialNormal.ttf', ARIAL_NORMAL);
     doc.addFont('ArialNormal.ttf', 'Arial', 'normal');

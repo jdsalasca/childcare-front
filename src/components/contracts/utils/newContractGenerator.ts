@@ -140,10 +140,10 @@ contractData.guardians.find(g => g.guardian_type_id === FATHER_GUARDIAN_TYPE_ID)
         separator: true,
         start: true,
         content: {
-          parr1: "\nNombre del niño: {{childName}}. Estado actual de salud de su niño o algo que debamos saber al respecto: _________________________________________________",
-          parr2: "\n¿Está teniendo algún tratamiento? ¿Cuál?: ________________________________________________________",
-          parr3: "\n¿Tiene alguna alergia y/o intolerancia a alguna comida, picadura de insectos, crema de rozaduras, repelente de insectos, bloqueador solar o cualquier otra cosa que desencadene una reacción alérgica? _________________________________________________",
-          parr4: "\nFavor de darnos instrucciones claras de cómo ayudar a su niño si se diera el caso: _________________________________________________________________________________",
+          parr1: "\nNombre del niño: {{childName}}. Estado actual de salud de su niño o algo que debamos saber al respecto: {{healthStatus}}",
+          parr2: "\n¿Está teniendo algún tratamiento? ¿Cuál?: {{treatment}}",
+          parr3: "\n¿Tiene alguna alergia y/o intolerancia a alguna comida, picadura de insectos, crema de rozaduras, repelente de insectos, bloqueador solar o cualquier otra cosa que desencadene una reacción alérgica? {{allergies}}",
+          parr4: "\nFavor de darnos instrucciones claras de cómo ayudar a su niño si se diera el caso: {{instructions}}",
           parr5: "\nYo certifico que la información proporcionada es correcta y basada en mi conocimiento.",
           signSection: true
         },
@@ -158,33 +158,38 @@ contractData.guardians.find(g => g.guardian_type_id === FATHER_GUARDIAN_TYPE_ID)
           separator: true,
           parr1: `\nNombre del niño: {{childName}}                                        Fecha de Nacimiento: {{childBornDate}}`,
           parr2: `\n<strong>                                                                   Instrucciones</strong>`,
-          parr3: `\no Leche maternal o fórmula: ______________________________________________________________________`,
-          parr4: `\no Horas aproximadas de comer: ________    ________     ________     ________     _______`,
-          parr5: `\no Máximo tiempo entre biberones: _______________ Mínimo (si se diera el caso): _________`,
-          parr6: `\no Cantidad aproximada (onzas): ________________________________`,
-          parr7: `\no Instrucciones para dar de comer: \n __________________________________________________________________________________________________________________________________________________________________________________________________`,
-          parr8: `\no Otra información de comida (cereal, comida de bebé, comida preparada, jugos, etc.): \n___________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________`,
-          parr9: `\no Alergias a alguna comida o alguna comida que no debe comer: \n______________________________________________________________________________________________________________________________________________________`,
+          parr3: `\no Leche maternal o fórmula: {{formula}}`,
+          parr4: `\no Horas aproximadas de comer: {{feedingTimes}}`,
+          parr5: `\no Máximo tiempo entre biberones: {{maxBottleTime}} Mínimo (si se diera el caso): {{minBottleTime}}`,
+          parr6: `\no Cantidad aproximada (onzas): {{bottleAmount}}`,
+          parr7: `\no Instrucciones para dar de comer: \n{{feedingInstructions}}`,
+          parr8: `\no Otra información de comida (cereal, comida de bebé, comida preparada, jugos, etc.): \n{{otherFood}}`,
+          parr9: `\no Alergias a alguna comida o alguna comida que no debe comer: \n{{foodAllergies}}`,
           parr10: `\no Sigue el Programa de Comidas de niños y adultos (póngale un círculo):`,
-          parr11: `\n                  Si                                           No`,
+          parr11: `\n                  {{followMealProgramYes}} Si                                           {{followMealProgramNo}} No`,
           signSection: true,
         }
       }
     },
-      "page6": {
-        "parr0": "\n<strong> Permiso para administración de algunos productos </strong>",
-        "separator": true,
-        "parr1": "\nDoy mi permiso a Educando Childcare de administrar a mi hijo(a) lo siguiente:",
-        "parr2": "\n(Marcar con un check o palomita)",
-        "parr3": "\no Jabón de manos líquido o en barra",
-        "parr4": "\no Sanitizador de manos",
-        "parr5": "\no Crema para rozaduras",
-        "parr6": "\no Medicamento para denticion",
-        "parr7": "\no Protector solar",
-        "parr8": "\no Repelente de insectos",
-        "parr9": "\no Otros: ________________________________",
-        "signSection2": true
-      },
+    page6: {
+      childIteration: {
+        content: {
+          parr0: '\n<strong>Permiso para administración de algunos productos</strong>',
+          separator: true,
+          parr1: '\nNombre del niño: {{childName}}',
+          parr2: '\nDoy mi permiso a Educando Childcare de administrar a mi hijo(a) lo siguiente:',
+          parr3: '\n(Marcar con un check o palomita)',
+          parr4: '\no Jabón de manos líquido o en barra {{soap}}',
+          parr5: '\no Sanitizador de manos {{sanitizer}}',
+          parr6: '\no Crema para rozaduras {{rashCream}}',
+          parr7: '\no Medicamento para denticion {{teethingMedicine}}',
+          parr8: '\no Protector solar {{sunscreen}}',
+          parr9: '\no Repelente de insectos {{insectRepellent}}',
+          parr10: '\no Otros: ________________________________',
+          signSection: true
+        }
+      }
+    },
     
   
         "page7": {
@@ -395,10 +400,10 @@ page4: {
     separator: true,
     start: true,
     content: {
-      parr1: "\nChild's name: {{childName}}. Current health status or anything we should know: _________________________________________________",
-      parr2: "\nIs he/she under any treatment? Which?: ________________________________________________________",
-      parr3: "\nDoes he/she have any allergies and/or intolerance to any food, insect bites, rash cream, insect repellent, sunscreen, or anything else that triggers an allergic reaction? _________________________________________________",
-      parr4: "\nPlease give us clear instructions on how to help your child if the case arises: _________________________________________________________________________________________________________________________________________________________________________________________________________________________________",
+      parr1: "\nChild's name: {{childName}}. Current health status or anything we should know: {{healthStatus}}",
+      parr2: "\nIs he/she under any treatment? Which?: {{treatment}}",
+      parr3: "\nDoes he/she have any allergies and/or intolerance to any food, insect bites, rash cream, insect repellent, sunscreen, or anything else that triggers an allergic reaction? {{allergies}}",
+      parr4: "\nPlease give us clear instructions on how to help your child if the case arises: {{instructions}}",
       parr5: "\nI certify that the information provided is correct and based on my knowledge.",
       signSection: true
     },
@@ -414,35 +419,39 @@ page5: {
       separator: true,
       parr1: `\nChild's Name: {{childName}}                                        Date of Birth: {{childBornDate}}`,
       parr2: `\n<strong>                                                                   Instructions</strong>`,
-      parr3: `\no Breast milk or formula: ______________________________________________________________________`,
-      parr4: `\no Approximate meal times: ________    ________     ________     ________     _______`,
-      parr5: `\no Maximum time between bottles: _______________ Minimum (if applicable): _________`,
-      parr6: `\no Approximate amount (ounces): ________________________________`,
-      parr7: `\no Feeding instructions: \n __________________________________________________________________________________________________________________________________________________________________________________________________`,
-      parr8: `\no Other food information (cereal, baby food, prepared food, juices, etc.): \n___________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________`,
-      parr9: `\no Allergies to any food or anything that the baby should not eat: \n______________________________________________________________________________________________________________________________________________________`,
+      parr3: `\no Breast milk or formula: {{formula}}`,
+      parr4: `\no Approximate meal times: {{feedingTimes}}`,
+      parr5: `\no Maximum time between bottles: {{maxBottleTime}} Minimum (if applicable): {{minBottleTime}}`,
+      parr6: `\no Approximate amount (ounces): {{bottleAmount}}`,
+      parr7: `\no Feeding instructions: \n{{feedingInstructions}}`,
+      parr8: `\no Other food information (cereal, baby food, prepared food, juices, etc.): \n{{otherFood}}`,
+      parr9: `\no Allergies to any food or anything that the baby should not eat: \n{{foodAllergies}}`,
       parr10: `\no Follow the Food Program for children and adults (circle):`,
-      parr11: `\n                  Yes        No`,
-      signSection: true,
+      parr11: `\n                  {{followMealProgramYes}} Yes        {{followMealProgramNo}} No`,
+signSection: true,
     }
   }
 }
 ,
-    page6: {
-      parr0:
-        '\n<strong> Permission for Administration of Certain Products </strong>',
+page6: {
+  childIteration: {
+    content: {
+      parr0: '\n<strong>Permission for Administration of Certain Products</strong>',
       separator: true,
-      parr1:
-        '\nI give my permission to Educando Childcare to administer the following to my child: (mark or with a check or check mark)',
-      parr3: '\no Liquid or bar hand soap',
-      parr4: '\no Hand sanitizer',
-      parr5: '\no Chafing cream',
-      parr6: '\no Teething medication',
-      parr7: '\no Sunscreen',
-      parr8: '\no Insect repellent',
-      parr9: '\no Others: ________________________________',
-      signSection2: true
-    },
+      parr1: '\nChild\'s name: {{childName}}',
+      parr2: '\nI give my permission to Educando Childcare to administer the following to my child:',
+      parr3: '\n(Mark with a check)',
+      parr4: '\no Liquid or bar hand soap {{soap}}',
+      parr5: '\no Hand sanitizer {{sanitizer}}',
+      parr6: '\no Chafing cream {{rashCream}}',
+      parr7: '\no Teething medication {{teethingMedicine}}',
+      parr8: '\no Sunscreen {{sunscreen}}',
+      parr9: '\no Insect repellent {{insectRepellent}}',
+      parr10: '\no Others: ________________________________',
+      signSection: true
+    }
+  }
+},
     page7: {
       parr0: '\n<strong>Transportation Agreement</strong>',
       separator: true,

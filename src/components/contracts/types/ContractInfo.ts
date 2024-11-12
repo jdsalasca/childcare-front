@@ -1,6 +1,25 @@
 import { ChildType } from "types/child";
 import { Guardian } from "types/guardian";
 
+
+interface MedicalInfo {
+  currentHealth: string;
+  currentTreatment: string;
+  allergies: string;
+  allergiesInstructions: string;
+  // For babies/infants
+  formulaType: string;
+  feedingTimes: string[];
+  maxTimeBetweenFeedings: string;
+  minTimeBetweenFeedings: string;
+  feedingAmount: string;
+  feedingInstructions: string;
+  otherFoodInfo: string;
+  foodAllergies: string;
+  followsFoodProgram: boolean;
+}
+
+
 export interface ContractInfo {
     titularName: string;
     todayDate: string; // ISO date string
