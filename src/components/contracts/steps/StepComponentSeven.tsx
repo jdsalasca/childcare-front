@@ -144,6 +144,13 @@ const StepComponentSeven: React.FC<StepComponentSevenProps> = ({
   
       // Get the size of the new page to ensure correct placement
       const { width, height } = newPage.getSize();
+
+      newPage.drawText(child.classroom || '', {
+        x: 200, // Adjust this value
+        y: height - 621, // Adjust this value
+        size: 12,
+        color: rgb(0, 0, 0),
+      });   
   
       // Add only the current child's name
       newPage.drawText(`${child.first_name} ${child.last_name}`, {
