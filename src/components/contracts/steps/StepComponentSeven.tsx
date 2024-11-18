@@ -263,7 +263,7 @@ const StepComponentSeven: React.FC<StepComponentSevenProps> = ({
       ) : (
         <div className="pdf-container">
           <iframe
-            src={`${receiptBase64}#page=3`}
+            src={`${receiptBase64}#page=1`}
             className="pdf-iframe"
             title="PDF Preview"
           />
