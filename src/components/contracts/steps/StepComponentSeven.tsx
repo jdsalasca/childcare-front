@@ -74,7 +74,7 @@ const StepComponentSeven: React.FC<StepComponentSevenProps> = ({
   
       fillGuardianInformation(form, contractInformation.guardians);
       fillDates(form);
-      fillMedicalInformation(form, contractInformation.children?.[0]?.medicalInformation);
+      //fillMedicalInformation(form, contractInformation.children?.[0]?.medicalInformation);
       form.getTextField('I (name)')?.setText(contractInformation.titularName || '');
       
       form.flatten();
@@ -115,6 +115,7 @@ const StepComponentSeven: React.FC<StepComponentSevenProps> = ({
       form.getTextField('Special Concerns')?.setText(medInfo.instructions || '');
     }
   };
+
   
   const onGenerateContractWithGob = async (contractInformation: ContractInfo, language: Language) => {
     customLogger.debug('onGenerateContractWithGob');
@@ -122,56 +123,62 @@ const StepComponentSeven: React.FC<StepComponentSevenProps> = ({
     // Generate initial contract
     const contractWi = await ContractPdf.contractBuilder(contractInformation, language).output("arraybuffer");
     const jsPdfDocument = await PDFDocument.load(contractWi);
-    
+  
     // Load and prepare external form
     const externalPdf = await PDFDocument.load(FormGob.contractVersion1);
     const form = externalPdf.getForm();
-      // Get page 3
-  const pages = externalPdf.getPages();
-  const page3 = pages[2]; // 0-based index, so page 3 is at index 2
   
-  // Prepare the text
-  const allChildrenNames = contractInformation.children
-    ?.map(child => `${child.first_name} ${child.last_name}`)
-    .join(', ');
+    // Remove the original page 3
+    
   
-  const guardianNames = contractInformation.guardians
-    ?.map(guardian => guardian.name + " " + guardian.last_name)
-    .join(', ');
+    // Prepare guardian names
+    const guardianNames = contractInformation.guardians
+      ?.map(guardian => guardian.name + " " + guardian.last_name)
+      .join(', ');
+  
+    // Duplicate page 3 for each child and insert after page 2
+    let insertionIndex = 3; // Start after page 2
+    for (const child of contractInformation.children || []) {
+      // Copy page 3 for each child
+      const [newPage] = await externalPdf.copyPages(externalPdf, [2]);
+  
+      // Get the size of the new page to ensure correct placement
+      const { width, height } = newPage.getSize();
+  
+      // Add only the current child's name
+      newPage.drawText(`${child.first_name} ${child.last_name}`, {
+        x: 200, // Adjust this value
+        y: height - 657, // Adjust this value
+        size: 12,
+        color: rgb(0, 0, 0),
+      });
+  
+      // Add guardian names
+      newPage.drawText(guardianNames || '', {
+        x: 200, // Adjust this value
+        y: height - 697, // Adjust this value
+        size: 12,
+        color: rgb(0, 0, 0),
+      });
+  
+      // Insert the new page at the current insertion index
+      externalPdf.insertPage(insertionIndex, newPage);
+      insertionIndex++; // Increment the index for the next child
+    }
 
-  // Add text to page 3
-  // You'll need to adjust these coordinates based on your PDF
-  const { width, height } = page3.getSize();
-  
-  // Add children names (adjust x and y coordinates as needed)
-  page3.drawText(allChildrenNames || '', {
-    x: 200, // Adjust this value
-    y: height - 657, // Adjust this value
-    size: 12,
-    color: rgb(0, 0, 0),
-  });
-
-  // Add guardian names (adjust x and y coordinates as needed)
-  page3.drawText(guardianNames || '', {
-    x: 200, // Adjust this value
-    y: height - 697, // Adjust this value
-    size: 12,
-    color: rgb(0, 0, 0),
-  });
-  
+  externalPdf.removePage(2);
     // Fill form fields
     fillFormFields(form, contractInformation);
-    
+  
     // Merge documents
     const copiedPages = await jsPdfDocument.copyPages(externalPdf, externalPdf.getPageIndices());
     copiedPages.forEach(page => jsPdfDocument.addPage(page));
-    
+  
     // Save and return result
     const mergedPdfBytes = await jsPdfDocument.saveAsBase64({ dataUri: true });
     setReceiptBase64(mergedPdfBytes);
     return jsPdfDocument.save();
   };
-
   
   const handleDownloadPdf = async (language: Language) => {
     const contractInfo = contractBuilder();
@@ -249,7 +256,7 @@ const StepComponentSeven: React.FC<StepComponentSevenProps> = ({
       ) : (
         <div className="pdf-container">
           <iframe
-            src={`${receiptBase64}#page=1`}
+            src={`${receiptBase64}#page=3`}
             className="pdf-iframe"
             title="PDF Preview"
           />

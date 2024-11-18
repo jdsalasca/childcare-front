@@ -2,7 +2,7 @@ import { ChildMedicalInformation } from "./childMedicalInformation";
 
 // Define the structure of the child data
 export interface ChildType {
-    id?: string;
+    id?: number;
     first_name: string;
     last_name: string;
     name?: string;
@@ -69,7 +69,7 @@ export const defaultChild: ChildType = {
 
 export const defaultChildMedical:ChildType = {
     age: 0,
-    id: '',
+    id: 0,
     program: '',
     first_name: '',
     last_name: '',

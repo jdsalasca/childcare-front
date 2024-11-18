@@ -114,15 +114,7 @@ const StepComponentFour: React.FC<StepComponentFourProps> = ({
           showIcon
           rules={{ required: t('contractStartDateRequired') }}
         />
-       {/*  <CalendarWrapper
-          name="end_date"
-          control={control}
-          dateFormat="mm/dd/yy"
-          label={t('contractEndDate')}
-          spanClassName="p-float-label"
-          showIcon
-          rules={{ required: t('contractEndDateRequired') }}
-        /> */}
+
         <DropdownWrapper
           name="payment_method_id"
           control={control}

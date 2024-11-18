@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { Functions } from '../../../utils/functions';
+import { PRICES } from '../data/prices';
 import { ContractInfo, defaultContractInfoFinished, Language } from '../types/ContractInfo';
 import { calculateWeeksOld, determineProgram, fontStyles } from '../utilsAndConstants';
 export const contractInfo = (contractData: ContractInfo= defaultContractInfoFinished, language:Language = Language.English) => {
@@ -111,29 +112,23 @@ contractData.guardians.find(g => g.guardian_type_id === FATHER_GUARDIAN_TYPE_ID)
         parr10: `\nSi los Padres tienen que pagar un copay del programa de Subsidio o título 20, el pago será al daycare y durante los <strong>primeros 5 días</strong> del cada mes. Pasado este tiempo tendrá un cargo de $10 por día pasado.`,
      
     },
-    
-      "page3": {
-        "parr2": "\nEducando Childcare Center dedicara el tiempo necesario para la Registración de su(s) niño(s) ingresando a nuestro Programa especializado toda su información y la de su(s) niño(s), brindándole así las facilidades tecnológicas para el registro diario de ingreso y salida de su(s) niño(s), comunicación e información diaria de su(s) niño(s), en caso de emergencia y agilidad en sus pagos.",
-        "parr3": "\nEn Educando Childcare llevamos un Calendario de actividades y festividades con los niños fuera y dentro de nuestras instalaciones, los cuales tendrá un costo simbólico de $25 anuales por niño Toddler, Prescolar y Escolar. No se incluye a bebes hasta de 2 años.",
-        "parr4": "\n<strong>                                                              NUESTRAS TARIFAS </strong>",
-        "parr5": "\nNuestras tarifas están actualizadas bajo regulaciones del DHHS del Estado de Nebraska para todas las guarderías de servicio infantil y son las siguientes:",
-        "separator": true,
-        "parr6": "\nPago por registración: ………………………………………………………………… $25.00",
-        "parr7": "\nPago Anual por actividades (Toddlers, Prescolares y escolares) ……………….. $25.00  ____",
-        "parr8": "\nInfant (bebe 6 semanas a 18 meses)  ……………………………………………… $275.00 ____",
-        "parr9": "\nToddler (18 meses a 3 años) …………………………………………………………$250.00  ____",
-        "parr10": "\nPreschool (3 a 5 años)…………………………………………………………………$225.00 ____",
-        "parr11": "\nSchool (5 a 12 años)……………………………………………………………………$200.00____",
-        "parr12": "\nTransporte a la escuela (ida y Vuelta por semana)………………………………….$50.00  ____",
-        // "parr13": "\nMarque lo que corresponda para su servicio y a la edad de su(s) niño(s).\nSu pago será de:_________",
-        "parr14": "\n                                 Pago al momento de la registración: $________________________",
-        "parr15": `\n                                                                                                    <strong>Pago semanal: $ ${weekly_payment} </strong>`,
-        "signSection": true,  
-        "parr16": "\n",
-        "signSectionEducando": true
-      }
-    ,
-    
+    page3: {
+      parr4: "\n<strong>                                                              NUESTRAS TARIFAS </strong>",
+      parr5: "\nNuestras tarifas están actualizadas bajo regulaciones del DHHS del Estado de Nebraska para todas las guarderías de servicio infantil y son las siguientes:",
+      separator: true,
+      parr6: `\nPago por registración (${contractData.serviceCounts?.registrationCount || 0} niños) ........................... $${(contractData.serviceCounts?.registrationCount || 0) * PRICES.REGISTRATION_FEE}`,
+      parr7: `\nPago Anual por actividades (${contractData.serviceCounts?.activityCount || 0} niños) ................ $${(contractData.serviceCounts?.activityCount || 0) * PRICES.ACTIVITY_FEE}`,
+      parr8: `\nInfant (${contractData.serviceCounts?.infantCount || 0} niños) .................................................. $${(contractData.serviceCounts?.infantCount || 0) * PRICES.RATES.INFANT}`,
+      parr9: `\nToddler (${contractData.serviceCounts?.toddlerCount || 0} niños) ............................................... $${(contractData.serviceCounts?.toddlerCount || 0) * PRICES.RATES.TODDLER}`,
+      parr10: `\nPreschool (${contractData.serviceCounts?.preschoolCount || 0} niños) .......................................... $${(contractData.serviceCounts?.preschoolCount || 0) * PRICES.RATES.PRESCHOOL}`,
+      parr11: `\nSchool (${contractData.serviceCounts?.schoolCount || 0} niños) ............................................... $${(contractData.serviceCounts?.schoolCount || 0) * PRICES.RATES.SCHOOL}`,
+      parr12: `\nTransporte (${contractData.serviceCounts?.transportationCount || 0} niños) ...................................... $${(contractData.serviceCounts?.transportationCount || 0) * PRICES.TRANSPORTATION}`,
+      parr14: `\n\n                                     Pago al momento de la registración: $${contractData.total_to_pay || 0}`,
+      parr15: `\n                                                                    <strong>Pago semanal: $${weekly_payment}</strong>`,
+      signSection: true,
+      parr16: "\n",
+      signSectionEducando: true
+    },
     page4: {
       parr0: "\n<strong>Información Médica de su niño</strong>",
       childIteration: {
@@ -178,7 +173,7 @@ contractData.guardians.find(g => g.guardian_type_id === FATHER_GUARDIAN_TYPE_ID)
           separator: true,
           parr1: '\nNombre del niño: {{childName}}',
           parr2: '\nDoy mi permiso a Educando Childcare de administrar a mi hijo(a) lo siguiente:',
-          parr3: '\n(Marcar con un check o palomita)',
+          parr3: '\n(Marcar con una X)',
           parr4: '\no Jabón de manos líquido o en barra {{soap}}',
           parr5: '\no Sanitizador de manos {{sanitizer}}',
           parr6: '\no Crema para rozaduras {{rashCream}}',
@@ -377,26 +372,25 @@ page18: {
       parr10: `\nEducando Childcare Center will dedicate the necessary time to the Registration of your child(ren) into our specialized program, thus providing you with the technological facilities for daily in and out of your child(ren), daily communication, communication in case of emergency, and agility in your payments.`,
       parr11: `\nAt Educando Childcare, we have an Activity Calendar and festivities celebrations with your children outside and inside our facilities, which will have a symbolic cost of $25 <strong>per year</strong> per Toddler, Preschool and school child. Babies less than 2 years old are not included.`
     },
-page3: {
-    parr4: `\n\n<strong>                                                                        OUR RATES</strong>
-    \nOur rates are updated under the State of Nebraska DHHS regulations for all Childcare Centers and are as follows:\n`,
-    separator: true,
-    parr5: `Registration fee: ......................$25.00`,
-    parr6: `\nActivity fee (Toddlers, Preschool, School): ............................................................. $25.00____`,
-    parr7: `\nInfant (baby 6 weeks – 18 months): ..................................................................... $275.00____`,
-    parr8: `\nToddler (18 months – 3 years old): ....................................................................... $250.00____`,
-    parr9: `\nPreschool (3 years old – 5 years old): .................................................................. $225.00____`,
-    parr10: `\nSchool (5 – 12 years old): .....................................................................................$200.00____`,
-    parr11: `\nSchool Transportation (2 ways): ............................................................................. $50.00____`,
-    parr12: `\n                                                Your payment at registration time: $______________________`,
-    parr121: `\n                                                                                             Weekly payment: $ ${weekly_payment}\n\n`,
-    signSection: true,
-    parr16: "\n",
-    signSectionEducando: true
-},
-page4: {
-  parr0: "\n<strong>Medical Information</strong>",
-  childIteration: {
+    page3: {
+      parr4: "\n<strong>                                                              OUR RATES</strong>",
+      separator: true,
+      parr5: `\nRegistration fee (${contractData.serviceCounts?.registrationCount || 0} children) ................... $${(contractData.serviceCounts?.registrationCount || 0) * PRICES.REGISTRATION_FEE}`,
+      parr6: `\nActivity fee (${contractData.serviceCounts?.activityCount || 0} children) ........................ $${(contractData.serviceCounts?.activityCount || 0) * PRICES.ACTIVITY_FEE}`,
+      parr7: `\nInfant (${contractData.serviceCounts?.infantCount || 0} children) ............................... $${(contractData.serviceCounts?.infantCount || 0) * PRICES.RATES.INFANT}`,
+      parr8: `\nToddler (${contractData.serviceCounts?.toddlerCount || 0} children) ............................. $${(contractData.serviceCounts?.toddlerCount || 0) * PRICES.RATES.TODDLER}`,
+      parr9: `\nPreschool (${contractData.serviceCounts?.preschoolCount || 0} children) ......................... $${(contractData.serviceCounts?.preschoolCount || 0) * PRICES.RATES.PRESCHOOL}`,
+      parr10: `\nSchool (${contractData.serviceCounts?.schoolCount || 0} children) .............................. $${(contractData.serviceCounts?.schoolCount || 0) * PRICES.RATES.SCHOOL}`,
+      parr11: `\nTransportation (${contractData.serviceCounts?.transportationCount || 0} children) ............... $${(contractData.serviceCounts?.transportationCount || 0) * PRICES.TRANSPORTATION}`,
+      parr12: `\n\n                                     Your payment at registration time: $${contractData.total_to_pay || 0}`,
+      parr121: `\n                                                               <strong>Weekly payment: $${weekly_payment}\n\n </strong>`,
+      signSection: true,
+      parr16: "\n",
+      signSectionEducando: true
+    },
+      page4: {
+      parr0: "\n<strong>Medical Information</strong>",
+      childIteration: {
     separator: true,
     start: true,
     content: {
@@ -410,8 +404,6 @@ page4: {
     end: true
   }
 },
-
-
 page5: {
   childIteration: {
     content: {
@@ -426,13 +418,12 @@ page5: {
       parr7: `\no Feeding instructions: \n{{feedingInstructions}}`,
       parr8: `\no Other food information (cereal, baby food, prepared food, juices, etc.): \n{{otherFood}}`,
       parr9: `\no Allergies to any food or anything that the baby should not eat: \n{{foodAllergies}}`,
-      parr10: `\no Follow the Food Program for children and adults (circle):`,
+      parr10: `\no Follow the Food Program for children and adults (X):`,
       parr11: `\n                  {{followMealProgramYes}} Yes        {{followMealProgramNo}} No`,
 signSection: true,
     }
   }
-}
-,
+},
 page6: {
   childIteration: {
     content: {
@@ -440,7 +431,7 @@ page6: {
       separator: true,
       parr1: '\nChild\'s name: {{childName}}',
       parr2: '\nI give my permission to Educando Childcare to administer the following to my child:',
-      parr3: '\n(Mark with a check)',
+      parr3: '\n(Mark with a X)',
       parr4: '\no Liquid or bar hand soap {{soap}}',
       parr5: '\no Hand sanitizer {{sanitizer}}',
       parr6: '\no Chafing cream {{rashCream}}',

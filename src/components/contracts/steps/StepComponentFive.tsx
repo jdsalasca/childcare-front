@@ -145,7 +145,7 @@ export const StepComponentFive: React.FC<StepComponentFiveProps> = ({
     const newSchedule = days.map((day) => day.response);
     setContractInformation({ ...contractInformation, schedule: newSchedule });
     ToastInterpreterUtils.toastInterpreter(toast, 'success', t('success'), t('scheduleUpdated'), 3000);
-    setActiveIndex(5); // Move to the next step or handle as needed
+    setActiveIndex(6); // Move to the next step or handle as needed
   };
 
   return !daysCache ? (

@@ -2,23 +2,6 @@ import { ChildType } from "types/child";
 import { Guardian } from "types/guardian";
 
 
-interface MedicalInfo {
-  currentHealth: string;
-  currentTreatment: string;
-  allergies: string;
-  allergiesInstructions: string;
-  // For babies/infants
-  formulaType: string;
-  feedingTimes: string[];
-  maxTimeBetweenFeedings: string;
-  minTimeBetweenFeedings: string;
-  feedingAmount: string;
-  feedingInstructions: string;
-  otherFoodInfo: string;
-  foodAllergies: string;
-  followsFoodProgram: boolean;
-}
-
 
 export interface ContractInfo {
     titularName: string;
@@ -36,7 +19,26 @@ export interface ContractInfo {
     start_date?: string; // ISO date string
     end_date?: string; // ISO date string,
     guardian_id_titular?: number;
+    priceBreakdown?: {
+      registrationFees: number;
+      activityFees: number;
+      infantCare: number;
+      toddlerCare: number;
+      preschoolCare: number;
+      schoolCare: number;
+      transportation: number;
+    };
+    serviceCounts?: {
+      registrationCount: number;
+      activityCount: number;
+      infantCount: number;
+      toddlerCount: number;
+      preschoolCount: number;
+      schoolCount: number;
+      transportationCount: number;
+    };
   }
+
   export const defaultContractInfo: ContractInfo = {
     titularName: '',
     todayDate: new Date().toISOString(), // Sets today's date in ISO format
@@ -59,7 +61,7 @@ export interface ContractInfo {
     "todayDate": "2024-10-04T02:23:13.045Z",
     "children": [
       {
-        "id": "386",
+        "id": 386,
         "child_id": 11,
         "born_date": "2020-09-09T22:00:00.000000Z",
         "first_name": "123123",
@@ -181,7 +183,7 @@ export const defaultContractInfoFinished: ContractInfo = {
 
     children: [
       {
-        "id": "1",
+        "id": 1,
         "child_id": 1,
         "born_date": "2020-09-09T22:00:00.000000Z",
         "first_name": "123123",

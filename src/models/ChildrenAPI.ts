@@ -47,7 +47,7 @@ getChildren: async (): Promise<ApiResponse<ChildType[]>> => {  // Change the res
     },
 
     // Update a child by ID
-    updateChild: async (id: string, childData: CreateChildData): Promise<ApiResponse<ChildType>> => {
+    updateChild: async (id: number, childData: CreateChildData): Promise<ApiResponse<ChildType>> => {
         try {
             const response = await API.put<ChildType>(BASE_URL, `/children/${id}`, childData);
             return response; // Ensure you return the correct data structure
