@@ -172,7 +172,7 @@ export const Contracts: React.FC<ContractsProps> = () => {
       case 8:
         return <PermissionsInformationForm setLoadingInfo={setLoadingInfo} toast={toast} setActiveIndex={setActiveIndex} contractInformation={contractInformation} setContractInformation={setContractInformation} />;
       case 9:
-        return <StepComponentSeven setLoadingInfo={setLoadingInfo} toast={toast} setActiveIndex={setActiveIndex} contractInformation={mockContract} setContractInformation={setContractInformation} />;
+        return <StepComponentSeven setLoadingInfo={setLoadingInfo} toast={toast} setActiveIndex={setActiveIndex} contractInformation={contractInformation} setContractInformation={setContractInformation} />;
       default:
         return null;
     }
