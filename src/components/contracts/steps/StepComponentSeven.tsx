@@ -12,7 +12,7 @@ import useGenerateContract from '../viewModels/useGenerateContract';
 import { Functions } from '@utils/functions';
 import { ChildMedicalInformation } from 'types/childMedicalInformation';
 import { Guardian } from 'types/guardian';
-import { MedicalInformation } from 'types/child';
+import { ChildType, MedicalInformation } from 'types/child';
 
 
 
@@ -116,77 +116,160 @@ const StepComponentSeven: React.FC<StepComponentSevenProps> = ({
     }
   };
 
+  const fillFormFieldsForChild = async (form: PDFForm, contractInfo: ContractInfo, currentChild: ChildType) => {
+    try {
+      console.log("test", form.getFields());
+       
+      // Basic Child Information
+      form.getTextField('Childrens Name')?.setText(`${currentChild.first_name} ${currentChild.last_name}`);
+      form.getTextField('Birthdates')?.setText(Functions.formatDateToMMDDYY(currentChild.born_date));
+      
+      // Contract Dates
+      form.getTextField('Enrollment Date 1')?.setText(Functions.formatDateToMMDDYY(contractInfo.start_date!));
+      form.getTextField('Date Care Ceased')?.setText(Functions.formatDateToMMDDYY(contractInfo.end_date!));
   
+      // Guardian Information
+      const father = contractInfo.guardians?.find(g => g.guardian_type_id === 1);
+      if (father) {
+        form.getTextField('Name 1')?.setText(father.name || '');
+        form.getTextField('Address 1')?.setText(father.address || '');
+        form.getTextField('City 1')?.setText(father.city || '');
+        form.getTextField('Phone 1')?.setText(father.phone || '');
+      }
+  
+      const mother = contractInfo.guardians?.find(g => g.guardian_type_id === 2);
+      if (mother) {
+        form.getTextField('Name_2')?.setText(mother.name || '');
+        form.getTextField('Address_2')?.setText(mother.address || '');
+        form.getTextField('City 2')?.setText(mother.city || '');
+        form.getTextField('Phone_2')?.setText(mother.phone || '');
+      }
+  
+      // Medical Information
+      if (currentChild.medicalInformation) {
+        form.getTextField('Health status')?.setText(currentChild.medicalInformation.healthStatus || '');
+        form.getTextField('Allergies')?.setText(currentChild.medicalInformation.allergies || '');
+        form.getTextField('Special Concerns')?.setText(currentChild.medicalInformation.instructions || '');
+      }
+  
+      // Current Date Fields
+      const currentDate = Functions.formatDateToMMDDYY(new Date());
+      form.getTextField('Consent date')?.setText("              " + currentDate);
+      form.getTextField('Signature date')?.setText("                     " + currentDate);
+      form.getTextField('Date of Signature of Parent or Guardian for form')?.setText("                                    " + currentDate);
+  
+      // Contract Holder Name
+      form.getTextField('I (name)')?.setText(contractInfo.titularName || '');
+  
+    } catch (error) {
+      customLogger.error('Error filling form fields for child:', error);
+      throw new Error(`Error filling form fields for child: ${error}`);
+    }
+  };
   const onGenerateContractWithGob = async (contractInformation: ContractInfo, language: Language) => {
     customLogger.debug('onGenerateContractWithGob');
-  
+   // Prepare guardian names
+   const guardianNames = contractInformation.guardians
+   ?.map(guardian => guardian.name + " " + guardian.last_name)
+   .join(', ');
+
     // Generate initial contract
     const contractWi = await ContractPdf.contractBuilder(contractInformation, language).output("arraybuffer");
     const jsPdfDocument = await PDFDocument.load(contractWi);
   
-    // Load and prepare external form
-    const externalPdf = await PDFDocument.load(FormGob.contractVersion1);
-    const form = externalPdf.getForm();
-  
-    // Remove the original page 3
+    // Load original form
+    const originalPdf = await PDFDocument.load(FormGob.contractVersion1);
     
-  
-    // Prepare guardian names
-    const guardianNames = contractInformation.guardians
-      ?.map(guardian => guardian.name + " " + guardian.last_name)
-      .join(', ');
-  
-    // Duplicate page 3 for each child and insert after page 2
-    let insertionIndex = 3; // Start after page 2
+    // For each child, create a complete set of forms
     for (const child of contractInformation.children || []) {
-      // Copy page 3 for each child
-      const [newPage] = await externalPdf.copyPages(externalPdf, [2]);
+      // Instead of creating a new PDF, copy the original one for each child
+      const childPdf = await PDFDocument.load(FormGob.contractVersion1); // Load a fresh copy for each child
+      const childForm = childPdf.getForm();
+      
+      // Fill form fields for this child
+      const currentDate = Functions.formatDateToMMDDYY(new Date());
+      
+      // Basic Information
+      childForm.getTextField('Childrens Name')?.setText(`${child.first_name} ${child.last_name}`);
+      childForm.getTextField('Birthdates')?.setText(Functions.formatDateToMMDDYY(child.born_date));
+      childForm.getTextField('Enrollment Date 1')?.setText(Functions.formatDateToMMDDYY(contractInformation.start_date!));
+      childForm.getTextField('Date Care Ceased')?.setText(Functions.formatDateToMMDDYY(contractInformation.end_date!));
+      
+      // Guardian Information
+      const father = contractInformation.guardians?.find(g => g.guardian_type_id === 1);
+      if (father) {
+        childForm.getTextField('Name 1')?.setText(father.name || '');
+        childForm.getTextField('Address 1')?.setText(father.address || '');
+        childForm.getTextField('City 1')?.setText(father.city || '');
+        childForm.getTextField('Phone 1')?.setText(father.phone || '');
+      }
   
-      // Get the size of the new page to ensure correct placement
-      const { width, height } = newPage.getSize();
-
-      newPage.drawText(child.classroom || '', {
-        x: 200, // Adjust this value
-        y: height - 621, // Adjust this value
+      const mother = contractInformation.guardians?.find(g => g.guardian_type_id === 2);
+      if (mother) {
+        childForm.getTextField('Name_2')?.setText(mother.name || '');
+        childForm.getTextField('Address_2')?.setText(mother.address || '');
+        childForm.getTextField('City 2')?.setText(mother.city || '');
+        childForm.getTextField('Phone_2')?.setText(mother.phone || '');
+      }
+  
+      // Dates
+      childForm.getTextField('Consent date')?.setText("              " + currentDate);
+      childForm.getTextField('Signature date')?.setText("                     " + currentDate);
+      childForm.getTextField('Date of Signature of Parent or Guardian for form')?.setText("                                    " + currentDate);
+      
+      // Medical Information
+      if (child.medicalInformation) {
+        childForm.getTextField('Health status')?.setText(child.medicalInformation.healthStatus || '');
+        childForm.getTextField('Allergies')?.setText(child.medicalInformation.allergies || '');
+        childForm.getTextField('Special Concerns')?.setText(child.medicalInformation.instructions || '');
+      }
+  
+      childForm.getTextField('I (name)')?.setText(contractInformation.titularName || '');
+  
+      // Flatten the form before copying pages
+      childForm.flatten();
+  
+      // Get pages 0-2 from the filled childPdf
+      const filledPages = await jsPdfDocument.copyPages(childPdf, [0, 1, 2]);
+      
+      // Add manual text to page 2
+      const page2 = filledPages[2];
+      const { height } = page2.getSize();
+      page2.drawText(child.classroom || '', {
+        x: 200,
+        y: height - 621,
         size: 12,
         color: rgb(0, 0, 0),
       });   
   
-      // Add only the current child's name
-      newPage.drawText(`${child.first_name} ${child.last_name}`, {
-        x: 200, // Adjust this value
-        y: height - 657, // Adjust this value
+      page2.drawText(`${child.first_name} ${child.last_name}`, {
+        x: 200,
+        y: height - 657,
         size: 12,
         color: rgb(0, 0, 0),
       });
   
-      // Add guardian names
-      newPage.drawText(guardianNames || '', {
-        x: 200, // Adjust this value
-        y: height - 697, // Adjust this value
+      page2.drawText(guardianNames || '', {
+        x: 200,
+        y: height - 697,
         size: 12,
         color: rgb(0, 0, 0),
       });
   
-      // Insert the new page at the current insertion index
-      externalPdf.insertPage(insertionIndex, newPage);
-      insertionIndex++; // Increment the index for the next child
+  
+      // Add pages to final document
+      filledPages.forEach(page => jsPdfDocument.addPage(page));
     }
-
-  externalPdf.removePage(2);
-    // Fill form fields
-    fillFormFields(form, contractInformation);
   
-    // Merge documents
-    const copiedPages = await jsPdfDocument.copyPages(externalPdf, externalPdf.getPageIndices());
-    copiedPages.forEach(page => jsPdfDocument.addPage(page));
+    // Add the last page
+    const [lastPage] = await jsPdfDocument.copyPages(originalPdf, [3]);
+    jsPdfDocument.addPage(lastPage);
   
     // Save and return result
     const mergedPdfBytes = await jsPdfDocument.saveAsBase64({ dataUri: true });
     setReceiptBase64(mergedPdfBytes);
     return jsPdfDocument.save();
   };
-  
   const handleDownloadPdf = async (language: Language) => {
     const contractInfo = contractBuilder();
     customLogger.info('language', language);
