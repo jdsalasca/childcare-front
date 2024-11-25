@@ -8,6 +8,7 @@ import { InputTextAreaWrapper } from '@components/formsComponents/InputTextAreaW
 import { Toast } from 'primereact/toast';
 import InputTextWrapper from '@components/formsComponents/InputTextWrapper';
 import { LoadingInfo } from '@models/AppModels';
+import { motion } from 'framer-motion';
 interface MedicalInformationFormProps {
   setLoadingInfo: (info: LoadingInfo) => void;  
   contractInformation: ContractInfo;
@@ -70,52 +71,93 @@ export const MedicalInformationForm: React.FC<MedicalInformationFormProps>
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col  gap-10'>
-      <h4 className='text-center'>{t('medicalInformation')}</h4>
-      
-      <Controller
-        name="childName"
-        control={control}
-        rules={{ required: t('requiredField') }}
-        render={({ field }) => (
-          <Dropdown
-            id="childName"
-            options={contractInformation.children.map((child: ChildType) => ({
-              label: `${child.first_name} ${child.last_name}`,
-              value: `${child.first_name} ${child.last_name}`
-            }))}
-            value={field.value}
-            onChange={(e) => onChildChange(e.value)}
-            placeholder={t('selectChild')}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="max-w-4xl mx-auto w-full p-4"
+    >
+      <motion.form 
+        onSubmit={handleSubmit(onSubmit)} 
+        className='flex flex-col gap-6'
+      >
+        <div className="bg-white rounded-xl shadow-md p-6 mb-6">
+          <h4 className='text-2xl font-semibold text-center text-gray-800 mb-6'>
+            {t('medicalInformation')}
+          </h4>
+
+          <div className="mb-8">
+            <Controller
+              name="childName"
+              control={control}
+              rules={{ required: t('requiredField') }}
+              render={({ field }) => (
+                <Dropdown
+                  id="childName"
+                  options={contractInformation.children.map((child: ChildType) => ({
+                    label: `${child.first_name} ${child.last_name}`,
+                    value: `${child.first_name} ${child.last_name}`
+                  }))}
+                  value={field.value}
+                  onChange={(e) => onChildChange(e.value)}
+                  placeholder={t('selectChild')}
+                  className="w-full"
+                />
+              )}
+            />
+          </div>
+
+          <motion.div 
+            className="bg-gray-50 rounded-lg p-6 space-y-6"
+            whileHover={{ scale: 1.01 }}
+            transition={{ duration: 0.2 }}
+          >
+            <InputTextAreaWrapper
+              name="medicalInfo.healthStatus"
+              control={control}
+              label={t('healthStatus')}
+              className="mb-4"
+            />
+
+            <InputTextWrapper
+              name="medicalInfo.treatment"
+              control={control}
+              label={t('treatment')}
+              className="mb-4"
+            />
+
+            <InputTextAreaWrapper
+              name="medicalInfo.allergies"
+              control={control}
+              label={t('allergies')}
+              className="mb-4"
+            />
+
+            <InputTextAreaWrapper
+              name="medicalInfo.instructions"
+              control={control}
+              label={t('instructions')}
+            />
+          </motion.div>
+        </div>
+
+        <motion.div 
+          className='flex justify-center gap-4 mt-8'
+          whileHover={{ scale: 1.02 }}
+          transition={{ duration: 0.2 }}
+        >
+          <Button
+            type="submit"
+            label={t('save')}
+            className='p-button-primary px-6 py-2'
           />
-        )}
-      />
-
-      <InputTextAreaWrapper
-        name="medicalInfo.healthStatus"
-        control={control}
-        label={t('healthStatus')}
-      />
-
-      <InputTextWrapper
-        name="medicalInfo.treatment"
-        control={control}
-        label={t('treatment')}
-      />
-
-      <InputTextAreaWrapper
-        name="medicalInfo.allergies"
-        control={control}
-        label={t('allergies')}
-      />
-
-      <InputTextAreaWrapper
-        name="medicalInfo.instructions"
-        control={control}
-        label={t('instructions')}
-      />
-
-      <Button type="submit" label={t('save')} className='w-40 mx-auto' />
-    </form>
+          <Button
+            label={t('returnToPreviousStep')}
+            className='p-button-secondary px-6 py-2'
+            onClick={() => setActiveIndex(6)}
+          />
+        </motion.div>
+      </motion.form>
+    </motion.div>
   );
 };

@@ -19,7 +19,9 @@ interface FormulaInformationFormProps {
   setLoadingInfo: (info: LoadingInfo) => void;
 }
 
-export const FormulaInformationForm: React.FC<FormulaInformationFormProps> = ({ contractInformation, setContractInformation, toast }) => {
+export const FormulaInformationForm: React.FC<FormulaInformationFormProps> = ({ contractInformation, setContractInformation,
+  setActiveIndex,
+  toast }) => {
   const { t } = useTranslation();
   const { control, handleSubmit, reset } = useForm<{
     childName: string;
@@ -72,95 +74,144 @@ export const FormulaInformationForm: React.FC<FormulaInformationFormProps> = ({ 
   };
 
   return (
-    <motion.form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-10'>
-      <h4 className='text-center'>{t('babyFormulaAndFeeding')}</h4>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="max-w-4xl mx-auto w-full p-4"
+    >
+      <motion.form 
+        onSubmit={handleSubmit(onSubmit)} 
+        className='flex flex-col gap-6'
+      >
+        <div className="bg-white rounded-xl shadow-md p-6 mb-6">
+          <h4 className='text-2xl font-semibold text-center text-gray-800 mb-6'>
+            {t('babyFormulaAndFeeding')}
+          </h4>
 
-      <Controller
-        name="childName"
-        control={control}
-        rules={{ required: t('requiredField') }}
-        render={({ field }) => (
-          <Dropdown
-            id="childName"
-            options={contractInformation.children.map((child: ChildType) => ({
-              label: `${child.first_name} ${child.last_name}`,
-              value: `${child.first_name} ${child.last_name}`
-            }))}
-            value={field.value}
-            onChange={(e) => onChildChange(e.value)}
-            placeholder={t('selectChild')}
+          <div className="mb-8">
+            <Controller
+              name="childName"
+              control={control}
+              rules={{ required: t('requiredField') }}
+              render={({ field }) => (
+                <Dropdown
+                  id="childName"
+                  options={contractInformation.children.map((child: ChildType) => ({
+                    label: `${child.first_name} ${child.last_name}`,
+                    value: `${child.first_name} ${child.last_name}`
+                  }))}
+                  value={field.value}
+                  onChange={(e) => onChildChange(e.value)}
+                  placeholder={t('selectChild')}
+                  className="w-full"
+                />
+              )}
+            />
+          </div>
+
+          <motion.div 
+            className="bg-gray-50 rounded-lg p-6 mb-6"
+            whileHover={{ scale: 1.01 }}
+            transition={{ duration: 0.2 }}
+          >
+            <InputTextAreaWrapper
+              name="formulaInfo.formula"
+              control={control}
+              label={t('formula')}
+              rules={{ required: t('requiredField') }}
+            />
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 my-6">
+              {[0,1,2,3].map((index) => (
+                <InputTextWrapper
+                  key={index}
+                  name={`formulaInfo.feedingTimes.${index}`}
+                  control={control}
+                  label={`${t('feeding')} ${index + 1}`}
+                />
+              ))}
+            </div>
+          </motion.div>
+
+          <motion.div 
+            className="bg-gray-50 rounded-lg p-6 mb-6"
+            whileHover={{ scale: 1.01 }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <InputTextWrapper
+                name="formulaInfo.maxBottleTime"
+                control={control}
+                label={t('maxBottleTime')}
+                rules={{ required: t('requiredField') }}
+              />
+              <InputTextWrapper
+                name="formulaInfo.minBottleTime"
+                control={control}
+                label={t('minBottleTime')}
+                rules={{ required: t('requiredField') }}
+              />
+              <InputTextWrapper
+                name="formulaInfo.bottleAmount"
+                control={control}
+                label={t('bottleAmount')}
+                rules={{ required: t('requiredField') }}
+                keyfilter="int"
+              />
+            </div>
+          </motion.div>
+
+          <motion.div 
+            className="bg-gray-50 rounded-lg p-6"
+            whileHover={{ scale: 1.01 }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className="grid grid-cols-1 gap-6">
+              <InputTextAreaWrapper
+                name="formulaInfo.feedingInstructions"
+                control={control}
+                label={t('feedingInstructions')}
+                rules={{ required: t('requiredField') }}
+              />
+              <InputTextAreaWrapper
+                name="formulaInfo.otherFood"
+                control={control}
+                label={t('otherFood')}
+                rules={{ required: t('requiredField') }}
+              />
+              <InputTextAreaWrapper
+                name="formulaInfo.foodAllergies"
+                control={control}
+                label={t('foodAllergies')}
+                rules={{ required: t('requiredField') }}
+              />
+              <CheckboxWrapper
+                name="formulaInfo.followMealProgram"
+                control={control}
+                label={t('followMealProgram')}
+              />
+            </div>
+          </motion.div>
+        </div>
+
+        <motion.div 
+          className='flex justify-center gap-4 mt-8'
+          whileHover={{ scale: 1.02 }}
+          transition={{ duration: 0.2 }}
+        >
+          <Button
+            type="submit"
+            label={t('save')}
+            className='p-button-primary px-6 py-2'
           />
-        )}
-      />
-
-      <InputTextAreaWrapper
-        name="formulaInfo.formula"
-        control={control}
-        label={t('formula')}
-        rules={{ required: t('requiredField') }}
-      />
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-        {[0,1,2,3].map((index) => (
-          <InputTextWrapper
-            key={index}
-            name={`formulaInfo.feedingTimes.${index}`}
-            control={control}
-            label={`${t('feeding')} ${index + 1}`}
+          <Button
+            label={t('returnToPreviousStep')}
+            className='p-button-secondary px-6 py-2'
+            onClick={() => setActiveIndex(3)}
           />
-        ))}
-      </div>
-
-      <InputTextWrapper
-        name="formulaInfo.maxBottleTime"
-        control={control}
-        label={t('maxBottleTime')}
-        rules={{ required: t('requiredField') }}
-      />
-
-      <InputTextWrapper
-        name="formulaInfo.minBottleTime"
-        control={control}
-        label={t('minBottleTime')}
-        rules={{ required: t('requiredField') }}
-       
-      />
-
-      <InputTextWrapper
-        name="formulaInfo.bottleAmount"
-        control={control}
-        label={t('bottleAmount')}
-        rules={{ required: t('requiredField') }}
-        keyfilter="int"
-      />
-
-      <InputTextAreaWrapper
-        name="formulaInfo.feedingInstructions"
-        control={control}
-        label={t('feedingInstructions')}
-        rules={{ required: t('requiredField') }}
-      />
-
-      <InputTextAreaWrapper
-        name="formulaInfo.otherFood"
-        control={control}
-        label={t('otherFood')}
-        rules={{ required: t('requiredField') }}
-      />
-
-      <InputTextAreaWrapper
-        name="formulaInfo.foodAllergies"
-        control={control}
-        label={t('foodAllergies')}
-        rules={{ required: t('requiredField') }}
-      />
-       <CheckboxWrapper
-        name="formulaInfo.followMealProgram"
-        control={control}
-        label={t('followMealProgram')}
-      />
-
-      <Button type="submit" label={t('save')} className='w-40 mx-auto' />
-    </motion.form>
+        </motion.div>
+      </motion.form>
+    </motion.div>
   );
 }

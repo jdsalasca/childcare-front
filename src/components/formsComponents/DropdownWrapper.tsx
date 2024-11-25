@@ -20,6 +20,8 @@ interface DropdownWrapperProps extends Omit<DropdownProps, 'onChange' | 'value'>
   filter?: boolean;
   placeholder?: string;
   spanClassName?: string;
+  internationalization?: boolean; // New prop for controlling translation
+
   rest?: object;
 }
 
@@ -35,6 +37,7 @@ const DropdownWrapper: React.FC<DropdownWrapperProps> = ({
   filter = false,
   placeholder,
   spanClassName = '',
+  internationalization = false,
   ...rest
 }) => {
   const { t } = useTranslation();
@@ -48,7 +51,14 @@ const DropdownWrapper: React.FC<DropdownWrapperProps> = ({
       }
     }
   }, [options, optionValue]);
-
+  // Helper function to handle option display
+ // Helper function to handle option display
+ const displayOption = (option: DropdownOption) => {
+  if (!option) return '';
+  const text = internationalization ? t(option[optionLabel]) : option[optionLabel];
+  // Return the text wrapped in a div that matches PrimeReact's default styling
+  return <div className="p-dropdown-item">{text}</div>;
+};
   return (
     <Controller
       name={name}
@@ -63,8 +73,14 @@ const DropdownWrapper: React.FC<DropdownWrapperProps> = ({
             filter={filter}
             emptyMessage={t('dropdownEmptyMessage')}
             optionLabel={optionLabel}
+            itemTemplate={internationalization ? (option) => displayOption(option) : undefined}
+            valueTemplate={internationalization ? (option) => displayOption(option) : undefined}
+          
             optionValue={optionValue}
-            className={classNames({ 'p-invalid': error })}
+            className={classNames(
+              { 'p-invalid': error },
+              'p-dropdown-item-container' // Add PrimeReact's container class
+            )}
             disabled={disabled}
             placeholder={placeholder}
             {...rest}

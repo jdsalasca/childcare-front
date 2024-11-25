@@ -128,8 +128,8 @@ export const StepComponentTwo: FC<StepComponentTwoProps> = ({
               spanClassName='c-small-field r-m-10'
             />
             <DropdownWrapper
-              
-            rules={{ required: t('guardianTypeRequired') }}
+              key={`guardians[${index}].guardian_type_id`}
+              rules={{ required: t('guardianTypeRequired') }}
               options={getAvailableGuardianTypes(index)}
               optionValue={'id'}
               optionLabel='name'
@@ -137,6 +137,7 @@ export const StepComponentTwo: FC<StepComponentTwoProps> = ({
               spanClassName='c-small-field r-10'
               name={`guardians[${index}].guardian_type_id`}
               control={control}
+              internationalization={true}
             />
             <CheckboxWrapper
               name={`guardians[${index}].titular`}

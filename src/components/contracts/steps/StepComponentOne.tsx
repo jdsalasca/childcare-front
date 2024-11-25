@@ -40,7 +40,7 @@ export const StepComponentOne: React.FC<StepComponentOneProps> = ({
   const { t } = useTranslation();
   const [childrenOptions, setChildrenOptions] = useState<ChildType[]>([]);
   const { genderOptions } = useGenderOptions();
-  const { data: children, isLoading } = useChildren();
+  const { data: children, isLoading, refreshChildren } = useChildren();
 
   useEffect(() => {
     customLogger.debug("children", children);
@@ -115,7 +115,7 @@ export const StepComponentOne: React.FC<StepComponentOneProps> = ({
       
       // Filter out undefined responses
       const validResponses = responses.filter((response): response is ChildType => response !== undefined);
-      
+      await refreshChildren();
       setLoadingInfo({
         loading: false,
         loadingMessage: "",
@@ -202,8 +202,17 @@ export const StepComponentOne: React.FC<StepComponentOneProps> = ({
 
     toast?.current?.show({ severity: 'success', summary: 'Success', detail: t('childrenInfoLoaded'), life: 3000 });
 
-    const existingChildIndex = fields.findIndex(child => child.fullName === selectedChild.fullName);
-
+    const existingChildIndex = fields.findIndex(child => {  
+      if(child.static_id && selectedChild.static_id){
+        return child.static_id === selectedChild.static_id;
+      }else if(child.name && selectedChild.name){
+        return (child.name+child.last_name).toLowerCase() ===  (selectedChild.name+selectedChild.last_name).toLowerCase();
+      }
+      return false;
+    });
+    customLogger.debug("existingChildIndex", existingChildIndex);
+    customLogger.debug("selectedChild", selectedChild);
+    customLogger.debug("fields", fields);
     if (existingChildIndex === -1) {
       append({
         ...selectedChild,
@@ -268,7 +277,8 @@ export const StepComponentOne: React.FC<StepComponentOneProps> = ({
               rules={{ required: t('bornDateRequired') }}
               label={t('bornDate')}
               dateFormat="mm/dd/yy"
-              spanClassName="c-small-field r-m-13"
+              spanClassName="p-float-label"
+
               showIcon
               onChangeCustom={(value : Date) => handleBornDateChange(value, index)}
             />

@@ -8,6 +8,7 @@ import InputTextWrapper from '@components/formsComponents/InputTextWrapper';
 import { Toast } from 'primereact/toast';
 import { LoadingInfo } from '@models/AppModels';
 import { ChildType } from 'types/child';
+import { motion } from 'framer-motion';
 const calculateAgeCounts = (children: ChildType[]) => {
     return children.reduce((acc, child) => {
       const birthDate = new Date(child.born_date);
@@ -133,99 +134,153 @@ const StepComponentPricing: React.FC<StepComponentPricingProps> = ({
     setActiveIndex(5);
   };
   return (
-    <div className="max-w-3xl mx-auto p-6">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <h3 className="text-2xl font-semibold text-gray-800 mb-6">{t('priceCalculation')}</h3>
-        
-        <div className="space-y-4">
-          {/* Registration Fee Row */}
-          <div className="grid grid-cols-3 items-center gap-4 p-4 bg-gray-50 rounded-lg">
-            <div className="space-y-1">
-              <span className="block font-medium text-gray-700">{t('registrationFee')}</span>
-              <span className="text-sm text-gray-500">${PRICES.REGISTRATION_FEE}/child</span>
-            </div>
-            <InputTextWrapper
-              control={control}
-              name="registrationCount"
-              label=""
-              min={0}
-              showButtons
-              className="w-full"
-            />
-            <div className="text-right font-medium text-gray-900">
-              ${(watchAllFields.registrationCount * PRICES.REGISTRATION_FEE).toFixed(2)}
-            </div>
-          </div>
-
-          {/* Activity Fee Row */}
-          <div className="grid grid-cols-3 items-center gap-4 p-4 bg-gray-50 rounded-lg">
-            <div className="space-y-1">
-              <span className="block font-medium text-gray-700">{t('activityFee')}</span>
-              <span className="text-sm text-gray-500">${PRICES.ACTIVITY_FEE}/child</span>
-            </div>
-            <InputTextWrapper
-              control={control}
-              name="activityCount"
-              label=""
-              min={0}
-              showButtons
-              className="w-full"
-            />
-            <div className="text-right font-medium text-gray-900">
-              ${(watchAllFields.activityCount * PRICES.ACTIVITY_FEE).toFixed(2)}
-            </div>
-          </div>
-
-          {/* Care Type Rows */}
-          {[
-            { name: 'infantCount', label: t('infantCare'), rate: PRICES.RATES.INFANT },
-            { name: 'toddlerCount', label: t('toddlerCare'), rate: PRICES.RATES.TODDLER },
-            { name: 'preschoolCount', label: t('preschoolCare'), rate: PRICES.RATES.PRESCHOOL },
-            { name: 'schoolCount', label: t('schoolCare'), rate: PRICES.RATES.SCHOOL },
-            { name: 'transportationCount', label: t('transportation'), rate: PRICES.TRANSPORTATION },
-          ].map(({ name, label, rate }) => (
-            <div key={name} className="grid grid-cols-3 items-center gap-4 p-4 bg-gray-50 rounded-lg">
-              <div className="space-y-1">
-                <span className="block font-medium text-gray-700">{label}</span>
-                <span className="text-sm text-gray-500">${rate}/child</span>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="max-w-5xl mx-auto p-4"
+    >
+      <motion.form 
+        onSubmit={handleSubmit(onSubmit)} 
+        className="space-y-6"
+      >
+        <motion.div
+          className="bg-white rounded-xl shadow-lg p-6"
+          whileHover={{ scale: 1.005 }}
+          transition={{ duration: 0.2 }}
+        >
+          <motion.h3 
+            className="text-xl font-semibold text-center text-gray-800 mb-6"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            {t('priceCalculation')}
+          </motion.h3>
+  
+          <div className="space-y-4">
+            {/* Initial Fees Section */}
+            <motion.div
+              className="bg-gray-50 rounded-xl p-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.1 }}
+            >
+              <h4 className="text-base font-medium text-gray-700 mb-3">{t('initialFees')}</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {[
+                  { name: 'registrationCount', label: t('registrationFee'), rate: PRICES.REGISTRATION_FEE },
+                  { name: 'activityCount', label: t('activityFee'), rate: PRICES.ACTIVITY_FEE }
+                ].map((fee, index) => (
+                  <motion.div
+                    key={fee.name}
+                    className="bg-white rounded-lg p-3 shadow-sm hover:shadow-md transition-all duration-200"
+                    whileHover={{ scale: 1.01 }}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.05 * index }}
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="min-w-[120px]">
+                        <div className="font-medium text-gray-700 text-sm">{fee.label}</div>
+                        <div className="text-xs text-gray-500">${fee.rate}/{t('perChild')}</div>
+                      </div>
+                      <InputTextWrapper
+                        control={control}
+                        name={fee.name}
+                        label=""
+                        min={0}
+                        showButtons
+                        className="w-24"
+                      />
+                      <div className="text-right font-medium text-gray-900 min-w-[80px]">
+                        ${(watchAllFields[fee.name as keyof typeof watchAllFields] * fee.rate).toFixed(2)}
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
               </div>
-              <InputTextWrapper
-                control={control}
-                name={name}
-                label=""
-                min={0}
-                showButtons
-                className="w-full"
-              />
-              <div className="text-right font-medium text-gray-900">
-                ${(watchAllFields[name as keyof typeof watchAllFields] * rate).toFixed(2)}
+            </motion.div>
+  
+            {/* Care Services Section */}
+            <motion.div
+              className="bg-gray-50 rounded-xl p-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              <h4 className="text-base font-medium text-gray-700 mb-3">{t('careServices')}</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {[
+                  { name: 'infantCount', label: t('infantCare'), rate: PRICES.RATES.INFANT },
+                  { name: 'toddlerCount', label: t('toddlerCare'), rate: PRICES.RATES.TODDLER },
+                  { name: 'preschoolCount', label: t('preschoolCare'), rate: PRICES.RATES.PRESCHOOL },
+                  { name: 'schoolCount', label: t('schoolCare'), rate: PRICES.RATES.SCHOOL },
+                  { name: 'transportationCount', label: t('transportation'), rate: PRICES.TRANSPORTATION }
+                ].map((service, index) => (
+                  <motion.div
+                    key={service.name}
+                    className="bg-white rounded-lg p-3 shadow-sm hover:shadow-md transition-all duration-200"
+                    whileHover={{ scale: 1.01 }}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.05 * index }}
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="min-w-[120px]">
+                        <div className="font-medium text-gray-700 text-sm">{service.label}</div>
+                        <div className="text-xs text-gray-500">${service.rate}/{t('perChild')}</div>
+                      </div>
+                      <InputTextWrapper
+                        control={control}
+                        name={service.name}
+                        label=""
+                        min={0}
+                        showButtons
+                        className="w-24"
+                      />
+                      <div className="text-right font-medium text-gray-900 min-w-[80px]">
+                        ${(watchAllFields[service.name as keyof typeof watchAllFields] * service.rate).toFixed(2)}
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
               </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-8 border-t pt-6">
-          <div className="text-xl font-bold text-gray-900 text-right">
-            {t('estimatedTotal')}: ${total.toFixed(2)}
+            </motion.div>
+  
+            {/* Total Section */}
+            <motion.div
+              className="bg-blue-50 rounded-xl p-4 shadow-md mt-6"
+              whileHover={{ scale: 1.01 }}
+              transition={{ duration: 0.2 }}
+            >
+              <div className="text-lg font-bold text-gray-900 text-right">
+                {t('estimatedTotal')}: ${total.toFixed(2)}
+              </div>
+            </motion.div>
           </div>
-        </div>
-
-        <div className='button-group'>
-        <Button
-            type='submit'
+        </motion.div>
+  
+        <motion.div 
+          className="flex justify-end gap-3 mt-4"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <Button
+            type="submit"
             label={t('save')}
-            className='p-button-primary p-ml-2'
+            className="p-button-primary px-6 py-2 text-sm font-medium rounded-lg 
+              hover:shadow-lg transition-all duration-200 hover:scale-105"
           />
           <Button
             label={t('returnToPreviousStep')}
-            className='p-button-secondary p-ml-2'
-            onClick={() => {
-              setActiveIndex(3);
-            }}
+            className="p-button-secondary px-6 py-2 text-sm font-medium rounded-lg 
+              hover:shadow-lg transition-all duration-200 hover:scale-105"
+            onClick={() => setActiveIndex(3)}
           />
-        </div>
-      </form>
-    </div>
+        </motion.div>
+      </motion.form>
+    </motion.div>
   );
 };
 

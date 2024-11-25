@@ -1,7 +1,8 @@
-import { useQuery, UseQueryResult } from '@tanstack/react-query';
+import { useQuery, useQueryClient, UseQueryResult } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { ChildType } from 'types/child';
 import API, { ApiResponse, BASE_URL } from './API';
+import { AppModels } from './AppModels';
 
 
 interface CreateChildData {
@@ -28,6 +29,17 @@ const ChildrenAPI = {
 getChildren: async (): Promise<ApiResponse<ChildType[]>> => {  // Change the response type to Child[]
     try {
         const response = await API.get<ChildType[]>(BASE_URL, '/children');
+        if(response.httpStatus === 200 && response.response.length > 0){
+            return {
+                httpStatus: response.httpStatus,
+                response: response.response.map((child: ChildType) => ({
+                    ...child,
+                    static_id: child.id,
+                    fullName: `${child.first_name} ${child.last_name}`,
+                })),
+            };
+        }
+
         return response; // Ensure you return the correct data structure
     } catch (error) {
         console.error('Error fetching children:', error);
@@ -68,35 +80,33 @@ getChildren: async (): Promise<ApiResponse<ChildType[]>> => {  // Change the res
         }
     }
 };
+interface UseChildrenResult {
+    data: ChildType[];
+    isLoading: boolean;
+    isError: boolean;
+    error: Error | null;
+    refreshChildren: () => Promise<void>;
+}
 
-export const useChildren = (): UseQueryResult<ChildType[], Error> => {  
+export const useChildren = (): UseChildrenResult => {  
+    const queryClient = useQueryClient();
     const childrenQuery = useQuery<ApiResponse<ChildType[]>, Error>({
-        queryKey: ['children'], // Unique key for caching
-        queryFn: ChildrenAPI.getChildren, // Function to fetch children
-        // Optional: Add config like staleTime, cacheTime, etc., to avoid unnecessary refetching
+        queryKey: ['children'],
+        queryFn: ChildrenAPI.getChildren,
+        staleTime: AppModels.DEFAULT_CACHE_TIME_5_MINUTES,
     });
 
-    // Memoize the transformed data to avoid unnecessary re-renders
-    const updateChildren = useMemo(() => {
-        if (childrenQuery.data && childrenQuery.data.httpStatus === 200) {
-            return childrenQuery.data.response.map(child => ({
-                ...child,
-                fullName: `${child.first_name} ${child.last_name}`,
-            }));
-        }
-        return [];
-    }, [childrenQuery.data]);
+    const refreshChildren = async () => {
+        await queryClient.invalidateQueries({ queryKey: ['children'] });
+    };
 
     return {
-        ...childrenQuery,
-        data: updateChildren, // Ensure data is always of type ChildType[]
-        error: childrenQuery.error, // Pass the error if it exists
-        isError: childrenQuery.isError,
+        data: childrenQuery.data?.response || [],
         isLoading: childrenQuery.isLoading,
-        isSuccess: childrenQuery.isSuccess,
-        status: childrenQuery.status,
-        // Include other properties as needed...
-    } as UseQueryResult<ChildType[], Error>; // Assert the return type
+        isError: childrenQuery.isError,
+        error: childrenQuery.error,
+        refreshChildren
+    };
 };
 
 export default ChildrenAPI;

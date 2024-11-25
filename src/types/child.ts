@@ -2,6 +2,7 @@ import { ChildMedicalInformation } from "./childMedicalInformation";
 
 // Define the structure of the child data
 export interface ChildType {
+    static_id?: number;
     id?: number;
     first_name: string;
     last_name: string;

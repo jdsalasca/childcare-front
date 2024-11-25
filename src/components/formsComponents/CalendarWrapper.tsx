@@ -84,13 +84,18 @@ const CalendarWrapper: React.FC<CalendarWrapperProps> = ({
           typeof field.value === 'string' ? new Date(field.value) : field.value;
 
         return (
-          <span className={`p-float-label ${spanClassName}`}>
+          <span className={`relative flex flex-col w-full ${spanClassName}`}>
+         
             <Calendar
               mask={timeOnly ? undefined : '99/99/9999'} // Use undefined instead of null
               id={name}
               {...field}
               dateFormat={dateFormat}
-              className={classNames({ 'p-invalid': error })}
+              className={classNames(
+                'w-full',
+                { 'p-invalid': error },
+                'min-w-[12rem]' // Ensure minimum width
+              )}
               disabled={disabled}
               showIcon={showIcon}
               maxDate={maxDate}
