@@ -47,6 +47,7 @@ export const MedicalInformationForm: React.FC<MedicalInformationFormProps>
 
 
   const onSubmit = (data: { childName: string; medicalInfo: MedicalInformation }) => {
+    toast.current?.show({ severity: 'info', summary: t('medicalInfoSaved') });
     if (data.childName) {
       const updatedChildren = contractInformation.children.map(child => {
         const fullName = `${child.first_name} ${child.last_name}`;
@@ -90,19 +91,21 @@ export const MedicalInformationForm: React.FC<MedicalInformationFormProps>
             <Controller
               name="childName"
               control={control}
-              rules={{ required: t('requiredField') }}
-              render={({ field }) => (
-                <Dropdown
-                  id="childName"
+              render={({ field, fieldState: { error } }) => (
+                <>
+                  <Dropdown
+                    id="childName"
                   options={contractInformation.children.map((child: ChildType) => ({
                     label: `${child.first_name} ${child.last_name}`,
                     value: `${child.first_name} ${child.last_name}`
                   }))}
                   value={field.value}
-                  onChange={(e) => onChildChange(e.value)}
-                  placeholder={t('selectChild')}
-                  className="w-full"
-                />
+                    onChange={(e) => onChildChange(e.value)}
+                    placeholder={t('selectChild')}
+                    className="w-full"
+                  />
+                  {error && <small className="p-error">{error.message}</small>}
+                </>
               )}
             />
           </div>
@@ -151,10 +154,18 @@ export const MedicalInformationForm: React.FC<MedicalInformationFormProps>
             label={t('save')}
             className='p-button-primary px-6 py-2'
           />
+  
+          <Button
+            label={t('goToFormulaInfo')}
+            icon="pi pi-arrow-right"
+            iconPos="right"
+            className='p-button-primary px-6 py-2'
+            onClick={() => setActiveIndex(7)}
+          />
           <Button
             label={t('returnToPreviousStep')}
             className='p-button-secondary px-6 py-2'
-            onClick={() => setActiveIndex(6)}
+            onClick={() => setActiveIndex(5)}
           />
         </motion.div>
       </motion.form>

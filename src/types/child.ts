@@ -10,7 +10,7 @@ export interface ChildType {
     fullName?: string;
     classroom: string | null;
     age: number | null;
-    born_date: Date | string;
+    born_date?: Date | string;
     program?: string;
     child_id?: number;
     middle_initial?: string;

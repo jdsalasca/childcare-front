@@ -1,6 +1,27 @@
 import { ChildType } from "types/child";
 import { Guardian } from "types/guardian";
 
+export interface WorkInformation {
+  employer: string;
+  address: string;
+  city: string;
+  phone: string;
+}
+
+export interface DoctorInformation {
+  name: string;
+  phone: string;
+  address: string;
+  city: string;
+  clinic: string;
+}
+
+export interface EmergencyContact {
+  name: string;
+  address: string;
+  city: string;
+  phone: string;
+}
 
 
 export interface ContractInfo {
@@ -37,6 +58,8 @@ export interface ContractInfo {
       schoolCount: number;
       transportationCount: number;
     };
+    doctorInformation?: DoctorInformation;
+    emergencyContact?: EmergencyContact;
   }
 
   export const defaultContractInfo: ContractInfo = {

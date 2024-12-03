@@ -21,7 +21,7 @@ interface DropdownWrapperProps extends Omit<DropdownProps, 'onChange' | 'value'>
   placeholder?: string;
   spanClassName?: string;
   internationalization?: boolean; // New prop for controlling translation
-
+  dropdownStyle?: React.CSSProperties;
   rest?: object;
 }
 
@@ -38,6 +38,7 @@ const DropdownWrapper: React.FC<DropdownWrapperProps> = ({
   placeholder,
   spanClassName = '',
   internationalization = false,
+  dropdownStyle,
   ...rest
 }) => {
   const { t } = useTranslation();
@@ -80,13 +81,15 @@ const DropdownWrapper: React.FC<DropdownWrapperProps> = ({
             className={classNames(
               { 'p-invalid': error },
               'p-dropdown-item-container' // Add PrimeReact's container class
-            )}
+            )
+          }
             disabled={disabled}
             placeholder={placeholder}
+            style={{ minHeight: '2.2em', ...dropdownStyle }} // Set a minimum height
             {...rest}
           />
           <label htmlFor={name}>{label}</label>
-          {error && <small className="p-error">{error.message}</small>}
+          {error && <small className="p-error h">{error.message}</small>}
         </span>
       )}
     />

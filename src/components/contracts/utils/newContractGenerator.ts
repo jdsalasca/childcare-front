@@ -40,14 +40,14 @@ contractData.guardians.find(g => g.guardian_type_id === FATHER_GUARDIAN_TYPE_ID)
     scheduleFormatted[`${day}.check_out`] = entry.check_out;
   });
   contractData.children.forEach(child => {
-    child.classroom = determineProgram(calculateWeeksOld(child.born_date));
-    child.program = determineProgram(calculateWeeksOld(child.born_date));
+    child.classroom = determineProgram(calculateWeeksOld(child.born_date!));
+    child.program = determineProgram(calculateWeeksOld(child.born_date!));
   });
 
   const guardians = contractData.guardians.map(g => g.name).join(', ');
   const children = contractData.children
     .map(child =>
-      Language.Spanish === language ? `- Nombre del niño: ${child.first_name} ${child.last_name}, fecha de nacimiento: ${Functions.formatDateToMMDDYY(child.born_date)}` : `- Child's name: ${child.first_name} ${child.last_name}, birth date: ${Functions.formatDateToMMDDYY(child.born_date)}`
+      Language.Spanish === language ? `- Nombre del niño: ${child.first_name} ${child.last_name}, fecha de nacimiento: ${Functions.formatDateToMMDDYY(child.born_date!)}` : `- Child's name: ${child.first_name} ${child.last_name}, birth date: ${Functions.formatDateToMMDDYY(child.born_date!)}`
     )
     .join('\n');
     const transportChildren = contractData.children
@@ -153,14 +153,14 @@ contractData.guardians.find(g => g.guardian_type_id === FATHER_GUARDIAN_TYPE_ID)
           separator: true,
           parr1: `\nNombre del niño: {{childName}}                                        Fecha de Nacimiento: {{childBornDate}}`,
           parr2: `\n<strong>                                                                   Instrucciones</strong>`,
-          parr3: `\no Leche maternal o fórmula: {{formula}}`,
-          parr4: `\no Horas aproximadas de comer: {{feedingTimes}}`,
-          parr5: `\no Máximo tiempo entre biberones: {{maxBottleTime}} Mínimo (si se diera el caso): {{minBottleTime}}`,
-          parr6: `\no Cantidad aproximada (onzas): {{bottleAmount}}`,
-          parr7: `\no Instrucciones para dar de comer: \n{{feedingInstructions}}`,
-          parr8: `\no Otra información de comida (cereal, comida de bebé, comida preparada, jugos, etc.): \n{{otherFood}}`,
-          parr9: `\no Alergias a alguna comida o alguna comida que no debe comer: \n{{foodAllergies}}`,
-          parr10: `\no Sigue el Programa de Comidas de niños y adultos (póngale un círculo):`,
+          parr3: `\n- Leche maternal o fórmula: {{formula}}`,
+          parr4: `\n- Horas aproximadas de comer: {{feedingTimes}}`,
+          parr5: `\n- Máximo tiempo entre biberones: {{maxBottleTime}} Mínimo (si se diera el caso): {{minBottleTime}}`,
+          parr6: `\n- Cantidad aproximada (onzas): {{bottleAmount}}`,
+          parr7: `\n- Instrucciones para dar de comer: \n{{feedingInstructions}}`,
+          parr8: `\n- Otra información de comida (cereal, comida de bebé, comida preparada, jugos, etc.): \n{{otherFood}}`,
+          parr9: `\n- Alergias a alguna comida o alguna comida que no debe comer: \n{{foodAllergies}}`,
+          parr10: `\n- Sigue el Programa de Comidas de niños y adultos (póngale un círculo):`,
           parr11: `\n                  {{followMealProgramYes}} Si                                           {{followMealProgramNo}} No`,
           signSection: true,
         }
@@ -174,13 +174,13 @@ contractData.guardians.find(g => g.guardian_type_id === FATHER_GUARDIAN_TYPE_ID)
           parr1: '\nNombre del niño: {{childName}}',
           parr2: '\nDoy mi permiso a Educando Childcare de administrar a mi hijo(a) lo siguiente:',
           parr3: '\n(Marcar con una X)',
-          parr4: '\no Jabón de manos líquido o en barra {{soap}}',
-          parr5: '\no Sanitizador de manos {{sanitizer}}',
-          parr6: '\no Crema para rozaduras {{rashCream}}',
-          parr7: '\no Medicamento para denticion {{teethingMedicine}}',
-          parr8: '\no Protector solar {{sunscreen}}',
-          parr9: '\no Repelente de insectos {{insectRepellent}}',
-          parr10: '\no Otros: ________________________________',
+          parr4: '\n- Jabón de manos líquido o en barra {{soap}}',
+          parr5: '\n- Sanitizador de manos {{sanitizer}}',
+          parr6: '\n- Crema para rozaduras {{rashCream}}',
+          parr7: '\n- Medicamento para denticion {{teethingMedicine}}',
+          parr8: '\n- Protector solar {{sunscreen}}',
+          parr9: '\n- Repelente de insectos {{insectRepellent}}',
+          parr10: '\n- Otros: ________________________________',
           signSection: true
         }
       }
@@ -411,14 +411,14 @@ page5: {
       separator: true,
       parr1: `\nChild's Name: {{childName}}                                        Date of Birth: {{childBornDate}}`,
       parr2: `\n<strong>                                                                   Instructions</strong>`,
-      parr3: `\no Breast milk or formula: {{formula}}`,
-      parr4: `\no Approximate meal times: {{feedingTimes}}`,
-      parr5: `\no Maximum time between bottles: {{maxBottleTime}} Minimum (if applicable): {{minBottleTime}}`,
-      parr6: `\no Approximate amount (ounces): {{bottleAmount}}`,
-      parr7: `\no Feeding instructions: \n{{feedingInstructions}}`,
-      parr8: `\no Other food information (cereal, baby food, prepared food, juices, etc.): \n{{otherFood}}`,
-      parr9: `\no Allergies to any food or anything that the baby should not eat: \n{{foodAllergies}}`,
-      parr10: `\no Follow the Food Program for children and adults (X):`,
+      parr3: `\n- Breast milk or formula: {{formula}}`,
+      parr4: `\n- Approximate meal times: {{feedingTimes}}`,
+      parr5: `\n- Maximum time between bottles: {{maxBottleTime}} Minimum (if applicable): {{minBottleTime}}`,
+      parr6: `\n- Approximate amount (ounces): {{bottleAmount}}`,
+      parr7: `\n- Feeding instructions: \n{{feedingInstructions}}`,
+      parr8: `\n- Other food information (cereal, baby food, prepared food, juices, etc.): \n{{otherFood}}`,
+      parr9: `\n- Allergies to any food or anything that the baby should not eat: \n{{foodAllergies}}`,
+      parr10: `\n- Follow the Food Program for children and adults (X):`,
       parr11: `\n                  {{followMealProgramYes}} Yes        {{followMealProgramNo}} No`,
 signSection: true,
     }
@@ -432,13 +432,13 @@ page6: {
       parr1: '\nChild\'s name: {{childName}}',
       parr2: '\nI give my permission to Educando Childcare to administer the following to my child:',
       parr3: '\n(Mark with a X)',
-      parr4: '\no Liquid or bar hand soap {{soap}}',
-      parr5: '\no Hand sanitizer {{sanitizer}}',
-      parr6: '\no Chafing cream {{rashCream}}',
-      parr7: '\no Teething medication {{teethingMedicine}}',
-      parr8: '\no Sunscreen {{sunscreen}}',
-      parr9: '\no Insect repellent {{insectRepellent}}',
-      parr10: '\no Others: ________________________________',
+      parr4: '\n- Liquid or bar hand soap {{soap}}',
+      parr5: '\n- Hand sanitizer {{sanitizer}}',
+      parr6: '\n- Chafing cream {{rashCream}}',
+      parr7: '\n- Teething medication {{teethingMedicine}}',
+      parr8: '\n- Sunscreen {{sunscreen}}',
+      parr9: '\n- Insect repellent {{insectRepellent}}',
+      parr10: '\n- Others: ________________________________',
       signSection: true
     }
   }

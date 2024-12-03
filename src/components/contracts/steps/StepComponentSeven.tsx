@@ -63,7 +63,7 @@ const StepComponentSeven: React.FC<StepComponentSevenProps> = ({
         ?.map(child => `${child.first_name} ${child.last_name}`)
         .join(', ');
       const allChildrenBirthDates = contractInformation.children
-        ?.map(child => Functions.formatDateToMMDDYY(child.born_date))
+        ?.map(child => Functions.formatDateToMMDDYY(child.born_date!))
         .join(', ');
   
       // Basic Contract Information
@@ -122,7 +122,7 @@ const StepComponentSeven: React.FC<StepComponentSevenProps> = ({
        
       // Basic Child Information
       form.getTextField('Childrens Name')?.setText(`${currentChild.first_name} ${currentChild.last_name}`);
-      form.getTextField('Birthdates')?.setText(Functions.formatDateToMMDDYY(currentChild.born_date));
+      form.getTextField('Birthdates')?.setText(Functions.formatDateToMMDDYY(currentChild.born_date!));
       
       // Contract Dates
       form.getTextField('Enrollment Date 1')?.setText(Functions.formatDateToMMDDYY(contractInfo.start_date!));
@@ -144,7 +144,29 @@ const StepComponentSeven: React.FC<StepComponentSevenProps> = ({
         form.getTextField('City 2')?.setText(mother.city || '');
         form.getTextField('Phone_2')?.setText(mother.phone || '');
       }
-  
+  // Work Information - Father
+if (father?.workInformation) {
+  form.getTextField('Employer 3')?.setText(father.workInformation.employer || '');
+  form.getTextField('Address_3')?.setText(father.workInformation.address || '');
+  form.getTextField('City_3')?.setText(father.workInformation.city || '');
+  form.getTextField('Phone_3')?.setText(father.workInformation.phone || '');
+}
+
+// Work Information - Mother
+if (mother?.workInformation) {
+  form.getTextField('Employer_4')?.setText(mother.workInformation.employer || '');
+  form.getTextField('Address_4')?.setText(mother.workInformation.address || '');
+  form.getTextField('City_4')?.setText(mother.workInformation.city || '');
+  form.getTextField('Phone_4')?.setText(mother.workInformation.phone || '');
+}
+
+// Doctor Information
+if (contractInformation.doctorInformation) {
+  form.getTextField('Contact doctor')?.setText(contractInformation.doctorInformation.name || '');
+  form.getTextField('Contact phone')?.setText(contractInformation.doctorInformation.phone || '');
+  form.getTextField('Contact address')?.setText(contractInformation.doctorInformation.address || '');
+      form.getTextField('Doctor(s), clinics or hospital')?.setText(contractInformation.doctorInformation.clinic || '');
+    }
       // Medical Information
       if (currentChild.medicalInformation) {
         form.getTextField('Health status')?.setText(currentChild.medicalInformation.healthStatus || '');
@@ -185,13 +207,14 @@ const StepComponentSeven: React.FC<StepComponentSevenProps> = ({
       // Instead of creating a new PDF, copy the original one for each child
       const childPdf = await PDFDocument.load(FormGob.contractVersion1); // Load a fresh copy for each child
       const childForm = childPdf.getForm();
+      console.log("childForm", childForm.getFields().map(field => field.getName()));
       
       // Fill form fields for this child
       const currentDate = Functions.formatDateToMMDDYY(new Date());
       
       // Basic Information
       childForm.getTextField('Childrens Name')?.setText(`${child.first_name} ${child.last_name}`);
-      childForm.getTextField('Birthdates')?.setText(Functions.formatDateToMMDDYY(child.born_date));
+      childForm.getTextField('Birthdates')?.setText(Functions.formatDateToMMDDYY(child.born_date!));
       childForm.getTextField('Enrollment Date 1')?.setText(Functions.formatDateToMMDDYY(contractInformation.start_date!));
       childForm.getTextField('Date Care Ceased')?.setText(Functions.formatDateToMMDDYY(contractInformation.end_date!));
       

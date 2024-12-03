@@ -128,16 +128,17 @@ export const StepComponentTwo: FC<StepComponentTwoProps> = ({
               spanClassName='c-small-field r-m-10'
             />
             <DropdownWrapper
+              dropdownStyle={{ maxWidth: '9em'}}
               key={`guardians[${index}].guardian_type_id`}
               rules={{ required: t('guardianTypeRequired') }}
               options={getAvailableGuardianTypes(index)}
               optionValue={'id'}
               optionLabel='name'
               label={t('guardianType')}
-              spanClassName='c-small-field r-10'
               name={`guardians[${index}].guardian_type_id`}
               control={control}
               internationalization={true}
+              spanClassName="p-float-label c-dropdown-field m-r-inherit"
             />
             <CheckboxWrapper
               name={`guardians[${index}].titular`}

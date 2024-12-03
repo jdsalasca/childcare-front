@@ -10,6 +10,8 @@ import DropdownWrapper from '../../formsComponents/DropdownWrapper';
 import InputTextWrapper from '../../formsComponents/InputTextWrapper';
 import { ToastInterpreterUtils } from '../../utils/ToastInterpreterUtils';
 import { ContractInfo } from '../types/ContractInfo';
+import { DoctorInformationCard } from './cards/DoctorInformationCard';
+import { WorkInformationCard } from './cards/WorkInformationCard';
 
 
 interface StepComponentFourProps {
@@ -57,6 +59,21 @@ const StepComponentFour: React.FC<StepComponentFourProps> = ({
       payment_method_id: contractInformation.payment_method_id || '',
       total_to_pay: contractInformation.total_to_pay || '',
       weekly_payment: contractInformation.weekly_payment || '',
+      guardians: contractInformation.guardians?.map(guardian => ({
+        ...guardian,
+        workInformation: guardian.workInformation || {
+          employer: '',
+          address: '',
+          city: '',
+          phone: ''
+        }
+      })),
+      doctorInformation: contractInformation.doctorInformation || {
+        name: '',
+        address: '',
+        city: '',
+        phone: ''
+      }
     },
   });
 
@@ -74,19 +91,50 @@ const StepComponentFour: React.FC<StepComponentFourProps> = ({
     }
   }, [startDate, endDate, setError, clearErrors, t]);
 
+  
   const onSubmit = async (data: any) => {
-    if (data.total_to_pay) {
-      data.total_to_pay = parseFloat(data.total_to_pay as string).toFixed(2);
+    try {
+      // Format payment data
+      const paymentData = {
+        contract_id: data.contract_id,
+        start_date: data.start_date,
+        end_date: data.end_date,
+        payment_method_id: data.payment_method_id,
+        total_to_pay: data.total_to_pay ? parseFloat(data.total_to_pay).toFixed(2) : '',
+        weekly_payment: data.weekly_payment ? parseFloat(data.weekly_payment).toFixed(2) : ''
+      };
+  
+      if (paymentData.contract_id == null) {
+        ToastInterpreterUtils.toastInterpreter(toast, 'info', 'info', t('contractInformationRequiredMessage'), 3000);
+        return;
+      }
+  
+      // Update guardians with work information
+      const updatedGuardians = contractInformation.guardians?.map((guardian, index) => ({
+        ...guardian,
+        workInformation: data.guardians?.[index]?.workInformation || guardian.workInformation
+      }));
+  
+      // Create the updated contract information
+      const updatedContractInfo = {
+        ...contractInformation,
+        ...paymentData,
+        guardians: updatedGuardians,
+        doctorInformation: data.doctorInformation
+      };
+  
+      // Update contract information in state
+      setContractInformation(updatedContractInfo);
+  
+      // Save payment details to backend
+      await ContractAPI.updateContractPaymentDetails(paymentData);
+      
+      ToastInterpreterUtils.toastInterpreter(toast, 'success', t('success'), t('termsUpdated'));
+      setActiveIndex(4);
+    } catch (error) {
+      console.error('Error in form submission:', error);
+      ToastInterpreterUtils.toastInterpreter(toast, 'error', t('error'), t('failedToUpdateInformation'));
     }
-    if (data.contract_id == null) {
-      ToastInterpreterUtils.toastInterpreter(toast, 'info', 'info', t('contractInformationRequiredMessage'), 3000);
-      return;
-    }
-    setContractInformation({ ...contractInformation, ...data });
-    await ContractAPI.updateContractPaymentDetails(data);
-    ToastInterpreterUtils.toastInterpreter(toast, 'success', t('success'), t('termsUpdated'));
-
-    setActiveIndex(4);
   };
 
   const formatValue = (event: React.FocusEvent<HTMLInputElement>) => {
@@ -148,7 +196,20 @@ const StepComponentFour: React.FC<StepComponentFourProps> = ({
           <Button type="submit" label={t('save')} className="p-button-primary p-ml-2" />
           <Button label={t('returnToPreviousStep')} className="p-button-secondary p-ml-2" onClick={() => setActiveIndex(2)} />
         </div>
+        {contractInformation.guardians?.map((guardian, index) => (
+        <div key={index}>
+          <WorkInformationCard 
+            control={control}
+            index={index}
+            guardianType={guardian.guardian_type_id === 1 ? t('father') : t('mother')}
+          />
+        </div>
+      ))}
+      
+      <DoctorInformationCard control={control} />
       </form>
+
+      
     </div>
   );
 };

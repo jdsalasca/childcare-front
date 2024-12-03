@@ -38,7 +38,8 @@ export const calculateAge = (bornDate: string | Date): number  => {
   return age;
 };
 
-export const calculateWeeksOld = (bornDate: string | Date): number => {
+export const calculateWeeksOld = (bornDate: string | Date | null): number => {
+  if (!bornDate) return 0;
   const today = new Date();
   const birthDate = new Date(bornDate);
   const diffTime = Math.abs(today.getTime() - birthDate.getTime());

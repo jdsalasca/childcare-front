@@ -102,7 +102,6 @@ const CalendarWrapper: React.FC<CalendarWrapperProps> = ({
               disabledDates={disabledDates}
               icon={icon}
               timeOnly={timeOnly}
-              yearRange='2023:2025'
               value={value ?? undefined} // Use undefined instead of null
               onChange={(e) => {
                 const newValue = e.value instanceof Date ? e.value : undefined; // Ensure it's a Date or undefined

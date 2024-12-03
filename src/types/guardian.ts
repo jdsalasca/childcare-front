@@ -1,3 +1,5 @@
+import { WorkInformation } from "@components/contracts/types/ContractInfo";
+
 export interface Guardian {
   id?:               number;
   name:             string;
@@ -14,6 +16,7 @@ export interface Guardian {
   value?: number;
   titular:          boolean;
   telephone?: string;
+  workInformation?: WorkInformation;
 }
 
 export const defaultGuardian: Guardian = {

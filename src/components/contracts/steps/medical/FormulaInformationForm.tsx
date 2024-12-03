@@ -52,6 +52,7 @@ export const FormulaInformationForm: React.FC<FormulaInformationFormProps> = ({ 
   };
 
   const onSubmit = (data: { childName: string; formulaInfo: FormulaInformation }) => {
+    toast.current?.show({ severity: 'info', summary: t('formulaInfoSaved') });
     if (data.childName) {
       const updatedChildren = contractInformation.children.map((child: ChildType) => {
         const fullName = `${child.first_name} ${child.last_name}`;
@@ -93,7 +94,6 @@ export const FormulaInformationForm: React.FC<FormulaInformationFormProps> = ({ 
             <Controller
               name="childName"
               control={control}
-              rules={{ required: t('requiredField') }}
               render={({ field }) => (
                 <Dropdown
                   id="childName"
@@ -119,7 +119,6 @@ export const FormulaInformationForm: React.FC<FormulaInformationFormProps> = ({ 
               name="formulaInfo.formula"
               control={control}
               label={t('formula')}
-              rules={{ required: t('requiredField') }}
             />
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 my-6">
@@ -128,7 +127,7 @@ export const FormulaInformationForm: React.FC<FormulaInformationFormProps> = ({ 
                   key={index}
                   name={`formulaInfo.feedingTimes.${index}`}
                   control={control}
-                  label={`${t('feeding')} ${index + 1}`}
+                  label={`${t('feddingTimes')} ${index + 1}`}
                 />
               ))}
             </div>
@@ -144,19 +143,16 @@ export const FormulaInformationForm: React.FC<FormulaInformationFormProps> = ({ 
                 name="formulaInfo.maxBottleTime"
                 control={control}
                 label={t('maxBottleTime')}
-                rules={{ required: t('requiredField') }}
               />
               <InputTextWrapper
                 name="formulaInfo.minBottleTime"
                 control={control}
                 label={t('minBottleTime')}
-                rules={{ required: t('requiredField') }}
               />
               <InputTextWrapper
                 name="formulaInfo.bottleAmount"
                 control={control}
                 label={t('bottleAmount')}
-                rules={{ required: t('requiredField') }}
                 keyfilter="int"
               />
             </div>
@@ -172,19 +168,16 @@ export const FormulaInformationForm: React.FC<FormulaInformationFormProps> = ({ 
                 name="formulaInfo.feedingInstructions"
                 control={control}
                 label={t('feedingInstructions')}
-                rules={{ required: t('requiredField') }}
               />
               <InputTextAreaWrapper
                 name="formulaInfo.otherFood"
                 control={control}
                 label={t('otherFood')}
-                rules={{ required: t('requiredField') }}
               />
               <InputTextAreaWrapper
                 name="formulaInfo.foodAllergies"
                 control={control}
                 label={t('foodAllergies')}
-                rules={{ required: t('requiredField') }}
               />
               <CheckboxWrapper
                 name="formulaInfo.followMealProgram"
@@ -205,10 +198,17 @@ export const FormulaInformationForm: React.FC<FormulaInformationFormProps> = ({ 
             label={t('save')}
             className='p-button-primary px-6 py-2'
           />
+  <Button
+    label={t('goToPermissionsInfo')}
+    icon="pi pi-arrow-right"
+    iconPos="right"
+    className='p-button-primary px-4 py-2 text-sm font-medium'
+    onClick={() => setActiveIndex(8)}
+  />
           <Button
             label={t('returnToPreviousStep')}
             className='p-button-secondary px-6 py-2'
-            onClick={() => setActiveIndex(3)}
+            onClick={() => setActiveIndex(6)}
           />
         </motion.div>
       </motion.form>

@@ -155,7 +155,7 @@ export const StepComponentOne: React.FC<StepComponentOneProps> = ({
       first_name: '',
       last_name: '',
       name: '', // Set a default or empty value as needed
-      born_date: "",
+      born_date:  undefined,
       program: '',
       classroom: '', // Set a default or empty value as needed
       age: 0, // or any default value you prefer
@@ -218,12 +218,12 @@ export const StepComponentOne: React.FC<StepComponentOneProps> = ({
         ...selectedChild,
         name: selectedChild.first_name || selectedChild.name,
         last_name: selectedChild.last_name,
-        age: calculateAge(selectedChild.born_date),
-        born_date: new Date(selectedChild.born_date),
-        program: determineProgram(calculateWeeksOld(selectedChild.born_date)),
+        age: calculateAge(selectedChild.born_date!),
+        born_date: new Date(selectedChild.born_date!),
+        program: determineProgram(calculateWeeksOld(selectedChild.born_date!)),
       });
     } else {
-      setValue(`children.${existingChildIndex}.born_date` as const, new Date(selectedChild.born_date));
+      setValue(`children.${existingChildIndex}.born_date` as const, new Date(selectedChild.born_date!));
     }
   };
 

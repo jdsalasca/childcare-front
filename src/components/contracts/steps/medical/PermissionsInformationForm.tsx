@@ -48,6 +48,7 @@ export const PermissionsInformationForm: React.FC<PermissionsInformationFormProp
   };
 
   const onSubmit = (data: { childName: string; permissions: PermissionsInformation }) => {
+    toast.current?.show({ severity: 'info', summary: t('permissionsInfoSaved') });
     if (data.childName) {
       const updatedChildren = contractInformation.children.map(child => {
         const fullName = `${child.first_name} ${child.last_name}`;
@@ -89,10 +90,10 @@ export const PermissionsInformationForm: React.FC<PermissionsInformationFormProp
             <Controller
               name="childName"
               control={control}
-              rules={{ required: t('requiredField') }}
-              render={({ field }) => (
-                <Dropdown
-                  id="childName"
+              render={({ field, fieldState: { error } }) => (
+                <>
+                  <Dropdown
+                    id="childName"
                   options={contractInformation.children.map(child => ({
                     label: `${child.first_name} ${child.last_name}`,
                     value: `${child.first_name} ${child.last_name}`
@@ -100,8 +101,10 @@ export const PermissionsInformationForm: React.FC<PermissionsInformationFormProp
                   value={field.value}
                   onChange={(e) => onChildChange(e.value)}
                   placeholder={t('selectChild')}
-                  className="w-full"
-                />
+                    className="w-full"
+                  />
+                  {error && <small className="p-error">{error.message}</small>}
+                </>
               )}
             />
           </div>
@@ -180,8 +183,16 @@ export const PermissionsInformationForm: React.FC<PermissionsInformationFormProp
           <Button
             label={t('returnToPreviousStep')}
             className='p-button-secondary px-6 py-2'
-            onClick={() => setActiveIndex(5)}
+            onClick={() => setActiveIndex(7)}
           />
+          <Button
+            label={t('goToContractInfo')}
+            icon="pi pi-arrow-right"
+            iconPos="right"
+            className='p-button-primary px-4 py-2 text-sm font-medium'
+            onClick={() => setActiveIndex(9)}
+          />
+
         </motion.div>
       </motion.form>
     </motion.div>
