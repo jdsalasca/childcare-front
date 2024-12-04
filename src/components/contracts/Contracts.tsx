@@ -33,7 +33,7 @@ export const Contracts: React.FC<ContractsProps> = () => {
   const [loadingInfo, setLoadingInfo] = useState(LoadingInfo.DEFAULT_MESSAGE);
   const { t } = useTranslation();
   const [activeIndex, setActiveIndex] = useState(0);
-  const [contractInformation, setContractInformation] = useState<ContractInfo>(defaultContractInfo);
+  const [contractInformation, setContractInformation] = useState<ContractInfo>(mockContract);
   const { laboralDays: daysCache } = useDays();
   const toast = useRef<Toast | null>(null);
 

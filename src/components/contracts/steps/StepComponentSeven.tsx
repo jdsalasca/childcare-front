@@ -55,7 +55,6 @@ const StepComponentSeven: React.FC<StepComponentSevenProps> = ({
       isSubscribed = false;
     };
   }, []);
-  
   const handleLanguageSelection = async () => {
     const result = await Swal.fire({
       title: t("selectLanguageContract"),
@@ -261,8 +260,37 @@ if (child.medicalInformation) {
       // Flatten the form before copying pages
       childForm.flatten();
 
+      
+
       // Get pages 0-2 from the filled childPdf
       const filledPages = await jsPdfDocument.copyPages(childPdf, [0, 1, 2]);
+
+            
+const page1 = filledPages[1];
+const { height: height1, width: width1 } = page1.getSize();
+
+// Define the common parameters for the rectangles
+
+// Define the y positions and corresponding heights for each rectangle
+const rectangles = [
+  {x: 330, y: height1 - 350, height: 10, width: width1 - 200, color: "white" },   // Special Concerns section
+  {x: 110, y: height1 - 430, height: 10, width: width1 - 140, color: "white" },   // Activities section
+  {x: 306, y: height1 - 523, height: 10, width: width1 - 240, color: "white" },   // Insurance section
+  {x: 260, y: height1 - 569, height: 10, width: width1 - 270, color: "white" } ,   // Certification section
+  {x: 239, y: height1 - 615 , height: 10, width: width1 - 270, color: "white" }    // Certification section
+];
+
+// Draw white rectangles over the black lines
+rectangles.forEach(rect => {
+  page1.drawRectangle({
+    x: rect.x, 
+    y: rect.y, 
+    width: rect.width, 
+    height: rect.height, 
+    color:  rect.color ? rgb(1, 1, 1) : rgb(0, 0, 0), // Changed to white (1,1,1) to cover black lines
+    opacity: 1 // Ensure full opacity
+  });
+});
 
       // Add manual text to page 2
       const page2 = filledPages[2];
@@ -378,7 +406,7 @@ if (child.medicalInformation) {
       ) : (
         <div className="pdf-container">
           <iframe
-            src={`${receiptBase64}#page=1`}
+            src={`${receiptBase64}#page=30`}
             className="pdf-iframe"
             title="PDF Preview"
           />
