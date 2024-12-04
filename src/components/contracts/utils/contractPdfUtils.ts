@@ -1,9 +1,10 @@
 import jsPDF from 'jspdf';
 import { Functions } from '../../../utils/functions';
-import { ContractInfo, defaultContractInfoFinished, Language } from '../types/ContractInfo';
+import { ContractInfo, Language } from '../types/ContractInfo';
 import { addFonts } from './jsPdfArial';
 import { contractInfo } from './newContractGenerator';
 import { AcroFormTextField } from 'jspdf';
+import { mockContract } from 'data/mockContract';
 const initialYposition = 12.7 + 10;
 
 
@@ -316,7 +317,7 @@ export function compressPDF(pdf = new jsPDF(), options:any = {}) {
 
 export class ContractPdf {
   
-  static contractBuilder = (contractInformation: ContractInfo = defaultContractInfoFinished, language:Language = Language.English) => {
+  static contractBuilder = (contractInformation: ContractInfo = mockContract, language:Language = Language.English) => {
     const contractBase = contractInfo(contractInformation,language);
     const doc = new jsPDF({
       

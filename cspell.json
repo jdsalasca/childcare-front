@@ -9,6 +9,7 @@
         "datetime",
         "denticion",
         "DHHS",
+        "fedding",
         "friday",
         "Handwash",
         "handwashing",
@@ -20,6 +21,7 @@
         "preschool",
         "Prescolar",
         "Prescolares",
+        "primeicons",
         "primereact",
         "Procare",
         "redirección",
@@ -27,6 +29,7 @@
         "Registración",
         "Sanitizador",
         "spanish",
+        "stylesheet",
         "Swal",
         "sweetalert",
         "tanstack",
@@ -38,9 +41,7 @@
         "todos",
         "tuesday",
         "wednesday",
-        "primeicons",
         "yopmail",
-        "stylesheet",
         "Yposition"
     ],
     "ignorePaths": [

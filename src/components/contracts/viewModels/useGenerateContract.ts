@@ -1,8 +1,8 @@
 import { useTranslation } from "react-i18next";
 import { customLogger } from "../../../configs/logger";
 import { ToastInterpreterUtils } from "../../utils/ToastInterpreterUtils";
-import { ContractInfo, defaultContractInfoFinished } from "../types/ContractInfo";
-
+import { ContractInfo } from "../types/ContractInfo";
+import { mockContract } from 'data/mockContract';
 interface UseGenerateContractProps {
   contractInformation?: ContractInfo;
   toast: any; // Adjust type as necessary
@@ -10,7 +10,7 @@ interface UseGenerateContractProps {
 }
 
 const useGenerateContract = ({
-  contractInformation  = defaultContractInfoFinished,
+  contractInformation  = mockContract,
   toast,
   ...props
 }: UseGenerateContractProps) => {

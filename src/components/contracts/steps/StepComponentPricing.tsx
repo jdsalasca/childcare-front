@@ -11,7 +11,7 @@ import { ChildType } from 'types/child';
 import { motion } from 'framer-motion';
 const calculateAgeCounts = (children: ChildType[]) => {
     return children.reduce((acc, child) => {
-      const birthDate = new Date(child.born_date);
+      const birthDate = new Date(child.born_date!);
       const today = new Date();
       const ageInYears = (today.getTime() - birthDate.getTime()) / (1000 * 60 * 60 * 24 * 365.25);
   

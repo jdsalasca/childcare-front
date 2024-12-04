@@ -1,8 +1,11 @@
 import { ContractInfo } from "@components/contracts/types/ContractInfo";
 
 export const mockContract: ContractInfo =
-
 {
+  "provider_name": "Test Test",
+  "provider_director_staff": "Test Test",
+  "restricted_activities": "Test Test",
+  "insurance_company": "Test Test",
   "titularName": "Test Test",
   "todayDate": "2024-11-17T17:26:44.444Z",
   "children": [

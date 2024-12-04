@@ -1,9 +1,10 @@
 /* eslint-disable no-unused-vars */
 import { Functions } from '../../../utils/functions';
 import { PRICES } from '../data/prices';
-import { ContractInfo, defaultContractInfoFinished, Language } from '../types/ContractInfo';
+import { ContractInfo, Language } from '../types/ContractInfo';
 import { calculateWeeksOld, determineProgram, fontStyles } from '../utilsAndConstants';
-export const contractInfo = (contractData: ContractInfo= defaultContractInfoFinished, language:Language = Language.English) => {
+import { mockContract } from 'data/mockContract';
+export const contractInfo = (contractData: ContractInfo= mockContract, language:Language = Language.English) => {
   const todayDate = Functions.formatDateToMMDDYY(contractData.todayDate);
   const startDate = Functions.formatDateToMMDDYY(contractData.start_date!);
   const endDate = Functions.formatDateToMMDDYY(contractData.end_date!);

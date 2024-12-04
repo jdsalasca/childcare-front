@@ -16,9 +16,8 @@ import { ContractPermissionsValidator } from '../../models/ContractPermissionsAP
 import useDays from '../../models/customHooks/useDays';
 import Loader from '../utils/Loader';
 import StepComponentFive from './steps/StepComponentFive';
-import { contractDone, ContractInfo, defaultContractInfo, defaultContractInfoFinished } from './types/ContractInfo';
+import { contractDone, ContractInfo, defaultContractInfo } from './types/ContractInfo';
 import { mockContract } from '../../data/mockContract';
-import StepComponentSix from './steps/StepComponentSix';
 import { MedicalInformationForm } from './steps/medical/MedicalInformationForm';
 import { FormulaInformationForm } from './steps/medical/FormulaInformationForm';
 import { PermissionsInformationForm } from './steps/medical/PermissionsInformationForm';

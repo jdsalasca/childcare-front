@@ -13,7 +13,7 @@ import { ContractInfo } from '../types/ContractInfo';
 
 // Create an interface to handle the dynamic fields for check_in and check_out
 interface ScheduleFormValues {
-  [key: string]: Date; // Dynamically named fields like "mondaycheck_in", "mondaycheck_out", etc.
+  [key: string]: Date; // Dynamically named fields like "monday check_in", "monday check_out", etc.
 }
 
 interface StepComponentFiveProps {
@@ -45,6 +45,7 @@ export const StepComponentFive: React.FC<StepComponentFiveProps> = ({
     getValues,
   } = useForm<ScheduleFormValues>({
     defaultValues: {} as ScheduleFormValues, // Initially empty or predefined
+    
   });
 
   // INITIALIZATION OF THE COMPONENT
