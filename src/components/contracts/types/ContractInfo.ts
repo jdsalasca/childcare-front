@@ -28,10 +28,6 @@ export interface EmergencyContact {
 
 export interface ContractInfo {
 
-    provider_name: string;
-    provider_director_staff: string;
-    restricted_activities: string;
-    insurance_company: string;
     titularName: string;
     todayDate: string; // ISO date string
     children: ChildType[];
@@ -72,11 +68,7 @@ export interface ContractInfo {
   }
 
   export const defaultContractInfo: ContractInfo = {
-    provider_name: '',
-    provider_director_staff: '',
-    restricted_activities: '',
-    insurance_company: '',
-    titularName: '',
+    titularName: "",
     todayDate: new Date().toISOString(), // Sets today's date in ISO format
     children: [], // Assuming ChildType is defined elsewhere
     guardians: [], // Assuming Guardian is defined elsewhere
@@ -93,10 +85,6 @@ export interface ContractInfo {
   
 
   export const contractDone: ContractInfo = {
-    provider_name: '',
-    provider_director_staff: '',
-    restricted_activities: '',
-    insurance_company: '',
     "titularName": "",
     "todayDate": "2024-10-04T02:23:13.045Z",
     "children": [

@@ -4,7 +4,7 @@ import { ContractInfo, Language } from '../types/ContractInfo';
 import { addFonts } from './jsPdfArial';
 import { contractInfo } from './newContractGenerator';
 import { AcroFormTextField } from 'jspdf';
-import { mockContract } from 'data/mockContract';
+import { mockContract } from '../../../data/mockContract';
 const initialYposition = 12.7 + 10;
 
 

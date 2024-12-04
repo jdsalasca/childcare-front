@@ -21,31 +21,26 @@ export const DoctorInformationCard: React.FC<DoctorInformationCardProps> = ({
           name="doctorInformation.name"
           control={control}
           label={t('doctorName')}
-          rules={{ required: t('doctorNameRequired') }}
         />
         <InputTextWrapper
           name="doctorInformation.phone"
           control={control}
           label={t('doctorPhone')}
-          rules={{ required: t('phoneRequired') }}
         />
         <InputTextWrapper
           name="doctorInformation.address"
           control={control}
           label={t('doctorAddress')}
-          rules={{ required: t('addressRequired') }}
         />
         <InputTextWrapper
           name="doctorInformation.city"
           control={control}
           label={t('doctorCity')}
-          rules={{ required: t('cityRequired') }}
         />
         <InputTextWrapper
           name="doctorInformation.clinic"
           control={control}
           label={t('clinic')}
-          rules={{ required: t('clinicRequired') }}
         />
       </div>
     </Card>

@@ -2,10 +2,6 @@ import { ContractInfo } from "@components/contracts/types/ContractInfo";
 
 export const mockContract: ContractInfo =
 {
-  "provider_name": "Test Test",
-  "provider_director_staff": "Test Test",
-  "restricted_activities": "Test Test",
-  "insurance_company": "Test Test",
   "titularName": "Test Test",
   "todayDate": "2024-11-17T17:26:44.444Z",
   "children": [
@@ -27,7 +23,12 @@ export const mockContract: ContractInfo =
         "healthStatus": "qqqqqqqqqqqqq",
         "treatment": "qqqqqqqqqqqqq",
         "allergies": "qqqqqqqqqqqqq",
-        "instructions": "qqqqqqqqqqqqq"
+        "instructions": "qqqqqqqqqqqqq",
+        "medication": "qqqqqqqqqqqqq",
+        "provider_director_staff": "qqqqqqqqqqqqq",
+        "restricted_activities": "qqqqqqqqqqqqq",
+        "insurance_company": "qqqqqqqqqqqqq",
+        "caregiver_name": "qqqqqqqqqqqqq"
       },
       "formulaInformation": {
         "formula": "eeeeeeeeeee",
@@ -74,7 +75,12 @@ export const mockContract: ContractInfo =
         "healthStatus": "aaaaaaaaaaaaaaaaaa",
         "treatment": "aaaaaaaaaaaaaaaaaa",
         "allergies": "aaaaaaaaaaaaaaaaaa",
-        "instructions": "aaaaaaaaaaaaaaaaaa"
+        "instructions": "aaaaaaaaaaaaaaaaaa",
+        "medication": "aaaaaaaaaaaaaaaaaa",
+        "provider_director_staff": "aaaaaaaaaaaaaaaaaa",
+        "restricted_activities": "aaaaaaaaaaaaaaaaaa",
+        "insurance_company": "aaaaaaaaaaaaaaaaaa",
+        "caregiver_name": "aaaaaaaaaaaaaaaaaa"
       },
       "permissionsInformation": {
         "soap": true,
@@ -105,7 +111,12 @@ export const mockContract: ContractInfo =
         "healthStatus": "eeeeeeeeeee",
         "treatment": "eeeeeeeeeee",
         "allergies": "eeeeeeeeeee",
-        "instructions": "eeeeeeeeeee"
+        "instructions": "eeeeeeeeeee",
+        "medication": "eeeeeeeeeee",
+        "provider_director_staff": "eeeeeeeeeee",
+        "restricted_activities": "eeeeeeeeeee",
+        "insurance_company": "eeeeeeeeeee",
+        "caregiver_name": "eeeeeeeeeee"
       },
       "permissionsInformation": {
         "soap": true,

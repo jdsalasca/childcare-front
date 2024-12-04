@@ -13,10 +13,9 @@ import { FormGob } from "../types/formGob";
 import { ContractPdf } from "../utils/contractPdfUtils";
 import useGenerateContract from "../viewModels/useGenerateContract";
 import { Functions } from "@utils/functions";
-import { ChildMedicalInformation } from "types/childMedicalInformation";
 import { Guardian } from "types/guardian";
 import { ChildType, MedicalInformation } from "types/child";
-import { mockContract } from "data/mockContract";
+import { mockContract } from '../../../data/mockContract';
 
 interface StepComponentSevenProps {
   contractInformation?: ContractInfo;
@@ -42,9 +41,21 @@ const StepComponentSeven: React.FC<StepComponentSevenProps> = ({
   });
 
   useEffect(() => {
-    handleLanguageSelection();
+    let isSubscribed = true;
+    
+    const handleLanguage = async () => {
+      if (isSubscribed) {
+        await handleLanguageSelection();
+      }
+    };
+    
+    handleLanguage();
+    
+    return () => {
+      isSubscribed = false;
+    };
   }, []);
-
+  
   const handleLanguageSelection = async () => {
     const result = await Swal.fire({
       title: t("selectLanguageContract"),
@@ -95,29 +106,8 @@ const StepComponentSeven: React.FC<StepComponentSevenProps> = ({
       const currentDate = Functions.formatDateToMMDDYY(new Date());
 // Add after line 179, before Emergency Contacts section
 // Provider and Staff Information
-childForm
-  .getTextField("Consent to")
-  ?.setText(contractInformation.provider_name || "");
 
-childForm
-  .getTextField("Provider/Director/Staff")
-  ?.setText(contractInformation.provider_director_staff || "");
 
-// Parent/Guardian Name for Medication
-childForm
-  .getTextField("I (name)")
-  ?.setText(contractInformation.titularName || "");
-
-// Activities and Insurance
-childForm
-  .getTextField("Any activities children should NOT engage in")
-  ?.setText(contractInformation.restricted_activities || "");
-
-childForm
-      .getTextField(
-        "Company providing health andor accident insurance coverage Optional"
-      )
-      ?.setText(contractInformation.insurance_company || "");
       // Basic Information
       childForm
         .getTextField("Childrens Name")
@@ -236,16 +226,32 @@ contractInformation.emergencyContacts?.forEach((contact, index) => {
         ?.setText("                                    " + currentDate);
 
       // Medical Information
-      if (child.medicalInformation) {
-        childForm
-          .getTextField("Health status")
-          ?.setText(child.medicalInformation.healthStatus || "");
-        childForm
-          .getTextField("Allergies")
-          ?.setText(child.medicalInformation.allergies || "");
-        childForm
-          .getTextField("Special Concerns")
-          ?.setText(child.medicalInformation.instructions || "");
+// Update the medical information section
+if (child.medicalInformation) {
+  childForm
+    .getTextField("Health status")
+    ?.setText(child.medicalInformation.healthStatus || "");
+  childForm
+    .getTextField("Allergies")
+    ?.setText(child.medicalInformation.allergies || "");
+  childForm
+    .getTextField("Special Concerns")
+    ?.setText(child.medicalInformation.instructions || "");
+  childForm
+    .getTextField("Medication")
+    ?.setText(child.medicalInformation.medication || "");
+  childForm
+    .getTextField("Provider/Director/Staff")
+    ?.setText(child.medicalInformation.provider_director_staff || "");
+  childForm
+    .getTextField("Any activities children should NOT engage in")
+    ?.setText(child.medicalInformation.restricted_activities || "");
+  childForm
+    .getTextField("Company providing health andor accident insurance coverage Optional")
+    ?.setText(child.medicalInformation.insurance_company || "");
+  childForm
+    .getTextField("Consent to")
+        ?.setText(child.medicalInformation.caregiver_name || "");
       }
 
       childForm

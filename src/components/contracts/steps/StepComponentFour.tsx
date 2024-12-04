@@ -80,10 +80,6 @@ const StepComponentFour: React.FC<StepComponentFourProps> = ({
       },
       emergencyContacts: contractInformation.emergencyContacts || [],
       releasedToPersons: contractInformation.releasedToPersons || [],
-      provider_name: contractInformation.provider_name || '',
-      provider_director_staff: contractInformation.provider_director_staff || '',
-      restricted_activities: contractInformation.restricted_activities || '',
-      insurance_company: contractInformation.insurance_company || ''
     },
   });
 
@@ -134,10 +130,10 @@ const StepComponentFour: React.FC<StepComponentFourProps> = ({
     doctorInformation: data.doctorInformation,
     emergencyContacts: data.emergencyContacts,
       releasedToPersons: data.releasedToPersons,
-      provider_name: data.provider_name,
+      caregiver_name: data.caregiver_name,
       provider_director_staff: data.provider_director_staff,
       restricted_activities: data.restricted_activities,
-      insurance_company: data.insurance_company
+      insurance_company: data.insurance_company,
     };
       // Update contract information in state
       setContractInformation(updatedContractInfo);
@@ -218,47 +214,6 @@ const StepComponentFour: React.FC<StepComponentFourProps> = ({
                 onBlur={formatValue}
                 spanClassName="p-float-label"
               />
-                {/* Consent to Contact Physician */}
-  <InputTextWrapper
-    name="provider_name"
-    control={control}
-    rules={{ required: t('providerNameRequired') }}
-    label={t('providerName')}
-    keyFilter={/^[a-zA-ZñÑ.,\s]*$/}
-    onChangeCustom={(value) => Validations.capitalizeFirstLetter(value)}
-  />
-
-  {/* Doctor Information */}
-  <InputTextWrapper
-    name="doctor_name"
-    control={control}
-    rules={{ required: t('doctorNameRequired') }}
-    label={t('doctorName')}
-    keyFilter={/^[a-zA-ZñÑ.,\s]*$/}
-  />
-
-  {/* Medical Staff Information */}
-  <InputTextWrapper
-    name="provider_director_staff"
-    control={control}
-    rules={{ required: t('providerDirectorStaffRequired') }}
-    label={t('providerDirectorStaff')}
-    keyFilter={/^[a-zA-ZñÑ.,\s]*$/}
-  />
-
-  {/* Activities Restrictions */}
-  <InputTextAreaWrapper
-    name="restricted_activities"
-    control={control}
-    label={t('restrictedActivities')}
-  />
-
-  {/* Insurance Information */}
-  <InputTextWrapper
-    name="insurance_company"
-    control={control}
-    label={t('insuranceCompany')}
-  />
             </div>
           </motion.div>
 
@@ -268,7 +223,7 @@ const StepComponentFour: React.FC<StepComponentFourProps> = ({
               key={guardian.id || index}
               control={control}
               index={index}
-              guardianType={guardian.guardian_type_id === 1 ? t('father') : t('mother')}
+              guardianType={guardian.guardian_type_id === 1 ? t('father') : guardian.guardian_type_id === 2 ? t('mother') : t('guardian')}
             />
           ))}
 

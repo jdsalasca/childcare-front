@@ -25,25 +25,21 @@ export const WorkInformationCard: React.FC<WorkInformationCardProps> = ({
           name={`guardians[${index}].workInformation.employer`}
           control={control}
           label={t('employer')}
-          rules={{ required: t('employerRequired') }}
         />
         <InputTextWrapper
           name={`guardians[${index}].workInformation.address`}
           control={control}
           label={t('workAddress')}
-          rules={{ required: t('addressRequired') }}
         />
         <InputTextWrapper
           name={`guardians[${index}].workInformation.city`}
           control={control}
           label={t('workCity')}
-          rules={{ required: t('cityRequired') }}
         />
         <InputTextWrapper
           name={`guardians[${index}].workInformation.phone`}
           control={control}
           label={t('workPhone')}
-          rules={{ required: t('phoneRequired') }}
         />
       </div>
     </Card>

@@ -1,4 +1,3 @@
-import { ChildMedicalInformation } from "./childMedicalInformation";
 
 // Define the structure of the child data
 export interface ChildType {
@@ -29,6 +28,11 @@ export interface ChildType {
     treatment: string;
     allergies: string;
     instructions: string;
+    medication: string;
+    provider_director_staff: string;
+    restricted_activities: string;
+    insurance_company: string;
+    caregiver_name: string;
   }
   
   export interface FormulaInformation {
@@ -82,6 +86,11 @@ export const defaultChildMedical:ChildType = {
       treatment: '',
       allergies: '',
       instructions: '',
+      medication: '',
+      provider_director_staff: '',
+      restricted_activities: '',
+      insurance_company: '',
+      caregiver_name: '',
     },
     formulaInformation: {
       formula: '',

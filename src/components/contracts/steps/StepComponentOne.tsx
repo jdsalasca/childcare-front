@@ -132,24 +132,47 @@ export const StepComponentOne: React.FC<StepComponentOneProps> = ({
     }
 };
 
+const onSubmit = async (data: { children: ChildType[] }) => {
+  if (ContractService.isInvalidFormDataChildren(data)) {
+    ToastInterpreterUtils.toastInterpreter(toast, 'info', t('info'), t('addAtLeastOneGuardianAndAtLeastOneChild'), 3000);
+    return;
+  }
 
-  const onSubmit = async (data: { children: ChildType[] }) => {
-    if (ContractService.isInvalidFormDataChildren(data)) {
-      ToastInterpreterUtils.toastInterpreter(toast, 'info', t('info'), t('addAtLeastOneGuardianAndAtLeastOneChild'), 3000);
-      return;
-    }
+  try {
+    const childrenAsync = await onHandlerChildBackendAsync(data);
+    
+    // Create a map of existing children's additional information
+    const existingChildrenMap = new Map(
+      contractInformation.children?.map(child => [
+        child.id,
+        {
+          medicalInformation: child.medicalInformation,
+          formulaInformation: child.formulaInformation,
+          permissionsInformation: child.permissionsInformation
+        }
+      ])
+    );
 
-    try {
-      const childrenAsync = await onHandlerChildBackendAsync(data);
-      setContractInformation({ ...contractInformation, children: childrenAsync });
-      toast?.current?.show({ severity: 'success', summary: 'Success', detail: t('childrenInfoSaved'), life: 3000 });
-      setActiveIndex(1);
-    } catch (error) {
-      console.error('Error processing children data', error);
-      toast?.current?.show({ severity: 'error', summary: 'Error', detail: t('childrenInfoSaveFailed'), life: 3000 });
-    }
-  };
+    // Merge new children data with existing additional information
+    const mergedChildren = childrenAsync.map(child => ({
+      ...child,
+      medicalInformation: existingChildrenMap.get(child.id)?.medicalInformation || child.medicalInformation,
+      formulaInformation: existingChildrenMap.get(child.id)?.formulaInformation || child.formulaInformation,
+      permissionsInformation: existingChildrenMap.get(child.id)?.permissionsInformation || child.permissionsInformation
+    }));
 
+    setContractInformation({ 
+      ...contractInformation, 
+      children: mergedChildren 
+    });
+
+    toast?.current?.show({ severity: 'success', summary: 'Success', detail: t('childrenInfoSaved'), life: 3000 });
+    setActiveIndex(1);
+  } catch (error) {
+    console.error('Error processing children data', error);
+    toast?.current?.show({ severity: 'error', summary: 'Error', detail: t('childrenInfoSaveFailed'), life: 3000 });
+  }
+};
   const addChild = () => {
     append({
       first_name: '',
