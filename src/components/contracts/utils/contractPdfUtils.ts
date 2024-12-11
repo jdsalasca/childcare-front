@@ -467,6 +467,7 @@ function processChildIterations(page: PageContent, children: any[]): PageContent
       const icons = {
         check: 'X',
         circle: 'O',
+        none: ' ',
         // Add more icons as needed
       };
     
@@ -493,13 +494,13 @@ function processChildIterations(page: PageContent, children: any[]): PageContent
          .replace('{{foodAllergies}}', child.formulaInformation?.foodAllergies || '______________________________________________________________________________________________________________________________________________________')
          // Follow meal program with unicode support
          .replace('{{followMealProgramYes}}', child.formulaInformation?.followMealProgram ? icons.check : '')
-         .replace('{{followMealProgramNo}}', child.formulaInformation?.followMealProgram ? '' : icons.circle)
-         .replace('{{soap}}', child.permissionsInformation?.soap ? icons.check : icons.circle)
-         .replace('{{sanitizer}}', child.permissionsInformation?.sanitizer ? icons.check : icons.circle)
-         .replace('{{rashCream}}', child.permissionsInformation?.rashCream ? icons.check : icons.circle)
-         .replace('{{teethingMedicine}}', child.permissionsInformation?.teethingMedicine ? icons.check : icons.circle)
-         .replace('{{sunscreen}}', child.permissionsInformation?.sunscreen ? icons.check : icons.circle)
-         .replace('{{insectRepellent}}', child.permissionsInformation?.insectRepellent ? icons.check : icons.circle)
+         .replace('{{followMealProgramNo}}', child.formulaInformation?.followMealProgram ? '' : icons.none)
+         .replace('{{soap}}', child.permissionsInformation?.soap ? icons.check : icons.none)
+         .replace('{{sanitizer}}', child.permissionsInformation?.sanitizer ? icons.check : icons.none)
+         .replace('{{rashCream}}', child.permissionsInformation?.rashCream ? icons.check : icons.none)
+         .replace('{{teethingMedicine}}', child.permissionsInformation?.teethingMedicine ? icons.check : icons.none)
+         .replace('{{sunscreen}}', child.permissionsInformation?.sunscreen ? icons.check : icons.none)
+         .replace('{{insectRepellent}}', child.permissionsInformation?.insectRepellent ? icons.check : icons.none)
          .replace('{{other}}', child.permissionsInformation?.other || '______________________________________________________________________________________________________________________________________________________');
 
          

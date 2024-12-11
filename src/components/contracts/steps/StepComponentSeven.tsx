@@ -127,11 +127,23 @@ const StepComponentSeven: React.FC<StepComponentSevenProps> = ({
       const father = contractInformation.guardians?.find(
         (g) => g.guardian_type_id === 1
       );
+      const guardian = contractInformation.guardians?.find(
+        (g) => g.guardian_type_id === 3
+      );
       if (father) {
         childForm.getTextField("Name 1")?.setText(father.name || "");
         childForm.getTextField("Address 1")?.setText(father.address || "");
         childForm.getTextField("City 1")?.setText(father.city || "");
         childForm.getTextField("Phone 1")?.setText(father.phone || "");
+      }else if (guardian) {
+        childForm.getTextField("Name 1")?.setText(guardian.name || "");
+        childForm.getTextField("Address 1")?.setText(guardian.address || "");
+        childForm.getTextField("City 1")?.setText(guardian.city || "");
+        childForm.getTextField("Phone 1")?.setText(guardian.phone || "");
+        childForm.getTextField("Employer 3")?.setText(guardian.workInformation?.employer ?? "");
+        childForm.getTextField("Address_3")?.setText(guardian.workInformation?.address ?? "");
+        childForm.getTextField("City_3")?.setText(guardian.workInformation?.city ?? "");
+        childForm.getTextField("Phone_3")?.setText(guardian.workInformation?.phone ?? "");
       }
 
       const mother = contractInformation.guardians?.find(
@@ -142,6 +154,15 @@ const StepComponentSeven: React.FC<StepComponentSevenProps> = ({
         childForm.getTextField("Address_2")?.setText(mother.address || "");
         childForm.getTextField("City 2")?.setText(mother.city || "");
         childForm.getTextField("Phone_2")?.setText(mother.phone || "");
+      }else if (guardian && father) {
+        childForm.getTextField("Name_2")?.setText(guardian.name || "");
+        childForm.getTextField("Address_2")?.setText(guardian.address || "");
+        childForm.getTextField("City 2")?.setText(guardian.city || "");
+        childForm.getTextField("Phone_2")?.setText(guardian.phone || "");
+        childForm.getTextField("Employer_4")?.setText(guardian.workInformation?.employer ?? "");
+        childForm.getTextField("Address_4")?.setText(guardian.workInformation?.address ?? "");
+        childForm.getTextField("City_4")?.setText(guardian.workInformation?.city ?? "");
+        childForm.getTextField("Phone_4")?.setText(guardian.workInformation?.phone ?? "");
       }
       // Work Information - Father
       if (father?.workInformation) {
@@ -190,18 +211,26 @@ const StepComponentSeven: React.FC<StepComponentSevenProps> = ({
           .getTextField("Doctor(s), clinics or hospital")
           ?.setText(contractInformation.doctorInformation.clinic || "");
       }
-// Emergency Contacts
-contractInformation.emergencyContacts?.forEach((contact, index) => {
-        const fieldPrefix = `Name_${index + 5}`;
-        childForm.getTextField(fieldPrefix)?.setText(contact.name || "");
-        childForm
-          .getTextField(`Address_${index + 5}`)
-          ?.setText(contact.address || "");
-        childForm.getTextField(`City_${index + 5}`)?.setText(contact.city || "");
-        childForm
-          .getTextField(`Phone_${index + 5}`)
-          ?.setText(contact.phone || "");
-});
+
+      // Released To Persons
+const totalReleaseFields = 4; // Total number of release person fields in the form
+for (let i = 0; i < totalReleaseFields; i++) {
+  const abs = i + 5;
+  const contact = contractInformation.emergencyContacts?.[i];
+  const fieldPrefix = `Name_${abs}`;
+  
+  // Fill with contact info if exists, otherwise fill with "none"
+  childForm.getTextField(fieldPrefix)?.setText(contact?.name || "none");
+  childForm
+    .getTextField(`Address_${abs}`)
+    ?.setText(contact?.address || "none");
+  childForm.getTextField((abs ===6) ? `City ${abs}` : `City_${abs}`)
+    ?.setText(contact?.city || "none");
+  childForm
+    .getTextField(`Phone_${abs}`)
+    ?.setText(contact?.phone || "none");
+}
+
 
 // Released To Persons
       contractInformation.releasedToPersons?.forEach((contact, index) => {
