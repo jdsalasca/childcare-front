@@ -276,6 +276,8 @@
   "noTotalMoneyOnHandMessage": "No money on hand for the day",
   "totalMoneyOnHand": "Total money on hand found",
   "bills": {
+    "newBillAdded": "New Bill Added",
+    "removeFiltersToSeeNewBill": "Please remove filters and check the last record to see it.",
     "cash_on_hand": "Cash on Hand",
     "blockContent": "Content blocked, first pick a date to continue",
     "total_not_cash_on_hand": "Total (not cash on hand)",

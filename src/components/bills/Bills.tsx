@@ -33,7 +33,7 @@ export const Bills: React.FC = () => {
     onDownloadBoxedPdf,
     onHandlerDateChanged,
     onRecalculateAll,
-    remove,
+    safeRemove,
     onSubmit,
     sums,
     filteredBills,
@@ -54,8 +54,8 @@ export const Bills: React.FC = () => {
     const defaultIndex = 0; // or any other default value
     return getFormErrorMessage(name as keyof Bill, defaultIndex);
   };
+  console.log("filteredBills", filteredBills);
   
-  const MemoizedChildFormField = React.memo(ChildFormField);
 
   //#region  Component Return
   return (
@@ -147,16 +147,16 @@ export const Bills: React.FC = () => {
       <form onSubmit={handleSubmit(onSubmit)}>
         {filteredBills.map((bill, index) => (
           
-          <MemoizedChildFormField
+          <ChildFormField
             key={bill.id}
             bill={bill}
-            index={index}
+            index={bill.originalIndex}
             blockContent={blockContent}
             control={control}
             errors={errors}
             t={t}
             onRecalculateAll={onRecalculateAll}
-            remove={remove}
+            remove={safeRemove}
             getFormErrorMessage={getFormErrorMessageWrapper}
           />
         ))}
@@ -223,7 +223,7 @@ export const Bills: React.FC = () => {
             type='button'
             label={t('bills.addNew')}
             icon='pi pi-plus'
-            className='p-button-secondary'
+            className='p-button-success'
             onClick={addNewBill}
           />
         </div>

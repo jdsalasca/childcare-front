@@ -95,6 +95,7 @@ export const useBillsViewModel = () => {
   });
   // Assert type for billsFields
 const billsFields = fields as Array<Bill>;
+
   const fetchChildren = async (): Promise<any[]> => {
     try {
       const response = children
@@ -459,11 +460,52 @@ const filteredBills = billsFields.filter(bill =>
   bill.names?.toLowerCase().includes(searchTerm.toLowerCase()) &&
   (searchedProgram ? bill.classroom?.toLowerCase().includes(searchedProgram.toLowerCase()) : true)
 );
+const safeRemove = (index: number): void => {
+  console.log("safeRemove", index);
+  try {
+    // Find the actual index in the fields array based on originalIndex
+    const actualFieldIndex = billsFields.findIndex(bill => bill.originalIndex === index);
+    
+    if (actualFieldIndex === -1) {
+      customLogger.error(`Could not find bill with originalIndex ${index} to remove`);
+      return;
+    }
+    
+    // Remove the bill at the actual index in the array
+    remove(actualFieldIndex);
+    
+    // Update originalIndex values for all remaining bills to maintain consistency
+    setTimeout(() => {
+      const updatedBills = getValues('bills');
+      updatedBills.forEach((bill, i) => {
+        update(i, {
+          ...bill,
+          originalIndex: i
+        });
+      });
+      
+      // Recalculate totals after removal
+      calculateSums(true);
+      recalculateFields();
+    }, 0);
+    
+  } catch (error) {
+    customLogger.error('Error removing bill:', error);
+    toast.current.show({
+      severity: 'error',
+      summary: t('bills.errorRemoving'),
+      detail: t('bills.errorRemovingDetail'),
+      life: 5000
+    });
+  }
+};
 
 const addNewBill = (): void => {
+
   append(
   {
-    "originalIndex": 0, // Default value
+    id: billsFields.length.toString(),
+    "originalIndex": billsFields.length, // Default value
     "disabled": false, // Default value
     "names": '', // Default value
     "cash": 0, // Default value
@@ -472,6 +514,13 @@ const addNewBill = (): void => {
     "date": "",
     "classroom": '' // Default value
   })
+   // Show toast notification after adding a new bill
+   toast.current.show({
+    severity: 'info',
+    summary: t('bills.newBillAdded'),
+    detail: t('bills.removeFiltersToSeeNewBill'),
+    life: 5000
+  });
 };
   return {
     control,
@@ -487,7 +536,7 @@ const addNewBill = (): void => {
     billTypeFields,
     setValue,
     append,
-    remove,
+    safeRemove,
     update,
     handleSubmit,
     onSubmit,
