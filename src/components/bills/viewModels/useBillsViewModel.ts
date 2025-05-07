@@ -1,5 +1,5 @@
 import { confirmDialog } from "primereact/confirmdialog"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, useCallback, useMemo } from "react"
 import { useFieldArray, useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 import { customLogger } from "../../../configs/logger"
@@ -13,18 +13,20 @@ import { ToastInterpreterUtils } from "../../utils/ToastInterpreterUtils"
 import { BillsModel } from "../models/BillModel"
 import { exportToPDF } from "../utils/billsPdf"
 import { exportBoxesToPDF } from "../utils/boxesPdf"
+import { exportToSummaryPDF } from "../utils/summaryPdf"
 
 export interface Bill {
   id?: string // Ensure id is required
   originalIndex: number
   disabled: boolean
   names: string
-  cash?: number // Should be a number, not string
-  check?: number // Should be a number, not string
-  total?: number // Should be a number, not string
+  cash?: number // Keep as number
+  check?: number // Keep as number 
+  total?: number // Keep as number
   date: string
   classroom: string
 }
+
 interface BillType {
   bill: string;
   amount: number;
@@ -49,6 +51,12 @@ export interface FormValues {
   program: number
 }
 
+// Helper function to convert bill field to number
+const toNumber = (value: string | number | undefined): number => {
+  if (value === undefined || value === '') return 0;
+  if (typeof value === 'number') return value;
+  return parseFloat(value) || 0;
+};
 
 // FIXME  improve the rerender of this module cuz I'm rerendering the bills component so many times
 export const useBillsViewModel = () => {
@@ -63,6 +71,8 @@ export const useBillsViewModel = () => {
   const [searchedProgram, SetSearchedProgram] = useState<string | null>(null)
   const toast = useRef<any>(null)
   const [blockContent, setBlockContent] = useState<boolean>(true)
+  // Add this to prevent useEffect from re-triggering
+  const recalculateFieldsRef = useRef<boolean>(false)
 
   const {
     control,
@@ -94,7 +104,7 @@ export const useBillsViewModel = () => {
     keyName: 'id'
   });
   // Assert type for billsFields
-const billsFields = fields as Array<Bill>;
+  const billsFields = fields as Array<Bill>;
 
   const fetchChildren = async (): Promise<any[]> => {
     try {
@@ -114,32 +124,128 @@ const billsFields = fields as Array<Bill>;
     }
   }
 
-  const recalculateFields = (newFields: any = billsFields) => {
-    const count = newFields.filter(
-      (bill: { cash: any; check: any }) => (bill.cash && Number(bill.cash) > 0) || (bill.check && Number(bill.check) > 0)
-    ).length
-    setExportableCount(count)
-  }
+  const recalculateFields = useCallback((newFields: any = billsFields) => {
+    if (recalculateFieldsRef.current) return; // Prevent multiple simultaneous calls
+    
+    recalculateFieldsRef.current = true;
+    try {
+      const count = newFields.filter(
+        (bill: { cash: any; check: any }) => {
+          const cashNum = toNumber(bill.cash);
+          const checkNum = toNumber(bill.check);
+          return (cashNum > 0) || (checkNum > 0);
+        }
+      ).length;
+      setExportableCount(count);
+    } finally {
+      recalculateFieldsRef.current = false;
+    }
+  }, [billsFields]);
 
   useEffect(() => {
-    recalculateFields()
-  }, [billsFields])
+    if (!billsFields.length) return; // Skip if no bills yet
+    recalculateFields();
+  }, [recalculateFields]);
 
-  const onRecalculateAll = async (index = 0, bill: Bill | null = null): Promise<void> => {
+  const calculateSums = useCallback((setValues: boolean = false): {
+    cash_on_hand: number;
+    cash: number;
+    check: number;
+    total: number;
+    total_cash_on_hand: number;
+  } => {
+    const total = billsFields.reduce(
+      (acc, bill) => {
+        acc.cash_on_hand = Number(getValues("cashOnHand")) || 0
+        acc.cash += toNumber(bill.cash);
+        acc.check += toNumber(bill.check);
+        acc.total += Number(bill.total) || 0
+        acc.total_cash_on_hand = acc.cash - acc.cash_on_hand
+        return acc
+      },
+      { cash_on_hand: 0, cash: 0, check: 0, total: 0, total_cash_on_hand: 0 }
+    )
+    setValues && setSums(total)
+    return total
+  }, [billsFields, getValues]);
+  
+  const [sums, setSums] = useState(calculateSums());
+
+  // Trigger recalculation on component mount or when billsFields change
+  useEffect(() => {
+    if (billsFields.length === 0) return; // Skip if no bills
+    
+    const newSums = calculateSums(true);
+    setSums(newSums); // Update sums state
+  }, [billsFields, calculateSums]); // Added calculateSums as dependency
+
+  const onRecalculateAll = useCallback(async (index = 0, bill: Bill | null = null): Promise<void> => {
     if (!bill?.id || bill.originalIndex == null || index == null) {
       customLogger.error("Error on onRecalculateAll usage. You're sending an empty data object")
-      return
-      
+      return;
     }
-    calculateSums(true)
-    const data = getValues('bills')
+    
+    const data = getValues('bills');
+    const cashValue = toNumber(bill.cash);
+    const checkValue = toNumber(bill.check);
+    
     update(bill.originalIndex, {
       ...getValues(`bills.${bill.originalIndex}`),
-      total: Number((Number(bill.cash) + Number(bill.check)).toFixed(2))
-    })
+      total: Number((cashValue + checkValue).toFixed(2))
+    });
 
-    recalculateFields(data)
-  }
+    calculateSums(true);
+    recalculateFields(data);
+  }, [getValues, update, calculateSums, recalculateFields]);
+
+  // Function to download only the first part of PDF (no receipts)
+  const onDownloadFirstPartPdf = (): void => {
+    const data = getValues();
+
+    // Check if the date is present
+    if (data.date == null) {
+      toast.current.show({
+        severity: 'info',
+        summary: t('bills.dateRequired'),
+        detail: t('bills.dateRequiredDetails')
+      });
+      return;
+    }
+
+    // Recalculate fields based on bills
+    recalculateFields(data.bills);
+
+    // Format the data for PDF export
+    const dataFormatted = {
+      ...data,
+      date: Functions.formatDateToMMDDYY(data.date),
+      bills: data.bills
+        .map(student => {
+          // Convert empty values to 0 for PDF only
+          const cashValue = student.cash === undefined || student.cash === null ? 0 : 
+                            typeof student.cash === 'string' && student.cash === '' ? 0 : Number(student.cash);
+          const checkValue = student.check === undefined || student.check === null ? 0 : 
+                            typeof student.check === 'string' && student.check === '' ? 0 : Number(student.check);
+          return {
+            ...student,
+            cash: cashValue,
+            check: checkValue,
+            total: student.total === undefined || student.total === null ? 0 : Number(student.total)
+          };
+        })
+        .filter(student => {
+          const cashNum = toNumber(student.cash);
+          const checkNum = toNumber(student.check);
+          return (cashNum > 0) || (checkNum > 0);
+        })
+    };
+
+    // Call the function to export just the summary part
+    exportToSummaryPDF(dataFormatted);
+
+    // Log with customLogger for debugging
+    customLogger.debug('Exporting summary PDF', dataFormatted);
+  };
 
   const onDownloadBoxedPdf = (): void => {
     const data = getValues();
@@ -162,37 +268,78 @@ const billsFields = fields as Array<Bill>;
       ...data,
       date: Functions.formatDateToMMDDYY(data.date),
       bills: data.bills
-        .map(student => ({
-          ...student,
-          cash: student.cash, // Ensure cash is a number
-          check: student.check, // Ensure check is a number
-          total: student.total // Ensure total is a number
-        }))
-        .filter(student =>
-          (student.cash! > 0) || (student.check! > 0)
-        )
+        .map(student => {
+          // Convert empty values to 0 for PDF only
+          const cashValue = student.cash === undefined || student.cash === null ? 0 : 
+                            typeof student.cash === 'string' && student.cash === '' ? 0 : Number(student.cash);
+          const checkValue = student.check === undefined || student.check === null ? 0 : 
+                            typeof student.check === 'string' && student.check === '' ? 0 : Number(student.check);
+          return {
+            ...student,
+            cash: cashValue,
+            check: checkValue,
+            total: student.total === undefined || student.total === null ? 0 : Number(student.total)
+          };
+        })
+        .filter(student => {
+          const cashNum = toNumber(student.cash);
+          const checkNum = toNumber(student.check);
+          return (cashNum > 0) || (checkNum > 0);
+        })
     };
 
     // Call the function to export the formatted data to PDF
     exportBoxesToPDF(dataFormatted);
 
-    // Debugging output
-    console.log('printing boxes', dataFormatted);
+    // Log with customLogger for debugging
+    customLogger.debug('Exporting full PDF with receipts', dataFormatted);
   };
 
   useEffect(() => {
+    if (!children && !currenciesInformation) {
+      // Initial loading state
+      setLoadingInfo({
+        loading: true,
+        loadingMessage: t('weAreLookingForChildrenInformation')
+      });
+      return;
+    }
+    
+    if (!children || !currenciesInformation) return;
+    
     customLogger.debug("useEffect triggered", { children, currenciesInformation });
     setLoadingInfo({
       loading: true,
       loadingMessage: t('weAreLookingForChildrenInformation')
     });
-    if (children && currenciesInformation) {
-      onStartForm();
-      setLoadingInfo(AppModels.defaultLoadingInfo);
-    }
-
+    
+    onStartForm();
+    // Don't reset loading here to avoid flickering
+    
     return () => { }
-  }, [currenciesInformation, children]);
+  }, [currenciesInformation, children, t]);
+
+  // Add a separate useEffect to show loading screen when children data is loading
+  useEffect(() => {
+    // When children data is undefined but not null, it means data is being fetched
+    if (children === undefined) {
+      setLoadingInfo({
+        loading: true,
+        loadingMessage: t('weAreLookingForChildrenInformation')
+      });
+    } else if (children === null) {
+      // When children is null, maintain loading state
+      setLoadingInfo({
+        loading: true,
+        loadingMessage: t('weAreLookingForChildrenInformation')
+      });
+    } else if (children && children.length > 0) {
+      // Only clear loading when we actually have data
+      setTimeout(() => {
+        setLoadingInfo(AppModels.defaultLoadingInfo);
+      }, 500); // Small delay to ensure UI updates properly
+    }
+  }, [children, t]);
 
   const onStartForm = async (): Promise<void> => {
     const students = await fetchChildren();
@@ -203,8 +350,9 @@ const billsFields = fields as Array<Bill>;
         originalIndex: index,
         disabled: true,
         names: child.childName,
-        cash: undefined,
-        check: undefined,
+        cash: undefined, // Initialize as undefined (will render as empty string)
+        check: undefined, // Initialize as undefined (will render as empty string)
+        total: 0, // Total can still be 0
         date: new Date().toISOString().split('T')[0],
         classroom: child.classroom
       })),
@@ -220,39 +368,6 @@ const billsFields = fields as Array<Bill>;
       cashOnHand: getValues('cashOnHand')
     });
   };
-
-  
-
-  const calculateSums = (setValues: boolean = false): {
-    cash_on_hand: number;
-    cash: number;
-    check: number;
-    total: number;
-    total_cash_on_hand: number;
-  } => {
-    const total = billsFields.reduce(
-      (acc, bill) => {
-        acc.cash_on_hand = Number(getValues("cashOnHand")) || 0
-        acc.cash += Number(bill.cash) || 0
-        acc.check += Number(bill.check) || 0
-        acc.total += Number(bill.total) || 0
-        acc.total_cash_on_hand = acc.cash - acc.cash_on_hand
-        return acc
-      },
-      { cash_on_hand: 0, cash: 0, check: 0, total: 0, total_cash_on_hand: 0 }
-    )
-    setValues && setSums(total)
-    customLogger.info('total', total)
-    return total
-  }
-  const [sums, setSums] = useState(calculateSums())
-  // const sums = calculateSums()
-
-  // Trigger recalculation on component mount or when billsFields change
-  useEffect(() => {
-    const newSums = calculateSums(true);
-    setSums(newSums); // Update sums state
-  }, [billsFields]); // Recalculate whenever billsFields change
 
   const saveInformation = async (data: FormValues): Promise<void> => {
     setLoadingInfo({
@@ -294,19 +409,36 @@ const billsFields = fields as Array<Bill>;
     billModel.onProcessCashData(new CashOnHandByDyModel(data.date, totalCashOnBills, new Date()));
   
     data?.bills?.forEach((bill, index) => {
-      update(index, { ...bill, total: Number(bill.cash) + Number(bill.check) });
+      update(index, { ...bill, total: Number(bill.cash || 0) + Number(bill.check || 0) });
     });
   
-
+    // Format the data for PDF export, ensuring zeros for empty fields
     const dataFormatted = {
       ...data,
       date: Functions.formatDateToMMDDYY(data.date),
-      bills: data.bills.filter(
-        student =>
-          (student.cash != null && student.cash > 0) ||
-          (student.check != null && student.check > 0)
-      ),
+      bills: data.bills
+        .map(student => {
+          // Convert empty values to 0 for PDF only
+          const cashValue = student.cash === undefined || student.cash === null ? 0 : 
+                          typeof student.cash === 'string' && student.cash === '' ? 0 : Number(student.cash);
+          const checkValue = student.check === undefined || student.check === null ? 0 : 
+                           typeof student.check === 'string' && student.check === '' ? 0 : Number(student.check);
+          const totalValue = cashValue + checkValue;
+          
+          return {
+            ...student,
+            cash: cashValue,
+            check: checkValue,
+            total: totalValue
+          };
+        })
+        .filter(student => {
+          const cashNum = toNumber(student.cash);
+          const checkNum = toNumber(student.check);
+          return (cashNum > 0) || (checkNum > 0);
+        }),
     };
+    
     // Show the confirmation dialog and wait for the user's response
     const confirmed = await new Promise<boolean>((resolve) => {
       confirmDialog({
@@ -456,12 +588,14 @@ const onHandlerDateChanged = async (date: Date |null) => {
   }
 };
 
-const filteredBills = billsFields.filter(bill =>
+const filteredBills = useMemo(() => billsFields.filter(bill =>
   bill.names?.toLowerCase().includes(searchTerm.toLowerCase()) &&
   (searchedProgram ? bill.classroom?.toLowerCase().includes(searchedProgram.toLowerCase()) : true)
-);
-const safeRemove = (index: number): void => {
-  console.log("safeRemove", index);
+), [billsFields, searchTerm, searchedProgram]);
+
+// Update safeRemove to use proper logging
+const safeRemove = useCallback((index: number): void => {
+  customLogger.debug(`Removing bill with index ${index}`);
   try {
     // Find the actual index in the fields array based on originalIndex
     const actualFieldIndex = billsFields.findIndex(bill => bill.originalIndex === index);
@@ -498,30 +632,38 @@ const safeRemove = (index: number): void => {
       life: 5000
     });
   }
-};
+}, [billsFields, calculateSums, getValues, recalculateFields, remove, t, update]);
 
-const addNewBill = (): void => {
-
-  append(
-  {
-    id: billsFields.length.toString(),
-    "originalIndex": billsFields.length, // Default value
-    "disabled": false, // Default value
-    "names": '', // Default value
-    "cash": 0, // Default value
-    "check": 0, // Default value
-    "total": 0, // Default value
-    "date": "",
-    "classroom": '' // Default value
-  })
-   // Show toast notification after adding a new bill
-   toast.current.show({
+const addNewBill = useCallback((): void => {
+  const lastIndex = billsFields.length > 0 
+    ? Math.max(...billsFields.map(bill => bill.originalIndex)) + 1 
+    : 0;
+    
+  append({
+    id: `new-${Date.now()}`, // Ensure unique ID
+    originalIndex: lastIndex,
+    disabled: false,
+    names: '',
+    cash: 0, // Use 0 instead of undefined
+    check: 0, // Use 0 instead of undefined
+    total: 0, // Use 0 instead of undefined
+    date: "",
+    classroom: ''
+  });
+  
+  // Show toast notification after adding a new bill
+  toast.current.show({
     severity: 'info',
     summary: t('bills.newBillAdded'),
     detail: t('bills.removeFiltersToSeeNewBill'),
     life: 5000
   });
-};
+  
+  // Clear filters to show the new bill
+  setSearchTerm('');
+  SetSearchedProgram(null);
+}, [append, billsFields, t]);
+
   return {
     control,
     errors,
@@ -536,11 +678,12 @@ const addNewBill = (): void => {
     billTypeFields,
     setValue,
     append,
-    safeRemove,
+    remove,
     update,
     handleSubmit,
     onSubmit,
     onDownloadBoxedPdf,
+    onDownloadFirstPartPdf,
     onRecalculateAll,
     confirmResetForm,
     recalculateFields,
@@ -552,8 +695,7 @@ const addNewBill = (): void => {
     onHandlerDateChanged,
     filteredBills,
     addNewBill,
-    getValues
-    
+    getValues,
+    safeRemove
   }
-
 }

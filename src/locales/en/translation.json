@@ -309,7 +309,13 @@
     "checkRequired": "Check is required",
     "subtotalRequired": "Subtotal is required",
     "receivedRequired": "Received is required",
-    "totalRequired": "Total is required"
+    "totalRequired": "Total is required",
+    "registerReport": "Register Report with Receipts",
+    "summaryReport": "Summary Report (No Receipts)",
+    "fullReport": "Full Report with Receipts",
+    "errorRemoving": "Error Removing Bill",
+    "errorRemovingDetail": "There was an error removing the bill. Please try again.",
+    "removeThisBill": "Remove this bill"
   },
   "childName": "Child name",
   "healthStatus": "Health Status",

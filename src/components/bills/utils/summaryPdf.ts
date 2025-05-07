@@ -1,8 +1,7 @@
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
-import { FormValues } from '../viewModels/useBillsViewModel';
+import { Bill, FormValues } from '../viewModels/useBillsViewModel';
 import { educando } from './assets/educando_logo';
-
 
 interface BillType {
     bill: string;
@@ -10,32 +9,20 @@ interface BillType {
     total: number;
 }
 
-export interface pdfDataType {
-    date: string;
-    bills: Bill[];
-    cashOnHand?: string;
-    totalDeposit?: string;
-    totalOverall?: string;
-    billTypes: BillType[];
-    notes?: string;
-}
-
-export const exportBoxesToPDF = (data: FormValues): void => {
+export const exportToSummaryPDF = (data: FormValues): void => {
     const doc = new jsPDF();
     const margin = 10;
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
     const halfPageWidth = pageWidth / 2;
 
-    // Convert date to string
-    const dateStr = typeof data.date === 'string' ? data.date : 
-                   data.date instanceof Date ? data.date.toISOString().split('T')[0] : '';
-
     // Add Title and Date
     doc.setFontSize(14);
     doc.text("EDUCANDO CHILDCARE CASH REGISTER", pageWidth / 2, margin, { align: 'center' });
     doc.setFontSize(12);
-    doc.text(dateStr, pageWidth / 2, margin + 10, { align: 'center' });
+    // Convert date to string if needed
+    const dateString = typeof data.date === 'string' ? data.date : (data.date ? data.date.toString() : '');
+    doc.text(dateString, pageWidth / 2, margin + 10, { align: 'center' });
 
     let currentY = margin + 20;
 
@@ -58,17 +45,9 @@ export const exportBoxesToPDF = (data: FormValues): void => {
 
     // Notes and Scanned Date, QuickBooks, Signature on the right side
     generateNotesSection(doc, data, currentY, currentY, halfPageWidth, pageHeight, margin);
-       // Iterate over each child and generate a receipt on a new page
-       data.bills!.forEach((bill, index) => {
-        
-            doc.addPage();  // New page for each child
 
-        // Call the receipt generation function for the current child
-        generateReceiptForChild(doc, bill, dateStr);
-    });
-
-
-    doc.save('deposit_ticket.pdf');
+    // Save without adding receipt pages
+    doc.save('summary_report.pdf');
 };
 
 const generateChildrenTable = (doc: jsPDF, bills: Bill[], startY: number, pageHeight: number, margin: number): number => {
@@ -125,84 +104,6 @@ const generateChildrenTable = (doc: jsPDF, bills: Bill[], startY: number, pageHe
 
     return doc.autoTable.previous.finalY + 10;  // Return the new Y position after the table
 };
-const generateReceiptForChild = (doc: jsPDF, bill: Bill, date: string): void => {
-    const margin = 10;
-    const pageWidth = doc.internal.pageSize.getWidth(); // Get the width of the page
-    const pageHeight = doc.internal.pageSize.getHeight(); // Get the height of the page
-  
-    let currentY = margin;
-
-    // Title: "RECEIPT"
-    doc.setFontSize(14);
-    doc.setFont('helvetica', 'bold');
-    doc.text(`RECEIPT`, (pageWidth/2)-15, currentY);  
-    currentY += 15;
-
-    // Reset to regular font and size
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'normal');
-
-    // Date
-    doc.text(`Date: ${date}`, margin, currentY);
-    currentY += 10;
-
-    // Payment received by
-    doc.text(`Payment received by: ____________________________`, margin, currentY);
-    currentY += 10;
-
-    // Child's Name
-    doc.text(`For Child: ${bill.names}`, margin, currentY);
-    currentY += 10;
-
-    // Line for the child's name
-    doc.line(margin, currentY, margin + 180, currentY);
-    currentY += 20;
-
-    // Calculate the total amount properly
-    const cash = Number(bill.cash) || 0;
-    const check = Number(bill.check) || 0;
-    const total = cash + check;
-    
-    // Amount section with proper formatting
-    const amount = `$${total.toFixed(2)}`;
-    doc.text(`Amount: ${amount}`, margin, currentY);
-    currentY += 10;
-
-    // Services provided for the weeks section
-    doc.text(`Services provided for the weeks of: ____________ to ____________`, margin, currentY);
-    currentY += 10;
-
-    // Days and options
-    doc.text(`________ days`, margin, currentY);
-    currentY += 10;
-
-    doc.text(`1 week                               $ _________ Still due        $ ___________ Credit.`, margin, currentY);
-    currentY += 10;
-
-    doc.text(`2 weeks`, margin, currentY);
-    currentY += 10;
-
-    doc.text(`Transportation`, margin, currentY);
-    currentY += 10;
-
-    doc.text(`Enrollment fee`, margin, currentY);
-    currentY += 10;
-
-    doc.text(`Copay for month: ____________`, margin, currentY);
-    currentY += 20;
-
-    // Employee signature, right-aligned
-    const employeeSignatureText = "Employee signature: _______________________";
-    const textWidth = doc.getTextWidth(employeeSignatureText); // Measure the text width
-    doc.text(employeeSignatureText, pageWidth - margin - textWidth, currentY); // Right-align the signature line
-     // Add the base64 image as a footer at the bottom of the page
-     const footerHeight = 50;
-    
-    //const base64Image = 'data:image/png;base64,'+educando; // Your base64 image string
-
-    doc.addImage(educando, 'PNG', margin, pageHeight - footerHeight - 50, pageWidth - 2 * margin, footerHeight); // Adjust width and height as necessary
-};
-
 
 const generateCashOnHandSection = (doc: jsPDF, data: FormValues, startY: number, pageHeight: number, margin: number): number => {
     // Format values properly
@@ -275,20 +176,15 @@ const generateNotesSection = (doc: jsPDF, data: FormValues, startY: number, left
     halfPageWidth = halfPageWidth - 12;
 
     // Set up text positions
-    const boxHeight = 40;  // Define the height for the "Notas" box
-    const boxPadding = 5;
+    const boxHeight = 40;  // Define the height for the "Notes" box
     const boxYPosition = startY;  // Box will start here
 
-    // Convert date to string
-    const dateStr = typeof data.date === 'string' ? data.date : 
-                  data.date instanceof Date ? data.date.toISOString().split('T')[0] : '';
-
-    // Draw the box for "Notas"
+    // Draw the box for "Notes"
     doc.setDrawColor(0);  // Black border
     doc.setLineWidth(1);
     doc.rect(halfPageWidth + 10, boxYPosition, halfPageWidth - 20, boxHeight);  // Draw the rectangle
 
-    // Write the "NOTAS:" label and content inside the box
+    // Write the "NOTES:" label and content inside the box
     doc.setFontSize(12);
     doc.text(" NOTES:", halfPageWidth + 12, boxYPosition + 8);  // Label position inside the box
 
@@ -298,16 +194,19 @@ const generateNotesSection = (doc: jsPDF, data: FormValues, startY: number, left
     });
 
     // Now, place the other fields below the box
-    const newStartY = boxYPosition + boxHeight + 10;  // Start below the "Notas" box
+    const newStartY = boxYPosition + boxHeight + 10;  // Start below the "Notes" box
+
+    // Convert date to string to ensure it's compatible with jsPDF text method
+    const dateString = typeof data.date === 'string' ? data.date : (data.date ? data.date.toString() : '');
 
     doc.setFontSize(12);
     doc.text("SCANNED DATE:", halfPageWidth + 10, newStartY);
-    doc.text(dateStr, halfPageWidth + 50, newStartY);
+    doc.text(dateString, halfPageWidth + 50, newStartY);
 
     doc.text("QUICKBOOKS:", halfPageWidth + 10, newStartY + 10);
-    doc.text(dateStr, halfPageWidth + 50, newStartY + 10);
+    doc.text(dateString, halfPageWidth + 50, newStartY + 10);
 
     doc.text("_________________________", halfPageWidth + 30, newStartY + 20);
 
     return newStartY + 30;  // Return the Y position after the signature field
-};
+}; 
