@@ -72,26 +72,28 @@ export const exportBoxesToPDF = (data: FormValues): void => {
 };
 
 const generateChildrenTable = (doc: jsPDF, bills: Bill[], startY: number, pageHeight: number, margin: number): number => {
-    const headers = [["Children Name", "Cash", "Check", "Total"]];
+    const headers = [["#","Children Name", "Cash", "Check", "Total"]];
     const rows: (string | number)[][] = [];
 
     // First, calculate the correct totals
     let totalCash = 0;
     let totalCheck = 0;
     let totalOverall = 0;
-
+    let numerator = 1;
     bills.forEach(bill => {
         const cash = Number(bill.cash) || 0; // Convert to number, default to 0 if NaN
         const check = Number(bill.check) || 0; // Convert to number, default to 0 if NaN
         const total = cash + check;
-    
+        
         if (cash > 0 || check > 0) {
             rows.push([
+                numerator++,
                 bill.names!,
-                `$${cash.toFixed(2)}`, // Format with 2 decimal places
-                `$${check.toFixed(2)}`, // Format with 2 decimal places
-                `$${total.toFixed(2)}` // Format with 2 decimal places
+                `$${cash.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+                `$${check.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+                `$${total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
             ]);
+            
 
             // Add to totals
             totalCash += cash;
@@ -102,10 +104,12 @@ const generateChildrenTable = (doc: jsPDF, bills: Bill[], startY: number, pageHe
     
     // Add the totals row
     rows.push([
-        "Total", 
-        `$${totalCash.toFixed(2)}`, 
-        `$${totalCheck.toFixed(2)}`, 
-        `$${totalOverall.toFixed(2)}`
+        "",
+        "Total",
+        `$${totalCash.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+        `$${totalCheck.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+        `$${totalOverall.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+                 
     ]);
 
     doc.autoTable({
@@ -113,7 +117,7 @@ const generateChildrenTable = (doc: jsPDF, bills: Bill[], startY: number, pageHe
         body: rows,
         startY: startY,
         theme: 'grid',
-        headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0] },
+        headStyles: { fillColor: [190, 22, 34], textColor: [255, 255, 255] },
         didParseCell: (data: any) => { // Specify the type here
             if (data.row.index === data.table.body.length - 1) {
                 doc.setFont('helvetica', 'bold');  // Set font to bold for the last row (Total)
@@ -220,10 +224,23 @@ const generateCashOnHandSection = (doc: jsPDF, data: FormValues, startY: number,
         startY = margin;
     }
 
+
+    
     const values = [
-        // { label: "Cash on Hand", value: `$${cashOnHandValue.toFixed(2)}` },
-        { label: "Total Deposit", value: `$${totalDepositValue.toFixed(2)}` },
-        { label: "TOTAL", value: `$${totalOverallValue.toFixed(2)}` }
+        {
+            label: "Total Deposit",
+            value: `${Number(totalDepositValue).toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            })}`
+        },
+        {
+            label: "TOTAL",
+            value: `${Number(totalOverallValue).toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            })}`
+        }
     ];
 
     values.forEach((item, index) => {
