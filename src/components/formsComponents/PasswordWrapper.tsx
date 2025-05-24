@@ -42,7 +42,7 @@ const PasswordWrapper: React.FC<PasswordWrapperProps> = ({
         <li>At least one lowercase</li>
         <li>At least one uppercase</li>
         <li>At least one numeric</li>
-        <li>Minimum 8 characters</li>
+        <li>Minimum 4 characters</li>
       </ul>
     </>
   );

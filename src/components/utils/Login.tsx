@@ -96,12 +96,7 @@ const Login: React.FC = () => {
             />
             <section className="c-section-login-actions">
               <Button type="submit" label={t('signIn')} className="p-button-success" />
-              <Button 
-                type="button" 
-                label={t('signUp')} 
-                severity="secondary" 
-                onClick={() => navigate('/auth/childadmin/admin/register')} 
-              />
+              
             </section>
           </form>
         </Card>

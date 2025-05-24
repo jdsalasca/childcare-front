@@ -44,6 +44,7 @@ function RouterLayout() {
             <Route path="childadmin/admin/manage-teachers" element={<HomePage />} />
             <Route path="childadmin/admin/register-payment-form" element={<HomePage />} />
             <Route path="childadmin/admin/register-payments-excel" element={<HomePage />} />
+            <Route path="childadmin/admin/users"  element={<FormRegister />} />
           </Route>
         </Routes>
       </div>

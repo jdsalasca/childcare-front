@@ -34,6 +34,10 @@ const Layout: React.FC<LayoutProps> = ({ insideAuthApplication = false }) => {
   const items : MenuItem[]= [
     LayoutModels.iconModel,
     LayoutModels.homeModel(handleHomeClick),
+    {label: t('Admin user'), items: [
+      {label: t('New user'), command: () => customNavigate('/users')},
+      
+    ]},
     {
       label: t('contracts'), // Ensure this is a string
       items: [

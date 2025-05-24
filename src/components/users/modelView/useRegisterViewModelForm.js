@@ -1,6 +1,4 @@
-/* eslint-disable no-unused-vars */
-
-import { useRef } from "react";
+import { useRef, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -8,17 +6,23 @@ import { customLogger } from "../../../configs/logger";
 import { ApiModels } from "../../../models/ApiModels";
 import UsersAPI from "../../../models/UsersAPI";
 
-/**
- * This is the useModelview for the register Form.
- * @returns 
- */
 const useRegisterViewModelForm = () => {
   const navigate = useNavigate();
-
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const toast = useRef(null);
 
-  const {getValues, setValue, watch, control, handleSubmit, formState: { errors },setError } = useForm({
+  const [roles, setRoles] = useState([]);
+  const [cashiers, setCashiers] = useState([]);
+
+  const {
+    getValues,
+    setValue,
+    control,
+    handleSubmit,
+    setError,
+    reset, // ✅ añadido aquí
+    formState: { errors },
+  } = useForm({
     defaultValues: {
       username: '',
       first_name: '',
@@ -26,60 +30,120 @@ const useRegisterViewModelForm = () => {
       birth_date: '',
       email: '',
       password: '',
+      password_confirmation: '',
+      role_id: '',
+      cashiers_id: '',
+      user_status_id: 1,
     },
   });
 
+  const fetchData = async () => {
+    try {
+      const rolesRes = await UsersAPI.getRoles();
+      const cashiersRes = await UsersAPI.getCashiers();
 
-  const onSubmit = async (data) =>{
-    customLogger.debug("data", data);
-    if(await emailExist(data) || await userNameExist(data)){
-      return
+      console.log("rolesRes", rolesRes);
+      console.log("cashiersRes", cashiersRes);
+
+      if (rolesRes?.httpStatus === 200 && Array.isArray(rolesRes.response)) {
+        setRoles(
+          rolesRes.response.map((role) => ({
+            label: role.name,
+            value: role.id,
+          }))
+        );
+      }
+
+      if (cashiersRes?.httpStatus === 200 && Array.isArray(cashiersRes.response)) {
+        setCashiers(
+          cashiersRes.response.map((cashier) => ({
+            label: cashier.cashierNumber,
+            value: cashier.id,
+          }))
+        );
+      }
+    } catch (error) {
+      customLogger.error("Error fetching roles or cashiers", error);
     }
-    // Accessing the static method build from UserBuilder
-const userFormatted = ApiModels.UserBuilder.build(data);
-    customLogger.debug("aca seguimos motherfuckers", data,userFormatted);
-    const createUser =await  UsersAPI.createUser(userFormatted);
+  };
 
-    customLogger.debug("Usuario creadooooooooooooooooooooooooooooo", createUser);
-    
-  }
-// Check if email already exists
-const emailExist = async (data) => {
-  try {
-    const userExists = await UsersAPI.getUserByEmail(getValues("email"));
-    customLogger.debug("userExists", userExists);
-    if (userExists.httpStatus === 200) {
-      setError("email", {
-        type: "manual",
-        message: t("email_already_exists"),  // Set custom error message using i18n
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const onSubmit = async (data) => {
+    if (await emailExist(data) || await userNameExist(data)) return;
+
+    const userFormatted = ApiModels.UserBuilder.build(data);
+
+    try {
+      const createUser = await UsersAPI.createUser(userFormatted);
+      customLogger.debug("Usuario creado:", createUser);
+
+      if (createUser?.httpStatus === 201 || createUser?.httpStatus === 200) {
+        toast.current?.show({
+          severity: "success",
+          summary: t("success"),
+          detail: t("user_created_successfully"),
+          life: 3000,
+        });
+
+        // ✅ limpia el formulario después de crear el usuario
+        reset({
+          username: '',
+          first_name: '',
+          last_name: '',
+          birth_date: '',
+          email: '',
+          password: '',
+          password_confirmation: '',
+          role_id: '',
+          cashiers_id: '',
+          user_status_id: 1,
+        });
+      }
+    } catch (error) {
+      customLogger.error("Error al crear el usuario", error);
+      toast.current?.show({
+        severity: "error",
+        summary: t("error"),
+        detail: t("failed_to_create_user"),
+        life: 3000,
       });
-      return true;
     }
-    return false;
-  } catch (error) {
-    customLogger.error("Email check failed", error);
-  }
-};
+  };
 
-// Check if username already exists
-const userNameExist = async (data) => {
-  try {
-    const userExists = await UsersAPI.getUserByNickname( getValues("username"));
-    customLogger.debug("userExists", userExists);
-
-    if (userExists.httpStatus === 200) {
-      setError("userName", {
-        type: "manual",
-        message: t("username_already_exists"),  // Set custom error message using i18n
-      });
-      return true;
+  const emailExist = async () => {
+    try {
+      const userExists = await UsersAPI.getUserByEmail(getValues("email"));
+      if (userExists.httpStatus === 200) {
+        setError("email", {
+          type: "manual",
+          message: t("email_already_exists"),
+        });
+        return true;
+      }
+      return false;
+    } catch (error) {
+      customLogger.error("Email check failed", error);
     }
-    return false;
-  } catch (error) {
-    customLogger.error("Username check failed", error);
-  }
-};
+  };
 
+  const userNameExist = async () => {
+    try {
+      const userExists = await UsersAPI.getUserByNickname(getValues("username"));
+      if (userExists.httpStatus === 200) {
+        setError("username", {
+          type: "manual",
+          message: t("username_already_exists"),
+        });
+        return true;
+      }
+      return false;
+    } catch (error) {
+      customLogger.error("Username check failed", error);
+    }
+  };
 
   return {
     handleSubmit,
@@ -90,7 +154,9 @@ const userNameExist = async (data) => {
     navigate,
     getValues,
     emailExist,
-    userNameExist
+    userNameExist,
+    roles,
+    cashiers,
   };
 };
 

@@ -81,7 +81,30 @@ const UsersAPI = {
       console.error('Error getUserByEmail:', error);
       throw error;
     }
+  },
+
+// Get roles
+getRoles: async (): Promise<ApiResponse<{ id: number; name: string }[]>> => {
+  try {
+    const response = await API.get<{ id: number; name: string }[]>(BASE_URL, '/users/roles');
+    return response;
+  } catch (error) {
+    console.error('Error getRoles:', error);
+    throw error;
   }
+},
+
+// Get cashiers
+getCashiers: async (): Promise<ApiResponse<{ id: number; cashierNumber: string }[]>> => {
+  try {
+    const response = await API.get<{ id: number; cashierNumber: string }[]>(BASE_URL, '/users/cashiers');
+    return response;
+  } catch (error) {
+    console.error('Error getCashiers:', error);
+    throw error;
+  }
+},
+   
 };
 
 export default UsersAPI;

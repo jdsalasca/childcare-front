@@ -28,6 +28,10 @@ export class UserBuilder {
     role: string;
     username: string;
     user_status_id: number;
+    cashiers_id: number;
+    role_id: number;
+
+    
 
     constructor(
         birth_date: string,
@@ -38,7 +42,10 @@ export class UserBuilder {
         phone_number: string,
         role: string,
         username: string,
-        user_status_id: number = UserBuilder.USER_STATUS_CREATED
+        cashiers_id: number,
+        role_id: number,
+        user_status_id: number = UserBuilder.USER_STATUS_CREATED,
+        
     ) {
         this.birth_date = birth_date;
         this.email = email;
@@ -48,7 +55,10 @@ export class UserBuilder {
         this.phone_number = phone_number;
         this.role = role;
         this.username = username;
+        this.cashiers_id = cashiers_id;
+        this.role_id = role_id;
         this.user_status_id = user_status_id;
+        
     }
 
     /**
@@ -65,6 +75,8 @@ export class UserBuilder {
             password: this.password,
             phone_number: this.phone_number,
             username: this.username,
+            cashiers_id: this.cashiers_id,
+            role_id: this.role_id,
             user_status_id: this.user_status_id ?? UserBuilder.USER_STATUS_CREATED,
         };
     }
@@ -76,7 +88,7 @@ export class UserBuilder {
      * @returns {Object} - A formatted user object.
      */
     static build(data: Partial<UserBuilder>) {
-        const { birth_date, email, first_name, last_name, password, phone_number, role, username } = data;
+        const { birth_date, email, first_name, last_name, password, phone_number, role, username, cashiers_id, role_id } = data;
         const userBuilder = new UserBuilder(
             birth_date ?? "",
             email ?? "",
@@ -85,7 +97,9 @@ export class UserBuilder {
             password ?? "",
             phone_number ?? "",
             role ?? "",
-            username ?? ""
+            username ?? "",
+            cashiers_id ?? 0,
+            role_id ?? 0
         );
         return userBuilder.build();
     }
