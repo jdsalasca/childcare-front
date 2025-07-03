@@ -1,8 +1,9 @@
-
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { SecurityService } from 'configs/storageUtils';
 
+
 export const BASE_URL = import.meta.env.VITE_BASE_URL;
+
 // Define the base URL for the API
 //export const BASE_URL = 'https://www.educandochildcare.com/childadmin';
 //export const BASE_URL = 'http://localhost:8000/childadmin';  // Replace with your actual API base URL
@@ -68,6 +69,9 @@ const makeRequest = async <T>(
     options: RequestOptions = {},
     withPayload: boolean = false
 ): Promise<ApiResponse<T>> => {
+    // Debug: Log the URL construction
+    const fullUrl = `${url}${endpoint}`;
+
     // Create headers for the request
     const myHeaders: Record<string, string | undefined> = {
         ...headers,
@@ -81,7 +85,7 @@ const makeRequest = async <T>(
         ...options,
         method: method,
         headers: myHeaders,
-        url: `${url}${endpoint}`,
+        url: fullUrl,
         params: options.params, // Include params in the request options
         data: method === 'GET' && !withPayload ? null : body,
     };

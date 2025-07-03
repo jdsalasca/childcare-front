@@ -66,6 +66,9 @@ const UsersAPI = {
   // Authenticate user
   authUser: async (data: AuthUserData): Promise<ApiResponse<User>> => {
     try {
+      // Debug: Log the URL being constructed
+      const loginUrl = `${BASE_URL}/users/login`;
+
       const response = await API.post<User>(BASE_URL, "/users/login", data);
       return response;
     } catch (error) {
