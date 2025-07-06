@@ -66,7 +66,14 @@ const CloseRegisterForm: React.FC<Props> = ({ date, onSuccess }) => {
   };
 
   const watchedBills = watch('bills');
-  const totalAmount = calculateBillTotal(watchedBills);
+  
+  // Ensure watchedBills is always an array with valid values
+  const safeBills = Array.isArray(watchedBills) ? watchedBills.map(bill => ({
+    bill_type_id: Number(bill?.bill_type_id) || 1,
+    quantity: Number(bill?.quantity) || 0
+  })) : [];
+  
+  const totalAmount = calculateBillTotal(safeBills);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -150,16 +157,31 @@ const CloseRegisterForm: React.FC<Props> = ({ date, onSuccess }) => {
                 name={`bills.${idx}.quantity`}
                 control={control}
                 rules={{ required: true, min: 0 }}
-                render={({ field }) => (
-                  <InputNumber
-                    {...field}
-                    min={0}
-                    placeholder={t('cashRegister.enterQuantity')}
-                    className="w-32"
-                    onValueChange={(e) => field.onChange(e.value)}
-                    value={field.value || 0}
-                  />
-                )}
+                render={({ field }) => {
+                  // Ensure we always have a valid number value
+                  const currentValue = field.value === null || field.value === undefined || isNaN(Number(field.value)) ? 0 : Number(field.value);
+                  
+                  return (
+                    <InputNumber
+                      min={0}
+                      placeholder={t('cashRegister.enterQuantity')}
+                      className="w-32"
+                      value={currentValue}
+                      onValueChange={(e) => {
+                        // Ensure we always set a valid number
+                        const newValue = e.value === null || e.value === undefined || isNaN(Number(e.value)) ? 0 : Number(e.value);
+                        field.onChange(newValue);
+                      }}
+                      onBlur={() => {
+                        // Double-check on blur to ensure valid value
+                        const blurValue = field.value === null || field.value === undefined || isNaN(Number(field.value)) ? 0 : Number(field.value);
+                        if (blurValue !== field.value) {
+                          field.onChange(blurValue);
+                        }
+                      }}
+                    />
+                  );
+                }}
               />
               <Button
                 type="button"
@@ -178,7 +200,7 @@ const CloseRegisterForm: React.FC<Props> = ({ date, onSuccess }) => {
           <div className="text-center">
             <p className="text-sm text-gray-600 mb-1">{t('cashRegister.closingAmount')}</p>
             <p className="text-2xl font-bold text-green-800">
-              ${isNaN(totalAmount) ? '0' : totalAmount.toLocaleString()}
+              ${isNaN(totalAmount) || totalAmount === null || totalAmount === undefined ? '0' : totalAmount.toLocaleString()}
             </p>
           </div>
         </Card>

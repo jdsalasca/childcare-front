@@ -71,7 +71,13 @@ const OpenRegisterForm: React.FC<Props> = ({ date, onSuccess }) => {
   // Debugging para identificar el problema
   console.log('OpenRegisterForm - watchedBills:', watchedBills);
   
-  const totalAmount = calculateBillTotal(watchedBills);
+  // Ensure watchedBills is always an array with valid values
+  const safeBills = Array.isArray(watchedBills) ? watchedBills.map(bill => ({
+    bill_type_id: Number(bill?.bill_type_id) || 1,
+    quantity: Number(bill?.quantity) || 0
+  })) : [];
+  
+  const totalAmount = calculateBillTotal(safeBills);
   
   // Debugging del resultado
   console.log('OpenRegisterForm - totalAmount:', totalAmount, 'isNaN:', isNaN(totalAmount));
@@ -158,28 +164,33 @@ const OpenRegisterForm: React.FC<Props> = ({ date, onSuccess }) => {
                 name={`bills.${idx}.quantity`}
                 control={control}
                 rules={{ required: true, min: 0 }}
-                render={({ field }) => (
-                  <InputNumber
-                    {...field}
-                    min={0}
-                    placeholder={t('cashRegister.enterQuantity')}
-                    className="w-32"
-                    onValueChange={(e) => {
-                      // Asegurar que siempre sea un número válido
-                      const value = e.value === null || e.value === undefined ? 0 : Number(e.value);
-                      console.log(`InputNumber ${idx} - onValueChange:`, { original: e.value, processed: value });
-                      field.onChange(value);
-                    }}
-                    value={field.value === null || field.value === undefined ? 0 : field.value}
-                    onBlur={() => {
-                      // Asegurar valor válido al perder el foco
-                      if (field.value === null || field.value === undefined || isNaN(Number(field.value))) {
-                        console.log(`InputNumber ${idx} - onBlur fixing value:`, field.value);
-                        field.onChange(0);
-                      }
-                    }}
-                  />
-                )}
+                render={({ field }) => {
+                  // Ensure we always have a valid number value
+                  const currentValue = field.value === null || field.value === undefined || isNaN(Number(field.value)) ? 0 : Number(field.value);
+                  
+                  return (
+                    <InputNumber
+                      min={0}
+                      placeholder={t('cashRegister.enterQuantity')}
+                      className="w-32"
+                      value={currentValue}
+                      onValueChange={(e) => {
+                        // Ensure we always set a valid number
+                        const newValue = e.value === null || e.value === undefined || isNaN(Number(e.value)) ? 0 : Number(e.value);
+                        console.log(`InputNumber ${idx} - onValueChange:`, { original: e.value, processed: newValue });
+                        field.onChange(newValue);
+                      }}
+                      onBlur={() => {
+                        // Double-check on blur to ensure valid value
+                        const blurValue = field.value === null || field.value === undefined || isNaN(Number(field.value)) ? 0 : Number(field.value);
+                        if (blurValue !== field.value) {
+                          console.log(`InputNumber ${idx} - onBlur fixing value:`, field.value, 'to', blurValue);
+                          field.onChange(blurValue);
+                        }
+                      }}
+                    />
+                  );
+                }}
               />
               <Button
                 type="button"
@@ -198,7 +209,7 @@ const OpenRegisterForm: React.FC<Props> = ({ date, onSuccess }) => {
           <div className="text-center">
             <p className="text-sm text-gray-600 mb-1">{t('cashRegister.openingAmount')}</p>
             <p className="text-2xl font-bold text-blue-800">
-              ${isNaN(totalAmount) ? '0' : totalAmount.toLocaleString()}
+              ${isNaN(totalAmount) || totalAmount === null || totalAmount === undefined ? '0' : totalAmount.toLocaleString()}
             </p>
           </div>
         </Card>

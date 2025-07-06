@@ -9,8 +9,7 @@ import { ProgressSpinner } from 'primereact/progressspinner';
 import { Message } from 'primereact/message';
 import { Divider } from 'primereact/divider';
 import CashRegisterAPI from '../../../models/CashRegisterAPI';
-import { RegisterDetailsResponse } from '../../../types/cashRegister';
-import { BILL_TYPES, getBillTypeLabel, getBillTypeValue, calculateBillTotal } from './constants';
+import { RegisterDetailsResponse, BillDetail } from '../../../types/cashRegister';
 
 interface Props {
   date: string;
@@ -19,7 +18,7 @@ interface Props {
 const RegisterDetailsPanel: React.FC<Props> = ({ date }) => {
   const { t } = useTranslation();
 
-  const { data: detailsData, isLoading, isError } = useQuery({
+  const { data: detailsData, isLoading, isError } = useQuery<RegisterDetailsResponse>({
     queryKey: ['cashRegisterDetails', date],
     queryFn: () => CashRegisterAPI.getDetails(date),
     enabled: !!date,
@@ -36,7 +35,7 @@ const RegisterDetailsPanel: React.FC<Props> = ({ date }) => {
     );
   }
 
-  if (isError || !detailsData?.data) {
+  if (isError || !detailsData?.success || !detailsData.data) {
     return (
       <Card>
         <Message 
@@ -54,16 +53,17 @@ const RegisterDetailsPanel: React.FC<Props> = ({ date }) => {
     return new Date(timeString).toLocaleTimeString();
   };
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(amount);
+  const formatDateTime = (timeString: string) => {
+    return new Date(timeString).toLocaleString();
   };
 
-  const openingTotal = data.opening ? calculateBillTotal(data.opening.bills) : 0;
-  const closingTotal = data.closing ? calculateBillTotal(data.closing.bills) : 0;
-  const difference = closingTotal - openingTotal;
+  const formatCurrency = (amount: number | string) => {
+    const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: data.summary?.currency || 'USD',
+    }).format(numAmount);
+  };
 
   const getDifferenceSeverity = (diff: number) => {
     if (diff > 0) return 'success';
@@ -77,6 +77,41 @@ const RegisterDetailsPanel: React.FC<Props> = ({ date }) => {
     return t('cashRegister.noDifference');
   };
 
+  const billDetailColumns = [
+    {
+      field: 'bill_label',
+      header: t('cashRegister.denomination'),
+      body: (rowData: BillDetail) => (
+        <span className="font-medium">{rowData.bill_label}</span>
+      )
+    },
+    {
+      field: 'quantity',
+      header: t('cashRegister.quantity'),
+      body: (rowData: BillDetail) => (
+        <span className="text-center block font-medium">{rowData.quantity}</span>
+      )
+    },
+    {
+      field: 'bill_value',
+      header: t('cashRegister.unitValue'),
+      body: (rowData: BillDetail) => (
+        <span className="text-blue-700 font-medium">
+          {formatCurrency(parseFloat(rowData.bill_value))}
+        </span>
+      )
+    },
+    {
+      field: 'total_amount',
+      header: t('cashRegister.subtotal'),
+      body: (rowData: BillDetail) => (
+        <span className="font-bold text-green-700">
+          {formatCurrency(parseFloat(rowData.total_amount))}
+        </span>
+      )
+    }
+  ];
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -87,40 +122,56 @@ const RegisterDetailsPanel: React.FC<Props> = ({ date }) => {
         <p className="text-gray-600">
           {t('cashRegister.date')}: <span className="font-medium">{date}</span>
         </p>
+        <div className="mt-2">
+          <Tag 
+            value={t(`cashRegister.status_${data.status.status}`)}
+            severity="success"
+            className="text-sm"
+          />
+        </div>
       </div>
 
       <Divider />
 
       {/* Daily Summary */}
       <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+        <h4 className="text-lg font-semibold text-gray-800 mb-4 text-center">
+          {t('cashRegister.dailySummary')}
+        </h4>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="text-center">
-            <h4 className="text-sm font-medium text-gray-600 mb-1">
+            <h5 className="text-sm font-medium text-gray-600 mb-1">
               {t('cashRegister.openingAmount')}
-            </h4>
+            </h5>
             <p className="text-2xl font-bold text-blue-800">
-              {formatCurrency(openingTotal)}
+              {formatCurrency(data.summary.opening_total)}
+            </p>
+            <p className="text-xs text-gray-500 mt-1">
+              {formatDateTime(data.status.opening_time)}
             </p>
           </div>
           <div className="text-center">
-            <h4 className="text-sm font-medium text-gray-600 mb-1">
+            <h5 className="text-sm font-medium text-gray-600 mb-1">
               {t('cashRegister.closingAmount')}
-            </h4>
+            </h5>
             <p className="text-2xl font-bold text-green-800">
-              {formatCurrency(closingTotal)}
+              {formatCurrency(data.summary.closing_total)}
+            </p>
+            <p className="text-xs text-gray-500 mt-1">
+              {formatDateTime(data.status.closing_time)}
             </p>
           </div>
           <div className="text-center">
-            <h4 className="text-sm font-medium text-gray-600 mb-1">
+            <h5 className="text-sm font-medium text-gray-600 mb-1">
               {t('cashRegister.dailyDifference')}
-            </h4>
+            </h5>
             <Tag 
-              value={formatCurrency(difference)}
-              severity={getDifferenceSeverity(difference)}
+              value={formatCurrency(data.summary.difference)}
+              severity={getDifferenceSeverity(data.summary.difference)}
               className="text-lg font-bold"
             />
             <p className="text-sm text-gray-500 mt-1">
-              {getDifferenceLabel(difference)}
+              {getDifferenceLabel(data.summary.difference)}
             </p>
           </div>
         </div>
@@ -130,10 +181,11 @@ const RegisterDetailsPanel: React.FC<Props> = ({ date }) => {
       {data.opening && (
         <Card>
           <div className="mb-4">
-            <h4 className="text-xl font-semibold text-gray-800 mb-3">
+            <h4 className="text-xl font-semibold text-gray-800 mb-3 flex items-center">
+              <i className="pi pi-play-circle text-blue-600 mr-2"></i>
               {t('cashRegister.opening')}
             </h4>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 bg-blue-50 p-4 rounded-lg">
               <div>
                 <span className="text-sm font-medium text-gray-600">
                   {t('cashRegister.cashier')}:
@@ -144,49 +196,31 @@ const RegisterDetailsPanel: React.FC<Props> = ({ date }) => {
                 <span className="text-sm font-medium text-gray-600">
                   {t('cashRegister.time')}:
                 </span>
-                <p className="text-gray-800 font-medium">{formatTime(data.opening.time)}</p>
+                <p className="text-gray-800 font-medium">{formatDateTime(data.opening.time)}</p>
               </div>
               <div>
                 <span className="text-sm font-medium text-gray-600">
                   {t('cashRegister.total')}:
                 </span>
-                <p className="text-gray-800 font-medium">{formatCurrency(openingTotal)}</p>
+                <p className="text-gray-800 font-bold text-lg">{formatCurrency(data.opening.total_amount)}</p>
               </div>
             </div>
           </div>
           
           <DataTable 
-            value={data.opening.bills} 
+            value={data.opening.details} 
             className="border rounded-lg overflow-hidden"
             stripedRows
+            emptyMessage={t('cashRegister.noData')}
           >
-            <Column 
-              field="bill_type_id" 
-              header={t('cashRegister.denomination')} 
-              body={(rowData) => (
-                <span className="font-medium">{getBillTypeLabel(rowData.bill_type_id)}</span>
-              )}
-            />
-            <Column 
-              field="quantity" 
-              header={t('cashRegister.quantity')}
-              body={(rowData) => (
-                <span className="text-center block">{rowData.quantity}</span>
-              )}
-            />
-            <Column 
-              header={t('cashRegister.subtotal')} 
-              body={(rowData) => {
-                const quantity = Number(rowData.quantity) || 0;
-                const denomination = getBillTypeValue(rowData.bill_type_id);
-                const subtotal = quantity * denomination;
-                return (
-                  <span className="font-medium text-green-700">
-                    {formatCurrency(subtotal)}
-                  </span>
-                );
-              }}
-            />
+            {billDetailColumns.map((col, index) => (
+              <Column 
+                key={index}
+                field={col.field}
+                header={col.header}
+                body={col.body}
+              />
+            ))}
           </DataTable>
         </Card>
       )}
@@ -195,10 +229,11 @@ const RegisterDetailsPanel: React.FC<Props> = ({ date }) => {
       {data.closing && (
         <Card>
           <div className="mb-4">
-            <h4 className="text-xl font-semibold text-gray-800 mb-3">
+            <h4 className="text-xl font-semibold text-gray-800 mb-3 flex items-center">
+              <i className="pi pi-stop-circle text-red-600 mr-2"></i>
               {t('cashRegister.closing')}
             </h4>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 bg-green-50 p-4 rounded-lg">
               <div>
                 <span className="text-sm font-medium text-gray-600">
                   {t('cashRegister.cashier')}:
@@ -209,94 +244,67 @@ const RegisterDetailsPanel: React.FC<Props> = ({ date }) => {
                 <span className="text-sm font-medium text-gray-600">
                   {t('cashRegister.time')}:
                 </span>
-                <p className="text-gray-800 font-medium">{formatTime(data.closing.time)}</p>
+                <p className="text-gray-800 font-medium">{formatDateTime(data.closing.time)}</p>
               </div>
               <div>
                 <span className="text-sm font-medium text-gray-600">
                   {t('cashRegister.total')}:
                 </span>
-                <p className="text-gray-800 font-medium">{formatCurrency(closingTotal)}</p>
+                <p className="text-gray-800 font-bold text-lg">{formatCurrency(data.closing.total_amount)}</p>
               </div>
             </div>
           </div>
           
           <DataTable 
-            value={data.closing.bills} 
+            value={data.closing.details} 
             className="border rounded-lg overflow-hidden"
             stripedRows
+            emptyMessage={t('cashRegister.noData')}
           >
-            <Column 
-              field="bill_type_id" 
-              header={t('cashRegister.denomination')} 
-              body={(rowData) => (
-                <span className="font-medium">{getBillTypeLabel(rowData.bill_type_id)}</span>
-              )}
-            />
-            <Column 
-              field="quantity" 
-              header={t('cashRegister.quantity')}
-              body={(rowData) => (
-                <span className="text-center block">{rowData.quantity}</span>
-              )}
-            />
-            <Column 
-              header={t('cashRegister.subtotal')} 
-              body={(rowData) => {
-                const quantity = Number(rowData.quantity) || 0;
-                const denomination = getBillTypeValue(rowData.bill_type_id);
-                const subtotal = quantity * denomination;
-                return (
-                  <span className="font-medium text-green-700">
-                    {formatCurrency(subtotal)}
-                  </span>
-                );
-              }}
-            />
+            {billDetailColumns.map((col, index) => (
+              <Column 
+                key={index}
+                field={col.field}
+                header={col.header}
+                body={col.body}
+              />
+            ))}
           </DataTable>
         </Card>
       )}
 
-      {/* Totals by Denomination */}
-      {data.totals_by_denomination && data.totals_by_denomination.length > 0 && (
-        <Card>
-          <h4 className="text-xl font-semibold text-gray-800 mb-4">
-            {t('cashRegister.totalsByDenomination')}
-          </h4>
-          <DataTable 
-            value={data.totals_by_denomination} 
-            className="border rounded-lg overflow-hidden"
-            stripedRows
-          >
-            <Column 
-              field="bill_type_id" 
-              header={t('cashRegister.denomination')} 
-              body={(rowData) => (
-                <span className="font-medium">{getBillTypeLabel(rowData.bill_type_id)}</span>
-              )}
-            />
-            <Column 
-              field="quantity" 
-              header={t('cashRegister.quantity')}
-              body={(rowData) => (
-                <span className="text-center block">{rowData.quantity}</span>
-              )}
-            />
-            <Column 
-              header={t('cashRegister.total')} 
-              body={(rowData) => {
-                const quantity = Number(rowData.quantity) || 0;
-                const denomination = getBillTypeValue(rowData.bill_type_id);
-                const subtotal = quantity * denomination;
-                return (
-                  <span className="font-medium text-blue-700">
-                    {formatCurrency(subtotal)}
-                  </span>
-                );
-              }}
-            />
-          </DataTable>
-        </Card>
-      )}
+      {/* Additional Information */}
+      <Card className="bg-gray-50">
+        <h4 className="text-lg font-semibold text-gray-800 mb-3">
+          {t('cashRegister.additionalInfo')}
+        </h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+          <div>
+            <span className="font-medium text-gray-600">
+              {t('cashRegister.recordId')}:
+            </span>
+            <span className="ml-2 text-gray-800">#{data.record_id}</span>
+          </div>
+          <div>
+            <span className="font-medium text-gray-600">
+              {t('cashRegister.currency')}:
+            </span>
+            <span className="ml-2 text-gray-800">{data.summary.currency}</span>
+          </div>
+          <div>
+            <span className="font-medium text-gray-600">
+              {t('cashRegister.openingCashier')}:
+            </span>
+            <span className="ml-2 text-gray-800">{data.status.opening_cashier.name}</span>
+          </div>
+          <div>
+            <span className="font-medium text-gray-600">
+              {t('cashRegister.closingCashier')}:
+            </span>
+            <span className="ml-2 text-gray-800">{data.status.closing_cashier.name}</span>
+          </div>
+        </div>
+      </Card>
     </div>
   );
 };

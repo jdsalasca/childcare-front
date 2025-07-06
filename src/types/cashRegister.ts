@@ -41,22 +41,54 @@ export interface GetCashiersResponse {
   data: Cashier[];
 }
 
+export interface BillDetail {
+  id: number;
+  daily_cash_record_id: number;
+  bill_type_id: number;
+  quantity: number;
+  total_amount: string;
+  is_opening: number;
+  is_closing: number;
+  cashier_id: number;
+  created_at: string;
+  updated_at: string;
+  bill_label: string;
+  bill_value: string;
+  currency_code: string;
+}
+
 export interface RegisterDetailsResponse {
   success: boolean;
   data: {
     date: string;
-    status: CashRegisterStatus;
-    opening?: {
+    record_id: number;
+    status: {
+      date: string;
+      status: CashRegisterStatus;
+      is_opened: boolean;
+      is_closed: boolean;
+      opening_time: string;
+      closing_time: string;
+      opening_cashier: Cashier;
+      closing_cashier: Cashier;
+    };
+    opening: {
       cashier: Cashier;
       time: string;
-      bills: BillInput[];
+      total_amount: number;
+      details: BillDetail[];
     };
-    closing?: {
+    closing: {
       cashier: Cashier;
       time: string;
-      bills: BillInput[];
+      total_amount: number;
+      details: BillDetail[];
     };
-    difference?: number;
-    totals_by_denomination?: { bill_type_id: number; quantity: number; }[];
+    summary: {
+      opening_total: number;
+      closing_total: number;
+      difference: number;
+      currency: string;
+    };
   };
 } 

@@ -398,6 +398,12 @@
     "details": "Detalles",
     "cashierInfo": "Información del cajero",
     "billBreakdown": "Desglose de billetes",
-    "dailySummary": "Resumen del día"
+    "dailySummary": "Resumen del día",
+    "unitValue": "Valor unitario",
+    "additionalInfo": "Información adicional",
+    "recordId": "ID del registro",
+    "currency": "Moneda",
+    "openingCashier": "Cajero de apertura",
+    "closingCashier": "Cajero de cierre"
   }
 }

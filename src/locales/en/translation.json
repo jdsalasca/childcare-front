@@ -401,6 +401,12 @@
     "details": "Details",
     "cashierInfo": "Cashier information",
     "billBreakdown": "Bill breakdown",
-    "dailySummary": "Daily summary"
+    "dailySummary": "Daily summary",
+    "unitValue": "Unit value",
+    "additionalInfo": "Additional information",
+    "recordId": "Record ID",
+    "currency": "Currency",
+    "openingCashier": "Opening cashier",
+    "closingCashier": "Closing cashier"
   }
 }
