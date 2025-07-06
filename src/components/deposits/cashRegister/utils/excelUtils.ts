@@ -100,12 +100,7 @@ export const generateCashRegisterExcel = (reportData: CashRegisterReportResponse
       ['Total Closing Amount', reportData.data.summary.total_closing_amount],
       ['Total Difference', reportData.data.summary.total_difference],
       ['Currency', reportData.data.summary.currency],
-      ['', ''],
-      ['Filters Applied', ''],
-      ['Start Date', reportData.data.filters_applied.start_date || 'All'],
-      ['End Date', reportData.data.filters_applied.end_date || 'All'],
-      ['Status Filter', reportData.data.filters_applied.status || 'All'],
-      ['', ''],
+    ['', ''],
       ['Generated On', new Date().toLocaleString()],
     ];
 
@@ -120,8 +115,8 @@ export const generateCashRegisterExcel = (reportData: CashRegisterReportResponse
     XLSX.utils.book_append_sheet(workbook, summaryWorksheet, 'Summary');
 
     // Generate filename with current date
-    const currentDate = new Date().toISOString().slice(0, 10);
-    const filename = `cash_register_report_${currentDate}.xlsx`;
+    const currentTime = new Date().toLocaleString();
+    const filename = `cash_register_report_${currentTime}.xlsx`;
 
     // Write and download file
     XLSX.writeFile(workbook, filename);
