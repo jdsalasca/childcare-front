@@ -1,26 +1,342 @@
-import { Badge } from 'primereact/badge';
+import React, { useState, useCallback, useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Controller } from 'react-hook-form';
 import { Button } from 'primereact/button';
 import { Calendar } from 'primereact/calendar';
 import { ConfirmDialog } from 'primereact/confirmdialog';
 import { Dropdown } from 'primereact/dropdown';
 import { InputText } from 'primereact/inputtext';
+import { Paginator } from 'primereact/paginator';
 import { Toast } from 'primereact/toast';
+import { Chip } from 'primereact/chip';
 import { Tooltip } from 'primereact/tooltip';
-import React, { memo, useMemo } from 'react';
-import { Controller } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
+import classNames from 'classnames';
 import { programOptions } from '../contracts/utilsAndConstants';
 import Loader from '../utils/Loader';
-import ChildFormField from './components/formComponents/ChildField';
 import { useBillsViewModel } from './viewModels/useBillsViewModel';
+import { Bill } from './viewModels/useBillsViewModel';
 
-// FIXME REVIEW ALERTS ON DATE CHANGE
-// FIXME REVIEW UTC DATE CONVERSION TO AVOID THE -5 UTC DIFFERENCE
 
-// Use React.memo to prevent unnecessary re-renders 
-const MemoizedChildFormField = memo(ChildFormField);
+const ITEMS_PER_PAGE = 10;
+
+// Inline BillCard component - memoized to prevent unnecessary re-renders
+const BillCard: React.FC<{
+  bill: Bill;
+  index: number;
+  control: any;
+  errors: any;
+  blockContent: boolean;
+  onRecalculateAll: (index: number, bill: Bill) => void;
+  onRemove: (index: number) => void;
+  isCompact?: boolean;
+}> = React.memo(({ bill, index, control, errors, blockContent, onRecalculateAll, onRemove, isCompact = false }) => {
+  const { t } = useTranslation();
+
+  const cash = typeof bill.cash === 'number' ? bill.cash : 
+               typeof bill.cash === 'string' && bill.cash !== '' ? parseFloat(bill.cash) : 0;
+  const check = typeof bill.check === 'number' ? bill.check : 
+                typeof bill.check === 'string' && bill.check !== '' ? parseFloat(bill.check) : 0;
+  
+  const displayTotal = (cash + check).toFixed(2);
+  
+
+
+  const handleRemove = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onRemove(index);
+  }, [index, onRemove]);
+
+  const handleCashChange = useCallback((e: React.ChangeEvent<HTMLInputElement>, onChange: (value: any) => void, fieldType: 'cash' | 'check') => {
+    const inputValue = e.target.value;
+    
+    // Store the input value as-is for the form
+    onChange(inputValue);
+    
+    // Use requestAnimationFrame to defer the recalculation to avoid focus loss
+    requestAnimationFrame(() => {
+      const numericValue = inputValue === '' ? 0 : parseFloat(inputValue) || 0;
+      const currentCash = fieldType === 'cash' ? numericValue : (parseFloat(bill.cash?.toString() || '0') || 0);
+      const currentCheck = fieldType === 'check' ? numericValue : (parseFloat(bill.check?.toString() || '0') || 0);
+      const newTotal = currentCash + currentCheck;
+      
+      const updatedBill = {
+        ...bill,
+        [fieldType]: inputValue, // Store the actual input value
+        total: newTotal
+      };
+      onRecalculateAll(bill.originalIndex || index, updatedBill);
+    });
+  }, [bill, onRecalculateAll, index]);
+
+  const getFormErrorMessage = useCallback((fieldName: string) => {
+    const fieldError = errors.bills?.[index]?.[fieldName];
+    return fieldError && (
+      <small className="p-error">{fieldError.message}</small>
+    );
+  }, [errors.bills, index]);
+
+  return (
+    <div 
+      id={`bill-card-${index}`}
+      className={classNames(
+        'bg-white rounded-lg shadow-md border border-gray-200 mb-4 transition-all duration-300',
+        {
+          'opacity-70 pointer-events-none': blockContent,
+          'hover:shadow-lg hover:-translate-y-1': !blockContent
+        }
+      )}
+    >
+      {blockContent && (
+        <Tooltip 
+          target={`#bill-card-${index}`} 
+          content={t('bills.blockContent')} 
+          position="top" 
+        />
+      )}
+      
+      {/* Card Header */}
+      <div className="flex items-center justify-between p-3 border-b border-gray-200">
+        <div className="flex items-center gap-2">
+          <i className="pi pi-receipt text-blue-600 text-lg"></i>
+        </div>
+        <Button
+          icon="pi pi-trash"
+          className="p-button-danger p-button-text p-button-sm"
+          onClick={handleRemove}
+          tooltip={t('bills.removeThisBill')}
+          tooltipOptions={{ position: 'left' }}
+          disabled={blockContent}
+        />
+      </div>
+      
+      {/* Card Content */}
+      <div className="p-3">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+          {/* Names Field */}
+          <div className="flex flex-col">
+            <label htmlFor={`names-${index}`} className="text-xs font-medium text-gray-700 mb-1">
+              {t('bills.names')}
+            </label>
+            <Controller
+              name={`bills[${index}].names`}
+              control={control}
+              render={({ field }) => (
+                <InputText
+                  id={`names-${index}`}
+                  {...field}
+                  disabled={blockContent}
+                  className={classNames('w-full text-sm', {
+                    'p-invalid': errors.bills?.[index]?.names,
+                  })}
+                  value={field.value || ''}
+                  onChange={(e) => field.onChange(e.target.value)}
+                  placeholder={t('bills.enterNames', 'Enter names')}
+                />
+              )}
+            />
+            {getFormErrorMessage('names')}
+          </div>
+
+          {/* Cash Field */}
+          <div className="flex flex-col">
+            <label htmlFor={`cash-${index}`} className="text-xs font-medium text-gray-700 mb-1">
+              {t('bills.cash')}
+            </label>
+            <Controller
+              name={`bills[${index}].cash`}
+              control={control}
+              render={({ field }) => (
+                <InputText
+                  id={`cash-${index}`}
+                  disabled={blockContent}
+                  className={classNames('w-full text-sm', {
+                    'p-invalid': errors.bills?.[index]?.cash,
+                  })}
+                  keyfilter="num"
+                  value={field.value !== undefined ? field.value : ''}
+                  onChange={(e) => handleCashChange(e, field.onChange, 'cash')}
+                  placeholder="0.00"
+                />
+              )}
+            />
+            {getFormErrorMessage('cash')}
+          </div>
+
+          {/* Check Field */}
+          <div className="flex flex-col">
+            <label htmlFor={`check-${index}`} className="text-xs font-medium text-gray-700 mb-1">
+              {t('bills.check')}
+            </label>
+            <Controller
+              name={`bills[${index}].check`}
+              control={control}
+              render={({ field }) => (
+                <InputText
+                  id={`check-${index}`}
+                  disabled={blockContent}
+                  className={classNames('w-full text-sm', {
+                    'p-invalid': errors.bills?.[index]?.check,
+                  })}
+                  keyfilter="num"
+                  value={field.value !== undefined ? field.value : ''}
+                  onChange={(e) => handleCashChange(e, field.onChange, 'check')}
+                  placeholder="0.00"
+                />
+              )}
+            />
+            {getFormErrorMessage('check')}
+          </div>
+
+          {/* Total Field */}
+          <div className="flex flex-col">
+            <label htmlFor={`total-${index}`} className="text-xs font-medium text-gray-700 mb-1">
+              {t('bills.total')}
+            </label>
+            <Controller
+              name={`bills[${index}].total`}
+              control={control}
+              defaultValue={0}
+              render={() => (
+                <InputText
+                  id={`total-${index}`}
+                  value={`$${displayTotal}`}
+                  readOnly
+                  className="w-full text-sm p-disabled bg-gray-50 font-bold"
+                />
+              )}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}, (prevProps, nextProps) => {
+  // Custom comparison function for React.memo
+  return (
+    prevProps.bill.cash === nextProps.bill.cash &&
+    prevProps.bill.check === nextProps.bill.check &&
+    prevProps.bill.names === nextProps.bill.names &&
+    prevProps.bill.total === nextProps.bill.total &&
+    prevProps.index === nextProps.index &&
+    prevProps.blockContent === nextProps.blockContent &&
+    prevProps.isCompact === nextProps.isCompact
+  );
+});
+
+// Inline BillSummary component
+const BillSummary: React.FC<{
+  sums: {
+    cash: number;
+    check: number;
+    total: number;
+    total_cash_on_hand: number;
+    cash_on_hand: number;
+  };
+  cashOnHand: number;
+}> = ({ sums, cashOnHand }) => {
+  const { t } = useTranslation();
+
+  const formatCurrency = (amount: number): string => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2
+    }).format(amount);
+  };
+
+  const summaryItems = [
+    {
+      label: t('bills.totalCash'),
+      value: sums.cash,
+      icon: 'pi pi-dollar',
+      color: 'text-green-600',
+      bgColor: 'bg-green-50'
+    },
+    {
+      label: t('bills.totalCheck'),
+      value: sums.check,
+      icon: 'pi pi-credit-card',
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-50'
+    },
+    {
+      label: t('bills.total'),
+      value: sums.cash + sums.check,
+      icon: 'pi pi-calculator',
+      color: 'text-purple-600',
+      bgColor: 'bg-purple-50'
+    },
+    {
+      label: t('bills.total_not_cash_on_hand'),
+      value: sums.total_cash_on_hand,
+      icon: 'pi pi-wallet',
+      color: 'text-orange-600',
+      bgColor: 'bg-orange-50'
+    }
+  ];
+
+  return (
+    <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6 mb-6">
+      <div className="flex items-center gap-2 mb-6">
+        <i className="pi pi-chart-bar text-xl text-gray-600"></i>
+        <h3 className="text-lg font-semibold text-gray-800 m-0">
+          {t('bills.summary', 'Summary')}
+        </h3>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        {summaryItems.map((item, index) => (
+          <div 
+            key={index}
+            className={`p-4 rounded-lg border border-gray-200 ${item.bgColor}`}
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <i className={`${item.icon} ${item.color}`}></i>
+              <span className="text-sm font-medium text-gray-700">
+                {item.label}
+              </span>
+            </div>
+            <div className="text-2xl font-bold text-gray-800">
+              {formatCurrency(item.value)}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <hr className="border-gray-200 mb-4" />
+
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="flex items-center gap-2">
+          <i className="pi pi-info-circle text-blue-600"></i>
+          <span className="text-sm text-gray-600">
+            {t('bills.cashOnHandNote', 'Cash on Hand represents the base amount available')}
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-gray-700">
+            {t('bills.cash_on_hand', 'Cash on Hand')}:
+          </span>
+          <span className="text-lg font-bold text-gray-800">
+            {formatCurrency(cashOnHand || 0)}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export const Bills: React.FC = () => {
+  const { t } = useTranslation();
+  const toast = useRef<Toast>(null);
+  
+  // Pagination state
+  const [first, setFirst] = useState(0);
+  const [rows, setRows] = useState(ITEMS_PER_PAGE);
+  
+  // View state
+  const [isCompactView, setIsCompactView] = useState(false);
+  
   const {
     control,
     handleSubmit,
@@ -30,8 +346,6 @@ export const Bills: React.FC = () => {
     setSearchTerm,
     SetSearchedProgram,
     exportableCount,
-    toast,
-    billTypeFields,
     onDownloadBoxedPdf,
     onDownloadFirstPartPdf,
     onHandlerDateChanged,
@@ -45,240 +359,295 @@ export const Bills: React.FC = () => {
     getValues
   } = useBillsViewModel();
 
-  const { t } = useTranslation(); // Initialize translation hook
 
-  // Memoize the error message functions to prevent unnecessary re-renders
-  const getFormErrorMessage = useMemo(() => (name: keyof Bill, index: number) => {
-    return errors.bills?.[index]?.[name] && (
-      <small className='p-error'>{errors.bills[index][name].message}</small>
-    );
-  }, [errors.bills]);
-  
-  const getFormErrorMessageWrapper = useMemo(() => (name: string) => {
-    // You can use a default index if necessary
-    const defaultIndex = 0; // or any other default value
-    return getFormErrorMessage(name as keyof Bill, defaultIndex);
-  }, [getFormErrorMessage]);
 
-  // Memoize buttons for performance
-  const actionButtons = useMemo(() => (
-    <div className='button-group p-mt-2'>
-      <Button
-        type='submit'
-        label={t('bills.save')}
-        icon='pi pi-save'
-        className='p-mr-2 p-button-primary'
-      />
-      <Button
-        type='button'
-        label={t('bills.summaryReport')}
-        icon='pi pi-file-pdf'
-        className='p-mr-2 p-button-help'
-        onClick={onDownloadFirstPartPdf}
-      />
-      <Button
-        type='button'
-        label={t('bills.fullReport')}
-        icon='pi pi-receipt'
-        className='p-mr-2 p-button-warning'
-        onClick={onDownloadBoxedPdf}
-      />
-      <Button
-        type='button'
-        label={t('bills.addNew')}
-        icon='pi pi-plus'
-        className='p-button-success'
-        onClick={addNewBill}
-      />
-    </div>
-  ), [t, onDownloadFirstPartPdf, onDownloadBoxedPdf, addNewBill]);
+  // Paginated bills
+  const paginatedBills = useMemo(() => {
+    const startIndex = first;
+    const endIndex = startIndex + rows;
+    return filteredBills.slice(startIndex, endIndex);
+  }, [filteredBills, first, rows]);
 
-  // Memoize the summary section for performance
-  const summarySection = useMemo(() => (
-    <div className='child-form'>
-      {/* <span className='p-float-label'>
-        <InputText
-          id='cash-on-hand'
-          value={getValues('cashOnHand')+""}
-          readOnly
-          className='p-disabled'
+  // Pagination handlers
+  const onPageChange = useCallback((event: any) => {
+    setFirst(event.first);
+    setRows(event.rows);
+  }, []);
+
+  // Header toolbar content
+  const headerToolbar = useMemo(() => (
+    <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="flex items-center gap-2">
+        <h1 className="text-2xl font-bold text-gray-800 m-0">
+          {t('bills.title', 'Bills Management')}
+        </h1>
+        <Chip 
+          label={`${filteredBills.length} ${t('bills.total', 'total')}`}
+          className="bg-blue-100 text-blue-800"
         />
-        <label htmlFor='cash-on-hand'>{t('bills.cash_on_hand')}</label>
-      </span> */}
-
-      <span className='p-float-label'>
-        <InputText
-          id='cash-total'
-          value={sums.cash.toFixed(2)}
-          readOnly
-          className='p-disabled'
+      </div>
+      
+      <div className="flex items-center gap-2">
+        <Button
+          icon={isCompactView ? "pi pi-th-large" : "pi pi-list"}
+          onClick={() => setIsCompactView(!isCompactView)}
+          className="p-button-text"
+          tooltip={isCompactView ? t('bills.gridView') : t('bills.listView')}
         />
-        <label htmlFor='cash-total'>{t('bills.totalCash')}</label>
-      </span>
-      <span className='p-float-label'>
-        <InputText
-          id='check-total'
-          value={sums.check.toFixed(2)}
-          readOnly
-          className='p-disabled'
+        <Button
+          icon="pi pi-plus"
+          label={t('bills.addNew')}
+          onClick={addNewBill}
+          className="p-button-success"
         />
-        <label htmlFor='check-total'>{t('bills.totalCheck')}</label>
-      </span>
-      <span className='p-float-label'>
-        <InputText
-          id='total-overall'
-          value={(sums.cash + sums.check).toFixed(2)}
-          readOnly
-          className='p-disabled'
-        />
-        <label htmlFor='total-overall'>{t('bills.total')}</label>
-      </span>
-      <span className='p-float-label'>
-        <InputText
-          id='total-not-cash'
-          value={sums.total_cash_on_hand.toFixed(2)}
-          readOnly
-          className='p-disabled'
-        />
-        <label htmlFor='total-not-cash'>{t('bills.total_not_cash_on_hand')}</label>
-      </span>
-    </div>
-  ), [getValues, t, sums]);
-
-  return (
-    <div className='p-fluid form-container'>
-      {loadingInfo.loading && <Loader message={loadingInfo.loadingMessage} />}
-      <Toast ref={toast} />
-      <ConfirmDialog />
-      <div>
-        {/* Tooltip component */}
-        <Tooltip target=".tooltip-icon" position='left' content={t('bills.registerReport')} />
-        <Tooltip target=".tooltip-icon-summary" position='left' content={t('bills.summaryReport')} />
-
-        {/* Icon with tooltip for full report */}
-        <i
-          className='pi pi-receipt p-overlay-badge tooltip-icon'
-          onClick={onDownloadBoxedPdf}
-          style={{
-            fontSize: '2rem',
-            position: 'fixed',
-            right: '20px',
-            top: '70px',
-            zIndex: 999,
-            cursor: 'pointer',
-            backgroundColor: 'white',
-            padding: '8px',
-            borderRadius: '4px',
-            boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
-          }}
-        >
-          <Badge value={exportableCount} severity='info' />
-        </i>
-        
-        {/* Icon with tooltip for summary report */}
-        <i
-          className='pi pi-file-pdf p-overlay-badge tooltip-icon-summary'
+        <Button
+          icon="pi pi-file-pdf"
+          label={t('bills.summaryReport')}
           onClick={onDownloadFirstPartPdf}
-          style={{
-            fontSize: '2rem',
-            position: 'fixed',
-            right: '20px',
-            top: '130px',
-            zIndex: 999,
-            cursor: 'pointer',
-            backgroundColor: 'white',
-            padding: '8px',
-            borderRadius: '4px',
-            boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
-          }}
-        >
-          <Badge value={exportableCount} severity='success' />
-        </i>
-      </div>
-      <div className='p-float-label' style={{ marginBottom: '3rem' }}>
-        <InputText
-          id='child-browser'
-          value={searchTerm}
-          onChange={e => setSearchTerm(e.target.value)}
+          className="p-button-help"
+          disabled={exportableCount === 0}
         />
-        <label htmlFor={`child-browser`}>{t('bills.searchPlaceholder')}</label>
+        <Button
+          icon="pi pi-receipt"
+          label={t('bills.fullReport')}
+          onClick={onDownloadBoxedPdf}
+          className="p-button-warning"
+          disabled={exportableCount === 0}
+        />
       </div>
-      <div className='form-row'>
-        <div className='p-field p-col-4'>
-          <span className='p-float-label'>
-            <Controller
-              name='program'
-              control={control}
-              render={({ field }) => (
-                <Dropdown
-                  id={field.name}
-                  {...field}
-                  showClear
-                  onChange={e => {
-                    SetSearchedProgram(e.value);
-                    field.onChange(e.value);
-                  }}
-                  style={{ minWidth: '15rem' }}
-                  options={programOptions}
-                  placeholder={t('select_program')}
-                />
-              )}
+    </div>
+  ), [t, filteredBills.length, exportableCount, isCompactView, addNewBill, onDownloadFirstPartPdf, onDownloadBoxedPdf]);
+
+  // Filters panel
+  const filtersPanel = useMemo(() => (
+    <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+      <div className="flex items-center gap-2 mb-4">
+        <i className="pi pi-filter text-lg text-gray-600"></i>
+        <h3 className="text-lg font-semibold text-gray-800 m-0">
+          {t('bills.filters', 'Filters')}
+        </h3>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Search */}
+        <div className="flex flex-col">
+          <label htmlFor="search" className="text-sm font-medium text-gray-700 mb-2">
+            {t('bills.searchPlaceholder')}
+          </label>
+          <div className="relative">
+            <i className="pi pi-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+            <InputText
+              id="search"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder={t('bills.searchPlaceholder')}
+              className="w-full pl-10"
             />
-            <label htmlFor='program'>{t('program')}</label>
-          </span>
+          </div>
+        </div>
+
+        {/* Program Filter */}
+        <div className="flex flex-col">
+          <label htmlFor="program" className="text-sm font-medium text-gray-700 mb-2">
+            {t('program')}
+          </label>
+          <Controller
+            name="program"
+            control={control}
+            render={({ field }) => (
+              <Dropdown
+                id="program"
+                {...field}
+                showClear
+                onChange={(e) => {
+                  SetSearchedProgram(e.value);
+                  field.onChange(e.value);
+                }}
+                options={programOptions}
+                placeholder={t('select_program')}
+                className="w-full"
+              />
+            )}
+          />
           {errors.program && (
-            <span className='p-error'>{errors.program.message}</span>
+            <small className="p-error mt-1">{errors.program.message}</small>
           )}
         </div>
 
-        <div className='p-field p-col-4'>
-          <span className='c-panel-media p-float-label'>
-            <Controller
-              name='date'
-              control={control}
-              render={({ field }) => (
-                <Calendar
-                  id={field.name}
-                  value={field.value ? new Date(field.value) : null} // Ensure value is a Date or null
-                  onChange={e => {
-                    const dateValue = e.value ? new Date(e.value) : null; // Convert to Date
-                    field.onChange(dateValue);
-                    onHandlerDateChanged(dateValue);
-                  }}
-                  showIcon
-                  dateFormat='mm/dd/yy'
-                  mask='99/99/9999'
-                  showOnFocus={false}
-                  hideOnDateTimeSelect={true}
-                />
-              )}
-            />
-            <label htmlFor='date'>{t('date')}</label>
-          </span>
+        {/* Date Filter */}
+        <div className="flex flex-col">
+          <label htmlFor="date" className="text-sm font-medium text-gray-700 mb-2">
+            {t('date')}
+          </label>
+          <Controller
+            name="date"
+            control={control}
+            render={({ field }) => (
+              <Calendar
+                id="date"
+                value={field.value ? new Date(field.value) : null}
+                onChange={(e) => {
+                  const dateValue = e.value ? new Date(e.value) : null;
+                  field.onChange(dateValue);
+                  onHandlerDateChanged(dateValue);
+                }}
+                showIcon
+                dateFormat="mm/dd/yy"
+                mask="99/99/9999"
+                showOnFocus={false}
+                hideOnDateTimeSelect={true}
+                className="w-full"
+              />
+            )}
+          />
         </div>
       </div>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        {filteredBills.map((bill, index) => (
-          <MemoizedChildFormField
-            key={bill.id || `bill-${index}`}
-            bill={bill}
-            index={bill.originalIndex}
-            blockContent={blockContent}
-            control={control}
-            errors={errors}
-            t={t}
-            onRecalculateAll={onRecalculateAll}
-            remove={safeRemove}
-            getFormErrorMessage={getFormErrorMessageWrapper}
-          />
-        ))}
+    </div>
+  ), [t, searchTerm, setSearchTerm, control, errors.program, SetSearchedProgram, onHandlerDateChanged]);
 
-        {summarySection}
+  // Bill item renderer - memoized to prevent unnecessary re-renders
+  const renderBillItem = useCallback((bill: Bill, index: number) => {
+    return (
+      <BillCard
+        key={bill.originalIndex || index}
+        bill={bill}
+        index={bill.originalIndex}
+        control={control}
+        errors={errors}
+        blockContent={blockContent}
+        onRecalculateAll={onRecalculateAll}
+        onRemove={safeRemove}
+        isCompact={isCompactView}
+      />
+    );
+  }, [control, errors, blockContent, onRecalculateAll, safeRemove, isCompactView]);
 
-        {actionButtons}
+  // Empty state - memoized to prevent unnecessary re-renders
+  const emptyTemplate = useMemo(() => (
+    <div className="text-center py-8">
+      <i className="pi pi-receipt text-4xl text-gray-400 mb-4"></i>
+      <h3 className="text-lg font-medium text-gray-600 mb-2">
+        {filteredBills.length === 0 && searchTerm 
+          ? t('bills.noResultsFound', 'No bills found matching your search')
+          : t('bills.noBills', 'No bills available')
+        }
+      </h3>
+      <p className="text-gray-500 mb-4">
+        {blockContent 
+          ? t('bills.selectDateFirst', 'Please select a date to start adding bills')
+          : t('bills.addFirstBill', 'Add your first bill to get started')
+        }
+      </p>
+      {!blockContent && (
+        <Button
+          icon="pi pi-plus"
+          label={t('bills.addNew')}
+          onClick={addNewBill}
+          className="p-button-success"
+        />
+      )}
+    </div>
+  ), [filteredBills.length, searchTerm, blockContent, t, addNewBill]);
+
+  if (loadingInfo.loading) {
+    return <Loader message={loadingInfo.loadingMessage} />;
+  }
+
+  return (
+    <div className="max-w-7xl mx-auto p-4 space-y-6">
+      <Toast ref={toast} />
+      <ConfirmDialog />
+      
+      {/* Header */}
+      <div className="bg-white shadow-sm border border-gray-200 rounded-lg p-4">
+        {headerToolbar}
+      </div>
+
+      {/* Content blocked overlay */}
+      {blockContent && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <div className="flex items-center gap-3">
+            <i className="pi pi-exclamation-triangle text-yellow-600 text-xl"></i>
+            <div>
+              <h4 className="text-yellow-800 font-medium m-0">
+                {t('bills.blockContent')}
+              </h4>
+              <p className="text-yellow-700 text-sm m-0 mt-1">
+                {t('bills.selectDateToContinue', 'Please select a date to continue managing bills')}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Filters */}
+      {filtersPanel}
+
+      {/* Bills Form */}
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        {/* Bills List */}
+        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+          <div className={isCompactView ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4' : 'space-y-4'}>
+            {paginatedBills.length > 0 ? (
+              paginatedBills.map((bill, index) => renderBillItem(bill, index))
+            ) : (
+              emptyTemplate
+            )}
+          </div>
+          
+          {/* Pagination */}
+          {filteredBills.length > ITEMS_PER_PAGE && (
+            <div className="mt-6 pt-4 border-t border-gray-200">
+              <Paginator
+                first={first}
+                rows={rows}
+                totalRecords={filteredBills.length}
+                rowsPerPageOptions={[5, 10, 20, 50]}
+                onPageChange={onPageChange}
+                template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
+                currentPageReportTemplate={t('bills.paginationTemplate', 'Showing {first} to {last} of {totalRecords} bills')}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Summary */}
+        <BillSummary
+          sums={sums}
+          cashOnHand={getValues('cashOnHand')}
+        />
+
+        {/* Actions */}
+        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+          <div className="flex flex-wrap justify-center gap-3">
+            <Button
+              type="submit"
+              label={t('bills.save')}
+              icon="pi pi-save"
+              className="p-button-primary"
+              disabled={blockContent}
+            />
+            <Button
+              type="button"
+              label={t('bills.summaryReport')}
+              icon="pi pi-file-pdf"
+              className="p-button-help"
+              onClick={onDownloadFirstPartPdf}
+              disabled={exportableCount === 0}
+            />
+            <Button
+              type="button"
+              label={t('bills.fullReport')}
+              icon="pi pi-receipt"
+              className="p-button-warning"
+              onClick={onDownloadBoxedPdf}
+              disabled={exportableCount === 0}
+            />
+          </div>
+        </div>
       </form>
     </div>
   );
-}
+};
 
 
