@@ -143,7 +143,7 @@ const BillCard: React.FC<{
           {/* Cash Field */}
           <div className="flex flex-col">
             <label htmlFor={`cash-${index}`} className="text-xs font-semibold text-gray-600 mb-1 uppercase tracking-wide">
-              💵 {t('bills.cash')}
+              {t('bills.cash')}
             </label>
             <Controller
               name={`bills[${index}].cash`}
@@ -168,7 +168,7 @@ const BillCard: React.FC<{
           {/* Check Field */}
           <div className="flex flex-col">
             <label htmlFor={`check-${index}`} className="text-xs font-semibold text-gray-600 mb-1 uppercase tracking-wide">
-              🏦 {t('bills.check')}
+              {t('bills.check')}
             </label>
             <Controller
               name={`bills[${index}].check`}
@@ -193,7 +193,7 @@ const BillCard: React.FC<{
           {/* Total Field */}
           <div className="flex flex-col">
             <label htmlFor={`total-${index}`} className="text-xs font-semibold text-gray-600 mb-1 uppercase tracking-wide">
-              💰 {t('bills.total')}
+              {t('bills.total')}
             </label>
             <Controller
               name={`bills[${index}].total`}
@@ -269,13 +269,7 @@ const BillSummary: React.FC<{
       color: 'text-purple-600',
       bgColor: 'bg-purple-50'
     },
-    {
-      label: t('bills.total_not_cash_on_hand'),
-      value: sums.total_cash_on_hand,
-      icon: 'pi pi-wallet',
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-50'
-    }
+    
   ];
 
   return (
@@ -289,11 +283,11 @@ const BillSummary: React.FC<{
         </h3>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {summaryItems.map((item, index) => (
           <div 
             key={index}
-            className={`p-5 rounded-xl border border-gray-100 ${item.bgColor} hover:shadow-md transition-all duration-200 hover:scale-105`}
+            className={`p-4 lg:p-5 rounded-xl border border-gray-100 ${item.bgColor} hover:shadow-md transition-all duration-200 hover:scale-105`}
           >
             <div className="flex items-center gap-3 mb-3">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center ${item.color.replace('text-', 'bg-').replace('-600', '-100')}`}>
@@ -365,42 +359,42 @@ export const Bills: React.FC = () => {
 
   // Header toolbar content
   const headerToolbar = useMemo(() => (
-    <div className="flex flex-wrap items-center justify-between gap-4">
-      <div className="flex items-center gap-3">
-        <h1 className="text-3xl font-bold text-white m-0">
+    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+        <h1 className="text-2xl lg:text-3xl font-bold text-white m-0">
           {t('bills.title', 'Bills Management')}
         </h1>
         <Chip 
           label={`${filteredBills.length} ${t('bills.total', 'total')}`}
-          className="bg-white/20 text-white border-white/30"
+          className="bg-white/20 text-white border-white/30 self-start sm:self-auto"
         />
       </div>
       
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <Button
           icon={isCompactView ? "pi pi-th-large" : "pi pi-list"}
           onClick={() => setIsCompactView(!isCompactView)}
-          className="p-button-text text-white border-white/30 hover:bg-white/20"
+          className="p-button-text text-white border-white/30 hover:bg-white/20 hidden sm:inline-flex"
           tooltip={isCompactView ? t('bills.gridView') : t('bills.listView')}
         />
         <Button
           icon="pi pi-plus"
           label={t('bills.addNew')}
           onClick={addNewBill}
-          className="bg-green-500 hover:bg-green-600 border-green-500 text-white"
+          className="bg-green-500 hover:bg-green-600 border-green-500 text-white text-sm"
         />
         <Button
           icon="pi pi-file-pdf"
           label={t('bills.summaryReport')}
           onClick={onDownloadFirstPartPdf}
-          className="bg-purple-500 hover:bg-purple-600 border-purple-500 text-white"
+          className="bg-purple-500 hover:bg-purple-600 border-purple-500 text-white text-sm"
           disabled={exportableCount === 0}
         />
         <Button
           icon="pi pi-receipt"
           label={t('bills.fullReport')}
           onClick={onDownloadBoxedPdf}
-          className="bg-orange-500 hover:bg-orange-600 border-orange-500 text-white"
+          className="bg-orange-500 hover:bg-orange-600 border-orange-500 text-white text-sm"
           disabled={exportableCount === 0}
         />
       </div>
@@ -409,7 +403,7 @@ export const Bills: React.FC = () => {
 
   // Filters panel
   const filtersPanel = useMemo(() => (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
       <div className="flex items-center gap-3 mb-4">
         <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
           <i className="pi pi-filter text-blue-600 text-sm"></i>
@@ -419,9 +413,9 @@ export const Bills: React.FC = () => {
         </h3>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Search */}
-        <div className="flex flex-col">
+        <div className="flex flex-col col-span-1 lg:col-span-1">
           <label htmlFor="search" className="text-sm font-medium text-gray-700 mb-2">
             {t('bills.searchPlaceholder')}
           </label>
@@ -438,7 +432,7 @@ export const Bills: React.FC = () => {
         </div>
 
         {/* Program Filter */}
-        <div className="flex flex-col">
+        <div className="flex flex-col col-span-1 lg:col-span-1">
           <label htmlFor="program" className="text-sm font-medium text-gray-700 mb-2">
             {t('program')}
           </label>
@@ -466,7 +460,7 @@ export const Bills: React.FC = () => {
         </div>
 
         {/* Date Filter */}
-        <div className="flex flex-col">
+        <div className="flex flex-col col-span-1 md:col-span-2 lg:col-span-1">
           <label htmlFor="date" className="text-sm font-medium text-gray-700 mb-2">
             {t('date')}
           </label>
@@ -545,12 +539,12 @@ export const Bills: React.FC = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-4 space-y-6">
+    <div className="max-w-7xl mx-auto p-2 sm:p-4 space-y-4 sm:space-y-6">
       <Toast ref={toast} />
       <ConfirmDialog />
       
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-700 shadow-lg rounded-xl p-6 text-white">
+      <div className="bg-gradient-to-r from-blue-600 to-purple-700 shadow-lg rounded-xl p-4 sm:p-6 text-white">
         {headerToolbar}
       </div>
 
