@@ -11,6 +11,7 @@ import { CashRegisterStatusResponse } from '../../../types/cashRegister';
 import OpenRegisterForm from './OpenRegisterForm';
 import CloseRegisterForm from './CloseRegisterForm';
 import RegisterDetailsPanel from './RegisterDetailsPanel';
+import ExcelReportButton from './ExcelReportButton';
 
 const CashRegister: React.FC = () => {
   const { t } = useTranslation();
@@ -51,12 +52,19 @@ const CashRegister: React.FC = () => {
     <div className="max-w-6xl mx-auto p-6">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">
-          {t('cashRegister.title')}
-        </h1>
-        <p className="text-gray-600">
-          {t('cashRegister.selectDate')}
-        </p>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">
+              {t('cashRegister.title')}
+            </h1>
+            <p className="text-gray-600">
+              {t('cashRegister.selectDate')}
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <ExcelReportButton className="h-fit" />
+          </div>
+        </div>
       </div>
 
       {/* Date Selection */}

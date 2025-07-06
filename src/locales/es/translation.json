@@ -404,6 +404,18 @@
     "recordId": "ID del registro",
     "currency": "Moneda",
     "openingCashier": "Cajero de apertura",
-    "closingCashier": "Cajero de cierre"
+    "closingCashier": "Cajero de cierre",
+    "downloadExcel": "Descargar Reporte Excel",
+    "downloadExcelTooltip": "Descargar un reporte completo en Excel de todos los días de caja registradora",
+    "downloadSuccess": "Descarga Exitosa",
+    "downloadError": "Error de Descarga",
+    "excelGeneratedSuccessfully": "El reporte de Excel ha sido generado y descargado exitosamente",
+    "errorGeneratingExcel": "Ocurrió un error al generar el archivo de Excel",
+    "generatingReport": "Generando Reporte",
+    "pleaseWait": "Por favor espere mientras generamos su reporte...",
+    "noDataAvailable": "No hay datos disponibles para exportar",
+    "serverError": "Error del Servidor",
+    "serverErrorMessage": "Ocurrió un error del servidor. Por favor intente más tarde",
+    "unexpectedError": "Ocurrió un error inesperado"
   }
 }

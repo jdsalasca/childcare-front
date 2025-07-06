@@ -5,6 +5,7 @@ import {
   CloseRegisterRequest,
   GetCashiersResponse,
   RegisterDetailsResponse,
+  CashRegisterReportResponse,
 } from '../types/cashRegister';
 
 const CashRegisterAPI = {
@@ -26,6 +27,20 @@ const CashRegisterAPI = {
   },
   getDetails: async (date: string): Promise<RegisterDetailsResponse> => {
     const res = await API.get<RegisterDetailsResponse>(BASE_URL, `/cash-register/details/${date}`);
+    return res.response;
+  },
+  getReport: async (params?: {
+    start_date?: string;
+    end_date?: string;
+    status?: string;
+  }): Promise<CashRegisterReportResponse> => {
+    const queryParams = new URLSearchParams();
+    if (params?.start_date) queryParams.append('start_date', params.start_date);
+    if (params?.end_date) queryParams.append('end_date', params.end_date);
+    if (params?.status) queryParams.append('status', params.status);
+    
+    const url = `/cash-register/report${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const res = await API.get<CashRegisterReportResponse>(BASE_URL, url);
     return res.response;
   },
 };

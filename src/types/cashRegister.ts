@@ -91,4 +91,46 @@ export interface RegisterDetailsResponse {
       currency: string;
     };
   };
+}
+
+export interface CashRegisterReportDay {
+  date: string;
+  status: CashRegisterStatus;
+  opening: {
+    time: string;
+    amount: number;
+    cashier: Cashier;
+  };
+  closing: {
+    time: string | null;
+    amount: number;
+    cashier: Cashier | null;
+  };
+  difference: number;
+  currency: string;
+}
+
+export interface CashRegisterReportResponse {
+  success: boolean;
+  data: {
+    days: CashRegisterReportDay[];
+    summary: {
+      total_opening_amount: number;
+      total_closing_amount: number;
+      total_difference: number;
+      total_days: number;
+      currency: string;
+    };
+    filters_applied: {
+      start_date: string | null;
+      end_date: string | null;
+      status: CashRegisterStatus | null;
+    };
+  };
+  total_records: number;
+  filters: {
+    start_date: string | null;
+    end_date: string | null;
+    status: CashRegisterStatus | null;
+  };
 } 

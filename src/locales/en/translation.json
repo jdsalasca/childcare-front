@@ -407,6 +407,18 @@
     "recordId": "Record ID",
     "currency": "Currency",
     "openingCashier": "Opening cashier",
-    "closingCashier": "Closing cashier"
+    "closingCashier": "Closing cashier",
+    "downloadExcel": "Download Excel Report",
+    "downloadExcelTooltip": "Download a comprehensive Excel report of all cash register days",
+    "downloadSuccess": "Download Successful",
+    "downloadError": "Download Error",
+    "excelGeneratedSuccessfully": "Excel report has been generated and downloaded successfully",
+    "errorGeneratingExcel": "An error occurred while generating the Excel file",
+    "generatingReport": "Generating Report",
+    "pleaseWait": "Please wait while we generate your report...",
+    "noDataAvailable": "No data available for export",
+    "serverError": "Server Error",
+    "serverErrorMessage": "A server error occurred. Please try again later",
+    "unexpectedError": "An unexpected error occurred"
   }
 }
