@@ -80,10 +80,10 @@ const BillCard: React.FC<{
     <div 
       id={`bill-card-${index}`}
       className={classNames(
-        'bg-white rounded-lg shadow-md border border-gray-200 mb-4 transition-all duration-300',
+        'bg-white rounded-xl shadow-sm border border-gray-100 mb-3 transition-all duration-300 hover:shadow-md',
         {
-          'opacity-70 pointer-events-none': blockContent,
-          'hover:shadow-lg hover:-translate-y-1': !blockContent
+          'opacity-50 pointer-events-none': blockContent,
+          'hover:border-blue-200': !blockContent
         }
       )}
     >
@@ -96,13 +96,15 @@ const BillCard: React.FC<{
       )}
       
       {/* Card Header */}
-      <div className="flex items-center justify-between p-3 border-b border-gray-200">
+      <div className="flex items-center justify-between p-3 border-b border-gray-50">
         <div className="flex items-center gap-2">
-          <i className="pi pi-receipt text-blue-600 text-lg"></i>
+          <div className="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center">
+            <i className="pi pi-receipt text-blue-600 text-sm"></i>
+          </div>
         </div>
         <Button
           icon="pi pi-trash"
-          className="p-button-danger p-button-text p-button-sm"
+          className="p-button-danger p-button-text p-button-sm hover:bg-red-50"
           onClick={handleRemove}
           tooltip={t('bills.removeThisBill')}
           tooltipOptions={{ position: 'left' }}
@@ -115,7 +117,7 @@ const BillCard: React.FC<{
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
           {/* Names Field */}
           <div className="flex flex-col">
-            <label htmlFor={`names-${index}`} className="text-xs font-medium text-gray-700 mb-1">
+            <label htmlFor={`names-${index}`} className="text-xs font-semibold text-gray-600 mb-1 uppercase tracking-wide">
               {t('bills.names')}
             </label>
             <Controller
@@ -126,7 +128,7 @@ const BillCard: React.FC<{
                   id={`names-${index}`}
                   {...field}
                   disabled={blockContent}
-                  className={classNames('w-full text-sm', {
+                  className={classNames('w-full text-sm border-gray-200 focus:border-blue-400 focus:ring-1 focus:ring-blue-100', {
                     'p-invalid': errors.bills?.[index]?.names,
                   })}
                   value={field.value || ''}
@@ -140,8 +142,8 @@ const BillCard: React.FC<{
 
           {/* Cash Field */}
           <div className="flex flex-col">
-            <label htmlFor={`cash-${index}`} className="text-xs font-medium text-gray-700 mb-1">
-              {t('bills.cash')}
+            <label htmlFor={`cash-${index}`} className="text-xs font-semibold text-gray-600 mb-1 uppercase tracking-wide">
+              💵 {t('bills.cash')}
             </label>
             <Controller
               name={`bills[${index}].cash`}
@@ -150,7 +152,7 @@ const BillCard: React.FC<{
                 <InputText
                   id={`cash-${index}`}
                   disabled={blockContent}
-                  className={classNames('w-full text-sm', {
+                  className={classNames('w-full text-sm border-gray-200 focus:border-green-400 focus:ring-1 focus:ring-green-100', {
                     'p-invalid': errors.bills?.[index]?.cash,
                   })}
                   keyfilter="num"
@@ -165,8 +167,8 @@ const BillCard: React.FC<{
 
           {/* Check Field */}
           <div className="flex flex-col">
-            <label htmlFor={`check-${index}`} className="text-xs font-medium text-gray-700 mb-1">
-              {t('bills.check')}
+            <label htmlFor={`check-${index}`} className="text-xs font-semibold text-gray-600 mb-1 uppercase tracking-wide">
+              🏦 {t('bills.check')}
             </label>
             <Controller
               name={`bills[${index}].check`}
@@ -175,7 +177,7 @@ const BillCard: React.FC<{
                 <InputText
                   id={`check-${index}`}
                   disabled={blockContent}
-                  className={classNames('w-full text-sm', {
+                  className={classNames('w-full text-sm border-gray-200 focus:border-blue-400 focus:ring-1 focus:ring-blue-100', {
                     'p-invalid': errors.bills?.[index]?.check,
                   })}
                   keyfilter="num"
@@ -190,8 +192,8 @@ const BillCard: React.FC<{
 
           {/* Total Field */}
           <div className="flex flex-col">
-            <label htmlFor={`total-${index}`} className="text-xs font-medium text-gray-700 mb-1">
-              {t('bills.total')}
+            <label htmlFor={`total-${index}`} className="text-xs font-semibold text-gray-600 mb-1 uppercase tracking-wide">
+              💰 {t('bills.total')}
             </label>
             <Controller
               name={`bills[${index}].total`}
@@ -202,7 +204,7 @@ const BillCard: React.FC<{
                   id={`total-${index}`}
                   value={`$${displayTotal}`}
                   readOnly
-                  className="w-full text-sm p-disabled bg-gray-50 font-bold"
+                  className="w-full text-sm p-disabled bg-gradient-to-r from-green-50 to-blue-50 border-green-200 font-bold text-green-800"
                 />
               )}
             />
@@ -277,10 +279,12 @@ const BillSummary: React.FC<{
   ];
 
   return (
-    <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6 mb-6">
-      <div className="flex items-center gap-2 mb-6">
-        <i className="pi pi-chart-bar text-xl text-gray-600"></i>
-        <h3 className="text-lg font-semibold text-gray-800 m-0">
+    <div className="bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-600 rounded-full flex items-center justify-center">
+          <i className="pi pi-chart-bar text-white text-lg"></i>
+        </div>
+        <h3 className="text-xl font-bold text-gray-800 m-0">
           {t('bills.summary', 'Summary')}
         </h3>
       </div>
@@ -289,11 +293,13 @@ const BillSummary: React.FC<{
         {summaryItems.map((item, index) => (
           <div 
             key={index}
-            className={`p-4 rounded-lg border border-gray-200 ${item.bgColor}`}
+            className={`p-5 rounded-xl border border-gray-100 ${item.bgColor} hover:shadow-md transition-all duration-200 hover:scale-105`}
           >
-            <div className="flex items-center gap-2 mb-2">
-              <i className={`${item.icon} ${item.color}`}></i>
-              <span className="text-sm font-medium text-gray-700">
+            <div className="flex items-center gap-3 mb-3">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${item.color.replace('text-', 'bg-').replace('-600', '-100')}`}>
+                <i className={`${item.icon} ${item.color} text-sm`}></i>
+              </div>
+              <span className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
                 {item.label}
               </span>
             </div>
@@ -304,24 +310,7 @@ const BillSummary: React.FC<{
         ))}
       </div>
 
-      <hr className="border-gray-200 mb-4" />
 
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div className="flex items-center gap-2">
-          <i className="pi pi-info-circle text-blue-600"></i>
-          <span className="text-sm text-gray-600">
-            {t('bills.cashOnHandNote', 'Cash on Hand represents the base amount available')}
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-gray-700">
-            {t('bills.cash_on_hand', 'Cash on Hand')}:
-          </span>
-          <span className="text-lg font-bold text-gray-800">
-            {formatCurrency(cashOnHand || 0)}
-          </span>
-        </div>
-      </div>
     </div>
   );
 };
@@ -377,13 +366,13 @@ export const Bills: React.FC = () => {
   // Header toolbar content
   const headerToolbar = useMemo(() => (
     <div className="flex flex-wrap items-center justify-between gap-4">
-      <div className="flex items-center gap-2">
-        <h1 className="text-2xl font-bold text-gray-800 m-0">
+      <div className="flex items-center gap-3">
+        <h1 className="text-3xl font-bold text-white m-0">
           {t('bills.title', 'Bills Management')}
         </h1>
         <Chip 
           label={`${filteredBills.length} ${t('bills.total', 'total')}`}
-          className="bg-blue-100 text-blue-800"
+          className="bg-white/20 text-white border-white/30"
         />
       </div>
       
@@ -391,27 +380,27 @@ export const Bills: React.FC = () => {
         <Button
           icon={isCompactView ? "pi pi-th-large" : "pi pi-list"}
           onClick={() => setIsCompactView(!isCompactView)}
-          className="p-button-text"
+          className="p-button-text text-white border-white/30 hover:bg-white/20"
           tooltip={isCompactView ? t('bills.gridView') : t('bills.listView')}
         />
         <Button
           icon="pi pi-plus"
           label={t('bills.addNew')}
           onClick={addNewBill}
-          className="p-button-success"
+          className="bg-green-500 hover:bg-green-600 border-green-500 text-white"
         />
         <Button
           icon="pi pi-file-pdf"
           label={t('bills.summaryReport')}
           onClick={onDownloadFirstPartPdf}
-          className="p-button-help"
+          className="bg-purple-500 hover:bg-purple-600 border-purple-500 text-white"
           disabled={exportableCount === 0}
         />
         <Button
           icon="pi pi-receipt"
           label={t('bills.fullReport')}
           onClick={onDownloadBoxedPdf}
-          className="p-button-warning"
+          className="bg-orange-500 hover:bg-orange-600 border-orange-500 text-white"
           disabled={exportableCount === 0}
         />
       </div>
@@ -420,10 +409,12 @@ export const Bills: React.FC = () => {
 
   // Filters panel
   const filtersPanel = useMemo(() => (
-    <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
-      <div className="flex items-center gap-2 mb-4">
-        <i className="pi pi-filter text-lg text-gray-600"></i>
-        <h3 className="text-lg font-semibold text-gray-800 m-0">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+          <i className="pi pi-filter text-blue-600 text-sm"></i>
+        </div>
+        <h3 className="text-lg font-bold text-gray-800 m-0">
           {t('bills.filters', 'Filters')}
         </h3>
       </div>
@@ -559,7 +550,7 @@ export const Bills: React.FC = () => {
       <ConfirmDialog />
       
       {/* Header */}
-      <div className="bg-white shadow-sm border border-gray-200 rounded-lg p-4">
+      <div className="bg-gradient-to-r from-blue-600 to-purple-700 shadow-lg rounded-xl p-6 text-white">
         {headerToolbar}
       </div>
 
@@ -586,8 +577,8 @@ export const Bills: React.FC = () => {
       {/* Bills Form */}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Bills List */}
-        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
-          <div className={isCompactView ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4' : 'space-y-4'}>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className={isCompactView ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4' : 'space-y-3'}>
             {paginatedBills.length > 0 ? (
               paginatedBills.map((bill, index) => renderBillItem(bill, index))
             ) : (
@@ -618,20 +609,20 @@ export const Bills: React.FC = () => {
         />
 
         {/* Actions */}
-        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
-          <div className="flex flex-wrap justify-center gap-3">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className="flex flex-wrap justify-center gap-4">
             <Button
               type="submit"
               label={t('bills.save')}
               icon="pi pi-save"
-              className="p-button-primary"
+              className="bg-blue-600 hover:bg-blue-700 border-blue-600 text-white px-8 py-3 text-lg font-semibold"
               disabled={blockContent}
             />
             <Button
               type="button"
               label={t('bills.summaryReport')}
               icon="pi pi-file-pdf"
-              className="p-button-help"
+              className="bg-purple-500 hover:bg-purple-600 border-purple-500 text-white px-6 py-3"
               onClick={onDownloadFirstPartPdf}
               disabled={exportableCount === 0}
             />
@@ -639,7 +630,7 @@ export const Bills: React.FC = () => {
               type="button"
               label={t('bills.fullReport')}
               icon="pi pi-receipt"
-              className="p-button-warning"
+              className="bg-orange-500 hover:bg-orange-600 border-orange-500 text-white px-6 py-3"
               onClick={onDownloadBoxedPdf}
               disabled={exportableCount === 0}
             />
