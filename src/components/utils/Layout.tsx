@@ -50,6 +50,7 @@ const Layout: React.FC<LayoutProps> = ({ insideAuthApplication = false }) => {
       items: [
         { label: t('manageBills'), command: () => customNavigate('/bills') },
         { label: t('migrateBills'), command: () => customNavigate('/migrate/bills') },
+        { label: t('cashRegister.title'), command: () => customNavigate('/deposits/cash-register') },
       ],
     },
     {

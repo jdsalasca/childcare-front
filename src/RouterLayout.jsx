@@ -8,6 +8,8 @@ import Layout from './components/utils/Layout'
 import Login from './components/utils/Login'
 import SessionExpired from './components/utils/SessionExpired'
 import { UnderConstruction } from './components/utils/UnderConstruction'
+import DepositsMenu from './components/deposits/DepositsMenu'
+import CashRegister from './components/deposits/cashRegister/CashRegister'
 function RouterLayout() {
   return (
     <Router >
@@ -45,6 +47,10 @@ function RouterLayout() {
             <Route path="childadmin/admin/register-payment-form" element={<HomePage />} />
             <Route path="childadmin/admin/register-payments-excel" element={<HomePage />} />
             <Route path="childadmin/admin/users"  element={<FormRegister />} />
+            {/* Deposits Section */}
+            <Route path="childadmin/admin/deposits" element={<DepositsMenu />}>
+              <Route path="cash-register" element={<CashRegister />} />
+            </Route>
           </Route>
         </Routes>
       </div>
