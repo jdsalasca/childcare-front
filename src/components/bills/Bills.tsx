@@ -28,8 +28,7 @@ const BillCard: React.FC<{
   blockContent: boolean;
   onRecalculateAll: (index: number, bill: Bill) => void;
   onRemove: (index: number) => void;
-  isCompact?: boolean;
-}> = React.memo(({ bill, index, control, errors, blockContent, onRecalculateAll, onRemove, isCompact = false }) => {
+}> = React.memo(({ bill, index, control, errors, blockContent, onRecalculateAll, onRemove }) => {
   const { t } = useTranslation();
 
   const cash = typeof bill.cash === 'number' ? bill.cash : 
@@ -80,10 +79,10 @@ const BillCard: React.FC<{
     <div 
       id={`bill-card-${index}`}
       className={classNames(
-        'bg-white rounded-xl shadow-sm border border-gray-100 mb-3 transition-all duration-300 hover:shadow-md',
+        'bg-white rounded-lg shadow-sm border border-gray-200 mb-2 p-4',
         {
           'opacity-50 pointer-events-none': blockContent,
-          'hover:border-blue-200': !blockContent
+          'hover:border-blue-300': !blockContent
         }
       )}
     >
@@ -95,120 +94,101 @@ const BillCard: React.FC<{
         />
       )}
       
-      {/* Card Header */}
-      <div className="flex items-center justify-between p-3 border-b border-gray-50">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center">
-            <i className="pi pi-receipt text-blue-600 text-sm"></i>
-          </div>
+      {/* Single Row Layout */}
+      <div className="grid grid-cols-12 gap-3 items-center">
+        {/* Names Field - Takes more space */}
+        <div className="col-span-4">
+          <Controller
+            name={`bills[${index}].names`}
+            control={control}
+            render={({ field }) => (
+              <InputText
+                id={`names-${index}`}
+                {...field}
+                disabled={blockContent}
+                className={classNames('w-full text-sm', {
+                  'p-invalid': errors.bills?.[index]?.names,
+                })}
+                value={field.value || ''}
+                onChange={(e) => field.onChange(e.target.value)}
+                placeholder={t('bills.enterNames', 'Enter names')}
+              />
+            )}
+          />
+          {getFormErrorMessage('names')}
         </div>
-        <Button
-          icon="pi pi-trash"
-          className="p-button-danger p-button-text p-button-sm hover:bg-red-50"
-          onClick={handleRemove}
-          tooltip={t('bills.removeThisBill')}
-          tooltipOptions={{ position: 'left' }}
-          disabled={blockContent}
-        />
-      </div>
-      
-      {/* Card Content */}
-      <div className="p-3">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-          {/* Names Field */}
-          <div className="flex flex-col">
-            <label htmlFor={`names-${index}`} className="text-xs font-semibold text-gray-600 mb-1 uppercase tracking-wide">
-              {t('bills.names')}
-            </label>
-            <Controller
-              name={`bills[${index}].names`}
-              control={control}
-              render={({ field }) => (
-                <InputText
-                  id={`names-${index}`}
-                  {...field}
-                  disabled={blockContent}
-                  className={classNames('w-full text-sm border-gray-200 focus:border-blue-400 focus:ring-1 focus:ring-blue-100', {
-                    'p-invalid': errors.bills?.[index]?.names,
-                  })}
-                  value={field.value || ''}
-                  onChange={(e) => field.onChange(e.target.value)}
-                  placeholder={t('bills.enterNames', 'Enter names')}
-                />
-              )}
-            />
-            {getFormErrorMessage('names')}
-          </div>
 
-          {/* Cash Field */}
-          <div className="flex flex-col">
-            <label htmlFor={`cash-${index}`} className="text-xs font-semibold text-gray-600 mb-1 uppercase tracking-wide">
-              {t('bills.cash')}
-            </label>
-            <Controller
-              name={`bills[${index}].cash`}
-              control={control}
-              render={({ field }) => (
-                <InputText
-                  id={`cash-${index}`}
-                  disabled={blockContent}
-                  className={classNames('w-full text-sm border-gray-200 focus:border-green-400 focus:ring-1 focus:ring-green-100', {
-                    'p-invalid': errors.bills?.[index]?.cash,
-                  })}
-                  keyfilter="num"
-                  value={field.value !== undefined ? field.value : ''}
-                  onChange={(e) => handleCashChange(e, field.onChange, 'cash')}
-                  placeholder="0.00"
-                />
-              )}
-            />
-            {getFormErrorMessage('cash')}
-          </div>
+        {/* Cash Field - Compact */}
+        <div className="col-span-2">
+          <Controller
+            name={`bills[${index}].cash`}
+            control={control}
+            render={({ field }) => (
+              <InputText
+                id={`cash-${index}`}
+                disabled={blockContent}
+                className={classNames('w-full text-sm', {
+                  'p-invalid': errors.bills?.[index]?.cash,
+                })}
+                keyfilter="num"
+                value={field.value !== undefined ? field.value : ''}
+                onChange={(e) => handleCashChange(e, field.onChange, 'cash')}
+                placeholder="0.00"
+              />
+            )}
+          />
+          {getFormErrorMessage('cash')}
+        </div>
 
-          {/* Check Field */}
-          <div className="flex flex-col">
-            <label htmlFor={`check-${index}`} className="text-xs font-semibold text-gray-600 mb-1 uppercase tracking-wide">
-              {t('bills.check')}
-            </label>
-            <Controller
-              name={`bills[${index}].check`}
-              control={control}
-              render={({ field }) => (
-                <InputText
-                  id={`check-${index}`}
-                  disabled={blockContent}
-                  className={classNames('w-full text-sm border-gray-200 focus:border-blue-400 focus:ring-1 focus:ring-blue-100', {
-                    'p-invalid': errors.bills?.[index]?.check,
-                  })}
-                  keyfilter="num"
-                  value={field.value !== undefined ? field.value : ''}
-                  onChange={(e) => handleCashChange(e, field.onChange, 'check')}
-                  placeholder="0.00"
-                />
-              )}
-            />
-            {getFormErrorMessage('check')}
-          </div>
+        {/* Check Field - Compact */}
+        <div className="col-span-2">
+          <Controller
+            name={`bills[${index}].check`}
+            control={control}
+            render={({ field }) => (
+              <InputText
+                id={`check-${index}`}
+                disabled={blockContent}
+                className={classNames('w-full text-sm', {
+                  'p-invalid': errors.bills?.[index]?.check,
+                })}
+                keyfilter="num"
+                value={field.value !== undefined ? field.value : ''}
+                onChange={(e) => handleCashChange(e, field.onChange, 'check')}
+                placeholder="0.00"
+              />
+            )}
+          />
+          {getFormErrorMessage('check')}
+        </div>
 
-          {/* Total Field */}
-          <div className="flex flex-col">
-            <label htmlFor={`total-${index}`} className="text-xs font-semibold text-gray-600 mb-1 uppercase tracking-wide">
-              {t('bills.total')}
-            </label>
-            <Controller
-              name={`bills[${index}].total`}
-              control={control}
-              defaultValue={0}
-              render={() => (
-                <InputText
-                  id={`total-${index}`}
-                  value={`$${displayTotal}`}
-                  readOnly
-                  className="w-full text-sm p-disabled bg-gradient-to-r from-green-50 to-blue-50 border-green-200 font-bold text-green-800"
-                />
-              )}
-            />
-          </div>
+        {/* Total Field - Compact */}
+        <div className="col-span-3">
+          <Controller
+            name={`bills[${index}].total`}
+            control={control}
+            defaultValue={0}
+            render={() => (
+              <InputText
+                id={`total-${index}`}
+                value={`$${displayTotal}`}
+                readOnly
+                className="w-full text-sm p-disabled bg-green-50 border-green-200 font-bold text-green-800"
+              />
+            )}
+          />
+        </div>
+
+        {/* Remove Button - Compact */}
+        <div className="col-span-1 flex justify-end">
+          <Button
+            icon="pi pi-trash"
+            className="p-button-danger p-button-text p-button-sm"
+            onClick={handleRemove}
+            tooltip={t('bills.removeThisBill')}
+            tooltipOptions={{ position: 'left' }}
+            disabled={blockContent}
+          />
         </div>
       </div>
     </div>
@@ -221,8 +201,7 @@ const BillCard: React.FC<{
     prevProps.bill.names === nextProps.bill.names &&
     prevProps.bill.total === nextProps.bill.total &&
     prevProps.index === nextProps.index &&
-    prevProps.blockContent === nextProps.blockContent &&
-    prevProps.isCompact === nextProps.isCompact
+    prevProps.blockContent === nextProps.blockContent
   );
 });
 
@@ -283,7 +262,7 @@ const BillSummary: React.FC<{
         </h3>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
         {summaryItems.map((item, index) => (
           <div 
             key={index}
@@ -317,8 +296,7 @@ export const Bills: React.FC = () => {
   const [first, setFirst] = useState(0);
   const [rows, setRows] = useState(ITEMS_PER_PAGE);
   
-  // View state
-  const [isCompactView, setIsCompactView] = useState(false);
+
   
   const {
     control,
@@ -359,47 +337,49 @@ export const Bills: React.FC = () => {
 
   // Header toolbar content
   const headerToolbar = useMemo(() => (
-    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-        <h1 className="text-2xl lg:text-3xl font-bold text-white m-0">
-          {t('bills.title', 'Bills Management')}
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+      {/* Title Section */}
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">
+          {t('bills.title', 'Children Bill Management')}
         </h1>
-        <Chip 
-          label={`${filteredBills.length} ${t('bills.total', 'total')}`}
-          className="bg-white/20 text-white border-white/30 self-start sm:self-auto"
-        />
+        <p className="text-gray-600 text-lg">
+          {t('bills.manageBillsDescription', 'Manage daily payments and generate reports')} • {filteredBills.length} {t('bills.total', 'total')}
+        </p>
       </div>
       
-      <div className="flex flex-wrap items-center gap-2">
-        <Button
-          icon={isCompactView ? "pi pi-th-large" : "pi pi-list"}
-          onClick={() => setIsCompactView(!isCompactView)}
-          className="p-button-text text-white border-white/30 hover:bg-white/20 hidden sm:inline-flex"
-          tooltip={isCompactView ? t('bills.gridView') : t('bills.listView')}
-        />
-        <Button
-          icon="pi pi-plus"
-          label={t('bills.addNew')}
-          onClick={addNewBill}
-          className="bg-green-500 hover:bg-green-600 border-green-500 text-white text-sm"
-        />
-        <Button
-          icon="pi pi-file-pdf"
-          label={t('bills.summaryReport')}
-          onClick={onDownloadFirstPartPdf}
-          className="bg-purple-500 hover:bg-purple-600 border-purple-500 text-white text-sm"
-          disabled={exportableCount === 0}
-        />
-        <Button
-          icon="pi pi-receipt"
-          label={t('bills.fullReport')}
-          onClick={onDownloadBoxedPdf}
-          className="bg-orange-500 hover:bg-orange-600 border-orange-500 text-white text-sm"
-          disabled={exportableCount === 0}
-        />
+      {/* Actions Section */}
+      <div className="border-t border-gray-100 pt-4">
+        <div className="flex flex-wrap gap-3 justify-center">
+          {/* Primary Action */}
+          <Button
+            icon="pi pi-plus"
+            label={t('bills.addNew', 'Add New Bill')}
+            onClick={addNewBill}
+            className="p-button-success p-button-sm"
+          />
+          
+          {/* Summary Report */}
+          <Button
+            icon="pi pi-file-pdf"
+            label={t('bills.summaryReport', 'Summary Report')}
+            onClick={onDownloadFirstPartPdf}
+            className="p-button-secondary p-button-sm"
+            disabled={exportableCount === 0}
+          />
+          
+          {/* Full Report */}
+          <Button
+            icon="pi pi-receipt"
+            label={t('bills.fullReport', 'Full Report')}
+            onClick={onDownloadBoxedPdf}
+            className="p-button-info p-button-sm"
+            disabled={exportableCount === 0}
+          />
+        </div>
       </div>
     </div>
-  ), [t, filteredBills.length, exportableCount, isCompactView, addNewBill, onDownloadFirstPartPdf, onDownloadBoxedPdf]);
+  ), [t, filteredBills.length, exportableCount, addNewBill, onDownloadFirstPartPdf, onDownloadBoxedPdf]);
 
   // Filters panel
   const filtersPanel = useMemo(() => (
@@ -502,10 +482,9 @@ export const Bills: React.FC = () => {
         blockContent={blockContent}
         onRecalculateAll={onRecalculateAll}
         onRemove={safeRemove}
-        isCompact={isCompactView}
       />
     );
-  }, [control, errors, blockContent, onRecalculateAll, safeRemove, isCompactView]);
+  }, [control, errors, blockContent, onRecalculateAll, safeRemove]);
 
   // Empty state - memoized to prevent unnecessary re-renders
   const emptyTemplate = useMemo(() => (
@@ -544,7 +523,7 @@ export const Bills: React.FC = () => {
       <ConfirmDialog />
       
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-700 shadow-lg rounded-xl p-4 sm:p-6 text-white">
+      <div className="mb-8">
         {headerToolbar}
       </div>
 
@@ -572,7 +551,26 @@ export const Bills: React.FC = () => {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Bills List */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <div className={isCompactView ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4' : 'space-y-3'}>
+          {paginatedBills.length > 0 && (
+            <div className="grid grid-cols-12 gap-3 items-center mb-4 pb-3 border-b border-gray-200">
+              <div className="col-span-4 text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                {t('bills.names')}
+              </div>
+              <div className="col-span-2 text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                {t('bills.cash')}
+              </div>
+              <div className="col-span-2 text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                {t('bills.check')}
+              </div>
+              <div className="col-span-3 text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                {t('bills.total')}
+              </div>
+              <div className="col-span-1 text-sm font-semibold text-gray-700 uppercase tracking-wide text-center">
+                {t('actions', 'Actions')}
+              </div>
+            </div>
+          )}
+          <div className="space-y-2">
             {paginatedBills.length > 0 ? (
               paginatedBills.map((bill, index) => renderBillItem(bill, index))
             ) : (
