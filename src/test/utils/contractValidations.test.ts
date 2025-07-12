@@ -698,12 +698,12 @@ describe('Contract Validations', () => {
         id: i + 1,
         first_name: `Child${i + 1}`,
         last_name: 'Test',
-        date_of_birth: '2020-01-01',
+        born_date: '2020-01-01',
         gender_id: 1,
-        document_type_id: 1,
-        document_number: `12345678${i.toString().padStart(2, '0')}`,
+        identification_number: `12345678${i.toString().padStart(2, '0')}`,
         age: 3,
         classroom: 'Toddler',
+        status: 'Active',
       }));
 
       const startTime = performance.now();

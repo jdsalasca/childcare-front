@@ -9,6 +9,7 @@ import { useBillTypesByCurrencyCode } from '../../../models/BillTypeAPI';
 import { useChildren } from '../../../models/ChildrenAPI';
 import { CashOnHandByDyAPI } from '../../../models/CashOnHandByDyAPI';
 import CashRegisterAPI from '../../../models/CashRegisterAPI';
+import { CashAPI } from '../../../models/CashAPI';
 import { ToastInterpreterUtils } from '../../utils/ToastInterpreterUtils';
 import { exportToSummaryPDF } from '../utils/summaryPdf';
 import { exportBoxesToPDF } from '../utils/boxesPdf';
@@ -189,10 +190,14 @@ export const useBillsViewModel = () => {
   // Recalculate sums when cashOnHand changes (but not when bills change - that's handled elsewhere)
   useEffect(() => {
     if (billsFields.length > 0) {
-      const newSums = calculateSums(billsFields, cashOnHandValue || 0);
-      setSums(newSums);
+      const timeoutId = setTimeout(() => {
+        const newSums = calculateSums(billsFields, cashOnHandValue || 0);
+        setSums(newSums);
+      }, 100); // Debounce the calculation
+      
+      return () => clearTimeout(timeoutId);
     }
-  }, [cashOnHandValue, calculateSums]); // Removed billsFields from dependencies to prevent infinite loop
+  }, [cashOnHandValue]); // Remove calculateSums from dependencies to prevent infinite loop
 
   // Optimized recalculation with debouncing
   const recalculateFields = useCallback((newFields?: Bill[]) => {
@@ -250,11 +255,19 @@ export const useBillsViewModel = () => {
       total: newTotal
     });
 
-    // Trigger recalculation with a slight delay to ensure the update is processed
-    setTimeout(() => {
-      recalculateFields();
-    }, 0);
-  }, [getValues, update, recalculateFields]);
+    // Immediately recalculate sums without triggering the recalculateFields function
+    const allBills = getValues('bills') || [];
+    const newSums = calculateSums(allBills, getValues('cashOnHand') || 0);
+    setSums(newSums);
+    
+    // Update exportable count
+    const count = allBills.filter(b => {
+      const cashNum = toNumber(b.cash);
+      const checkNum = toNumber(b.check);
+      return (cashNum > 0) || (checkNum > 0);
+    }).length;
+    setExportableCount(count);
+  }, [getValues, update, calculateSums]);
 
   // Optimized bills filtering
   const filteredBills = useMemo(() => {
@@ -295,7 +308,17 @@ export const useBillsViewModel = () => {
           });
         });
         
-        recalculateFields();
+        // Immediately recalculate sums without triggering the recalculateFields function
+        const newSums = calculateSums(updatedBills, getValues('cashOnHand') || 0);
+        setSums(newSums);
+        
+        // Update exportable count
+        const count = updatedBills.filter(b => {
+          const cashNum = toNumber(b.cash);
+          const checkNum = toNumber(b.check);
+          return (cashNum > 0) || (checkNum > 0);
+        }).length;
+        setExportableCount(count);
       }, 0);
       
     } catch (error) {
@@ -309,7 +332,7 @@ export const useBillsViewModel = () => {
         });
       }
     }
-  }, [billsFields, getValues, recalculateFields, remove, t, update]);
+  }, [billsFields, getValues, remove, t, update, calculateSums]);
 
   // Optimized form initialization
   const onStartForm = useCallback(async () => {
@@ -339,10 +362,15 @@ export const useBillsViewModel = () => {
         cashOnHand: getValues('cashOnHand') || 0.0
       });
 
-      // Force recalculation after form reset
-      setTimeout(() => {
-        recalculateFields(billList);
-      }, 100);
+      // Set initial sums and exportable count
+      setExportableCount(0);
+      setSums({
+        cash: 0,
+        check: 0,
+        total: 0,
+        cash_on_hand: getValues('cashOnHand') || 0,
+        total_cash_on_hand: 0
+      });
       
     } catch (error) {
       customLogger.error('Error in onStartForm:', error);
@@ -352,22 +380,23 @@ export const useBillsViewModel = () => {
         loadingMessage: ''
       });
     }
-  }, [children, currenciesInformation, reset, getValues, recalculateFields, t]);
+  }, [children, currenciesInformation, reset, getValues, t]);
 
   // Add new bill function
   const addNewBill = useCallback(() => {
+    const currentBills = getValues('bills') || [];
     const newBill: Bill = {
       id: `bill_${Date.now()}_${Math.random()}`,
       names: '',
       cash: '',
       check: '',
       total: 0,
-      originalIndex: billsFields.length,
+      originalIndex: currentBills.length,
       classroom: ''
     };
     
     append(newBill);
-  }, [append, billsFields.length]);
+  }, [append, getValues]);
 
   // Optimized date handling
   const onHandlerSetCashOnHand = useCallback(async (date: Date): Promise<number> => {
@@ -462,8 +491,8 @@ export const useBillsViewModel = () => {
         day: '2-digit' 
       }) : '';
 
-      const backendData = {
-        date: formattedDate,
+      const backendData: FormValues = {
+        date: data.date,
         bills: data.bills.map(bill => ({
           id: bill.id,
           names: bill.names,
@@ -475,22 +504,13 @@ export const useBillsViewModel = () => {
         cashOnHand: data.cashOnHand || 0
       };
 
-      // Call the backend API
-      const result = await fetch(`${import.meta.env.VITE_BASE_URL || 'http://localhost:8000/childadmin'}/daily-cash/process`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify(backendData)
-      });
-
-      const responseData = await result.json();
+      // Call the backend API using the centralized CashAPI service
+      const result = await CashAPI.processCashData(backendData);
       
       if (toast.current) {
         ToastInterpreterUtils.toastBackendInterpreter(
           toast,
-          { httpStatus: result.status, response: responseData },
+          result,
           t('billsProcessedSuccessfully'),
           t('errorProcessingBills')
         );
@@ -602,7 +622,7 @@ export const useBillsViewModel = () => {
     });
     
     onStartForm();
-  }, [currenciesInformation, children, t]);
+  }, [currenciesInformation, children, t, onStartForm]); // Add onStartForm to dependencies
 
   useEffect(() => {
     if (children === undefined) {
@@ -628,8 +648,14 @@ export const useBillsViewModel = () => {
   // Watch for changes in bills and trigger recalculation
   useEffect(() => {
     if (billsFields.length === 0) return;
-    recalculateFields();
-  }, [billsFields, recalculateFields]);
+    
+    // Use a stable reference to prevent infinite loops
+    const timeoutId = setTimeout(() => {
+      recalculateFields();
+    }, 50); // Small delay to batch updates
+    
+    return () => clearTimeout(timeoutId);
+  }, [billsFields.length]); // Only depend on length, not the entire array
 
   // Cleanup effect to prevent memory leaks
   useEffect(() => {

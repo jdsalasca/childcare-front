@@ -99,7 +99,7 @@ describe('Performance Tests', () => {
         identification_number: `ID${i.toString().padStart(6, '0')}`,
         age: 3,
         classroom: 'Toddler',
-        status: 'Active',
+        status: 'Active' as const,
       }))
 
       const startTime = performance.now()

@@ -20,6 +20,89 @@ vi.mock('react-i18next', async () => {
   }
 })
 
+// Mock react-hook-form
+vi.mock('react-hook-form', () => ({
+  useForm: () => ({
+    control: {
+      register: vi.fn(),
+      unregister: vi.fn(),
+      getFieldState: vi.fn(),
+      handleSubmit: vi.fn(),
+      reset: vi.fn(),
+      resetField: vi.fn(),
+      setError: vi.fn(),
+      clearErrors: vi.fn(),
+      setValue: vi.fn(),
+      setFocus: vi.fn(),
+      getValues: vi.fn(),
+      getFieldValue: vi.fn(),
+      trigger: vi.fn(),
+      formState: {
+        errors: {},
+        isSubmitting: false,
+        isValid: true,
+      },
+      watch: vi.fn(),
+    },
+    handleSubmit: vi.fn((fn: any) => (e: any) => {
+      e?.preventDefault?.();
+      fn({});
+    }),
+    formState: {
+      errors: {},
+      isSubmitting: false,
+      isValid: true,
+    },
+    watch: vi.fn(),
+    setValue: vi.fn(),
+    getValues: vi.fn(),
+    reset: vi.fn(),
+    setError: vi.fn(),
+    clearErrors: vi.fn(),
+  }),
+  Controller: ({ render, name, control, ...props }: any) => {
+    const field = {
+      onChange: vi.fn(),
+      onBlur: vi.fn(),
+      value: props.defaultValue || '',
+      name,
+      ref: vi.fn(),
+    };
+    const fieldState = {
+      invalid: false,
+      isTouched: false,
+      isDirty: false,
+      error: undefined,
+    };
+    const formState = {
+      errors: {},
+      isSubmitting: false,
+      isValid: true,
+    };
+    return render({ field, fieldState, formState });
+  },
+  useController: () => ({
+    field: {
+      onChange: vi.fn(),
+      onBlur: vi.fn(),
+      value: '',
+      name: 'test',
+      ref: vi.fn(),
+    },
+    fieldState: {
+      invalid: false,
+      isTouched: false,
+      isDirty: false,
+      error: undefined,
+    },
+    formState: {
+      errors: {},
+      isSubmitting: false,
+      isValid: true,
+    },
+  }),
+}))
+
 // Mock environment variables
 vi.stubEnv('VITE_BASE_URL', 'http://localhost:8000/childadmin')
 vi.stubEnv('VITE_ENV', 'test')

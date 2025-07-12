@@ -44,8 +44,13 @@ export const GuardiansValidations = {
       return guardianTypeOptions;
     }
 
+    // If index is provided but out of bounds, treat as adding a new guardian
     if (index !== undefined && (index < 0 || index >= guardians.length)) {
-      return guardianTypeOptions;
+      // For new guardian, exclude all already assigned types
+      return guardianTypeOptions.filter(guardianType => {
+        const isAssigned = guardians.some(guardian => guardian.guardian_type_id === guardianType.id);
+        return !isAssigned;
+      });
     }
     
     // Get the selected guardian type for the specified index
