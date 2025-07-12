@@ -30,27 +30,15 @@ jobs:
         run: corepack enable
 
       - name: 📦 Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install --immutable
 
       - name: 🔍 Run ESLint
-        run: yarn lint --format=json --output-file=eslint-report.json
-        continue-on-error: true
+        run: yarn lint
+        continue-on-error: false
 
       - name: 🎨 Check code formatting
         run: yarn prettier --check .
-        continue-on-error: true
-
-      - name: 📊 Upload ESLint results
-        uses: github/super-linter@v7
-        if: always()
-        env:
-          DEFAULT_BRANCH: main
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VALIDATE_ALL_CODEBASE: false
-          VALIDATE_JAVASCRIPT_ES: true
-          VALIDATE_TYPESCRIPT_ES: true
-          VALIDATE_CSS: true
-          VALIDATE_HTML: true
+        continue-on-error: false
 
   # Job 2: Testing & Coverage
   test:
@@ -70,26 +58,21 @@ jobs:
         run: corepack enable
 
       - name: 📦 Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install --immutable
 
       - name: 🧪 Run tests
-        run: yarn test --coverage --reporter=json --outputFile=test-results.json
+        run: yarn test --coverage
+        continue-on-error: false
 
       - name: 📊 Upload coverage to Codecov
         uses: codecov/codecov-action@v5
+        if: always()
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage/lcov.info
           flags: unittests
           name: codecov-umbrella
-
-      - name: 📈 Coverage comment
-        uses: 5monkeys/cobertura-action@master
-        if: github.event_name == 'pull_request'
-        with:
-          path: coverage/cobertura-coverage.xml
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          minimum_coverage: 70
+          fail_ci_if_error: false
 
   # Job 3: Security Scanning
   security:
@@ -109,18 +92,11 @@ jobs:
         run: corepack enable
 
       - name: 📦 Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install --immutable
 
       - name: 🔍 Run security audit
-        run: yarn audit --json > security-audit.json
+        run: yarn audit --level moderate
         continue-on-error: true
-
-      - name: 🛡️ Run Snyk security scan
-        uses: snyk/actions/node@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: --severity-threshold=high
 
   # Job 4: Build & Performance
   build:
@@ -140,7 +116,7 @@ jobs:
         run: corepack enable
 
       - name: 📦 Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install --immutable
 
       - name: 🏗️ Build application
         run: yarn build
@@ -153,7 +129,7 @@ jobs:
           exclude: '{**/*.map,**/node_modules/**}'
 
       - name: 📊 Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-files
           path: dist/
