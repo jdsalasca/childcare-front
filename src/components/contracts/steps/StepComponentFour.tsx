@@ -1,6 +1,6 @@
 import { LoadingInfo } from '@models/AppModels';
 import { Button } from 'primereact/button';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { ContractAPI } from '../../../models/ContractAPI';
@@ -33,16 +33,15 @@ const StepComponentFour: React.FC<StepComponentFourProps> = ({
   toast,
 }) => {
   const { paymentMethodsOptions: paymentMethodsCache, isLoading } = usePaymentMethodsOptions();
-  const [paymentMethods, setPaymentMethods] = useState<{ id: number; translationLabel: string; method: string }[]>([]);
-
-  useEffect(() => {
-    if (paymentMethodsCache && !isLoading) {
-      setPaymentMethods(paymentMethodsCache.map(paymentMethod => ({
-        ...paymentMethod,
-        label: paymentMethod.translationLabel,
-        value: paymentMethod.id,
-      })));
-    }
+  
+  // Memoize payment methods transformation
+  const paymentMethods = useMemo(() => {
+    if (!paymentMethodsCache || isLoading) return [];
+    return paymentMethodsCache.map(paymentMethod => ({
+      ...paymentMethod,
+      label: paymentMethod.translationLabel,
+      value: paymentMethod.id,
+    }));
   }, [paymentMethodsCache, isLoading]);
 
   const { t } = useTranslation();

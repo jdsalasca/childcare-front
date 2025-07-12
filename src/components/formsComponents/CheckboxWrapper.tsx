@@ -11,6 +11,9 @@ interface CheckboxWrapperProps {
   labelClassName?: string;
   spanClassName?: string;
   labelPosition?: 'left' | 'right';
+  checkboxClassName?: string; // Custom prop for checkbox styling
+  internationalization?: boolean | string; // Accept both boolean and string
+  className?: string;
   [key: string]: any;
 }
 
@@ -23,8 +26,21 @@ const CheckboxWrapper: React.FC<CheckboxWrapperProps> = ({
   labelClassName = '',
   spanClassName = '',
   labelPosition = 'right',
+  checkboxClassName = '',
+  internationalization,
+  className = '',
   ...rest
 }) => {
+  // Filter out custom props that shouldn't be passed to the Checkbox component
+  const {
+    checkboxClassName: _checkboxClassName,
+    internationalization: _internationalization,
+    labelClassName: _labelClassName,
+    spanClassName: _spanClassName,
+    labelPosition: _labelPosition,
+    ...checkboxProps
+  } = rest;
+
   return (
     <Controller
       name={name}
@@ -32,33 +48,36 @@ const CheckboxWrapper: React.FC<CheckboxWrapperProps> = ({
       rules={rules}
       render={({ field, fieldState: { error } }) => (
         <span
-          className={`inline-flex items-center max-w-5 break-words ${spanClassName} ${labelPosition === 'left' ? 'flex-row' : 'flex-row-reverse'}`}
-          style={{ maxWidth: '15rem', wordBreak: 'break-word', overflowWrap: 'break-word', width: '100%' }} // Added max-width style
+          className={`inline-flex items-center max-w-5 break-words ${spanClassName} ${labelPosition === 'left' ? 'flex-row' : 'flex-row-reverse'} ${className}`}
+          style={{ maxWidth: '15rem', wordBreak: 'break-word', overflowWrap: 'break-word', width: '100%' }}
         >
           {labelPosition === 'left' && (
-            <p className={`mr-auto ${labelClassName}`}>{label}</p> // Use mr-auto for left alignment
+            <p className={`mr-auto ${labelClassName}`}>{label}</p>
           )}
           <Checkbox
             id={name}
             {...field}
             checked={field.value}
-            className={classNames({ 'p-invalid': error })}
+            className={classNames(
+              { 'p-invalid': error },
+              checkboxClassName
+            )}
             disabled={disabled}
             onChange={(e) => field.onChange(e.checked)}
-            {...rest}
+            {...checkboxProps}
           />
-      {labelPosition === 'right' && (
-    <p 
-      className={`ml-2 break-all whitespace-normal ${labelClassName}`}
-      style={{ 
-        flexGrow: 1,    // Add this
-        flexShrink: 1,  // Add this
-        minWidth: 0,    // Add this - important for flex items
-        wordBreak: 'break-word',
-        overflowWrap: 'break-word'
-      }}
-    >
-      {label}
+          {labelPosition === 'right' && (
+            <p 
+              className={`ml-2 break-all whitespace-normal ${labelClassName}`}
+              style={{ 
+                flexGrow: 1,
+                flexShrink: 1,
+                minWidth: 0,
+                wordBreak: 'break-word',
+                overflowWrap: 'break-word'
+              }}
+            >
+              {label}
             </p>
           )}
           {error && <small className="p-error">{error.message}</small>}

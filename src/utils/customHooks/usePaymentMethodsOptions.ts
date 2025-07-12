@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { usePaymentMethodsCache } from "../../models/PaymentMethodAPI";
 import { PaymentMethodType } from "../../types/paymentMethod";
 
@@ -10,20 +10,19 @@ interface PaymentMethod {
 }
 
 const usePaymentMethodsOptions = () => {
-    const [paymentMethodsOptions, setPaymentMethodsOptions] = useState<PaymentMethodType[]>([]);
     const { data: paymentMethods, error, isLoading } = usePaymentMethodsCache();
 
-    useEffect(() => {
+    // Use useMemo to transform payment methods options and prevent unnecessary re-renders
+    const paymentMethodsOptions = useMemo(() => {
+        if (!paymentMethods || isLoading) return [];
+        
         console.log("paymentMethods", paymentMethods);
         
-        if (paymentMethods && !isLoading) {
-            const paymentMethodsOptions = paymentMethods.response.map((paymentMethod) => ({
-                ...paymentMethod,
-                label: paymentMethod.translationLabel, // Adjust according to your data structure
-                value: paymentMethod.id, // Adjust according to your data structure
-            }))
-            setPaymentMethodsOptions(paymentMethodsOptions);
-        }
+        return paymentMethods.response.map((paymentMethod) => ({
+            ...paymentMethod,
+            label: paymentMethod.translationLabel, // Adjust according to your data structure
+            value: paymentMethod.id, // Adjust according to your data structure
+        }));
     }, [paymentMethods, isLoading]);
 
     return { paymentMethodsOptions, error, isLoading };

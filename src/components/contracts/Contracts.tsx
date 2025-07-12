@@ -22,6 +22,7 @@ import { MedicalInformationForm } from './steps/medical/MedicalInformationForm';
 import { FormulaInformationForm } from './steps/medical/FormulaInformationForm';
 import { PermissionsInformationForm } from './steps/medical/PermissionsInformationForm';
 import StepComponentPricing from './steps/StepComponentPricing';
+import { ContractsErrorBoundary } from './ErrorBoundary';
 
 // Define the props type for the component
 type ContractsProps = {
@@ -45,24 +46,23 @@ export const Contracts: React.FC<ContractsProps> = () => {
     const totalPermissions = ContractModel.CONTRACT_PERMISSIONS.length;
     customLogger.debug("permissions", permissions);
     return `${ContractPermissionsValidator.getValidContractPermissions(permissions)}/${totalPermissions}`;
-  }, [contractInformation]);
+  }, [contractInformation?.terms]);
 
   const countChildrenWithMedicalInfo = useMemo(() => {
-    return contractInformation?.children.filter(child => 
-      
+    return contractInformation?.children?.filter(child => 
       child?.medicalInformation?.healthStatus !== '' &&
       child?.medicalInformation?.healthStatus != null &&
       child?.medicalInformation?.instructions !== '' &&
       child?.medicalInformation?.instructions != null
-    ).length;
-  }, [contractInformation]);
+    ).length || 0;
+  }, [contractInformation?.children]);
 
   const countChildrenWithFormulaInfo = useMemo(() => {
-    return contractInformation?.children.filter(child => 
+    return contractInformation?.children?.filter(child => 
       child?.formulaInformation?.formula !== '' &&
       child?.formulaInformation?.formula != null
-    ).length;
-  }, [contractInformation]);
+    ).length || 0;
+  }, [contractInformation?.children]);
 
   const countChildrenWithPermissionsInfo = useMemo(() => {
     return contractInformation?.children?.filter(child => {
@@ -70,45 +70,57 @@ export const Contracts: React.FC<ContractsProps> = () => {
       return permissions && Object.entries(permissions)
         .filter(([key]) => key !== 'other')
         .some(([, value]) => value === true);
-    }).length;
-  }, [contractInformation]);
+    }).length || 0;
+  }, [contractInformation?.children]);
 
   const getStepClass = useCallback((stepIndex: number) => {
     switch (stepIndex) {
       case 0:
-        return contractInformation.children[0]?.first_name ? 'step-valid' : 'step-invalid';
+        return contractInformation.children?.[0]?.first_name ? 'step-valid' : 'step-invalid';
       case 1:
-        return contractInformation.guardians[0]?.name ? 'step-valid' : 'step-invalid';
+        return contractInformation.guardians?.[0]?.name ? 'step-valid' : 'step-invalid';
       case 2:
         return (ContractPermissionsValidator.getValidContractPermissions(contractInformation.terms) > 1) ? 'step-valid' : 'step-invalid';
       case 3:
-        const { total_to_pay, payment_method_id, start_date, end_date } = contractInformation;
+        const { total_to_pay, payment_method_id, start_date } = contractInformation;
         const isStep3Valid = (total_to_pay && payment_method_id && start_date);
         return isStep3Valid ? 'step-valid' : 'step-invalid';
       case 4:
-        return contractInformation.guardians[0]?.name ? 'step-valid' : 'step-valid';
+        return contractInformation.guardians?.[0]?.name ? 'step-valid' : 'step-valid';
       case 5:
         return validateSchedule(contractInformation?.schedule, daysCache) ? 'step-valid' : 'step-invalid';
       case 6:
-        return countChildrenWithMedicalInfo === contractInformation.children.length ? 'step-valid' : 'step-invalid';
+        return countChildrenWithMedicalInfo === (contractInformation.children?.length || 0) ? 'step-valid' : 'step-invalid';
       case 7:
-        return countChildrenWithFormulaInfo === contractInformation.children.length ? 'step-valid' : 'step-invalid';
+        return countChildrenWithFormulaInfo === (contractInformation.children?.length || 0) ? 'step-valid' : 'step-invalid';
       case 8:
-        return countChildrenWithPermissionsInfo === contractInformation.children.length ? 'step-valid' : 'step-invalid';
+        return countChildrenWithPermissionsInfo === (contractInformation.children?.length || 0) ? 'step-valid' : 'step-invalid';
       case 9:
         return validateSchedule(contractInformation?.schedule, daysCache) ? 'step-valid' : 'step-invalid';
       default:
         return 'step-default';
     }
-  }, [contractInformation, daysCache, countChildrenWithMedicalInfo, countChildrenWithFormulaInfo, countChildrenWithPermissionsInfo]);
+  }, [
+    contractInformation.children,
+    contractInformation.guardians,
+    contractInformation.terms,
+    contractInformation.total_to_pay,
+    contractInformation.payment_method_id,
+    contractInformation.start_date,
+    contractInformation.schedule,
+    daysCache,
+    countChildrenWithMedicalInfo,
+    countChildrenWithFormulaInfo,
+    countChildrenWithPermissionsInfo
+  ]);
 
   const items = useMemo(() => [
     {
-      label: `${t('children')} (${contractInformation.children.length})`,
+      label: `${t('children')} (${contractInformation.children?.length || 0})`,
       command: () => setActiveIndex(0),
     },
     {
-      label: `${t('guardians')} (${contractInformation.guardians.length})`,
+      label: `${t('guardians')} (${contractInformation.guardians?.length || 0})`,
       command: () => setActiveIndex(1),
     },
     {
@@ -128,17 +140,17 @@ export const Contracts: React.FC<ContractsProps> = () => {
       command: () => setActiveIndex(5),
     },
     {
-      label: `${t('medicalInformation')} (${countChildrenWithMedicalInfo}/${contractInformation.children.length})`,
+      label: `${t('medicalInformation')} (${countChildrenWithMedicalInfo}/${contractInformation.children?.length || 0})`,
       command: () => setActiveIndex(6),
       /* disabled: contractInformation.children.length === 0, */
     },
     {
-      label: `${t('formulaInformation')} (${countChildrenWithFormulaInfo}/${contractInformation.children.length})`,
+      label: `${t('formulaInformation')} (${countChildrenWithFormulaInfo}/${contractInformation.children?.length || 0})`,
       command: () => setActiveIndex(7),
       /* disabled: contractInformation.children.length === 0, */
     },
     {
-      label: `${t('permissionsInformation')}(${countChildrenWithPermissionsInfo}/${contractInformation.children.length})`,
+      label: `${t('permissionsInformation')}(${countChildrenWithPermissionsInfo}/${contractInformation.children?.length || 0})`,
       command: () => setActiveIndex(8),
       /* disabled: contractInformation.children.length === 0, */
     },
@@ -148,37 +160,53 @@ export const Contracts: React.FC<ContractsProps> = () => {
     },
    
   
-  ], [contractInformation, t, countChildrenWithMedicalInfo, getAcceptedPermissionsCount]);
+  ], [
+    t,
+    contractInformation.children?.length,
+    contractInformation.guardians?.length,
+    getAcceptedPermissionsCount,
+    countChildrenWithMedicalInfo,
+    countChildrenWithFormulaInfo,
+    countChildrenWithPermissionsInfo
+  ]);
 
   const renderContent = useMemo(() => {
+    const commonProps = {
+      setLoadingInfo,
+      toast,
+      setActiveIndex,
+      contractInformation,
+      setContractInformation
+    };
+
     switch (activeIndex) {
       case 0:
-        return <StepComponentOne loadingInfo={loadingInfo} setLoadingInfo={setLoadingInfo} toast={toast} setActiveIndex={setActiveIndex} contractInformation={contractInformation} setContractInformation={setContractInformation} />;
+        return <StepComponentOne loadingInfo={loadingInfo} {...commonProps} />;
       case 1:
-        return <StepComponentTwo setLoadingInfo={setLoadingInfo} toast={toast} setActiveIndex={setActiveIndex} contractInformation={contractInformation} setContractInformation={setContractInformation} />;
+        return <StepComponentTwo {...commonProps} />;
       case 2:
-        return <StepComponentThree setLoadingInfo={setLoadingInfo} toast={toast} setActiveIndex={setActiveIndex} contractInformation={contractInformation} setContractInformation={setContractInformation} />;
+        return <StepComponentThree {...commonProps} />;
       case 3:
-        return <StepComponentFour setLoadingInfo={setLoadingInfo} toast={toast} setActiveIndex={setActiveIndex} contractInformation={contractInformation} setContractInformation={setContractInformation} />;
+        return <StepComponentFour {...commonProps} />;
       case 4:
-        return <StepComponentPricing setLoadingInfo={setLoadingInfo} toast={toast} setActiveIndex={setActiveIndex} contractInformation={contractInformation} setContractInformation={setContractInformation} />;
+        return <StepComponentPricing {...commonProps} />;
       case 5:
-        return <StepComponentFive setLoadingInfo={setLoadingInfo} toast={toast} setActiveIndex={setActiveIndex} contractInformation={contractInformation} setContractInformation={setContractInformation} />;
+        return <StepComponentFive {...commonProps} />;
       case 6:
-         return <MedicalInformationForm setLoadingInfo={setLoadingInfo} toast={toast} setActiveIndex={setActiveIndex} contractInformation={contractInformation} setContractInformation={setContractInformation} />;
+         return <MedicalInformationForm {...commonProps} />;
       case 7:
-        return <FormulaInformationForm setLoadingInfo={setLoadingInfo} toast={toast} setActiveIndex={setActiveIndex} contractInformation={contractInformation} setContractInformation={setContractInformation} />;
+        return <FormulaInformationForm {...commonProps} />;
       case 8:
-        return <PermissionsInformationForm setLoadingInfo={setLoadingInfo} toast={toast} setActiveIndex={setActiveIndex} contractInformation={contractInformation} setContractInformation={setContractInformation} />;
+        return <PermissionsInformationForm {...commonProps} />;
       case 9:
-        return <StepComponentSeven setLoadingInfo={setLoadingInfo} toast={toast} setActiveIndex={setActiveIndex} contractInformation={contractInformation} setContractInformation={setContractInformation} />;
+        return <StepComponentSeven {...commonProps} />;
       default:
         return null;
     }
-  }, [activeIndex, contractInformation, setLoadingInfo, toast, setContractInformation]);
+  }, [activeIndex, contractInformation, loadingInfo, setLoadingInfo, toast, setContractInformation]);
 
   return (
-    <>
+    <ContractsErrorBoundary>
       <Toast ref={toast} />
       {loadingInfo.loading && <Loader message={loadingInfo.loadingMessage} />}
       <div className="steps-wrapper my-2 px-2">
@@ -201,6 +229,6 @@ export const Contracts: React.FC<ContractsProps> = () => {
         />
       </div>
       {renderContent}
-    </>
+    </ContractsErrorBoundary>
   );
 };

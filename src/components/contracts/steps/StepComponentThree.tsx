@@ -127,7 +127,6 @@ const StepComponentThree: React.FC<StepComponentThreeProps> = ({
                         name={`terms.${term}`}
                         control={control}
                         label={""}
-                        internationalization={true}
                         className="flex items-center"
                         checkboxClassName="w-5 h-5 rounded-md border-2 border-gray-300 
                           checked:bg-blue-500 checked:border-blue-500 

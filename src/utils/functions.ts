@@ -29,10 +29,15 @@ static formatDateToYYYYMMDD(dateInput:string | Date ): string {
         return '';
     }
 
-    // Format the date as yyyy-mm-dd
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-    const day = String(date.getDate()).padStart(2, '0');
+    // Check if date is invalid
+    if (isNaN(date.getTime())) {
+        return '1970-01-01';
+    }
+
+    // Format the date as yyyy-mm-dd using UTC to avoid timezone issues
+    const year = date.getUTCFullYear();
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const day = String(date.getUTCDate()).padStart(2, '0');
 
     return `${year}-${month}-${day}`;
 }
@@ -59,10 +64,15 @@ static formatDateToYYYYMMDD(dateInput:string | Date ): string {
             return '';
         }
 
-        // Format the date as mm/dd/yy
-        const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-        const day = String(date.getDate()).padStart(2, '0');
-        const year = String(date.getFullYear()).slice(-2); // Get the last two digits of the year
+        // Check if date is invalid
+        if (isNaN(date.getTime())) {
+            return '01/01/70';
+        }
+
+        // Format the date as mm/dd/yy using UTC to avoid timezone issues
+        const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Months are zero-based
+        const day = String(date.getUTCDate()).padStart(2, '0');
+        const year = String(date.getUTCFullYear()).slice(-2); // Get the last two digits of the year
 
         return `${month}/${day}/${year}`;
     }

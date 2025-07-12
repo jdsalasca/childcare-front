@@ -3,7 +3,7 @@ import { customLogger } from 'configs/logger';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
 import { Toast } from 'primereact/toast';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { ChildType } from 'types/child';
@@ -38,9 +38,17 @@ export const StepComponentOne: React.FC<StepComponentOneProps> = ({
   toast,
 }) => {
   const { t } = useTranslation();
-  const [childrenOptions, setChildrenOptions] = useState<ChildType[]>([]);
   const { genderOptions } = useGenderOptions();
   const { data: children, isLoading, refreshChildren } = useChildren();
+
+  // Memoize children options to prevent unnecessary re-renders
+  const childrenOptions = useMemo(() => {
+    if (!children) return [];
+    return children.map((child: ChildType) => ({
+      ...child,
+      fullName: `${child.first_name} ${child.last_name}`,
+    }));
+  }, [children]);
 
   useEffect(() => {
     customLogger.debug("children", children);
@@ -48,32 +56,23 @@ export const StepComponentOne: React.FC<StepComponentOneProps> = ({
     // Handle loading state
     if (isLoading) {
       // Only set loading info if it's not already set
+      if (!loadingInfo.loading) {
         setLoadingInfo({
           loading: true,
           loadingMessage: t("weAreLookingForChildrenInformation"),
         });
+      }
     } else {
-      if (children) {
-        const newChildrenOptions = children.map((child: ChildType) => ({
-          ...child,
-          fullName: `${child.first_name} ${child.last_name}`,
-        }));
-  
-        // Only update children options if they're different
-        if (JSON.stringify(newChildrenOptions) !== JSON.stringify(childrenOptions)) {
-          setChildrenOptions(newChildrenOptions);
-        }
-  
-        // Update loading info if it needs to change
-        const loadingMessage =
-          children.length === 0 ? t("noChildrenAvailable") : "";
-          setLoadingInfo({
-            loading: false,
-            loadingMessage: loadingMessage,
-          });
+      // Update loading info if it needs to change
+      const loadingMessage = children?.length === 0 ? t("noChildrenAvailable") : "";
+      if (loadingInfo.loading || loadingInfo.loadingMessage !== loadingMessage) {
+        setLoadingInfo({
+          loading: false,
+          loadingMessage: loadingMessage,
+        });
       }
     }
-  }, [children]); // Added loadingInfo to dependencies
+  }, [children, isLoading, loadingInfo.loading, loadingInfo.loadingMessage, t, setLoadingInfo]);
 
   const { control, handleSubmit, formState: { errors }, setValue,getValues,  } = useForm<{ children: ChildType[] }>({
     defaultValues: {

@@ -81,7 +81,7 @@ const StepComponentPricing: React.FC<StepComponentPricingProps> = ({
         setValue(key as any, value);
       });
     }
-  }, [contractInformation.children, setValue, hasExistingCounts]);
+  }, [contractInformation.children, hasExistingCounts, setValue]);
 
   // Watch all fields to calculate total
   const watchAllFields = watch();

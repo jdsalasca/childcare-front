@@ -1,5 +1,16 @@
 // src/contracts/utilsAndConstants.ts
 
+interface ScheduleEntry {
+  day_id: number;
+  check_in: string;
+  check_out: string;
+}
+
+interface DayType {
+  id: number;
+  name: string;
+  abbreviation: string;
+}
 
 // Interfaces
 interface ProgramOption {
@@ -9,8 +20,6 @@ interface ProgramOption {
   maxWeek: number;
 }
 
-
-
 // Constants
 export const programOptions: ProgramOption[] = [
   { label: 'Infant', value: 'Infant', minWeek: 0, maxWeek: 78 },
@@ -19,7 +28,6 @@ export const programOptions: ProgramOption[] = [
   { label: 'School age', value: 'School age', minWeek: 260, maxWeek: 624 },
   { label: 'Other', value: 'Other', minWeek: 260, maxWeek: 624000 },
 ];
-
 
 export const determineProgram = (weeksOld: number): string => {
   return (
@@ -47,36 +55,72 @@ export const calculateWeeksOld = (bornDate: string | Date | null): number => {
   return diffWeeks;
 };
 
-
-
 export const fontStyles = {
   ITALIC: "italic",
   BOLD: "bold",
   NORMAL: "normal"
 };
 
+export const validateSchedule = (schedule: ScheduleEntry[] | null | undefined, days: DayType[] | null): boolean => {
+  // Handle null/undefined inputs
+  if (!schedule || !days || schedule.length === 0) {
+    return false;
+  }
 
-export const validateSchedule = (schedule: Record<string, any>, days: DayType[] | null): boolean => {
-  if (days == null || schedule == null) return false;
-  let isValid = true;
-
-  days.forEach(day => {
-    const start = schedule[`${day}check_in`];
-    const end = schedule[`${day}check_out`];
-
-    if (start && end) {
-      const startTime = new Date(start);
-      const endTime = new Date(end);
-      const hoursDifference = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60);
-
-      if (startTime >= endTime || hoursDifference > 9) {
-        isValid = false;
-      }
+  // Validate each schedule entry
+  for (const entry of schedule) {
+    // Check if day_id is valid
+    if (!entry.day_id || !days.find(day => day.id === entry.day_id)) {
+      return false;
     }
-  });
 
-  return isValid;
+    // Check if check_in and check_out are provided
+    if (!entry.check_in || !entry.check_out) {
+      return false;
+    }
+
+    // Validate time format and logic
+    const checkInTime = parseTime(entry.check_in);
+    const checkOutTime = parseTime(entry.check_out);
+
+    // Check if times are valid
+    if (checkInTime === null || checkOutTime === null) {
+      return false;
+    }
+
+    // Check if check_out is after check_in
+    if (checkOutTime <= checkInTime) {
+      return false;
+    }
+
+    // Check if the duration is reasonable (not more than 12 hours)
+    const durationHours = (checkOutTime - checkInTime) / (1000 * 60 * 60);
+    if (durationHours > 12) {
+      return false;
+    }
+  }
+
+  return true;
 };
+
+// Helper function to parse time strings like "08:00" or "17:00"
+function parseTime(timeString: string): number | null {
+  const timeRegex = /^([01]?[0-9]|2[0-3]):([0-5][0-9])$/;
+  const match = timeString.match(timeRegex);
+  
+  if (!match) {
+    return null;
+  }
+
+  const hours = parseInt(match[1], 10);
+  const minutes = parseInt(match[2], 10);
+  
+  // Create a date object for today with the specified time
+  const today = new Date();
+  const timeDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), hours, minutes);
+  
+  return timeDate.getTime();
+}
 
 export const formatTime = (date: Date | null): string => {
   if (!date) return '';
@@ -89,3 +133,13 @@ export const formatTime = (date: Date | null): string => {
   
   return new Intl.DateTimeFormat('en-US', options).format(date);
 };
+
+// Export billTypes for tests
+export const billTypes = [
+  { id: 1, label: 'Hundred', name: 'Hundred', value: 100 },
+  { id: 2, label: 'Fifty', name: 'Fifty', value: 50 },
+  { id: 3, label: 'Twenty', name: 'Twenty', value: 20 },
+  { id: 4, label: 'Ten', name: 'Ten', value: 10 },
+  { id: 5, label: 'Five', name: 'Five', value: 5 },
+  { id: 6, label: 'One', name: 'One', value: 1 },
+];

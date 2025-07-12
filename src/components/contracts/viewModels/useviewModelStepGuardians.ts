@@ -1,5 +1,5 @@
 import { ApiResponse } from "models/API"
-import React, { useCallback, useEffect, useState } from "react"
+import React, { useCallback, useEffect, useState, useMemo } from "react"
 import { Control, FieldArrayWithId, useFieldArray, useForm, UseFormGetValues, UseFormReturn } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 import Swal from "sweetalert2"
@@ -56,18 +56,21 @@ const useViewModelStepGuardians = ({
   setLoadingInfo,
 }: UseViewModelStepGuardiansProps): UseViewModelStepGuardiansReturn => {
   const { t } = useTranslation();
-  const [guardianOptions, setGuardianOptions] = useState<Guardian[]>([]);
   const { guardianTypeOptions } = useGuardianTypeOptions();
-  const { guardianOptions: guardians } = useGuardianOptions();
+  
+  // Use the existing guardian options hook instead of duplicating the logic
+  const { guardianOptions: guardianOptionsFromHook, isLoading: isLoadingGuardians } = useGuardianOptions();
 
-  const setLoading = (loading: boolean, message: string = '') => {
+  // Memoize the setLoading function to prevent unnecessary re-renders
+  const setLoading = useCallback((loading: boolean, message: string = '') => {
     setLoadingInfo({
       loading,
       loadingMessage: message ? t(message) : ''
     });
-  };
+  }, [setLoadingInfo, t]);
 
-  const showToast = (type: 'success' | 'error' | 'info', titleKey: string, messageKey?: string, duration: number = 3000) => {
+  // Memoize the showToast function to prevent unnecessary re-renders
+  const showToast = useCallback((type: 'success' | 'error' | 'info', titleKey: string, messageKey?: string, duration: number = 3000) => {
     ToastInterpreterUtils.toastInterpreter(
       toast,
       type,
@@ -75,37 +78,27 @@ const useViewModelStepGuardians = ({
       messageKey ? t(messageKey) : undefined,
       duration
     );
-  };
+  }, [toast, t]);
 
-  // Update the handlerGetGuardians function
-const handlerGetGuardians = useCallback(async (): Promise<ExtendedGuardian[]> => {
-  try {
-    setLoading(true, 'weAreLoadingGuardiansInformation');
-    const response = await GuardiansAPI.getGuardians();
+  // Transform guardian options to the expected format
+  const guardianOptions = useMemo(() => {
+    if (!guardianOptionsFromHook || isLoadingGuardians) return [];
     
-    if (response?.response?.length > 0) {
-      const formattedGuardians: ExtendedGuardian[] = response.response.map(guardian => ({
-        ...guardian,
-        label: guardian.name,
-        value: guardian.id!
-      }));
-      setGuardianOptions(formattedGuardians);
-      return formattedGuardians;
-    }
-    return [];
-  } catch (error) {
-    console.error('Error fetching guardians:', error);
-    showToast('error', 'error', 'failedToLoadGuardians');
-    return [];
-  } finally {
-    setLoading(false);
-  }
-}, [setLoading, showToast]);
+    return guardianOptionsFromHook.map(guardian => ({
+      ...guardian,
+      label: guardian.name,
+      value: guardian.id!
+    }));
+  }, [guardianOptionsFromHook, isLoadingGuardians]);
 
-
+  // Update loading state when guardians are loading
   useEffect(() => {
-    handlerGetGuardians();
-  }, [handlerGetGuardians]);
+    if (isLoadingGuardians) {
+      setLoading(true, 'weAreLoadingGuardiansInformation');
+    } else {
+      setLoading(false);
+    }
+  }, [isLoadingGuardians, setLoading]);
 
   const {
     control,
@@ -250,7 +243,7 @@ const onCreateGuardian = async (data: Guardian): Promise<ExtendedGuardian | unde
   
     return { isValid: true };
   };
-  const onSubmit = async (data: GuardianFormData): Promise<void> => {
+  const onSubmit = useCallback(async (data: GuardianFormData): Promise<void> => {
     try {
       // Basic validation
       if (ContractService.isInvalidFormData(data, contractInformation)) {
@@ -289,25 +282,25 @@ const onCreateGuardian = async (data: Guardian): Promise<ExtendedGuardian | unde
     } finally {
       setLoading(false);
     }
-  };
-  const addGuardian = () => {
+  }, [contractInformation, showToast, setLoading, setActiveIndex]);
+  const addGuardian = useCallback(() => {
     append(defaultGuardian);
-  };
+  }, [append]);
 
-  const removeGuardian = (index: number) => {
+  const removeGuardian = useCallback((index: number) => {
     if (fields.length === 1) {
       showToast('error', 'error', 'cannotRemoveAllGuardians');
       return;
     }
     remove(index);
-  };
+  }, [fields.length, showToast, remove]);
 
   const getAvailableGuardianTypes = React.useCallback((index: number) => {
     const guardians = getValues('guardians');
     return GuardiansValidations.availableGuardianTypes(guardianTypeOptions, guardians, index);
   }, [getValues, guardianTypeOptions]);
 
-  const handleGuardianSelect = (e: { value: number }): void => {
+  const handleGuardianSelect = useCallback((e: { value: number }): void => {
     const selectedGuardian = guardianOptions.find(g => g.id === e.value);
     if (!selectedGuardian) return;
 
@@ -324,7 +317,7 @@ const onCreateGuardian = async (data: Guardian): Promise<ExtendedGuardian | unde
     } else {
       showToast('info', 'info', 'guardianAlreadyAdded');
     }
-  };
+  }, [guardianOptions, fields, showToast, append]);
 
   return {
     onSubmit,

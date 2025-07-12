@@ -220,12 +220,14 @@ const BillSummary: React.FC<{
   const { t } = useTranslation();
 
   const formatCurrency = (amount: number): string => {
+    // Handle NaN, null, undefined, and other invalid values
+    const validAmount = isNaN(amount) || amount === null || amount === undefined ? 0 : amount;
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
-    }).format(amount);
+    }).format(validAmount);
   };
 
   const summaryItems = [
@@ -392,13 +394,16 @@ export const Bills: React.FC = () => {
       {/* Actions Section */}
       <div className="border-t border-gray-100 pt-4">
         <div className="flex flex-wrap gap-3 justify-center">
-          {/* Primary Action */}
-          <Button
-            icon="pi pi-plus"
-            label={t('bills.addNew', 'Add New Bill')}
-            onClick={addNewBill}
-            className="p-button-success p-button-sm"
-          />
+          {/* Primary Action - Only show if not blocked */}
+          {!blockContent && (
+            <Button
+              icon="pi pi-plus"
+              label={t('bills.addNew', 'Add New Bill')}
+              onClick={addNewBill}
+              className="p-button-success p-button-sm"
+              data-testid="header-add-bill-button"
+            />
+          )}
           
           {/* Summary Report */}
           <Button
@@ -420,7 +425,7 @@ export const Bills: React.FC = () => {
         </div>
       </div>
     </div>
-  ), [t, filteredBills.length, exportableCount, addNewBill, onDownloadFirstPartPdf, onDownloadBoxedPdf]);
+  ), [t, filteredBills.length, exportableCount, addNewBill, onDownloadFirstPartPdf, onDownloadBoxedPdf, blockContent]);
 
   // Stable date change handler
   const handleDateChange = useCallback((e: any, field: any) => {
@@ -555,6 +560,7 @@ export const Bills: React.FC = () => {
           label={t('bills.addNew')}
           onClick={addNewBill}
           className="p-button-success"
+          data-testid="empty-state-add-bill-button"
         />
       )}
     </div>
