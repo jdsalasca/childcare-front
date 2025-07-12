@@ -41,7 +41,7 @@ jobs:
         continue-on-error: true
 
       - name: 📊 Upload ESLint results
-        uses: github/super-linter@v5
+        uses: github/super-linter@v7
         if: always()
         env:
           DEFAULT_BRANCH: main
