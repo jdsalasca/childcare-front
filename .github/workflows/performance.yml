@@ -43,12 +43,6 @@ jobs:
           uploadArtifacts: true
           temporaryPublicStorage: true
 
-      - name: 📊 Bundle analyzer
-        run: |
-          yarn add -D webpack-bundle-analyzer
-          npx webpack-bundle-analyzer dist/assets/*.js --report --mode static --no-open
-        continue-on-error: true
-
       - name: 📈 Performance budget check
         run: |
           echo "Checking performance budget..."
@@ -57,8 +51,15 @@ jobs:
           MAX_JS_SIZE=500000  # 500KB
           MAX_CSS_SIZE=100000 # 100KB
           
-          JS_SIZE=$(find dist -name "*.js" -not -path "*/node_modules/*" -exec wc -c {} + | tail -1 | awk '{print $1}')
-          CSS_SIZE=$(find dist -name "*.css" -not -path "*/node_modules/*" -exec wc -c {} + | tail -1 | awk '{print $1}')
+          # Check if dist directory exists
+          if [ ! -d "dist" ]; then
+            echo "❌ Build directory not found!"
+            exit 1
+          fi
+          
+          # Calculate bundle sizes more safely
+          JS_SIZE=$(find dist -name "*.js" -type f -exec wc -c {} + 2>/dev/null | tail -1 | awk '{print $1}' || echo "0")
+          CSS_SIZE=$(find dist -name "*.css" -type f -exec wc -c {} + 2>/dev/null | tail -1 | awk '{print $1}' || echo "0")
           
           echo "JavaScript bundle size: $JS_SIZE bytes"
           echo "CSS bundle size: $CSS_SIZE bytes"
@@ -76,12 +77,11 @@ jobs:
           echo "✅ Performance budget check passed!"
 
       - name: 📊 Upload performance artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: performance-results
           path: |
             .lighthouseci/
             lhci_reports/
-            bundle-report.html
           retention-days: 30 
