@@ -114,4 +114,4 @@ describe('Integration Tests', () => {
       expect(renderTime).toBeLessThan(1000); // Less than 1 second
     });
   });
-}; 
+});

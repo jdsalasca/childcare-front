@@ -21,6 +21,8 @@
       "@config/*": ["config/*"],   // Alias for config folder
     },
     "resolveJsonModule": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "noEmit": true,
+    "outDir": "./dist"
   }
 }

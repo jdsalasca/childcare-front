@@ -5,7 +5,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { InputText } from 'primereact/inputtext';
 import { Toast } from 'primereact/toast';
 import { classNames } from 'primereact/utils';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 //import { exportToPDF } from './billsPdf';
@@ -69,16 +69,14 @@ const CombinedBillsForm = () => {
     toast.current.show({ severity: 'success', summary: t('bills.saved'), detail: t('bills.savedDetail') });
   };
 
-  useEffect(() => {
-    recalculateFields();
-    
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [childFields]);
-
-  const recalculateFields = (newFields = childFields) => {
+  const recalculateFields = useCallback((newFields = childFields) => {
     const count = newFields.filter(bill => (bill.cash && bill.cash > 0) || (bill.check && bill.check > 0)).length;
     setExportableCount(count);
-  };
+  }, [childFields]);
+
+  useEffect(() => {
+    recalculateFields();
+  }, [recalculateFields]);
 
   useEffect(() => {
     const sum = billFields.reduce((sum, bill) => {
