@@ -25,8 +25,20 @@ const CashRegisterAPI = {
     const res = await API.post<any>(BASE_URL, '/cash-register/close', data);
     return res.response;
   },
+  updateOpenRegister: async (date: string, data: OpenRegisterRequest): Promise<any> => {
+    const res = await API.put<any>(BASE_URL, `/cash-register/open/${date}`, data);
+    return res.response;
+  },
+  updateCloseRegister: async (date: string, data: CloseRegisterRequest): Promise<any> => {
+    const res = await API.put<any>(BASE_URL, `/cash-register/close/${date}`, data);
+    return res.response;
+  },
   getDetails: async (date: string): Promise<RegisterDetailsResponse> => {
     const res = await API.get<RegisterDetailsResponse>(BASE_URL, `/cash-register/details/${date}`);
+    return res.response;
+  },
+  getClosedMoney: async (date: string): Promise<any> => {
+    const res = await API.get<any>(BASE_URL, `/cash-register/closed-money/${date}`);
     return res.response;
   },
   getReport: async (params?: {

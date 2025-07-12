@@ -1,5 +1,5 @@
 // src/pages/Users/components/FormRegister.js
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "primereact/button";
 import { Card } from "primereact/card";
 import { Messages } from "primereact/messages";
@@ -51,7 +51,6 @@ const FormRegister = () => {
     userNameExist,
     roles,
     cashiers,
-    errors,
     setValue,
     reset,
   } = useRegisterViewModelForm(fetchUsers, editingUser, resetForm, toast);

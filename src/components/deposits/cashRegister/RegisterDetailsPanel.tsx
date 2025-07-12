@@ -1,15 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { Card } from 'primereact/card';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Tag } from 'primereact/tag';
+import { Button } from 'primereact/button';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Message } from 'primereact/message';
 import { Divider } from 'primereact/divider';
 import CashRegisterAPI from '../../../models/CashRegisterAPI';
 import { RegisterDetailsResponse, BillDetail } from '../../../types/cashRegister';
+import EditOpenRegisterForm from './EditOpenRegisterForm';
 
 interface Props {
   date: string;
@@ -17,6 +19,8 @@ interface Props {
 
 const RegisterDetailsPanel: React.FC<Props> = ({ date }) => {
   const { t } = useTranslation();
+  const [editingOpening, setEditingOpening] = useState(false);
+  const [editingClosing, setEditingClosing] = useState(false);
 
   const { data: detailsData, isLoading, isError } = useQuery<RegisterDetailsResponse>({
     queryKey: ['cashRegisterDetails', date],
@@ -180,48 +184,75 @@ const RegisterDetailsPanel: React.FC<Props> = ({ date }) => {
       {/* Opening Information */}
       {data.opening && (
         <Card>
-          <div className="mb-4">
-            <h4 className="text-xl font-semibold text-gray-800 mb-3 flex items-center">
-              <i className="pi pi-play-circle text-blue-600 mr-2"></i>
-              {t('cashRegister.opening')}
-            </h4>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 bg-blue-50 p-4 rounded-lg">
-              <div>
-                <span className="text-sm font-medium text-gray-600">
-                  {t('cashRegister.cashier')}:
-                </span>
-                <p className="text-gray-800 font-medium">{data.opening.cashier.name}</p>
+          {editingOpening ? (
+            <EditOpenRegisterForm
+              date={date}
+              currentData={{
+                cashier: data.opening.cashier,
+                details: data.opening.details
+              }}
+              onSuccess={() => {
+                setEditingOpening(false);
+                // Refetch data
+                window.location.reload(); // Simple way to refresh data
+              }}
+              onCancel={() => setEditingOpening(false)}
+            />
+          ) : (
+            <>
+              <div className="mb-4">
+                <h4 className="text-xl font-semibold text-gray-800 mb-3 flex items-center justify-between">
+                  <span className="flex items-center">
+                    <i className="pi pi-play-circle text-blue-600 mr-2"></i>
+                    {t('cashRegister.opening')}
+                  </span>
+                  <Button
+                    icon="pi pi-pencil"
+                    label={t('cashRegister.edit')}
+                    className="p-button-sm p-button-outlined"
+                    onClick={() => setEditingOpening(true)}
+                    disabled={editingOpening}
+                  />
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 bg-blue-50 p-4 rounded-lg">
+                  <div>
+                    <span className="text-sm font-medium text-gray-600">
+                      {t('cashRegister.cashier')}:
+                    </span>
+                    <p className="text-gray-800 font-medium">{data.opening.cashier.name}</p>
+                  </div>
+                  <div>
+                    <span className="text-sm font-medium text-gray-600">
+                      {t('cashRegister.time')}:
+                    </span>
+                    <p className="text-gray-800 font-medium">{formatDateTime(data.opening.time)}</p>
+                  </div>
+                  <div>
+                    <span className="text-sm font-medium text-gray-600">
+                      {t('cashRegister.total')}:
+                    </span>
+                    <p className="text-gray-800 font-bold text-lg">{formatCurrency(data.opening.total_amount)}</p>
+                  </div>
+                </div>
               </div>
-              <div>
-                <span className="text-sm font-medium text-gray-600">
-                  {t('cashRegister.time')}:
-                </span>
-                <p className="text-gray-800 font-medium">{formatDateTime(data.opening.time)}</p>
-              </div>
-              <div>
-                <span className="text-sm font-medium text-gray-600">
-                  {t('cashRegister.total')}:
-                </span>
-                <p className="text-gray-800 font-bold text-lg">{formatCurrency(data.opening.total_amount)}</p>
-              </div>
-            </div>
-          </div>
-          
-          <DataTable 
-            value={data.opening.details} 
-            className="border rounded-lg overflow-hidden"
-            stripedRows
-            emptyMessage={t('cashRegister.noData')}
-          >
-            {billDetailColumns.map((col, index) => (
-              <Column 
-                key={index}
-                field={col.field}
-                header={col.header}
-                body={col.body}
-              />
-            ))}
-          </DataTable>
+              
+              <DataTable 
+                value={data.opening.details} 
+                className="border rounded-lg overflow-hidden"
+                stripedRows
+                emptyMessage={t('cashRegister.noData')}
+              >
+                {billDetailColumns.map((col, index) => (
+                  <Column 
+                    key={index}
+                    field={col.field}
+                    header={col.header}
+                    body={col.body}
+                  />
+                ))}
+              </DataTable>
+            </>
+          )}
         </Card>
       )}
 
@@ -229,9 +260,18 @@ const RegisterDetailsPanel: React.FC<Props> = ({ date }) => {
       {data.closing && (
         <Card>
           <div className="mb-4">
-            <h4 className="text-xl font-semibold text-gray-800 mb-3 flex items-center">
-              <i className="pi pi-stop-circle text-red-600 mr-2"></i>
-              {t('cashRegister.closing')}
+            <h4 className="text-xl font-semibold text-gray-800 mb-3 flex items-center justify-between">
+              <span className="flex items-center">
+                <i className="pi pi-stop-circle text-red-600 mr-2"></i>
+                {t('cashRegister.closing')}
+              </span>
+              <Button
+                icon="pi pi-pencil"
+                label={t('cashRegister.edit')}
+                className="p-button-sm p-button-outlined"
+                onClick={() => setEditingClosing(true)}
+                disabled={editingClosing}
+              />
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 bg-green-50 p-4 rounded-lg">
               <div>

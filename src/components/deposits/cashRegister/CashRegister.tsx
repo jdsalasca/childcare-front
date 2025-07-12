@@ -6,6 +6,9 @@ import { Card } from 'primereact/card';
 import { Tag } from 'primereact/tag';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Message } from 'primereact/message';
+import { Button } from 'primereact/button';
+import { Dropdown } from 'primereact/dropdown';
+import { Divider } from 'primereact/divider';
 import CashRegisterAPI from '../../../models/CashRegisterAPI';
 import { CashRegisterStatusResponse } from '../../../types/cashRegister';
 import OpenRegisterForm from './OpenRegisterForm';
@@ -16,8 +19,29 @@ import ExcelReportButton from './ExcelReportButton';
 const CashRegister: React.FC = () => {
   const { t } = useTranslation();
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  
+  // Date range state for reports
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [statusFilter, setStatusFilter] = useState<string>('');
 
   const formattedDate = selectedDate ? selectedDate.toISOString().slice(0, 10) : undefined;
+
+  // Status filter options
+  const statusOptions = [
+    { label: t('cashRegister.all'), value: '' },
+    { label: t('cashRegister.status_opened'), value: 'opened' },
+    { label: t('cashRegister.status_closed'), value: 'closed' },
+    { label: t('cashRegister.status_both'), value: 'both' },
+    { label: t('cashRegister.status_not_started'), value: 'not_started' },
+  ];
+
+  // Generate filters for reports
+  const reportFilters = {
+    start_date: startDate ? startDate.toISOString().slice(0, 10) : undefined,
+    end_date: endDate ? endDate.toISOString().slice(0, 10) : undefined,
+    status: statusFilter || undefined,
+  };
 
   const hasData = (data: any): data is CashRegisterStatusResponse => {
     return data && typeof data === 'object' && 'data' in data;
@@ -50,21 +74,116 @@ const CashRegister: React.FC = () => {
 
   return (
     <div className="max-w-6xl mx-auto p-6">
-      {/* Header */}
-      <div className="mb-8">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+
+
+      {/* Date Range Report Section */}
+      <Card className="mb-6">
+        <div className="mb-4">
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">
+            {t('cashRegister.dateRangeReports')}
+          </h2>
+          <p className="text-gray-600 text-sm">
+            {t('cashRegister.generateReportsForDateRange')}
+          </p>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">
-              {t('cashRegister.title')}
-            </h1>
-            <p className="text-gray-600">
-              {t('cashRegister.selectDate')}
-            </p>
+            <label htmlFor="start-date" className="block text-sm font-medium text-gray-700 mb-2">
+              {t('cashRegister.startDate')}
+            </label>
+            <Calendar
+              id="start-date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.value ?? null)}
+              dateFormat="yy-mm-dd"
+              showIcon
+              className="w-full"
+              placeholder={t('cashRegister.selectStartDate')}
+              maxDate={endDate || undefined}
+            />
           </div>
-          <div className="flex gap-2">
-            <ExcelReportButton className="h-fit" />
+          
+          <div>
+            <label htmlFor="end-date" className="block text-sm font-medium text-gray-700 mb-2">
+              {t('cashRegister.endDate')}
+            </label>
+            <Calendar
+              id="end-date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.value ?? null)}
+              dateFormat="yy-mm-dd"
+              showIcon
+              className="w-full"
+              placeholder={t('cashRegister.selectEndDate')}
+              minDate={startDate || undefined}
+            />
+          </div>
+          
+          <div>
+            <label htmlFor="status-filter" className="block text-sm font-medium text-gray-700 mb-2">
+              {t('cashRegister.statusFilter')}
+            </label>
+            <Dropdown
+              id="status-filter"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.value)}
+              options={statusOptions}
+              placeholder={t('cashRegister.selectStatus')}
+              className="w-full"
+            />
+          </div>
+          
+          <div className="flex items-end">
+            <ExcelReportButton 
+              filters={reportFilters}
+              className="w-full"
+            />
           </div>
         </div>
+        
+        {(startDate || endDate || statusFilter) && (
+          <div className="flex flex-wrap gap-2 mt-4">
+            <span className="text-sm text-gray-600">{t('cashRegister.activeFilters')}:</span>
+            {startDate && (
+              <Tag 
+                value={`${t('cashRegister.from')}: ${startDate.toLocaleDateString()}`}
+                className="text-xs"
+              />
+            )}
+            {endDate && (
+              <Tag 
+                value={`${t('cashRegister.to')}: ${endDate.toLocaleDateString()}`}
+                className="text-xs"
+              />
+            )}
+            {statusFilter && (
+              <Tag 
+                value={statusOptions.find(opt => opt.value === statusFilter)?.label}
+                className="text-xs"
+              />
+            )}
+            <Button
+              icon="pi pi-times"
+              className="p-button-text p-button-sm"
+              onClick={() => {
+                setStartDate(null);
+                setEndDate(null);
+                setStatusFilter('');
+              }}
+              tooltip={t('cashRegister.clearFilters')}
+            />
+          </div>
+        )}
+      </Card>
+
+      <Divider />
+
+      {/* Individual Day Management */}
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold text-gray-800 mb-4">
+          {t('cashRegister.dailyManagement')}
+        </h2>
       </div>
 
       {/* Date Selection */}

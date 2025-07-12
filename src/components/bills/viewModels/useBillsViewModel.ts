@@ -1,79 +1,109 @@
-import { confirmDialog } from "primereact/confirmdialog"
-import { useEffect, useRef, useState, useCallback, useMemo } from "react"
-import { useFieldArray, useForm } from "react-hook-form"
-import { useTranslation } from "react-i18next"
-import { customLogger } from "../../../configs/logger"
-import { AppModels, LoadingInfo } from "../../../models/AppModels"
-import { useBillTypesByCurrencyCode } from "../../../models/BillTypeAPI"
-import { CashAPI } from "../../../models/CashAPI"
-import { CashOnHandByDyAPI, CashOnHandByDyModel } from "../../../models/CashOnHandByDyAPI"
-import { useChildren } from "../../../models/ChildrenAPI"
-import { Functions } from "../../../utils/functions"
-import { ToastInterpreterUtils } from "../../utils/ToastInterpreterUtils"
-import { BillsModel } from "../models/BillModel"
-import { exportToPDF } from "../utils/billsPdf"
-import { exportBoxesToPDF } from "../utils/boxesPdf"
-import { exportToSummaryPDF } from "../utils/summaryPdf"
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useForm, useFieldArray } from 'react-hook-form';
+import { customLogger } from '../../../configs/logger';
+import { BillsModel } from '../models/BillModel';
+import { LoadingInfo } from '../../../models/AppModels';
+import * as AppModels from '../../../models/AppModels';
+import { useBillTypesByCurrencyCode } from '../../../models/BillTypeAPI';
+import { useChildren } from '../../../models/ChildrenAPI';
+import { CashOnHandByDyAPI } from '../../../models/CashOnHandByDyAPI';
+import CashRegisterAPI from '../../../models/CashRegisterAPI';
+import { ToastInterpreterUtils } from '../../utils/ToastInterpreterUtils';
+import { exportToSummaryPDF } from '../utils/summaryPdf';
+import { exportBoxesToPDF } from '../utils/boxesPdf';
 
+// Types
 export interface Bill {
-  id?: string // Ensure id is required
-  originalIndex: number
-  disabled: boolean
-  names: string
-  cash?: number // Keep as number
-  check?: number // Keep as number 
-  total?: number // Keep as number
-  date: string
-  classroom: string
-}
-
-interface BillType {
-  bill: string;
-  amount: number;
-  value: number;
-  check: number;
-  cash: number;
-  total: number;
   id?: string;
-  billTypeId?: string;
+  names?: string;
+  cash?: string | number;
+  check?: string | number;
+  total?: number;
+  originalIndex?: number;
+  classroom?: string;
 }
 
-export interface FormValues {
-  bills: Bill[]
-  billTypes: BillType[] // This is fine if BillType is different from Bill
-  date?: string | Date
-  cashOnHand: number,
-  totalDeposit?: number,
-  totalOverall?: number,
-  notes?: string
-  amount: number
-  description: string
-  program: number
+interface FormValues {
+  bills: Bill[];
+  billTypes: any[];
+  date?: Date;
+  program?: string;
+  cashOnHand: number;
 }
 
-// Helper function to convert bill field to number
-const toNumber = (value: string | number | undefined): number => {
-  if (value === undefined || value === '') return 0;
+interface Sums {
+  cash_on_hand: number;
+  cash: number;
+  check: number;
+  total: number;
+  total_cash_on_hand: number;
+}
+
+const toNumber = (value: any): number => {
   if (typeof value === 'number') return value;
-  return parseFloat(value) || 0;
+  if (typeof value === 'string' && value !== '') {
+    const parsed = parseFloat(value);
+    return isNaN(parsed) ? 0 : parsed;
+  }
+  return 0;
 };
 
-// FIXME  improve the rerender of this module cuz I'm rerendering the bills component so many times
+// Memoized calculation functions
+const calculateBillSums = (bills: Bill[]): { cash: number; check: number; total: number } => {
+  return bills.reduce(
+    (acc, bill) => {
+      const cashValue = toNumber(bill.cash);
+      const checkValue = toNumber(bill.check);
+      const totalValue = cashValue + checkValue; // Calculate total from cash + check
+      
+      return {
+        cash: acc.cash + cashValue,
+        check: acc.check + checkValue,
+        total: acc.total + totalValue
+      };
+    },
+    { cash: 0, check: 0, total: 0 } as { cash: number; check: number; total: number }
+  );
+};
+
+const createBillSums = (bills: Bill[], cashOnHand: number): Sums => {
+  const basicSums = calculateBillSums(bills);
+  return {
+    ...basicSums,
+    cash_on_hand: cashOnHand,
+    total_cash_on_hand: basicSums.cash - cashOnHand
+  };
+};
+
 export const useBillsViewModel = () => {
-  const { t } = useTranslation() // Initialize translation hook
+  const { t } = useTranslation();
 
-  const [exportableCount, setExportableCount] = useState<number>(0)
-  const { data: currenciesInformation } = useBillTypesByCurrencyCode('USD')
-  const { data: children } = useChildren()
-  const [loadingInfo, setLoadingInfo] = useState<LoadingInfo>(AppModels.defaultLoadingInfo)
-  const isFetching = useRef<boolean>(false)
-  const [searchTerm, setSearchTerm] = useState<string>('')
-  const [searchedProgram, SetSearchedProgram] = useState<string | null>(null)
-  const toast = useRef<any>(null)
-  const [blockContent, setBlockContent] = useState<boolean>(true)
-  // Add this to prevent useEffect from re-triggering
-  const recalculateFieldsRef = useRef<boolean>(false)
+  // State
+  const [exportableCount, setExportableCount] = useState<number>(0);
+  const [closedMoneyData, setClosedMoneyData] = useState<any>(null);
+  const [loadingInfo, setLoadingInfo] = useState<LoadingInfo>({
+    loading: false,
+    loadingMessage: ''
+  });
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [searchedProgram, SetSearchedProgram] = useState<string | null>(null);
+  const [blockContent, setBlockContent] = useState<boolean>(true);
+  const [sums, setSums] = useState<Sums>({ cash: 0, check: 0, total: 0, cash_on_hand: 0, total_cash_on_hand: 0 });
+  
+  // Refs for preventing excessive calculations
+  const isFetching = useRef<boolean>(false);
+  const recalculateFieldsRef = useRef<boolean>(false);
+  const lastSelectedDateRef = useRef<Date | null>(null);
+  const toast = useRef<any>(null);
+  const recalculateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const updateIndicesTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  // API hooks
+  const { data: currenciesInformation } = useBillTypesByCurrencyCode('USD');
+  const { data: children } = useChildren();
+
+  // Form setup
   const {
     control,
     handleSubmit,
@@ -89,215 +119,430 @@ export const useBillsViewModel = () => {
       date: undefined,
       cashOnHand: 0.0
     }
-  })
+  });
 
-  const billModel = new BillsModel(getValues, toast, t)
+  const billModel = new BillsModel(getValues, toast, t);
 
-  
   const { fields: billTypeFields, update: updateBillType } = useFieldArray<FormValues>({
     control,
     name: 'billTypes'
-  })
+  });
+
   const { fields, append, remove, update } = useFieldArray<FormValues>({
     control,
     name: 'bills',
     keyName: 'id'
   });
-  // Assert type for billsFields
-  const billsFields = fields as Array<Bill>;
 
-  const fetchChildren = async (): Promise<any[]> => {
-    try {
-      const response = children
-      if (!response) {
-        customLogger.warn('No response received when fetching children.')
-        return []
-      }
+  // Memoized bills with proper type assertion
+  const billsFields = useMemo(() => fields as Array<Bill>, [fields]);
 
-      return response?.map((child: any) => ({
-        ...child,
-        childName: `${child.first_name} ${child.last_name}`
-      }))
-    } catch (err) {
-      customLogger.error('Error fetching children:', err)
-      return []
+  // Memoized children data
+  const childrenOptions = useMemo(() => {
+    if (!children) return [];
+    return children.map((child: any) => ({
+      ...child,
+      childName: `${child.first_name} ${child.last_name}`
+    }));
+  }, [children]);
+
+  // Memoized sums calculation
+  const calculateSums = useCallback((bills: Bill[], cashOnHand: number): Sums => {
+    return createBillSums(bills, cashOnHand);
+  }, []);
+
+  // Watch for cashOnHand changes
+  const cashOnHandValue = watch('cashOnHand');
+  
+  // Recalculate sums when cashOnHand changes (but not when bills change - that's handled elsewhere)
+  useEffect(() => {
+    if (billsFields.length > 0) {
+      const newSums = calculateSums(billsFields, cashOnHandValue || 0);
+      setSums(newSums);
     }
-  }
+  }, [cashOnHandValue, calculateSums]); // Removed billsFields from dependencies to prevent infinite loop
 
-  const recalculateFields = useCallback((newFields: any = billsFields) => {
-    if (recalculateFieldsRef.current) return; // Prevent multiple simultaneous calls
+  // Optimized recalculation with debouncing
+  const recalculateFields = useCallback((newFields?: Bill[]) => {
+    if (recalculateFieldsRef.current) return;
     
     recalculateFieldsRef.current = true;
-    try {
-      const count = newFields.filter(
-        (bill: { cash: any; check: any }) => {
+    
+    // Clear any existing timeout
+    if (recalculateTimeoutRef.current) {
+      clearTimeout(recalculateTimeoutRef.current);
+    }
+    
+    // Use setTimeout to debounce the calculation
+    recalculateTimeoutRef.current = setTimeout(() => {
+      try {
+        const fieldsToUse = newFields || getValues('bills') || [];
+        const count = fieldsToUse.filter(bill => {
           const cashNum = toNumber(bill.cash);
           const checkNum = toNumber(bill.check);
           return (cashNum > 0) || (checkNum > 0);
-        }
-      ).length;
-      setExportableCount(count);
-    } finally {
-      recalculateFieldsRef.current = false;
-    }
-  }, [billsFields]);
+        }).length;
+        
+        setExportableCount(count);
+        
+        // Update sums
+        const newSums = calculateSums(fieldsToUse, getValues('cashOnHand') || 0);
+        setSums(newSums);
+      } finally {
+        recalculateFieldsRef.current = false;
+      }
+    }, 100); // 100ms debounce
+  }, [calculateSums, getValues]);
 
-  useEffect(() => {
-    if (!billsFields.length) return; // Skip if no bills yet
-    recalculateFields();
-  }, [recalculateFields]);
-
-  const calculateSums = useCallback((setValues: boolean = false): {
-    cash_on_hand: number;
-    cash: number;
-    check: number;
-    total: number;
-    total_cash_on_hand: number;
-  } => {
-    const total = billsFields.reduce(
-      (acc, bill) => {
-        acc.cash_on_hand = Number(getValues("cashOnHand")) || 0
-        acc.cash += toNumber(bill.cash);
-        acc.check += toNumber(bill.check);
-        acc.total += Number(bill.total) || 0
-        acc.total_cash_on_hand = acc.cash - acc.cash_on_hand
-        return acc
-      },
-      { cash_on_hand: 0, cash: 0, check: 0, total: 0, total_cash_on_hand: 0 }
-    )
-    setValues && setSums(total)
-    return total
-  }, [billsFields, getValues]);
-  
-  const [sums, setSums] = useState(calculateSums());
-
-  // Trigger recalculation on component mount or when billsFields change
-  useEffect(() => {
-    if (billsFields.length === 0) return; // Skip if no bills
-    
-    const newSums = calculateSums(true);
-    setSums(newSums); // Update sums state
-  }, [billsFields, calculateSums]); // Added calculateSums as dependency
-
-  const onRecalculateAll = useCallback(async (index = 0, bill: Bill | null = null): Promise<void> => {
+  // Optimized recalculate all function
+  const onRecalculateAll = useCallback(async (index: number = 0, bill: Bill | null = null): Promise<void> => {
     if (!bill?.id || bill.originalIndex == null || index == null) {
-      customLogger.error("Error on onRecalculateAll usage. You're sending an empty data object")
+      customLogger.error("Error on onRecalculateAll usage. Missing required data");
       return;
     }
     
-    const data = getValues('bills');
     const cashValue = toNumber(bill.cash);
     const checkValue = toNumber(bill.check);
+    const newTotal = Number((cashValue + checkValue).toFixed(2));
     
+    // Only update if the total actually changed
+    const currentBill = getValues(`bills.${bill.originalIndex}`);
+    if (currentBill && Math.abs((currentBill.total || 0) - newTotal) < 0.01) {
+      return; // No significant change, skip update
+    }
+    
+    // Update the individual bill
     update(bill.originalIndex, {
-      ...getValues(`bills.${bill.originalIndex}`),
-      total: Number((cashValue + checkValue).toFixed(2))
+      ...currentBill,
+      ...bill,
+      total: newTotal
     });
 
-    calculateSums(true);
-    recalculateFields(data);
-  }, [getValues, update, calculateSums, recalculateFields]);
+    // Trigger recalculation with a slight delay to ensure the update is processed
+    setTimeout(() => {
+      recalculateFields();
+    }, 0);
+  }, [getValues, update, recalculateFields]);
 
-  // Function to download only the first part of PDF (no receipts)
-  const onDownloadFirstPartPdf = (): void => {
-    const data = getValues();
+  // Optimized bills filtering
+  const filteredBills = useMemo(() => {
+    if (!searchTerm && !searchedProgram) return billsFields;
+    
+    return billsFields.filter(bill => {
+      const matchesSearch = !searchTerm || 
+        (bill.names?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false);
+      const matchesProgram = !searchedProgram || 
+        (bill.classroom?.toLowerCase().includes(searchedProgram.toLowerCase()) ?? false);
+      
+      return matchesSearch && matchesProgram;
+    });
+  }, [billsFields, searchTerm, searchedProgram]);
 
-    // Check if the date is present
-    if (data.date == null) {
-      toast.current.show({
-        severity: 'info',
-        summary: t('bills.dateRequired'),
-        detail: t('bills.dateRequiredDetails')
+  // Optimized safe remove function
+  const safeRemove = useCallback((index: number): void => {
+    try {
+      const actualFieldIndex = billsFields.findIndex(bill => bill.originalIndex === index);
+      
+      if (actualFieldIndex === -1) {
+        customLogger.error(`Could not find bill with originalIndex ${index} to remove`);
+        return;
+      }
+      
+      remove(actualFieldIndex);
+      
+      // Update indices and recalculate after removal
+      if (updateIndicesTimeoutRef.current) {
+        clearTimeout(updateIndicesTimeoutRef.current);
+      }
+      updateIndicesTimeoutRef.current = setTimeout(() => {
+        const updatedBills = getValues('bills');
+        updatedBills.forEach((bill, i) => {
+          update(i, {
+            ...bill,
+            originalIndex: i
+          });
+        });
+        
+        recalculateFields();
+      }, 0);
+      
+    } catch (error) {
+      customLogger.error('Error removing bill:', error);
+      if (toast.current) {
+        toast.current.show({
+          severity: 'error',
+          summary: t('bills.errorRemoving'),
+          detail: t('bills.errorRemovingDetail'),
+          life: 5000
+        });
+      }
+    }
+  }, [billsFields, getValues, recalculateFields, remove, t, update]);
+
+  // Optimized form initialization
+  const onStartForm = useCallback(async () => {
+    if (!children || !currenciesInformation) return;
+
+    try {
+      setLoadingInfo({
+        loading: true,
+        loadingMessage: t('weAreLookingForChildrenInformation')
       });
+
+      // Create bills from children data directly to avoid dependency on childrenOptions
+      const billList: Bill[] = children.map((child: any, index: number) => ({
+        id: child.id?.toString() || `child_${index}`,
+        originalIndex: index,
+        names: child.childName || `${child.first_name} ${child.last_name}`,
+        cash: '',
+        check: '',
+        total: 0,
+        classroom: child.classroom || ''
+      }));
+      
+      reset({
+        bills: billList,
+        billTypes: currenciesInformation || [],
+        date: getValues('date'),
+        cashOnHand: getValues('cashOnHand') || 0.0
+      });
+
+      // Force recalculation after form reset
+      setTimeout(() => {
+        recalculateFields(billList);
+      }, 100);
+      
+    } catch (error) {
+      customLogger.error('Error in onStartForm:', error);
+    } finally {
+      setLoadingInfo({
+        loading: false,
+        loadingMessage: ''
+      });
+    }
+  }, [children, currenciesInformation, reset, getValues, recalculateFields, t]);
+
+  // Add new bill function
+  const addNewBill = useCallback(() => {
+    const newBill: Bill = {
+      id: `bill_${Date.now()}_${Math.random()}`,
+      names: '',
+      cash: '',
+      check: '',
+      total: 0,
+      originalIndex: billsFields.length,
+      classroom: ''
+    };
+    
+    append(newBill);
+  }, [append, billsFields.length]);
+
+  // Optimized date handling
+  const onHandlerSetCashOnHand = useCallback(async (date: Date): Promise<number> => {
+    try {
+      const totalCashOnMoney = await CashOnHandByDyAPI.getMoneyUntilDate(date);
+      
+      if (toast.current) {
+        ToastInterpreterUtils.toastBackendInterpreter(
+          toast, 
+          totalCashOnMoney, 
+          t('totalMoneyOnHand'), 
+          t('noTotalMoneyOnHandMessage')
+        );
+      }
+      
+      const totalCashOnMoneyUnWrapped = (totalCashOnMoney.httpStatus !== 200)
+        ? 0.0 
+        : totalCashOnMoney.response?.totalAmountUntilNow ?? 0.0;
+
+      setValue('cashOnHand', totalCashOnMoneyUnWrapped);
+      return totalCashOnMoneyUnWrapped;
+    } catch (error) {
+      customLogger.error('Error fetching cash on hand:', error);
+      return 0;
+    }
+  }, [setValue, t]);
+
+  const fetchClosedMoneyData = useCallback(async (date: Date): Promise<void> => {
+    try {
+      const formattedDate = date.toISOString().slice(0, 10);
+      const response = await CashRegisterAPI.getClosedMoney(formattedDate);
+      setClosedMoneyData(response.data);
+    } catch (error) {
+      customLogger.warn("Error fetching closed money data:", error);
+      setClosedMoneyData(null);
+    }
+  }, []);
+
+  const onHandlerDateChanged = useCallback(async (date: Date | null) => {
+    if (date === null) {
+      setBlockContent(true);
       return;
     }
 
-    // Recalculate fields based on bills
-    recalculateFields(data.bills);
+    try {
+      const currentDateObj = new Date(date);
 
-    // Format the data for PDF export
-    const dataFormatted = {
-      ...data,
-      date: Functions.formatDateToMMDDYY(data.date),
-      bills: data.bills
-        .map(student => {
-          // Convert empty values to 0 for PDF only
-          const cashValue = student.cash === undefined || student.cash === null ? 0 : 
-                            typeof student.cash === 'string' && student.cash === '' ? 0 : Number(student.cash);
-          const checkValue = student.check === undefined || student.check === null ? 0 : 
-                            typeof student.check === 'string' && student.check === '' ? 0 : Number(student.check);
-          return {
-            ...student,
-            cash: cashValue,
-            check: checkValue,
-            total: student.total === undefined || student.total === null ? 0 : Number(student.total)
-          };
-        })
-        .filter(student => {
-          const cashNum = toNumber(student.cash);
-          const checkNum = toNumber(student.check);
-          return (cashNum > 0) || (checkNum > 0);
-        })
-    };
+      // Prevent duplicate processing
+      if (lastSelectedDateRef.current && 
+          lastSelectedDateRef.current.toDateString() === currentDateObj.toDateString()) {
+        return;
+      }
 
-    // Call the function to export just the summary part
-    exportToSummaryPDF(dataFormatted);
-
-    // Log with customLogger for debugging
-    customLogger.debug('Exporting summary PDF', dataFormatted);
-  };
-
-  const onDownloadBoxedPdf = (): void => {
-    const data = getValues();
-
-    // Check if the date is present
-    if (data.date == null) {
-      toast.current.show({
-        severity: 'info',
-        summary: t('bills.dateRequired'),
-        detail: t('bills.dateRequiredDetails')
+      // Show loader while processing date change
+      setLoadingInfo({
+        loading: true,
+        loadingMessage: t('bills.loadingDateData', 'Loading data for selected date...')
       });
-      return;
+
+      lastSelectedDateRef.current = new Date(currentDateObj);
+      
+      await Promise.all([
+        onHandlerSetCashOnHand(currentDateObj),
+        fetchClosedMoneyData(currentDateObj)
+      ]);
+      
+      setBlockContent(false);
+    } catch (error) {
+      customLogger.error("Error on date changed", error);
+      setBlockContent(true);
+    } finally {
+      // Hide loader after processing
+      setLoadingInfo({
+        loading: false,
+        loadingMessage: ''
+      });
     }
+  }, [onHandlerSetCashOnHand, fetchClosedMoneyData, setLoadingInfo, t]);
 
-    // Recalculate fields based on bills
-    recalculateFields(data.bills);
+  // Submit handler
+  const onSubmit = useCallback(async (data: FormValues) => {
+    try {
+      setLoadingInfo({
+        loading: true,
+        loadingMessage: t('weAreProcessingYourInformation')
+      });
 
-    // Format the data for PDF export
-    const dataFormatted = {
-      ...data,
-      date: Functions.formatDateToMMDDYY(data.date),
-      bills: data.bills
-        .map(student => {
-          // Convert empty values to 0 for PDF only
-          const cashValue = student.cash === undefined || student.cash === null ? 0 : 
-                            typeof student.cash === 'string' && student.cash === '' ? 0 : Number(student.cash);
-          const checkValue = student.check === undefined || student.check === null ? 0 : 
-                            typeof student.check === 'string' && student.check === '' ? 0 : Number(student.check);
-          return {
-            ...student,
-            cash: cashValue,
-            check: checkValue,
-            total: student.total === undefined || student.total === null ? 0 : Number(student.total)
-          };
-        })
-        .filter(student => {
-          const cashNum = toNumber(student.cash);
-          const checkNum = toNumber(student.check);
-          return (cashNum > 0) || (checkNum > 0);
-        })
-    };
+      // Prepare data for backend API
+      const formattedDate = data.date ? new Date(data.date).toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: '2-digit', 
+        day: '2-digit' 
+      }) : '';
 
-    // Call the function to export the formatted data to PDF
-    exportBoxesToPDF(dataFormatted);
+      const backendData = {
+        date: formattedDate,
+        bills: data.bills.map(bill => ({
+          id: bill.id,
+          names: bill.names,
+          cash: toNumber(bill.cash),
+          check: toNumber(bill.check),
+          total: toNumber(bill.total)
+        })).filter(bill => (bill.cash > 0 || bill.check > 0)),
+        billTypes: data.billTypes || [],
+        cashOnHand: data.cashOnHand || 0
+      };
 
-    // Log with customLogger for debugging
-    customLogger.debug('Exporting full PDF with receipts', dataFormatted);
-  };
+      // Call the backend API
+      const result = await fetch(`${import.meta.env.VITE_BASE_URL || 'http://localhost:8000/childadmin'}/daily-cash/process`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(backendData)
+      });
 
+      const responseData = await result.json();
+      
+      if (toast.current) {
+        ToastInterpreterUtils.toastBackendInterpreter(
+          toast,
+          { httpStatus: result.status, response: responseData },
+          t('billsProcessedSuccessfully'),
+          t('errorProcessingBills')
+        );
+      }
+    } catch (error) {
+      customLogger.error('Error submitting bills:', error);
+      if (toast.current) {
+        toast.current.show({
+          severity: 'error',
+          summary: t('errorProcessingBills'),
+          detail: t('errorProcessingBillsDetail'),
+          life: 5000
+        });
+      }
+    } finally {
+      setLoadingInfo({
+        loading: false,
+        loadingMessage: ''
+      });
+    }
+  }, [t]);
+
+  // PDF generation functions
+  const onDownloadFirstPartPdf = useCallback(() => {
+    try {
+      customLogger.info('Generating summary PDF');
+      const formData = getValues();
+      
+      // Use static import to avoid component re-rendering
+      exportToSummaryPDF(formData);
+      
+      if (toast.current) {
+        toast.current.show({
+          severity: 'success',
+          summary: t('bills.summaryReport'),
+          detail: t('bills.summaryReportGenerated', 'Summary report generated successfully'),
+          life: 3000
+        });
+      }
+    } catch (error) {
+      customLogger.error('Error generating PDF:', error);
+      if (toast.current) {
+        toast.current.show({
+          severity: 'error',
+          summary: t('bills.errorGeneratingPDF', 'Error generating PDF'),
+          detail: t('bills.errorGeneratingPDFDetail', 'There was an error generating the PDF report'),
+          life: 5000
+        });
+      }
+    }
+  }, [getValues, t]);
+
+  const onDownloadBoxedPdf = useCallback(() => {
+    try {
+      customLogger.info('Generating full PDF with receipts');
+      const formData = getValues();
+      
+      // Use static import to avoid component re-rendering
+      exportBoxesToPDF(formData);
+      
+      if (toast.current) {
+        toast.current.show({
+          severity: 'success',
+          summary: t('bills.fullReport'),
+          detail: t('bills.fullReportGenerated', 'Full report with receipts generated successfully'),
+          life: 3000
+        });
+      }
+    } catch (error) {
+      customLogger.error('Error generating PDF:', error);
+      if (toast.current) {
+        toast.current.show({
+          severity: 'error',
+          summary: t('bills.errorGeneratingPDF', 'Error generating PDF'),
+          detail: t('bills.errorGeneratingPDFDetail', 'There was an error generating the PDF report'),
+          life: 5000
+        });
+      }
+    }
+  }, [getValues, t]);
+
+  // Effects
   useEffect(() => {
     if (!children && !currenciesInformation) {
-      // Initial loading state
       setLoadingInfo({
         loading: true,
         loadingMessage: t('weAreLookingForChildrenInformation')
@@ -307,395 +552,73 @@ export const useBillsViewModel = () => {
     
     if (!children || !currenciesInformation) return;
     
-    customLogger.debug("useEffect triggered", { children, currenciesInformation });
     setLoadingInfo({
       loading: true,
       loadingMessage: t('weAreLookingForChildrenInformation')
     });
     
     onStartForm();
-    // Don't reset loading here to avoid flickering
-    
-    return () => { }
   }, [currenciesInformation, children, t]);
 
-  // Add a separate useEffect to show loading screen when children data is loading
   useEffect(() => {
-    // When children data is undefined but not null, it means data is being fetched
     if (children === undefined) {
       setLoadingInfo({
         loading: true,
         loadingMessage: t('weAreLookingForChildrenInformation')
       });
     } else if (children === null) {
-      // When children is null, maintain loading state
       setLoadingInfo({
         loading: true,
         loadingMessage: t('weAreLookingForChildrenInformation')
       });
     } else if (children && children.length > 0) {
-      // Only clear loading when we actually have data
       setTimeout(() => {
-        setLoadingInfo(AppModels.defaultLoadingInfo);
-      }, 500); // Small delay to ensure UI updates properly
+        setLoadingInfo({
+          loading: false,
+          loadingMessage: ''
+        });
+      }, 500);
     }
   }, [children, t]);
 
-  const onStartForm = async (): Promise<void> => {
-    const students = await fetchChildren();
+  // Watch for changes in bills and trigger recalculation
+  useEffect(() => {
+    if (billsFields.length === 0) return;
+    recalculateFields();
+  }, [billsFields, recalculateFields]);
 
-    reset({
-      bills: students?.map((child, index) => ({
-        id: child.id,
-        originalIndex: index,
-        disabled: true,
-        names: child.childName,
-        cash: undefined, // Initialize as undefined (will render as empty string)
-        check: undefined, // Initialize as undefined (will render as empty string)
-        total: 0, // Total can still be 0
-        date: new Date().toISOString().split('T')[0],
-        classroom: child.classroom
-      })),
-      billTypes: currenciesInformation?.map((billType: any) => ({
-        bill: billType.label,
-        amount: 0,
-        value: billType.value,
-        total: 0,
-        id: billType.id,
-        billTypeId: billType.id
-      })),
-      date: getValues('date'),
-      cashOnHand: getValues('cashOnHand')
-    });
-  };
-
-  const saveInformation = async (data: FormValues): Promise<void> => {
-    setLoadingInfo({
-      loading: true,
-      loadingMessage: t('savingPaymentInfo') + ' ' + data.date
-    })
-
-    customLogger.info('data', data);
-    const response = await CashAPI.processCashData(data)
-    setLoadingInfo(AppModels.defaultLoadingInfo)
-
-    if (response.httpStatus === 200) {
-      ToastInterpreterUtils.toastInterpreter(
-        toast,
-        "success",
-        t('bills.saved'),
-        t('bills.savedDetail')
-      )
-    }
-  }
-
-  const onGetCashOnHandByBills = (listOfBills: Bill[]): number => {
-    const totalOfCashOnBills = listOfBills.reduce((acc, bill) => acc + (Number(bill.cash) || 0), 0);
-    customLogger.info('totalOfCashOnBills', totalOfCashOnBills);
-    return totalOfCashOnBills;
-  };
-  const onSubmit = async (data: FormValues) => {
-    if (data.date == null) {
-      toast.current.show({
-        severity: 'info',
-        summary: t('bills.dateRequired'),
-        detail: t('bills.dateRequiredDetails'),
-      });
-      return;
-    }
-  
-    const totalCashOnBills = onGetCashOnHandByBills(data.bills);
-    customLogger.info('totalCashOnBills', totalCashOnBills);
-    billModel.onProcessCashData(new CashOnHandByDyModel(data.date, totalCashOnBills, new Date()));
-  
-    data?.bills?.forEach((bill, index) => {
-      update(index, { ...bill, total: Number(bill.cash || 0) + Number(bill.check || 0) });
-    });
-  
-    // Format the data for PDF export, ensuring zeros for empty fields
-    const dataFormatted = {
-      ...data,
-      date: Functions.formatDateToMMDDYY(data.date),
-      bills: data.bills
-        .map(student => {
-          // Convert empty values to 0 for PDF only
-          const cashValue = student.cash === undefined || student.cash === null ? 0 : 
-                          typeof student.cash === 'string' && student.cash === '' ? 0 : Number(student.cash);
-          const checkValue = student.check === undefined || student.check === null ? 0 : 
-                           typeof student.check === 'string' && student.check === '' ? 0 : Number(student.check);
-          const totalValue = cashValue + checkValue;
-          
-          return {
-            ...student,
-            cash: cashValue,
-            check: checkValue,
-            total: totalValue
-          };
-        })
-        .filter(student => {
-          const cashNum = toNumber(student.cash);
-          const checkNum = toNumber(student.check);
-          return (cashNum > 0) || (checkNum > 0);
-        }),
-    };
-    
-    // Show the confirmation dialog and wait for the user's response
-    const confirmed = await new Promise<boolean>((resolve) => {
-      confirmDialog({
-        message: t('bills.confirmExportPDF'),
-        header: t('bills.confirmation'),
-        icon: 'pi pi-exclamation-triangle',
-        acceptLabel: t('yes'),
-        rejectLabel: t('no'),
-        accept: () => resolve(true),  // User accepted
-        reject: () => resolve(false),  // User rejected
-      });
-    });
-  
-    // After the user responds to the dialog
-    if (confirmed) {
-      exportToPDF(dataFormatted);  // Export PDF only if accepted
-    }
-    
-    await saveInformation(dataFormatted);  // Save information after confirmation
-  };
-  
-
-  // Confirmation dialog for resetting form
-  const confirmResetForm = (): void => {
-    confirmDialog({
-      message: t('bills.confirmReset'),
-      header: t('bills.resetForm'),
-      icon: 'pi pi-exclamation-triangle',
-      accept: () => {
-        reset({
-          bills: [],
-          billTypes: billTypeFields.map(billType => ({
-            ...billType,
-            amount: 0,
-            total: 0
-          })),
-          date: undefined,
-          cashOnHand: 0.0
-        })
+  // Cleanup effect to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (recalculateTimeoutRef.current) {
+        clearTimeout(recalculateTimeoutRef.current);
       }
-    })
-  }
-
-
-// Define the function
-const onHandlerSetCashOnHand = async (date: Date): Promise<number> => {
-  try {
-    const totalCashOnMoney = await CashOnHandByDyAPI.getMoneyUntilDate(date);
-    ToastInterpreterUtils.toastBackendInterpreter(
-      toast, 
-      totalCashOnMoney, 
-      t('totalMoneyOnHand'), 
-      t('noTotalMoneyOnHandMessage')
-    );
-    customLogger.info('totalCashOnMoney', totalCashOnMoney);
-    customLogger.info('date information', date);
-
-    const totalCashOnMoneyUnWrapped = (totalCashOnMoney.httpStatus !== 200)
-      ? 0.0 
-      : totalCashOnMoney.response?.totalAmountUntilNow ?? 0.0;
-
-    setValue('cashOnHand', totalCashOnMoneyUnWrapped);
-    return totalCashOnMoneyUnWrapped;
-  } catch (error) {
-    customLogger.error('Error fetching cash on hand:', error);
-    return  0;
-    // Handle error case as necessary
-  }
-};
-const lastSelectedDateRef = useRef<Date | null>(null);
-
-const onHandlerDateChanged = async (date: Date |null) => {
-  customLogger.info('onHandlerDateChanged', date);
-  if (isFetching.current || date == null) return;
-  // Create a ref to store the last selected date
-  // Check if the new date is the same as the last selected date
-  customLogger.info('lastSelectedDateRef.current', lastSelectedDateRef.current, date);
-  if (lastSelectedDateRef.current?.getTime() === date?.getTime()) {
-    customLogger.info('The selected date is the same as the last date. No further action taken.');
-    return;
-}
-  // Update the ref with the new date
-  lastSelectedDateRef.current = date;
-
-  isFetching.current = true;
-  const formattedDate = Functions.formatDateToYYYYMMDD(date);
-  const formattedDateUSA = Functions.formatDateToMMDDYY(date);
-
-  try {
-    setLoadingInfo(new LoadingInfo(true, t('lookingForPaymentInfo', { date: Functions.formatDateToMMDDYY(getValues('date')!) })));
-    const dayInformation = await CashAPI.getDetailsByDate(formattedDate);
-    
-    setBlockContent(false);
-    if (dayInformation?.httpStatus === 200) {
-      await onStartForm();
-      ToastInterpreterUtils.toastInterpreter(
-        toast,
-        "info",
-        t('informationFound'),
-        t('dataAddedForPickedDay', { date: formattedDateUSA })
-      );
-
-      const { daily_cash_details, child_cash_records } = dayInformation.response;
-
-      const updatedChildren = getValues('bills').map((child: any) => {
-        const matchedChildRecord = child_cash_records.find((record: any) => record.child_id === child.id);
-        return {
-          ...child,
-          cash: matchedChildRecord?.cash || '',
-          check: matchedChildRecord?.check || '',
-        };
-      });
-
-      const updatedBillTypes = getValues('billTypes').map((billType: any) => {
-        const matchedBillDetail = daily_cash_details.find((detail: any) => detail.bill_type_id === billType.billTypeId);
-        return {
-          ...billType,
-          amount: matchedBillDetail?.amount || '',
-          total: matchedBillDetail?.total || '',
-        };
-      });
-
-      
-
-      reset({
-        bills: updatedChildren,
-        billTypes: updatedBillTypes,
-        date: date,
-        cashOnHand: await onHandlerSetCashOnHand(date),
-        
-      });
-    } else {
-      onHandlerSetCashOnHand(date);
-      
-      customLogger.info('No information found for the day:', dayInformation);
-      await onStartForm();
-      ToastInterpreterUtils.toastInterpreter(toast, "info", t('noInformationFound'), t('noDataForPickedDay', { date: formattedDateUSA }));
-    }
-
-    setLoadingInfo(AppModels.defaultLoadingInfo);
-  } catch (error) {
-    customLogger.info('Error processing daily cash data:', error);
-    setLoadingInfo(AppModels.defaultLoadingInfo);
-  } finally {
-    
-    isFetching.current = false; // Reset the flag when done
-  }
-};
-
-const filteredBills = useMemo(() => billsFields.filter(bill =>
-  bill.names?.toLowerCase().includes(searchTerm.toLowerCase()) &&
-  (searchedProgram ? bill.classroom?.toLowerCase().includes(searchedProgram.toLowerCase()) : true)
-), [billsFields, searchTerm, searchedProgram]);
-
-// Update safeRemove to use proper logging
-const safeRemove = useCallback((index: number): void => {
-  customLogger.debug(`Removing bill with index ${index}`);
-  try {
-    // Find the actual index in the fields array based on originalIndex
-    const actualFieldIndex = billsFields.findIndex(bill => bill.originalIndex === index);
-    
-    if (actualFieldIndex === -1) {
-      customLogger.error(`Could not find bill with originalIndex ${index} to remove`);
-      return;
-    }
-    
-    // Remove the bill at the actual index in the array
-    remove(actualFieldIndex);
-    
-    // Update originalIndex values for all remaining bills to maintain consistency
-    setTimeout(() => {
-      const updatedBills = getValues('bills');
-      updatedBills.forEach((bill, i) => {
-        update(i, {
-          ...bill,
-          originalIndex: i
-        });
-      });
-      
-      // Recalculate totals after removal
-      calculateSums(true);
-      recalculateFields();
-    }, 0);
-    
-  } catch (error) {
-    customLogger.error('Error removing bill:', error);
-    toast.current.show({
-      severity: 'error',
-      summary: t('bills.errorRemoving'),
-      detail: t('bills.errorRemovingDetail'),
-      life: 5000
-    });
-  }
-}, [billsFields, calculateSums, getValues, recalculateFields, remove, t, update]);
-
-const addNewBill = useCallback((): void => {
-  const lastIndex = billsFields.length > 0 
-    ? Math.max(...billsFields.map(bill => bill.originalIndex)) + 1 
-    : 0;
-    
-  append({
-    id: `new-${Date.now()}`, // Ensure unique ID
-    originalIndex: lastIndex,
-    disabled: false,
-    names: '',
-    cash: 0, // Use 0 instead of undefined
-    check: 0, // Use 0 instead of undefined
-    total: 0, // Use 0 instead of undefined
-    date: "",
-    classroom: ''
-  });
-  
-  // Show toast notification after adding a new bill
-  toast.current.show({
-    severity: 'info',
-    summary: t('bills.newBillAdded'),
-    detail: t('bills.removeFiltersToSeeNewBill'),
-    life: 5000
-  });
-  
-  // Clear filters to show the new bill
-  setSearchTerm('');
-  SetSearchedProgram(null);
-}, [append, billsFields, t]);
+      if (updateIndicesTimeoutRef.current) {
+        clearTimeout(updateIndicesTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return {
     control,
-    errors,
-    exportableCount,
-    sums,
+    handleSubmit,
+    formState: { errors },
+    loadingInfo,
     searchTerm,
     setSearchTerm,
-    loadingInfo,
-    toast,
-    saveInformation,
-    billsFields,
-    billTypeFields,
-    setValue,
-    append,
-    remove,
-    update,
-    handleSubmit,
-    onSubmit,
+    SetSearchedProgram,
+    exportableCount,
     onDownloadBoxedPdf,
     onDownloadFirstPartPdf,
-    onRecalculateAll,
-    confirmResetForm,
-    recalculateFields,
-    SetSearchedProgram,
-    searchedProgram,
-    setExportableCount,
-    blockContent,
-    formState: { errors },
     onHandlerDateChanged,
+    onRecalculateAll,
+    safeRemove,
+    onSubmit,
+    sums,
     filteredBills,
+    blockContent,
     addNewBill,
     getValues,
-    safeRemove
-  }
-}
+    closedMoneyData
+  };
+};

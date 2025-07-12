@@ -10,51 +10,47 @@ import SessionExpired from './components/utils/SessionExpired'
 import { UnderConstruction } from './components/utils/UnderConstruction'
 import DepositsMenu from './components/deposits/DepositsMenu'
 import CashRegister from './components/deposits/cashRegister/CashRegister'
+import ErrorBoundary from './components/utils/ErrorBoundary'
 function RouterLayout() {
   return (
-    <Router >
-      <div className="App">
-        <Routes>
-          {/* Authentication Routes */}
-          <Route path="auth/*" element={<Layout insideAuthApplication={false} />}>
-            <Route path="childadmin/admin/login" element={<Login />} />
-            <Route path="childadmin/admin/register" element={<FormRegister />} />
-          </Route>
-          <Route path="info/*" element={<Layout insideAuthApplication={false} />}>
-          </Route>
-          <Route path="*"  element={<Layout insideAuthApplication={false} />}>
-            <Route path="childadmin/admin/session-expired/" element={<SessionExpired />} />
-          <Route path="childadmin/admin/" element={<Login />} />
-
-          </Route>
-          {/* Main Application Routes */}
-          <Route path="*" element={<Layout insideAuthApplication={true} />}>
-            {/* <Route path="/" element={<HomePage />} /> */}
-            <Route path="childadmin/admin/homepage" element={<HomePage />} />
+    <ErrorBoundary>
+      <Router basename="/childadmin/admin">
+        <div className="App">
+          <Routes>
+            {/* Authentication Routes */}
+            <Route path="/" element={<Login />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<FormRegister />} />
+            <Route path="/session-expired" element={<SessionExpired />} />
             
-            <Route path="childadmin/admin/report-payments-by-date" element={<HomePage />} />
-            <Route path="childadmin/admin/report-teachers" element={<HomePage />} />
-            <Route path="childadmin/admin/report-students" element={<HomePage />} />
-            <Route path="childadmin/admin/contracts" element={<Contracts />} />
-            <Route path="childadmin/admin/review-contracts" element={<UnderConstruction />} />
-            <Route path="childadmin/admin/bills"  element={<Bills />} />
-            <Route path="childadmin/admin/migrate/bills" element={<MigrateBills />}  />
-            <Route path="childadmin/admin/active-users-report" element={<HomePage />} />
-            <Route path="childadmin/admin/manage-guardians" element={<HomePage />} />
-            <Route path="childadmin/admin/new-contract" element={<HomePage />} />
-            <Route path="childadmin/admin/contract-reports" element={<HomePage />} />
-            <Route path="childadmin/admin/manage-teachers" element={<HomePage />} />
-            <Route path="childadmin/admin/register-payment-form" element={<HomePage />} />
-            <Route path="childadmin/admin/register-payments-excel" element={<HomePage />} />
-            <Route path="childadmin/admin/users"  element={<FormRegister />} />
-            {/* Deposits Section */}
-            <Route path="childadmin/admin/deposits" element={<DepositsMenu />}>
-              <Route path="cash-register" element={<CashRegister />} />
+            {/* Main Application Routes */}
+            <Route path="/*" element={<Layout insideAuthApplication={true} />}>
+              {/* <Route path="/" element={<HomePage />} /> */}
+              <Route path="homepage" element={<HomePage />} />
+              <Route path="report-payments-by-date" element={<HomePage />} />
+              <Route path="report-teachers" element={<HomePage />} />
+              <Route path="report-students" element={<HomePage />} />
+              <Route path="contracts" element={<Contracts />} />
+              <Route path="review-contracts" element={<UnderConstruction />} />
+              <Route path="bills" element={<ErrorBoundary><Bills /></ErrorBoundary>} />
+              <Route path="migrate/bills" element={<MigrateBills />} />
+              <Route path="active-users-report" element={<HomePage />} />
+              <Route path="manage-guardians" element={<HomePage />} />
+              <Route path="new-contract" element={<HomePage />} />
+              <Route path="contract-reports" element={<HomePage />} />
+              <Route path="manage-teachers" element={<HomePage />} />
+              <Route path="register-payment-form" element={<HomePage />} />
+              <Route path="register-payments-excel" element={<HomePage />} />
+              <Route path="users" element={<FormRegister />} />
+              {/* Deposits Section */}
+              <Route path="deposits" element={<DepositsMenu />}>
+                <Route path="cash-register" element={<CashRegister />} />
+              </Route>
             </Route>
-          </Route>
-        </Routes>
-      </div>
-    </Router>
+          </Routes>
+        </div>
+      </Router>
+    </ErrorBoundary>
   );
 }
 

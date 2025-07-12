@@ -44,23 +44,33 @@ const Login: React.FC = () => {
     try {
       const token = await UsersAPI.authUser(data);
       customLogger.debug("token", token);
-      SecurityService.getInstance().setEncryptedItem("token", token.response.token!);
-      if(token.httpStatus === 200){
-        customNavigate('/homepage');
-      }else{
-        customLogger.error("error on login", token);
-      }
-      customLogger.debug("data", data);
       
-      // login(token);
-      customNavigate('/homepage');
+      // Check if token response exists and has token property
+      if (token.response && token.response.token) {
+        SecurityService.getInstance().setEncryptedItem("token", token.response.token);
+        if (token.httpStatus === 200) {
+          customNavigate('/homepage');
+        } else {
+          customLogger.error("error on login", token);
+        }
+      } else {
+        customLogger.error("Invalid token response", token);
+        setError("username", { type: 'manual', message: t("invalid_login_response") });
+      }
     } catch (error) {
       const errorcasted = error as ApiResponse<User>;
       customLogger.error("error on login", error);
-      if(errorcasted.response.errorType === "username"){
-        setError("username", { type: 'manual', message: errorcasted.response.error });
-      }else{
-        setError("password", { type: 'manual', message: errorcasted.response.error });
+      
+      // Check if error response exists before accessing properties
+      if (errorcasted.response && errorcasted.response.errorType) {
+        if (errorcasted.response.errorType === "username") {
+          setError("username", { type: 'manual', message: errorcasted.response.error || t("username_error") });
+        } else {
+          setError("password", { type: 'manual', message: errorcasted.response.error || t("password_error") });
+        }
+      } else {
+        // General error fallback
+        setError("username", { type: 'manual', message: t("login_error") });
       }
     } finally {
       setLoading(false);

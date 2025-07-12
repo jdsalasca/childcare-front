@@ -37,12 +37,15 @@ const MigrateBills: React.FC = () => {
   
 
   useEffect(() => {
-    if(watch("initial_day") != null && watch("target_day") != null){
+    const initialDay = watch("initial_day");
+    const targetDay = watch("target_day");
+    
+    if(initialDay != null && targetDay != null){
       setValidMigration(true);
     }else{
       setValidMigration(false);
     }
-  }, [getValues("initial_day"), getValues("target_day")]);
+  }, [watch]);
   const onReloadComponent = async () => {
     customLogger.debug("onReloadComponent");
     initialDayRef.current = null;

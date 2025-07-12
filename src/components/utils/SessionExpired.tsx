@@ -16,7 +16,7 @@ const SessionExpired: React.FC = () => {
           type="button" 
           label={t('logIn')} // Use t for translation
           className="p-button-success p-button-lg" 
-          onClick={() => navigate('/auth/childadmin/admin/login')} 
+          onClick={() => navigate('/login')} 
         />
       </div>
     </div>

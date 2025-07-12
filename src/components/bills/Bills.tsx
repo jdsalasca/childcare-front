@@ -215,14 +215,16 @@ const BillSummary: React.FC<{
     cash_on_hand: number;
   };
   cashOnHand: number;
-}> = ({ sums, cashOnHand }) => {
+  closedMoneyData?: any;
+}> = ({ sums, cashOnHand, closedMoneyData }) => {
   const { t } = useTranslation();
 
   const formatCurrency = (amount: number): string => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
-      minimumFractionDigits: 2
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
     }).format(amount);
   };
 
@@ -283,6 +285,44 @@ const BillSummary: React.FC<{
         ))}
       </div>
 
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+        <div className="text-center">
+          <div className="text-2xl font-bold text-blue-600 mb-1">
+            {formatCurrency(cashOnHand)}
+          </div>
+          <div className="text-sm text-gray-600">
+            {t('bills.cash_on_hand')}
+          </div>
+          <div className="text-xs text-gray-500 mt-1">
+            {t('bills.cashOnHandNote')}
+          </div>
+        </div>
+
+        {/* Closed Money Display */}
+        {closedMoneyData?.has_closed_money && (
+          <div className="text-center">
+            <div className="text-2xl font-bold text-green-600 mb-1">
+              {formatCurrency(closedMoneyData.total_closing_amount)}
+            </div>
+            <div className="text-sm text-gray-600">
+              {t('bills.closedMoney')}
+            </div>
+            <div className="text-xs text-gray-500 mt-1">
+              {t('bills.closedMoneyNote')}
+            </div>
+          </div>
+        )}
+
+        <div className="text-center">
+          <div className="text-2xl font-bold text-emerald-600 mb-1">
+            {formatCurrency(sums.total_cash_on_hand)}
+          </div>
+          <div className="text-sm text-gray-600">
+            {t('bills.total_not_cash_on_hand')}
+          </div>
+        </div>
+      </div>
+
 
     </div>
   );
@@ -317,7 +357,8 @@ export const Bills: React.FC = () => {
     filteredBills,
     blockContent,
     addNewBill,
-    getValues
+    getValues,
+    closedMoneyData
   } = useBillsViewModel();
 
 
@@ -381,6 +422,19 @@ export const Bills: React.FC = () => {
     </div>
   ), [t, filteredBills.length, exportableCount, addNewBill, onDownloadFirstPartPdf, onDownloadBoxedPdf]);
 
+  // Stable date change handler
+  const handleDateChange = useCallback((e: any, field: any) => {
+    const dateValue = e.value ? new Date(e.value) : null;
+    field.onChange(dateValue);
+    onHandlerDateChanged(dateValue);
+  }, [onHandlerDateChanged]);
+
+  // Stable program change handler
+  const handleProgramChange = useCallback((e: any, field: any) => {
+    SetSearchedProgram(e.value);
+    field.onChange(e.value);
+  }, [SetSearchedProgram]);
+
   // Filters panel
   const filtersPanel = useMemo(() => (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
@@ -424,10 +478,7 @@ export const Bills: React.FC = () => {
                 id="program"
                 {...field}
                 showClear
-                onChange={(e) => {
-                  SetSearchedProgram(e.value);
-                  field.onChange(e.value);
-                }}
+                onChange={(e) => handleProgramChange(e, field)}
                 options={programOptions}
                 placeholder={t('select_program')}
                 className="w-full"
@@ -451,11 +502,7 @@ export const Bills: React.FC = () => {
               <Calendar
                 id="date"
                 value={field.value ? new Date(field.value) : null}
-                onChange={(e) => {
-                  const dateValue = e.value ? new Date(e.value) : null;
-                  field.onChange(dateValue);
-                  onHandlerDateChanged(dateValue);
-                }}
+                onChange={(e) => handleDateChange(e, field)}
                 showIcon
                 dateFormat="mm/dd/yy"
                 mask="99/99/9999"
@@ -468,7 +515,7 @@ export const Bills: React.FC = () => {
         </div>
       </div>
     </div>
-  ), [t, searchTerm, setSearchTerm, control, errors.program, SetSearchedProgram, onHandlerDateChanged]);
+  ), [t, searchTerm, setSearchTerm, control, errors.program, handleDateChange, handleProgramChange]);
 
   // Bill item renderer - memoized to prevent unnecessary re-renders
   const renderBillItem = useCallback((bill: Bill, index: number) => {
@@ -476,7 +523,7 @@ export const Bills: React.FC = () => {
       <BillCard
         key={bill.originalIndex || index}
         bill={bill}
-        index={bill.originalIndex}
+        index={bill.originalIndex ?? index}
         control={control}
         errors={errors}
         blockContent={blockContent}
@@ -598,6 +645,7 @@ export const Bills: React.FC = () => {
         <BillSummary
           sums={sums}
           cashOnHand={getValues('cashOnHand')}
+          closedMoneyData={closedMoneyData}
         />
 
         {/* Actions */}

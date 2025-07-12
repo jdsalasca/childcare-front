@@ -12,66 +12,75 @@ import ChildrenAPI from '../../../../models/ChildrenAPI';
 import { billTypes, programOptions } from '../../../contracts/utilsAndConstants';
 
 const BillsUpload = () => {
-  const toast = useRef(null)
-    const { control, handleSubmit, watch, formState: { errors } } = useForm({
-      defaultValues: {
-        bills: billTypes.map(billType => ({
-          bill: billType.label,
-          amount: 0,
-          value: billType.value,
-          total: 0
-        })),
-        program: '',
-        date: new Date(),
-        time: new Date()
-      }
-    });
-    const [totalSum, setTotalSum] = useState(0);
-    const { fields, update } = useFieldArray({
-      control,
-      name: 'bills'
-    });
-  
-    const { t } = useTranslation();
-  
-    const onSubmit = (data) => {
-      console.log("Sending information Total:", totalSum);
-      if(totalSum == null || totalSum == "" || totalSum <=0){
-        toast.current.show({ severity: 'success', summary: t('bills.empty'), detail: t('bills.emptyDetail') });
-        return
-      }
+  const toast = useRef(null);
+  const { control, handleSubmit, watch, formState: { errors } } = useForm({
+    defaultValues: {
+      bills: billTypes.map(billType => ({
+        bill: billType.label,
+        amount: 0,
+        value: billType.value,
+        total: 0
+      })),
+      program: '',
+      date: new Date(),
+      time: new Date()
+    }
+  });
+  const [totalSum, setTotalSum] = useState(0);
+  const { fields, update } = useFieldArray({
+    control,
+    name: 'bills'
+  });
 
-      console.log(data);
+  const { t } = useTranslation();
+
+  // Watch bills for changes
+  const bills = watch("bills");
+
+  // Fetch children data on component mount
+  useEffect(() => {
+    const fetchChildren = async () => {
+      try {
+        const response = await ChildrenAPI.getChildren();
+        console.log('====================================');
+        console.log("response", response);
+        console.log('====================================');
+        // setChildren(response);
+      } catch (err) {
+        customLogger.error('Error fetching children:', err);
+        // setError(err);
+      } finally {
+        // setLoading(false);
+      }
     };
-  
-    const bills = watch("bills");
-    useEffect(() => {
-      const fetchChildren = async () => {
-        try {
-          const response = await ChildrenAPI.getChildren();
-          console.log('====================================');
-          console.log("response", response);
-          console.log('====================================');
-          // setChildren(response);
-        } catch (err) {
-          customLogger.error('Error fetching children:', err);
-          // setError(err);
-        } finally {
-          // setLoading(false);
-        }
-      };
-  
-      fetchChildren();
-    }, []);
-  
-    useEffect(() => {
-      const sum = bills.reduce((sum, bill) => {
-        const amount = parseFloat(bill.amount) || 0;
-        const value = parseFloat(bill.value) || 0;
-        return sum + (amount * value);
-      }, 0);
-      setTotalSum(sum);
-    }, [bills]);
+
+    fetchChildren();
+  }, []);
+
+  // Calculate total sum whenever bills change
+  useEffect(() => {
+    const sum = bills.reduce((sum, bill) => {
+      const amount = parseFloat(bill.amount) || 0;
+      const value = parseFloat(bill.value) || 0;
+      return sum + (amount * value);
+    }, 0);
+    setTotalSum(sum);
+  }, [bills]);
+
+  const onSubmit = (data) => {
+    console.log("Sending information Total:", totalSum);
+    if (totalSum <= 0) {
+      toast.current?.show({ 
+        severity: 'error', 
+        summary: t('bills.empty'), 
+        detail: t('bills.emptyDetail') 
+      });
+      return;
+    }
+
+    console.log(data);
+    // Add your form submission logic here
+  };
   
     const handleAmountChange = (index, value) => {
       const amount = parseFloat(value) || 0;

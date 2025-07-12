@@ -219,13 +219,11 @@ const generateCashOnHandSection = (doc: jsPDF, data: FormValues, startY: number,
         return acc + cash + check;
     }, 0) || 0;
 
-    if (startY + 30 > pageHeight) {
+    if (startY + 50 > pageHeight) {
         doc.addPage();
         startY = margin;
     }
 
-
-    
     const values = [
         {
             label: "Total Deposit",
@@ -242,6 +240,17 @@ const generateCashOnHandSection = (doc: jsPDF, data: FormValues, startY: number,
             })}`
         }
     ];
+
+    // Add closed money data if available
+    if (data.closedMoneyData && data.closedMoneyData.has_closed_money) {
+        values.push({
+            label: "Closed Money",
+            value: `$${Number(data.closedMoneyData.total_closing_amount).toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            })}`
+        });
+    }
 
     values.forEach((item, index) => {
         doc.text(item.label, margin, startY + (index * 10));

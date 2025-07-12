@@ -1,8 +1,7 @@
 // src/pages/Users/modelView/useRegisterViewModelForm.js
-import { useRef, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
 import { customLogger } from "../../../configs/logger";
 import { ApiModels } from "../../../models/ApiModels";
 import UsersAPI from "../../../models/UsersAPI";
@@ -13,7 +12,6 @@ const useRegisterViewModelForm = (
   onCancelEdit = null,
   toastRef = null
 ) => {
-  const navigate = useNavigate();
   const { t } = useTranslation();
   const [roles, setRoles] = useState([]);
   const [cashiers, setCashiers] = useState([]);
@@ -26,7 +24,6 @@ const useRegisterViewModelForm = (
     setError,
     reset,
     formState: { errors },
-    watch,
   } = useForm({
     defaultValues: {
       username: "",
@@ -43,7 +40,6 @@ const useRegisterViewModelForm = (
   });
 
   const isEditing = Boolean(editingUser);
-  const watchedPassword = watch("password");
 
   useEffect(() => {
     if (editingUser) {

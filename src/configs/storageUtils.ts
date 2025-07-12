@@ -1,4 +1,5 @@
 // src/services/SecurityService.ts
+// @ts-ignore
 import CryptoJS from 'crypto-js';
 
 export class SecurityService  {

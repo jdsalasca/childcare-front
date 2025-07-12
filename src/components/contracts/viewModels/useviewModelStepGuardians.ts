@@ -1,5 +1,5 @@
 import { ApiResponse } from "models/API"
-import React, { useEffect, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import { Control, FieldArrayWithId, useFieldArray, useForm, UseFormGetValues, UseFormReturn } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 import Swal from "sweetalert2"
@@ -78,7 +78,7 @@ const useViewModelStepGuardians = ({
   };
 
   // Update the handlerGetGuardians function
-const handlerGetGuardians = async (): Promise<ExtendedGuardian[]> => {
+const handlerGetGuardians = useCallback(async (): Promise<ExtendedGuardian[]> => {
   try {
     setLoading(true, 'weAreLoadingGuardiansInformation');
     const response = await GuardiansAPI.getGuardians();
@@ -100,12 +100,12 @@ const handlerGetGuardians = async (): Promise<ExtendedGuardian[]> => {
   } finally {
     setLoading(false);
   }
-};
+}, [setLoading, showToast]);
 
 
   useEffect(() => {
     handlerGetGuardians();
-  }, []);
+  }, [handlerGetGuardians]);
 
   const {
     control,

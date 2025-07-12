@@ -2,11 +2,12 @@ import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { SecurityService } from 'configs/storageUtils';
 
 
-export const BASE_URL = import.meta.env.VITE_BASE_URL;
+// Define the base URL for the API with fallback
+export const BASE_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:8000/childadmin';
 
-// Define the base URL for the API
-//export const BASE_URL = 'https://www.educandochildcare.com/childadmin';
-//export const BASE_URL = 'http://localhost:8000/childadmin';  // Replace with your actual API base URL
+// Alternative URLs for different environments:
+// Production: 'https://www.educandochildcare.com/childadmin'
+// Development: 'http://localhost:8000/childadmin'
 // Define the types for the makeRequest function parameters
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 type RequestOptions = {
@@ -94,7 +95,7 @@ const makeRequest = async <T>(
         const response: AxiosResponse<T> = await axios(requestOptions);
 
         if (response.status === 401) {
-            window.location.href = '/childadmin/admin/info/session-expired';
+            window.location.href = './session-expired';
             return { response: null, httpStatus: 401 } as ApiResponse<T>;
         }
 
@@ -109,7 +110,7 @@ const makeRequest = async <T>(
                 console.error('Record not found:', error.response.data);
                 errorData.response = error.response.data; // Error data for 404
             } else if (error.response.status === 401) {
-                window.location.href = '/childadmin/admin/session-expired ';
+                window.location.href = './session-expired';
                 return { response: null, httpStatus: 401 } as ApiResponse<T>;
             } else {
                 console.error(`Error ${error.response.status}:`, error.response.data);

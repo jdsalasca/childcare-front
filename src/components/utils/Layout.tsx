@@ -59,7 +59,7 @@ const Layout: React.FC<LayoutProps> = ({ insideAuthApplication = false }) => {
       command: () => {
         // TODO active when auth is actived
         // logout();
-        navigate('/childadmin/admin');
+        navigate('/');
       },
     },
     LayoutModels.languageModel(handleLanguageChange, t),

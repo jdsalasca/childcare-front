@@ -28,8 +28,11 @@ export default defineConfig({
   define: {
     'process.env': {},
   },
+  build: {
+    chunkSizeWarningLimit: 1000, // Increase the warning limit to 1000 kB
+  },
   server: {
     port: 3000,
   },
-  base: '/childadmin/admin/',  // Ensure this matches your deployment path
+  base: '/childadmin/admin/',  // Base path for the application
 });
