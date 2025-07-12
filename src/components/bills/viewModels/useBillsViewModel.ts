@@ -24,12 +24,44 @@ export interface Bill {
   classroom?: string;
 }
 
-interface FormValues {
+interface CashRegisterDetail {
+  id: number;
+  bill_label: string;
+  bill_value: string;
+  quantity: number;
+  total_amount: string;
+  currency_code: string;
+}
+
+interface CashRegisterData {
+  success: boolean;
+  data: {
+    opening?: {
+      details: CashRegisterDetail[];
+      total_amount: number;
+    };
+    closing?: {
+      details: CashRegisterDetail[];
+      total_amount: number;
+    };
+    summary?: {
+      opening_total: number;
+      closing_total: number;
+      difference: number;
+      currency: string;
+    };
+  };
+}
+
+export interface FormValues {
   bills: Bill[];
   billTypes: any[];
   date?: Date;
   program?: string;
   cashOnHand: number;
+  closedMoneyData?: any; // Keep as any for now to match existing structure
+  totalDeposit?: number;
+  notes?: string;
 }
 
 interface Sums {
@@ -487,8 +519,14 @@ export const useBillsViewModel = () => {
       customLogger.info('Generating summary PDF');
       const formData = getValues();
       
+      // Add closedMoneyData to the form data
+      const pdfData = {
+        ...formData,
+        closedMoneyData: closedMoneyData
+      };
+      
       // Use static import to avoid component re-rendering
-      exportToSummaryPDF(formData);
+      exportToSummaryPDF(pdfData);
       
       if (toast.current) {
         toast.current.show({
@@ -509,15 +547,21 @@ export const useBillsViewModel = () => {
         });
       }
     }
-  }, [getValues, t]);
+  }, [getValues, t, closedMoneyData]);
 
   const onDownloadBoxedPdf = useCallback(() => {
     try {
       customLogger.info('Generating full PDF with receipts');
       const formData = getValues();
       
+      // Add closedMoneyData to the form data
+      const pdfData = {
+        ...formData,
+        closedMoneyData: closedMoneyData
+      };
+      
       // Use static import to avoid component re-rendering
-      exportBoxesToPDF(formData);
+      exportBoxesToPDF(pdfData);
       
       if (toast.current) {
         toast.current.show({
@@ -538,7 +582,7 @@ export const useBillsViewModel = () => {
         });
       }
     }
-  }, [getValues, t]);
+  }, [getValues, t, closedMoneyData]);
 
   // Effects
   useEffect(() => {

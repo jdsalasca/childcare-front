@@ -3,6 +3,23 @@ import 'jspdf-autotable';
 import { Bill, FormValues } from '../viewModels/useBillsViewModel';
 import { educando } from './assets/educando_logo';
 
+// Helper function to format date properly
+const formatDate = (date: Date | string | undefined): string => {
+    if (!date) return '';
+    
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    
+    if (isNaN(dateObj.getTime())) return '';
+    
+    // Format as: "Mon, Jul 07, 2025" (without time)
+    return dateObj.toLocaleDateString('en-US', {
+        weekday: 'short',
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit'
+    });
+};
+
 interface BillType {
     bill: string;
     amount: number;
@@ -20,8 +37,8 @@ export const exportToSummaryPDF = (data: FormValues): void => {
     doc.setFontSize(14);
     doc.text("EDUCANDO CHILDCARE CASH REGISTER", pageWidth / 2, margin, { align: 'center' });
     doc.setFontSize(12);
-    // Convert date to string if needed
-    const dateString = typeof data.date === 'string' ? data.date : (data.date ? data.date.toString() : '');
+    // Format date properly
+    const dateString = formatDate(data.date);
     doc.text(dateString, pageWidth / 2, margin + 10, { align: 'center' });
 
     let currentY = margin + 20;
@@ -41,7 +58,7 @@ export const exportToSummaryPDF = (data: FormValues): void => {
     }
 
     // Conteo de Cash Table on the left side
-    generateCashCountTable(doc, data.billTypes, currentY, halfPageWidth, pageHeight);
+    generateCashCountTable(doc, data, currentY, halfPageWidth, pageHeight);
 
     // Notes and Scanned Date, QuickBooks, Signature on the right side
     generateNotesSection(doc, data, currentY, currentY, halfPageWidth, pageHeight, margin);
@@ -113,7 +130,7 @@ const generateCashOnHandSection = (doc: jsPDF, data: FormValues, startY: number,
     const cashOnHandValue = Number(data.cashOnHand) || 0;
     const totalDepositValue = Number(data.totalDeposit) || 0;
     // Calculate total as sum of cash and check from bills
-    const totalOverallValue = data.bills?.reduce((acc, bill) => {
+    const totalOverallValue = data.bills?.reduce((acc: number, bill: Bill) => {
         const cash = Number(bill.cash) || 0;
         const check = Number(bill.check) || 0;
         return acc + cash + check;
@@ -160,21 +177,37 @@ const generateCashOnHandSection = (doc: jsPDF, data: FormValues, startY: number,
     return startY + values.length * 10 + 10;
 };
 
-const generateCashCountTable = (doc: jsPDF, billTypes: BillType[], startY: number, halfPageWidth: number, pageHeight: number): number => {
+const generateCashCountTable = (doc: jsPDF, data: FormValues, startY: number, halfPageWidth: number, pageHeight: number): number => {
     if (startY + 30 > pageHeight) {
         doc.addPage();
         startY = 10;
     }
 
-    const headers = [["Bill", "Amount", "Total"]];
-    const rows: (string | number)[][] = billTypes.map(bill => {
-        const totalValue = Number(bill.total) || 0;
-        return [
-            bill.bill, 
-            bill.amount, 
-            `$${totalValue.toFixed(2)}`
-        ];
-    });
+    const headers = [["Bill", "Quantity", "Total"]];
+    const rows: (string | number)[][] = [];
+
+    // Use cash register data if available - check the correct data structure
+    if (data.closedMoneyData?.closing_details && Array.isArray(data.closedMoneyData.closing_details)) {
+        data.closedMoneyData.closing_details.forEach((detail: any) => {
+            rows.push([
+                detail.bill_label || `$${Number(detail.bill_value).toFixed(2)}`,
+                detail.quantity,
+                `$${Number(detail.total_amount).toFixed(2)}`
+            ]);
+        });
+    } else if (data.closedMoneyData?.opening_details && Array.isArray(data.closedMoneyData.opening_details)) {
+        // Fallback to opening data if closing is not available
+        data.closedMoneyData.opening_details.forEach((detail: any) => {
+            rows.push([
+                detail.bill_label || `$${Number(detail.bill_value).toFixed(2)}`,
+                detail.quantity,
+                `$${Number(detail.total_amount).toFixed(2)}`
+            ]);
+        });
+    } else {
+        // Fallback to empty rows if no cash register data
+        rows.push(["No data", "0", "$0.00"]);
+    }
 
     doc.autoTable({
         head: headers,
@@ -221,15 +254,15 @@ const generateNotesSection = (doc: jsPDF, data: FormValues, startY: number, left
     // Now, place the other fields below the box
     const newStartY = boxYPosition + boxHeight + 10;  // Start below the "Notes" box
 
-    // Convert date to string to ensure it's compatible with jsPDF text method
-    const dateString = typeof data.date === 'string' ? data.date : (data.date ? data.date.toString() : '');
+    // Format date properly for display
+    const formattedDate = formatDate(data.date);
 
     doc.setFontSize(12);
     doc.text("SCANNED DATE:", halfPageWidth + 10, newStartY);
-    doc.text(dateString, halfPageWidth + 50, newStartY);
+    doc.text(formattedDate, halfPageWidth + 50, newStartY);
 
     doc.text("QUICKBOOKS:", halfPageWidth + 10, newStartY + 10);
-    doc.text(dateString, halfPageWidth + 50, newStartY + 10);
+    doc.text(formattedDate, halfPageWidth + 50, newStartY + 10);
 
     doc.text("_________________________", halfPageWidth + 30, newStartY + 20);
 

@@ -424,7 +424,7 @@ export const Bills: React.FC = () => {
 
   // Stable date change handler
   const handleDateChange = useCallback((e: any, field: any) => {
-    const dateValue = e.value ? new Date(e.value) : null;
+    const dateValue = e.value && e.value instanceof Date ? e.value : null;
     field.onChange(dateValue);
     onHandlerDateChanged(dateValue);
   }, [onHandlerDateChanged]);
@@ -501,7 +501,7 @@ export const Bills: React.FC = () => {
             render={({ field }) => (
               <Calendar
                 id="date"
-                value={field.value ? new Date(field.value) : null}
+                value={field.value instanceof Date ? field.value : (field.value ? new Date(field.value) : null)}
                 onChange={(e) => handleDateChange(e, field)}
                 showIcon
                 dateFormat="mm/dd/yy"
@@ -650,29 +650,13 @@ export const Bills: React.FC = () => {
 
         {/* Actions */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <div className="flex flex-wrap justify-center gap-4">
+          <div className="flex justify-center">
             <Button
               type="submit"
               label={t('bills.save')}
               icon="pi pi-save"
               className="bg-blue-600 hover:bg-blue-700 border-blue-600 text-white px-8 py-3 text-lg font-semibold"
               disabled={blockContent}
-            />
-            <Button
-              type="button"
-              label={t('bills.summaryReport')}
-              icon="pi pi-file-pdf"
-              className="bg-purple-500 hover:bg-purple-600 border-purple-500 text-white px-6 py-3"
-              onClick={onDownloadFirstPartPdf}
-              disabled={exportableCount === 0}
-            />
-            <Button
-              type="button"
-              label={t('bills.fullReport')}
-              icon="pi pi-receipt"
-              className="bg-orange-500 hover:bg-orange-600 border-orange-500 text-white px-6 py-3"
-              onClick={onDownloadBoxedPdf}
-              disabled={exportableCount === 0}
             />
           </div>
         </div>

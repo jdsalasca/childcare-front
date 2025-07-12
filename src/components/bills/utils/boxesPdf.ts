@@ -1,7 +1,24 @@
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
-import { FormValues } from '../viewModels/useBillsViewModel';
+import { FormValues, Bill } from '../viewModels/useBillsViewModel';
 import { educando } from './assets/educando_logo';
+
+// Helper function to format date properly
+const formatDate = (date: Date | string | undefined): string => {
+    if (!date) return '';
+    
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    
+    if (isNaN(dateObj.getTime())) return '';
+    
+    // Format as: "Mon, Jul 07, 2025" (without time)
+    return dateObj.toLocaleDateString('en-US', {
+        weekday: 'short',
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit'
+    });
+};
 
 
 interface BillType {
@@ -27,9 +44,8 @@ export const exportBoxesToPDF = (data: FormValues): void => {
     const pageHeight = doc.internal.pageSize.getHeight();
     const halfPageWidth = pageWidth / 2;
 
-    // Convert date to string
-    const dateStr = typeof data.date === 'string' ? data.date : 
-                   data.date instanceof Date ? data.date.toISOString().split('T')[0] : '';
+    // Format date properly
+    const dateStr = formatDate(data.date);
 
     // Add Title and Date
     doc.setFontSize(14);
@@ -54,7 +70,7 @@ export const exportBoxesToPDF = (data: FormValues): void => {
     }
 
     // Conteo de Cash Table on the left side
-    generateCashCountTable(doc, data.billTypes, currentY, halfPageWidth, pageHeight);
+    generateCashCountTable(doc, data, currentY, halfPageWidth, pageHeight);
 
     // Notes and Scanned Date, QuickBooks, Signature on the right side
     generateNotesSection(doc, data, currentY, currentY, halfPageWidth, pageHeight, margin);
@@ -260,21 +276,37 @@ const generateCashOnHandSection = (doc: jsPDF, data: FormValues, startY: number,
     return startY + values.length * 10 + 10;
 };
 
-const generateCashCountTable = (doc: jsPDF, billTypes: BillType[], startY: number, halfPageWidth: number, pageHeight: number): number => {
+const generateCashCountTable = (doc: jsPDF, data: FormValues, startY: number, halfPageWidth: number, pageHeight: number): number => {
     if (startY + 30 > pageHeight) {
         doc.addPage();
         startY = 10;
     }
 
-    const headers = [["Bill", "Amount", "Total"]];
-    const rows: (string | number)[][] = billTypes.map(bill => {
-        const totalValue = Number(bill.total) || 0;
-        return [
-            bill.bill, 
-            bill.amount, 
-            `$${totalValue.toFixed(2)}`
-        ];
-    });
+    const headers = [["Bill", "Quantity", "Total"]];
+    const rows: (string | number)[][] = [];
+
+    // Use cash register data if available - check the correct data structure
+    if (data.closedMoneyData?.closing_details && Array.isArray(data.closedMoneyData.closing_details)) {
+        data.closedMoneyData.closing_details.forEach((detail: any) => {
+            rows.push([
+                detail.bill_label || `$${Number(detail.bill_value).toFixed(2)}`,
+                detail.quantity,
+                `$${Number(detail.total_amount).toFixed(2)}`
+            ]);
+        });
+    } else if (data.closedMoneyData?.opening_details && Array.isArray(data.closedMoneyData.opening_details)) {
+        // Fallback to opening data if closing is not available
+        data.closedMoneyData.opening_details.forEach((detail: any) => {
+            rows.push([
+                detail.bill_label || `$${Number(detail.bill_value).toFixed(2)}`,
+                detail.quantity,
+                `$${Number(detail.total_amount).toFixed(2)}`
+            ]);
+        });
+    } else {
+        // Fallback to empty rows if no cash register data
+        rows.push(["No data", "0", "$0.00"]);
+    }
 
     doc.autoTable({
         head: headers,
@@ -305,9 +337,8 @@ const generateNotesSection = (doc: jsPDF, data: FormValues, startY: number, left
     const boxPadding = 5;
     const boxYPosition = startY;  // Box will start here
 
-    // Convert date to string
-    const dateStr = typeof data.date === 'string' ? data.date : 
-                  data.date instanceof Date ? data.date.toISOString().split('T')[0] : '';
+    // Format date properly
+    const dateStr = formatDate(data.date);
 
     // Draw the box for "Notas"
     doc.setDrawColor(0);  // Black border
