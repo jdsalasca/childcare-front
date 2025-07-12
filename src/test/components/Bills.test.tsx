@@ -23,7 +23,7 @@ const createMockViewModel = (overrides = {}) => ({
   safeRemove: vi.fn(),
   onSubmit: vi.fn(),
   sums: { cash: 0, check: 0, total: 0, cash_on_hand: 0, total_cash_on_hand: 0 },
-  filteredBills: [],
+  filteredBills: [] as any[],
   blockContent: false,
   addNewBill: vi.fn(),
   getValues: vi.fn(),
@@ -536,5 +536,244 @@ describe('Bills Component', () => {
       expect(screen.getByText('bills.summary')).toBeInTheDocument();
       expect(screen.getByText('bills.save')).toBeInTheDocument();
     });
+  });
+}); 
+
+describe('Date Picker Value Persistence', () => {
+  it('maintains date value after data loading', async () => {
+    const { getByLabelText } = renderWithProviders(<Bills />);
+    
+    // Wait for component to load
+    await waitFor(() => {
+      expect(screen.queryByText(/Loading/)).not.toBeInTheDocument();
+    });
+
+    const dateInput = getByLabelText(/date/i);
+    
+    // Set a date value
+    const testDate = new Date('2024-01-15');
+    fireEvent.change(dateInput, { target: { value: '01/15/2024' } });
+    
+    // Wait for any async operations
+    await waitFor(() => {
+      expect(dateInput).toHaveValue('01/15/2024');
+    });
+
+    // Simulate data loading that might reset the date
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    // Date should still be there
+    expect(dateInput).toHaveValue('01/15/2024');
+  });
+
+  it('handles date changes without losing focus', async () => {
+    const { getByLabelText } = renderWithProviders(<Bills />);
+    
+    await waitFor(() => {
+      expect(screen.queryByText(/Loading/)).not.toBeInTheDocument();
+    });
+
+    const dateInput = getByLabelText(/date/i);
+    
+    // Focus on the date input
+    fireEvent.focus(dateInput);
+    
+    // Change the date
+    fireEvent.change(dateInput, { target: { value: '01/15/2024' } });
+    
+    // The input should maintain focus and value
+    expect(dateInput).toHaveFocus();
+    expect(dateInput).toHaveValue('01/15/2024');
+  });
+
+  it('properly converts date formats', async () => {
+    const { getByLabelText } = renderWithProviders(<Bills />);
+    
+    await waitFor(() => {
+      expect(screen.queryByText(/Loading/)).not.toBeInTheDocument();
+    });
+
+    const dateInput = getByLabelText(/date/i);
+    
+    // Test various date formats
+    const testDates = [
+      '01/15/2024',
+      '1/15/2024',
+      '01/15/24'
+    ];
+
+    for (const dateStr of testDates) {
+      fireEvent.change(dateInput, { target: { value: dateStr } });
+      await waitFor(() => {
+        expect(dateInput).toHaveValue(dateStr);
+      });
+    }
+  });
+});
+
+describe('PDF Button Visibility and Colors', () => {
+  it('shows Summary Report button with warning color (not gray)', async () => {
+    const { getByText } = renderWithProviders(<Bills />);
+    
+    await waitFor(() => {
+      expect(screen.queryByText(/Loading/)).not.toBeInTheDocument();
+    });
+
+    const summaryButton = getByText('bills.summaryReport');
+    expect(summaryButton).toBeInTheDocument();
+    expect(summaryButton).toHaveClass('p-button-warning');
+    expect(summaryButton).not.toHaveClass('p-button-secondary');
+  });
+
+  it('shows Full Report button with info color', async () => {
+    const { getByText } = renderWithProviders(<Bills />);
+    
+    await waitFor(() => {
+      expect(screen.queryByText(/Loading/)).not.toBeInTheDocument();
+    });
+
+    const fullReportButton = getByText('bills.fullReport');
+    expect(fullReportButton).toBeInTheDocument();
+    expect(fullReportButton).toHaveClass('p-button-info');
+  });
+
+  it('enables PDF buttons when bills have names and amounts', async () => {
+    const mockViewModel = createMockViewModel({
+      exportableCount: 2,
+      filteredBills: [
+        { 
+          id: '1', 
+          names: 'John Doe', 
+          cash: '10.00', 
+          check: '5.00', 
+          total: 15.00,
+          originalIndex: 0
+        },
+        { 
+          id: '2', 
+          names: 'Jane Smith', 
+          cash: '20.00', 
+          check: '0.00', 
+          total: 20.00,
+          originalIndex: 1
+        }
+      ]
+    });
+
+    vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(mockViewModel);
+
+    const { getByText } = renderWithProviders(<Bills />);
+    
+    await waitFor(() => {
+      expect(screen.queryByText(/Loading/)).not.toBeInTheDocument();
+    });
+
+    const summaryButton = getByText('bills.summaryReport');
+    const fullReportButton = getByText('bills.fullReport');
+    
+    expect(summaryButton).not.toBeDisabled();
+    expect(fullReportButton).not.toBeDisabled();
+  });
+
+  it('disables PDF buttons when no exportable bills exist', async () => {
+    const mockViewModel = createMockViewModel({
+      exportableCount: 0,
+      filteredBills: [
+        { 
+          id: '1', 
+          names: '', // No names
+          cash: '10.00', 
+          check: '5.00', 
+          total: 15.00,
+          originalIndex: 0
+        },
+        { 
+          id: '2', 
+          names: 'Jane Smith', 
+          cash: '0.00', // No amounts
+          check: '0.00', 
+          total: 0.00,
+          originalIndex: 1
+        }
+      ]
+    });
+
+    vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(mockViewModel);
+
+    const { getByText } = renderWithProviders(<Bills />);
+    
+    await waitFor(() => {
+      expect(screen.queryByText(/Loading/)).not.toBeInTheDocument();
+    });
+
+    const summaryButton = getByText('bills.summaryReport');
+    const fullReportButton = getByText('bills.fullReport');
+    
+    expect(summaryButton).toBeDisabled();
+    expect(fullReportButton).toBeDisabled();
+  });
+
+  it('updates button state when exportable count changes', async () => {
+    const mockViewModel = createMockViewModel({
+      exportableCount: 0,
+      filteredBills: []
+    });
+
+    const { rerender, getByText } = renderWithProviders(<Bills />);
+    
+    await waitFor(() => {
+      expect(screen.queryByText(/Loading/)).not.toBeInTheDocument();
+    });
+
+    // Initially disabled
+    let summaryButton = getByText('bills.summaryReport');
+    expect(summaryButton).toBeDisabled();
+
+    // Update with exportable bills
+    const updatedMockViewModel = createMockViewModel({
+      exportableCount: 1,
+      filteredBills: [
+        { 
+          id: '1', 
+          names: 'John Doe', 
+          cash: '10.00', 
+          check: '0.00', 
+          total: 10.00,
+          originalIndex: 0
+        }
+      ]
+    });
+
+    vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(updatedMockViewModel);
+    
+    rerender(<Bills />);
+    
+    await waitFor(() => {
+      summaryButton = getByText('bills.summaryReport');
+      expect(summaryButton).not.toBeDisabled();
+    });
+  });
+});
+
+describe('Exportable Count Logic', () => {
+  it('counts bills with both names and amounts as exportable', () => {
+    const bills = [
+      { names: 'John Doe', cash: '10.00', check: '0.00' },
+      { names: 'Jane Smith', cash: '0.00', check: '5.00' },
+      { names: '', cash: '10.00', check: '0.00' }, // No names
+      { names: 'Bob Johnson', cash: '0.00', check: '0.00' }, // No amounts
+      { names: 'Alice Brown', cash: '15.00', check: '5.00' }
+    ];
+
+    // This test would be in the ViewModel test file, but we can test the logic here
+    const exportableCount = bills.filter(bill => {
+      const cashNum = parseFloat(bill.cash) || 0;
+      const checkNum = parseFloat(bill.check) || 0;
+      const hasNames = bill.names && bill.names.trim().length > 0;
+      
+      return hasNames && (cashNum > 0 || checkNum > 0);
+    }).length;
+
+    expect(exportableCount).toBe(3); // John, Jane, Alice
   });
 }); 

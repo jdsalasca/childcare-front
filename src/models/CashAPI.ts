@@ -12,7 +12,21 @@ interface CashRecordDetails {
   description: string;
 }
 
+// Backend data structure for API
+interface BackendBill {
+  id: number; // Numeric child_id for backend
+  names?: string;
+  cash: number;
+  check: number;
+  total: number;
+}
 
+interface BackendFormValues {
+  date?: Date;
+  bills: BackendBill[];
+  billTypes: any[];
+  cashOnHand: number;
+}
 
 // Define the properties based on the data structure being processed
 interface CashData {
@@ -36,7 +50,7 @@ const CashAPI = {
   },
 
   // Process Daily Cash Data
-  processCashData: async (cashData: FormValues): Promise<ApiResponse<CashRecordDetails>> => {
+  processCashData: async (cashData: FormValues | BackendFormValues): Promise<ApiResponse<CashRecordDetails>> => {
     try {
       const response = await API.post<CashRecordDetails>(BASE_URL, '/daily-cash/process', cashData);
       return response;

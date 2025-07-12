@@ -17,12 +17,29 @@ import { exportBoxesToPDF } from '../utils/boxesPdf';
 // Types
 export interface Bill {
   id?: string;
+  child_id?: number; // Add numeric child_id for backend
   names?: string;
   cash?: string | number;
   check?: string | number;
   total?: number;
   originalIndex?: number;
   classroom?: string;
+}
+
+// Backend data structure for API
+interface BackendBill {
+  id: number; // Numeric child_id for backend
+  names?: string;
+  cash: number;
+  check: number;
+  total: number;
+}
+
+interface BackendFormValues {
+  date?: Date;
+  bills: BackendBill[];
+  billTypes: any[];
+  cashOnHand: number;
 }
 
 interface CashRegisterDetail {
@@ -214,10 +231,15 @@ export const useBillsViewModel = () => {
     recalculateTimeoutRef.current = setTimeout(() => {
       try {
         const fieldsToUse = newFields || getValues('bills') || [];
+        
+        // Improved exportable count calculation - count bills with any content
         const count = fieldsToUse.filter(bill => {
           const cashNum = toNumber(bill.cash);
           const checkNum = toNumber(bill.check);
-          return (cashNum > 0) || (checkNum > 0);
+          const hasNames = bill.names && bill.names.trim().length > 0;
+          
+          // A bill is exportable if it has names and at least some amount
+          return hasNames && (cashNum > 0 || checkNum > 0);
         }).length;
         
         setExportableCount(count);
@@ -260,11 +282,14 @@ export const useBillsViewModel = () => {
     const newSums = calculateSums(allBills, getValues('cashOnHand') || 0);
     setSums(newSums);
     
-    // Update exportable count
+    // Update exportable count with improved logic
     const count = allBills.filter(b => {
       const cashNum = toNumber(b.cash);
       const checkNum = toNumber(b.check);
-      return (cashNum > 0) || (checkNum > 0);
+      const hasNames = b.names && b.names.trim().length > 0;
+      
+      // A bill is exportable if it has names and at least some amount
+      return hasNames && (cashNum > 0 || checkNum > 0);
     }).length;
     setExportableCount(count);
   }, [getValues, update, calculateSums]);
@@ -316,7 +341,10 @@ export const useBillsViewModel = () => {
         const count = updatedBills.filter(b => {
           const cashNum = toNumber(b.cash);
           const checkNum = toNumber(b.check);
-          return (cashNum > 0) || (checkNum > 0);
+          const hasNames = b.names && b.names.trim().length > 0;
+          
+          // A bill is exportable if it has names and at least some amount
+          return hasNames && (cashNum > 0 || checkNum > 0);
         }).length;
         setExportableCount(count);
       }, 0);
@@ -352,7 +380,8 @@ export const useBillsViewModel = () => {
         cash: '',
         check: '',
         total: 0,
-        classroom: child.classroom || ''
+        classroom: child.classroom || '',
+        child_id: child.id // Add child_id for backend
       }));
       
       reset({
@@ -392,7 +421,8 @@ export const useBillsViewModel = () => {
       check: '',
       total: 0,
       originalIndex: currentBills.length,
-      classroom: ''
+      classroom: '',
+      child_id: 0 // Default to 0 for new bills
     };
     
     append(newBill);
@@ -458,6 +488,9 @@ export const useBillsViewModel = () => {
 
       lastSelectedDateRef.current = new Date(currentDateObj);
       
+      // Ensure the date value is properly set in the form before processing
+      setValue('date', currentDateObj);
+      
       await Promise.all([
         onHandlerSetCashOnHand(currentDateObj),
         fetchClosedMoneyData(currentDateObj)
@@ -474,7 +507,7 @@ export const useBillsViewModel = () => {
         loadingMessage: ''
       });
     }
-  }, [onHandlerSetCashOnHand, fetchClosedMoneyData, setLoadingInfo, t]);
+  }, [onHandlerSetCashOnHand, fetchClosedMoneyData, setLoadingInfo, setValue, t]);
 
   // Submit handler
   const onSubmit = useCallback(async (data: FormValues) => {
@@ -491,10 +524,10 @@ export const useBillsViewModel = () => {
         day: '2-digit' 
       }) : '';
 
-      const backendData: FormValues = {
+      const backendData: BackendFormValues = {
         date: data.date,
         bills: data.bills.map(bill => ({
-          id: bill.id,
+          id: bill.child_id || 0, // Use numeric child_id, default to 0 if undefined
           names: bill.names,
           cash: toNumber(bill.cash),
           check: toNumber(bill.check),

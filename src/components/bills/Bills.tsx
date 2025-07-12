@@ -410,7 +410,7 @@ export const Bills: React.FC = () => {
             icon="pi pi-file-pdf"
             label={t('bills.summaryReport', 'Summary Report')}
             onClick={onDownloadFirstPartPdf}
-            className="p-button-secondary p-button-sm"
+            className="p-button-warning p-button-sm"
             disabled={exportableCount === 0}
           />
           
@@ -503,19 +503,27 @@ export const Bills: React.FC = () => {
           <Controller
             name="date"
             control={control}
-            render={({ field }) => (
-              <Calendar
-                id="date"
-                value={field.value instanceof Date ? field.value : (field.value ? new Date(field.value) : null)}
-                onChange={(e) => handleDateChange(e, field)}
-                showIcon
-                dateFormat="mm/dd/yy"
-                mask="99/99/9999"
-                showOnFocus={false}
-                hideOnDateTimeSelect={true}
-                className="w-full"
-              />
-            )}
+            render={({ field }) => {
+              // Ensure proper date value handling to prevent disappearing values
+              const dateValue = field.value instanceof Date ? field.value : 
+                               (field.value ? new Date(field.value) : null);
+              
+              return (
+                <Calendar
+                  id="date"
+                  value={dateValue}
+                  onChange={(e) => handleDateChange(e, field)}
+                  showIcon
+                  dateFormat="mm/dd/yy"
+                  mask="99/99/9999"
+                  showOnFocus={false}
+                  hideOnDateTimeSelect={true}
+                  className="w-full"
+                  keepInvalid={false}
+                  readOnlyInput={false}
+                />
+              );
+            }}
           />
         </div>
       </div>
