@@ -1,0 +1,85 @@
+name: 📊 Performance Monitoring
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  performance:
+    name: 📊 Performance Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🏗️ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'yarn'
+
+      - name: 📦 Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: 🏗️ Build application
+        run: yarn build
+
+      - name: 📏 Bundle size analysis
+        uses: preactjs/compressed-size-action@v2
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          pattern: 'dist/**/*.{js,css,html}'
+          exclude: '{**/*.map,**/node_modules/**}'
+          strip-hash: '[.-]([0-9a-f]{8,}|[0-9a-f]{20,})'
+
+      - name: 🔍 Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v10
+        with:
+          configPath: './.github/lighthouse/lighthouserc.json'
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+
+      - name: 📊 Bundle analyzer
+        run: |
+          yarn add -D webpack-bundle-analyzer
+          npx webpack-bundle-analyzer dist/assets/*.js --report --mode static --no-open
+        continue-on-error: true
+
+      - name: 📈 Performance budget check
+        run: |
+          echo "Checking performance budget..."
+          # Add your performance budget checks here
+          # Example: Check if bundle size exceeds limits
+          MAX_JS_SIZE=500000  # 500KB
+          MAX_CSS_SIZE=100000 # 100KB
+          
+          JS_SIZE=$(find dist -name "*.js" -not -path "*/node_modules/*" -exec wc -c {} + | tail -1 | awk '{print $1}')
+          CSS_SIZE=$(find dist -name "*.css" -not -path "*/node_modules/*" -exec wc -c {} + | tail -1 | awk '{print $1}')
+          
+          echo "JavaScript bundle size: $JS_SIZE bytes"
+          echo "CSS bundle size: $CSS_SIZE bytes"
+          
+          if [ $JS_SIZE -gt $MAX_JS_SIZE ]; then
+            echo "❌ JavaScript bundle size exceeds limit!"
+            exit 1
+          fi
+          
+          if [ $CSS_SIZE -gt $MAX_CSS_SIZE ]; then
+            echo "❌ CSS bundle size exceeds limit!"
+            exit 1
+          fi
+          
+          echo "✅ Performance budget check passed!"
+
+      - name: 📊 Upload performance artifacts
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: performance-results
+          path: |
+            .lighthouseci/
+            lhci_reports/
+            bundle-report.html
+          retention-days: 30 
