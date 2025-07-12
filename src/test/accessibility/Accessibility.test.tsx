@@ -104,6 +104,19 @@ describe('Accessibility Tests', () => {
         recalculateFields: vi.fn(),
         calculateBillSums: vi.fn(),
         updateBillField: vi.fn(),
+        control: {} as any,
+        formState: { errors: {} } as any,
+        loadingInfo: { loading: false, loadingMessage: '' },
+        SetSearchedProgram: vi.fn(),
+        getValues: vi.fn(),
+        setValue: vi.fn(),
+        watch: vi.fn(),
+        reset: vi.fn(),
+        childrenOptions: [],
+        toast: { current: null },
+        safeRemove: vi.fn(),
+        onSubmit: vi.fn(),
+        blockContent: false,
       }
 
       const useBillsViewModelModule = await import('../../components/bills/viewModels/useBillsViewModel')
@@ -265,7 +278,7 @@ describe('Accessibility Tests', () => {
       const steps = screen.getAllByRole('button')
       steps.forEach(step => {
         // Steps should have proper button styling instead of specific step classes
-        expect(step).toHaveClass(/p-button|bg-|border-/)
+        expect(step).toHaveClass('p-button')
       })
     })
   })
@@ -359,7 +372,7 @@ describe('Accessibility Tests', () => {
       const buttons = screen.getAllByRole('button')
       buttons.forEach(button => {
         // Buttons should have proper visual states
-        expect(button).toHaveClass(/p-button|bg-/)
+        expect(button).toHaveClass('p-button')
       })
     })
   })

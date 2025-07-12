@@ -66,7 +66,7 @@ export const StepComponentFive: React.FC<StepComponentFiveProps> = ({
         customLogger.debug('contractInformation.schedule', contractInformation.schedule);
         customLogger.debug('daysCache', daysCache);
         const formattedSchedule = contractInformation.schedule.reduce((acc, entry) => {
-          const day = daysCache.find((day) => day.id == String(entry.day_id));
+          const day = daysCache.find((day) => day.id === entry.day_id);
           if (day) {
             const [checkInHours, checkInMinutes] = entry.check_in.split(':').map(Number);
             const [checkOutHours, checkOutMinutes] = entry.check_out.split(':').map(Number);

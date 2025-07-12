@@ -2,7 +2,7 @@
 
 [![CI/CD Pipeline](https://github.com/your-username/childcare-front/actions/workflows/ci.yml/badge.svg)](https://github.com/your-username/childcare-front/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/your-username/childcare-front/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/your-username/childcare-front/actions/workflows/codeql-analysis.yml)
-[![codecov](https://codecov.io/gh/your-username/childcare-front/branch/main/graph/badge.svg)](https://codecov.io/gh/your-username/childcare-front)
+
 [![Maintainability](https://api.codeclimate.com/v1/badges/your-repo-id/maintainability)](https://codeclimate.com/github/your-username/childcare-front/maintainability)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=your-project-key&metric=security_rating)](https://sonarcloud.io/dashboard?id=your-project-key)
 [![Dependencies](https://img.shields.io/librariesio/github/your-username/childcare-front)](https://libraries.io/github/your-username/childcare-front)

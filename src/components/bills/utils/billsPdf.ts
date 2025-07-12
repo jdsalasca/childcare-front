@@ -166,7 +166,7 @@ const renderRightContent = (doc: jsPDF, startX: number, startY: number, lineHeig
   doc.setLineWidth(0.5); // Restore line width to 0.5
   doc.setFontSize(8);
   doc.setFont(undefined!, 'normal');  
-  if(bill?.cash &&bill?.cash >0){
+  if(bill?.cash && Number(bill?.cash) > 0){
     doc.text((Number(bill?.cash) || 0).toFixed(2), cashBoxX + 5, yPos, { align: 'left' });
   }
   yPos += lineHeight * 0.6;
@@ -194,7 +194,7 @@ const renderRightContent = (doc: jsPDF, startX: number, startY: number, lineHeig
   doc.setLineWidth(0.5); // Restore line width to 0.5
   doc.setFontSize(8);
   doc.setFont(undefined!, 'normal');
-  if(bill?.check &&bill?.check >0){
+  if(bill?.check && Number(bill?.check) > 0){
     doc.text((Number(bill?.check) || 0).toFixed(2), checkBoxX + 5, yPos, { align: 'left' });
   }
   yPos += lineHeight * 1.2;

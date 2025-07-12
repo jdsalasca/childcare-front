@@ -57,16 +57,20 @@ const toNumber = (value: any): number => {
   return 0;
 };
 
-// Simple debounce implementation
+// Simple debounce implementation with cancel method
 const debounce = <T extends (...args: any[]) => void>(
   func: T,
   delay: number
-): ((...args: Parameters<T>) => void) => {
+): ((...args: Parameters<T>) => void) & { cancel: () => void } => {
   let timeoutId: NodeJS.Timeout;
-  return (...args: Parameters<T>) => {
+  const debounced = (...args: Parameters<T>) => {
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => func(...args), delay);
   };
+  debounced.cancel = () => {
+    clearTimeout(timeoutId);
+  };
+  return debounced;
 };
 
 // Memoized calculation functions
