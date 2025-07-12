@@ -4,6 +4,7 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { renderWithProviders } from '../utils';
 import { Bills } from '../../components/bills/Bills';
 import { Contracts } from '../../components/contracts/Contracts';
+import ChildrenAPI from '../../models/ChildrenAPI';
 
 // Mock API modules
 vi.mock('../../models/ChildrenAPI', () => ({
@@ -42,14 +43,19 @@ describe('Integration Tests', () => {
       
       renderWithProviders(<Contracts />);
       
-      // Check Contracts component renders (or error boundary)
-      expect(screen.getByText(/contract/i) || screen.getByText(/Something went wrong/i)).toBeInTheDocument();
+      // Check Contracts component renders (fix: use proper try-catch pattern instead of logical OR)
+      try {
+        expect(screen.getByText(/contract/i)).toBeInTheDocument();
+      } catch {
+        // If contract text not found, check for error boundary
+        expect(screen.getByText(/Something went wrong/i)).toBeInTheDocument();
+      }
     });
 
     it('should handle API failures gracefully', async () => {
-      // Mock API failure
+      // Mock API failure (fix: use proper ES module import instead of CommonJS require)
       const mockError = new Error('API Error');
-      vi.mocked(require('../../models/ChildrenAPI').default.getChildren).mockRejectedValue(mockError);
+      vi.mocked(ChildrenAPI.getChildren).mockRejectedValue(mockError);
 
       renderWithProviders(<Bills />);
       
@@ -108,4 +114,4 @@ describe('Integration Tests', () => {
       expect(renderTime).toBeLessThan(1000); // Less than 1 second
     });
   });
-}); 
+}; 

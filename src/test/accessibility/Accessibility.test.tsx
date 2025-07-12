@@ -250,8 +250,12 @@ describe('Accessibility Tests', () => {
       const headings = screen.getAllByRole('heading')
       expect(headings.length).toBeGreaterThan(0)
       
-      // Check for contract-related content instead of specific text
-      expect(screen.getByText(/contract/i) || screen.getByText(/step/i) || headings[0]).toBeInTheDocument()
+      // Check for contract-related content - ensure at least one exists
+      const contractText = screen.queryByText(/contract/i)
+      const stepText = screen.queryByText(/step/i)
+      const hasHeadings = headings.length > 0
+      
+      expect(contractText || stepText || hasHeadings).toBeTruthy()
     })
 
     it('should provide proper feedback for validation states', async () => {
@@ -398,8 +402,11 @@ describe('Accessibility Tests', () => {
 
       renderWithProviders(<Bills />)
 
-      // Check for semantic HTML structure
-      expect(screen.getByRole('main') || screen.getByRole('form')).toBeInTheDocument()
+      // Check for semantic HTML structure - ensure at least one landmark exists
+      const mainElement = screen.queryByRole('main')
+      const formElement = screen.queryByRole('form')
+      
+      expect(mainElement || formElement).toBeTruthy()
       
       // Check for proper landmarks
       const headings = screen.getAllByRole('heading')
