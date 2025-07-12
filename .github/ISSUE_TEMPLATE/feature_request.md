@@ -1,9 +1,10 @@
 ---
-name: ✨ Feature Request
+name: "✨ Feature Request"
 about: Suggest an idea for this project
-title: '[FEATURE] '
-labels: ['enhancement', 'needs-triage']
+title: "[FEATURE] "
+labels: enhancement
 assignees: ''
+
 ---
 
 ## 🚀 Feature Description
@@ -72,4 +73,4 @@ assignees: ''
 - [ ] I have provided a clear description of the feature
 - [ ] I have explained the motivation and use case
 - [ ] I have considered the technical implications
-- [ ] I have thought about the user experience impact 
+- [ ] I have thought about the user experience impact

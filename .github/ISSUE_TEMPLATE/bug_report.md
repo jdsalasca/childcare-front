@@ -1,9 +1,10 @@
 ---
-name: 🐛 Bug Report
+name: "\U0001F41B Bug Report"
 about: Create a report to help us improve
-title: '[BUG] '
-labels: ['bug', 'needs-triage']
+title: "[BUG] "
+labels: bug
 assignees: ''
+
 ---
 
 ## 🐛 Bug Description
@@ -56,4 +57,4 @@ Paste error logs here
 - [ ] I have searched for existing issues
 - [ ] I have provided all requested information
 - [ ] I have tested this on the latest version
-- [ ] I can reproduce this issue consistently 
+- [ ] I can reproduce this issue consistently
