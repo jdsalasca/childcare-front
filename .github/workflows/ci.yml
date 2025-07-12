@@ -30,7 +30,7 @@ jobs:
         run: corepack enable
 
       - name: 📦 Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install --immutable
 
       - name: 🔍 Run ESLint
         run: yarn lint
@@ -58,7 +58,7 @@ jobs:
         run: corepack enable
 
       - name: 📦 Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install --immutable
 
       - name: 🧪 Run tests
         run: yarn test --coverage
@@ -92,7 +92,7 @@ jobs:
         run: corepack enable
 
       - name: 📦 Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install --immutable
 
       - name: 🔍 Run security audit
         run: yarn audit --level moderate
@@ -116,7 +116,7 @@ jobs:
         run: corepack enable
 
       - name: 📦 Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install --immutable
 
       - name: 🏗️ Build application
         run: yarn build
