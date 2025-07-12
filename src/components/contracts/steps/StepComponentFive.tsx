@@ -130,12 +130,27 @@ export const StepComponentFive: React.FC<StepComponentFiveProps> = ({
       customLogger.error('Form has validation errors:', errors);
       return; // Stop submission if there are errors
     }
-    const scheduleData = daysCache.map((day) => new ContractDaySchedule(
-      contractInformation.contract_id || 13,
-      day.id,
-      new Date(data[`${day.name.toLowerCase()}check_in`]).toTimeString().slice(0, 5),
-      new Date(data[`${day.name.toLowerCase()}check_out`]).toTimeString().slice(0, 5)
-    ));
+    const scheduleData = daysCache.map((day) => {
+      const checkInKey = `${day.name.toLowerCase()}check_in`;
+      const checkOutKey = `${day.name.toLowerCase()}check_out`;
+      let checkIn = data[checkInKey];
+      let checkOut = data[checkOutKey];
+      // Fallback to default times if missing or invalid
+      let checkInStr = '08:00';
+      let checkOutStr = '17:00';
+      if (checkIn instanceof Date && !isNaN(checkIn.getTime())) {
+        checkInStr = checkIn.toTimeString().slice(0, 5);
+      }
+      if (checkOut instanceof Date && !isNaN(checkOut.getTime())) {
+        checkOutStr = checkOut.toTimeString().slice(0, 5);
+      }
+      return new ContractDaySchedule(
+        contractInformation.contract_id || 13,
+        String(day.id),
+        checkInStr,
+        checkOutStr
+      );
+    });
     
     setLoadingInfo({
       loading: true,
