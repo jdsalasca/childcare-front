@@ -47,13 +47,11 @@ const StepComponentThree: React.FC<StepComponentThreeProps> = ({
       return;
     }
 
-    console.log('data', data);
 
     const termsRegistry = {
       ...data.terms,
       contract_id: contractInformation.contract_id,
     };
-    console.log('termsRegistry', termsRegistry);
 
     const permissionsCreated =
       await ContractPermissionsAPI.createContractPermissions(termsRegistry);

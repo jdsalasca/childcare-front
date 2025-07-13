@@ -72,7 +72,6 @@ const CombinedBillsForm: React.FC = () => {
 
   const onSubmit = (data: FormData) => {
     try {
-      console.log('Form data:', data);
       toast.current?.show({
         severity: 'success',
         summary: 'Success',

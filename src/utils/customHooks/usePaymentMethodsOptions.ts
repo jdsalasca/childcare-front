@@ -8,7 +8,6 @@ const usePaymentMethodsOptions = () => {
   const paymentMethodsOptions = useMemo(() => {
     if (!paymentMethods || isLoading) return [];
 
-    console.log('paymentMethods', paymentMethods);
 
     return paymentMethods.response.map(paymentMethod => ({
       ...paymentMethod,

@@ -51,9 +51,6 @@ const BillsUpload = () => {
     const fetchChildren = async () => {
       try {
         const response = await ChildrenAPI.getChildren();
-        console.log('====================================');
-        console.log('response', response);
-        console.log('====================================');
         // setChildren(response);
       } catch (err) {
         customLogger.error('Error fetching children:', err);
@@ -83,7 +80,6 @@ const BillsUpload = () => {
 
   const onSubmit = (data: any) => {
     try {
-      console.log('Form data:', data);
       toast.current?.show({
         severity: 'success',
         summary: 'Success',

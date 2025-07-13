@@ -46,7 +46,6 @@ const ContractAPI = {
   updateContractPaymentDetails: async (
     contract: Contract
   ): Promise<ApiResponse<Contract>> => {
-    console.log('contract on createContract', contract);
 
     try {
       const response = await API.put<Contract>(

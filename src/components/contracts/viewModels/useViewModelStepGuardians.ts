@@ -301,7 +301,6 @@ const useViewModelStepGuardians = ({
           showToast('error', 'error', 'failedToSaveGuardians');
           return;
         }
-        console.log('updatedGuardians', updatedGuardians);
 
         // Create contract
         const contractResponse = await onCreateContract(
@@ -357,8 +356,6 @@ const useViewModelStepGuardians = ({
       const selectedGuardian = guardianOptions.find(g => g.id === e.value);
       if (!selectedGuardian) return;
 
-      console.log('fields', fields);
-      console.log('selectedGuardian', selectedGuardian);
 
       const isGuardianAlreadyAdded = fields.some(
         guardian => guardian.value === selectedGuardian.id
