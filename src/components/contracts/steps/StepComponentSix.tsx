@@ -1,7 +1,6 @@
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
 import { InputText } from 'primereact/inputtext';
-import { InputTextarea } from 'primereact/inputtextarea';
 import { Controller, useForm } from 'react-hook-form';
 
 import { Checkbox } from 'primereact/checkbox';
@@ -43,7 +42,6 @@ const defaultHealthInfo: MedicalInfo = {
 }
 
 interface StepComponentSixProps {
-  setActiveIndex: (index: number) => void;
   contractInformation: ContractInfo;
   setContractInformation: (contract: ContractInfo) => void;
   toast: React.RefObject<Toast>;
@@ -52,7 +50,7 @@ interface StepComponentSixProps {
 }
 
 export const StepComponentSix: React.FC<StepComponentSixProps> =
-  ({ setActiveIndex, contractInformation, setContractInformation, toast, ...props }: StepComponentSixProps) => {
+  ({ contractInformation, setContractInformation, toast }: StepComponentSixProps) => {
     const { t } = useTranslation();
     const { control, handleSubmit, setValue, formState: { errors }, reset } = useForm({
       defaultValues: {

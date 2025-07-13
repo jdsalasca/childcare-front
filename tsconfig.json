@@ -1,26 +1,40 @@
 {
   "compilerOptions": {
-    "module": "ES2022",
-    "target": "es2020",
-    "jsx": "react-jsx",
-    "strict": true,
-    "esModuleInterop": true,
-    "moduleResolution": "node",
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "typeRoots": ["./node_modules/@types"],
-    "baseUrl": "./src",
-    "paths": {
-      "@models/*": ["models/*"],   // Custom alias for models folder
-      "@components/*": ["components/*"],   // Alias for components folder
-      "@utils/*": ["utils/*"],   // Alias for utilities folder, etc.
-      "types/*": ["types/*"], // Alias for types
-      "@hooks/*": ["hooks/*"],   // Alias for hooks folder
-      "@styles/*": ["styles/*"],   // Alias for styles folder
-      "@assets/*": ["assets/*"],   // Alias for assets folder
-      "@config/*": ["config/*"],   // Alias for config folder
-    },
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
-    "isolatedModules": true
-  }
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+
+    /* Path mapping */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "types/*": ["./src/types/*"],
+      "configs/*": ["./src/configs/*"],
+      "components/*": ["./src/components/*"],
+      "models/*": ["./src/models/*"],
+      "@models/*": ["./src/models/*"],
+      "@components/*": ["./src/components/*"],
+      "@utils/*": ["./src/utils/*"],
+      "utils/*": ["./src/utils/*"]
+    }
+  },
+  "include": ["src", "env.d.ts"],
+  "exclude": ["src/test/**/*"],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

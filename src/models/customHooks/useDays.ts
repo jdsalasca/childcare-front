@@ -16,7 +16,8 @@ const useDays = () => {
         days.response.map(day => ({
           ...day,
           label: day.name,  // Ensure label is taken from name
-          value: day.id     // Ensure value is taken from id
+          value: day.id,     // Ensure value is taken from id
+          abbreviation: day.abbreviation ?? day.name.slice(0, 3).toUpperCase(),
         }))
       );
       
@@ -25,7 +26,8 @@ const useDays = () => {
         days.response.filter(day => day.laboral_day).map(day => ({
           ...day,
           label: day.name,  // Ensure label is taken from name
-          value: day.id     // Ensure value is taken from id
+          value: day.id,     // Ensure value is taken from id
+          abbreviation: day.abbreviation ?? day.name.slice(0, 3).toUpperCase(),
         }))
       );
     }

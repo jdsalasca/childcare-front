@@ -24,6 +24,10 @@ yarn-debug.log*
 yarn-error.log*
 
 
+src/**/*.js.map
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+
 #vscode
 !.vscode/extensions.json
 .idea

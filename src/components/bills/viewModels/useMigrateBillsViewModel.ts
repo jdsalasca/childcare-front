@@ -9,7 +9,7 @@ interface MigrateBillsViewModel {
 }
 
 const useMigrateBillsViewModel = () => {
-    const [migrateBillsViewModel, setMigrateBillsViewModel] = useState<MigrateBillsViewModel>({
+    const [migrateBillsViewModel] = useState<MigrateBillsViewModel>({
         migrateBills: false,
         migrateBillsMessage: false,
         migrateBillsError: false,

@@ -60,7 +60,7 @@ vi.mock('react-hook-form', () => ({
     setError: vi.fn(),
     clearErrors: vi.fn(),
   }),
-  Controller: ({ render, name, control, ...props }: any) => {
+  Controller: ({ render, name, control: _control, ...props }: any) => {
     const field = {
       onChange: vi.fn(),
       onBlur: vi.fn(),

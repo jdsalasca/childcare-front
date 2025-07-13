@@ -1,8 +1,4 @@
-import { renderHook, act, waitFor } from '@testing-library/react';
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { useBillsViewModel } from '../../components/bills/viewModels/useBillsViewModel';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import React from 'react';
+import { vi, describe, it, expect } from 'vitest';
 
 // Mock dependencies
 vi.mock('react-i18next', () => ({
@@ -93,20 +89,6 @@ vi.mock('../../components/bills/utils/boxesPdf', () => ({
   exportBoxesToPDF: vi.fn(),
 }));
 
-const createWrapper = () => {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: { retry: false },
-      mutations: { retry: false },
-    },
-  });
-  
-  const Wrapper = ({ children }: { children: React.ReactNode }) => (
-    React.createElement(QueryClientProvider, { client: queryClient }, children)
-  );
-  
-  return Wrapper;
-};
 
 describe('useBillsViewModel', () => {
   // Skip the useBillsViewModel tests for now as they require complex mocking

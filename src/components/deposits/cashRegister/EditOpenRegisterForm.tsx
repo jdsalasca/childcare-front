@@ -96,7 +96,7 @@ const EditOpenRegisterForm: React.FC<Props> = ({ date, currentData, onSuccess, o
     value: cashier.id,
   })) || [];
 
-  const quantityTemplate = (rowData: BillDetail, options: any) => {
+  const quantityTemplate = (rowData: BillDetail, _options: any) => {
     const billIndex = bills.findIndex(b => b.bill_type_id === rowData.bill_type_id);
     const currentBill = bills[billIndex];
     

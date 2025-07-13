@@ -27,7 +27,7 @@ const CheckboxWrapper: React.FC<CheckboxWrapperProps> = ({
   spanClassName = '',
   labelPosition = 'right',
   checkboxClassName = '',
-  internationalization,
+  // internationalization, // Unused parameter removed
   className = '',
   ...rest
 }) => {

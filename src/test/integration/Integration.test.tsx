@@ -4,16 +4,30 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { renderWithProviders } from '../utils';
 import { Bills } from '../../components/bills/Bills';
 import { Contracts } from '../../components/contracts/Contracts';
+
 import ChildrenAPI from '../../models/ChildrenAPI';
 
 // Mock API modules
 vi.mock('../../models/ChildrenAPI', () => ({
   default: {
-    getChildren: vi.fn().mockResolvedValue([
+    getChildren: vi.fn().mockResolvedValue({
+      httpStatus: 200,
+      response: [
+        { id: 1, first_name: 'John', last_name: 'Doe', classroom: 'Toddler' },
+        { id: 2, first_name: 'Jane', last_name: 'Smith', classroom: 'Infant' }
+      ]
+    })
+  },
+  useChildren: vi.fn().mockReturnValue({
+    data: [
       { id: 1, first_name: 'John', last_name: 'Doe', classroom: 'Toddler' },
       { id: 2, first_name: 'Jane', last_name: 'Smith', classroom: 'Infant' }
-    ])
-  }
+    ],
+    isLoading: false,
+    isError: false,
+    error: null,
+    refreshChildren: vi.fn()
+  })
 }));
 
 vi.mock('../../models/BillTypeAPI', () => ({
@@ -23,6 +37,14 @@ vi.mock('../../models/BillTypeAPI', () => ({
       { id: 2, label: '$50 Bill', value: 50 }
     ]
   })
+}));
+
+// Mock react-query
+vi.mock('@tanstack/react-query', () => ({
+  useQuery: vi.fn(),
+  useQueryClient: vi.fn(() => ({
+    invalidateQueries: vi.fn()
+  }))
 }));
 
 describe('Integration Tests', () => {
@@ -53,7 +75,7 @@ describe('Integration Tests', () => {
     });
 
     it('should handle API failures gracefully', async () => {
-      // Mock API failure (fix: use proper ES module import instead of CommonJS require)
+      // Mock API failure
       const mockError = new Error('API Error');
       vi.mocked(ChildrenAPI.getChildren).mockRejectedValue(mockError);
 
@@ -114,4 +136,4 @@ describe('Integration Tests', () => {
       expect(renderTime).toBeLessThan(1000); // Less than 1 second
     });
   });
-}; 
+});

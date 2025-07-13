@@ -386,43 +386,10 @@ export class ContractPdf {
   };
 }
 
-const addFormField = (doc: jsPDF, x: number, y: number, width: number = 50) => {
-  try {
-    const field = new AcroFormTextField();
-    
-    field.x = x;
-    field.y = y - 10;
-    field.width = width;
-    field.height = 10;
-    field.fieldName = `field_${Math.random().toString(36).substr(2, 9)}`;
-    field.fontSize = 12;
-    field.value = '';
-    field.readOnly = false;
-    
-    // Add visible borders and background
-  /*   field.borderStyle = 'solid';
-    field.borderWidth = 1;
-    field.backgroundColor = [0.9, 0.9, 0.9];  // Light gray background
-    field.textColor = [0, 0, 0]; */
-    
-    doc.addField(field);
-    
-    // Draw a visible rectangle around the field
-    doc.setDrawColor(0);
-    doc.setLineWidth(0.1);
-    doc.rect(x, y - 10, width, 10);
-    
-    return width + 2;
-  } catch (error) {
-    console.error('Error adding form field:', error);
-    return width + 2;
-  }
-};
   // Function to add the first page
   const addFirstPage = (doc: jsPDF, options: Options,contractInfo :any ,contractInformation :ContractInfo, language : Language) => {
     options.yPosition = options.yPosition - 10
     const contractLabel: string = language === Language.English ? "Contract" : "Contrato"
-    const startDate: string = language === Language.English ? `Start Date ${Functions.formatDateToMMDDYY(contractInformation.start_date!)}` : `Fecha de Comienzo ${Functions.formatDateToMMDDYY(contractInformation.start_date!)}`
     addHeader(doc, "Educando Childcare Center", options,"title");
     addHeader(doc, contractLabel, options,"title");
     // addDateOnContract(doc,startDate,options)

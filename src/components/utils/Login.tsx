@@ -9,7 +9,6 @@ import { Card } from 'primereact/card';
 import React, { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import animationData from '../../assets/lottie/hellow_login.json';
 import useCustomNavigate from '../../utils/customHooks/useCustomNavigate';
 import InputTextWrapper from '../formsComponents/InputTextWrapper';
@@ -32,7 +31,6 @@ const Login: React.FC = () => {
     },
   });
 
-  const navigate = useNavigate();
   const customNavigate = useCustomNavigate();
   const { t } = useTranslation();
   // const { login } = useAuth();

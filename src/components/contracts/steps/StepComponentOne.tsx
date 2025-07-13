@@ -3,7 +3,7 @@ import { customLogger } from 'configs/logger';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
 import { Toast } from 'primereact/toast';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { ChildType } from 'types/child';

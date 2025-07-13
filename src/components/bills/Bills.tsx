@@ -8,7 +8,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { InputText } from 'primereact/inputtext';
 import { Paginator } from 'primereact/paginator';
 import { Toast } from 'primereact/toast';
-import { Chip } from 'primereact/chip';
+
 import { Tooltip } from 'primereact/tooltip';
 import classNames from 'classnames';
 import { programOptions } from '../contracts/utilsAndConstants';

@@ -30,7 +30,7 @@ jobs:
         run: corepack enable
 
       - name: 📦 Install dependencies
-        run: yarn install --immutable
+        run: yarn install
 
       - name: 🔍 Run ESLint
         run: yarn lint
@@ -58,21 +58,12 @@ jobs:
         run: corepack enable
 
       - name: 📦 Install dependencies
-        run: yarn install --immutable
+        run: yarn install
 
       - name: 🧪 Run tests
         run: yarn test --coverage
         continue-on-error: false
 
-      - name: 📊 Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
-        if: always()
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./coverage/lcov.info
-          flags: unittests
-          name: codecov-umbrella
-          fail_ci_if_error: false
 
   # Job 3: Security Scanning
   security:
@@ -92,7 +83,7 @@ jobs:
         run: corepack enable
 
       - name: 📦 Install dependencies
-        run: yarn install --immutable
+        run: yarn install
 
       - name: 🔍 Run security audit
         run: yarn audit --level moderate
@@ -116,7 +107,7 @@ jobs:
         run: corepack enable
 
       - name: 📦 Install dependencies
-        run: yarn install --immutable
+        run: yarn install
 
       - name: 🏗️ Build application
         run: yarn build

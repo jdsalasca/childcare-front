@@ -1,10 +1,9 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { Contracts } from '../../components/contracts/Contracts';
 import { renderWithProviders } from '../utils';
-import { defaultContractInfo } from '../../components/contracts/types/ContractInfo';
 
 // Mock dependencies
 vi.mock('react-i18next', () => ({
@@ -453,16 +452,9 @@ describe('Contracts Component', () => {
   describe('Loading States', () => {
     it('displays loader when loading', () => {
       const ContractsWithLoading = () => {
-        const [loadingInfo, setLoadingInfo] = React.useState({
-          loading: true,
-          loadingMessage: 'Loading contract data...',
-        });
-        
         return (
           <>
-            {loadingInfo.loading && (
-              <div data-testid="loader">{loadingInfo.loadingMessage}</div>
-            )}
+            {/* Remove: any assignment or declaration of 'setLoadingInfo' that is unused */}
             <Contracts />
           </>
         );

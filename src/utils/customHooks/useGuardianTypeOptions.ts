@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useGuardianTypes } from '../../models/cache/useGuardianTypesCache';
 
 const useGuardianTypeOptions = () => {

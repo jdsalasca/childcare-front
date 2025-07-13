@@ -1,10 +1,8 @@
 import React from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { Card } from 'primereact/card';
+import { Outlet } from 'react-router-dom';
 
 const DepositsMenu: React.FC = () => {
-  const { t } = useTranslation();
+  // const { t } = useTranslation(); // Unused variable removed
 
   return (
     <div className="max-w-6xl mx-auto p-6">

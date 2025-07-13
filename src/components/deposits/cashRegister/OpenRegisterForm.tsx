@@ -8,7 +8,7 @@ import { Message } from 'primereact/message';
 import { Card } from 'primereact/card';
 import { Divider } from 'primereact/divider';
 import CashRegisterAPI from '../../../models/CashRegisterAPI';
-import { OpenRegisterRequest, BillInput, Cashier } from '../../../types/cashRegister';
+import { OpenRegisterRequest } from '../../../types/cashRegister';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { BILL_TYPES, calculateBillTotal } from './constants';
 

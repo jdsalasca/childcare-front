@@ -1,7 +1,7 @@
 import { useForm, Controller } from 'react-hook-form';
 import { Dropdown } from 'primereact/dropdown';
 import { ContractInfo } from '../../types/ContractInfo';
-import { ChildType, PermissionsInformation } from 'types/child';
+import { PermissionsInformation } from 'types/child';
 import CheckboxWrapper from '@components/formsComponents/CheckboxWrapper';
 import { Button } from 'primereact/button';
 import { useTranslation } from 'react-i18next';

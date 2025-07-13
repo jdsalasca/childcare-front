@@ -12,7 +12,6 @@ interface UseGenerateContractProps {
 const useGenerateContract = ({
   contractInformation  = mockContract,
   toast,
-  ...props
 }: UseGenerateContractProps) => {
   const { t } = useTranslation();
 

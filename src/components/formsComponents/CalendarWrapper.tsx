@@ -64,7 +64,6 @@ const CalendarWrapper: React.FC<CalendarWrapperProps> = ({
   onChangeCustom,
   showIcon = false,
   availableDates = [],
-  ...rest
 }) => {
   // Memoize the disabled dates calculation
   const disabledDates = useMemo(() => {

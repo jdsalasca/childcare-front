@@ -75,7 +75,7 @@ export const exportBoxesToPDF = (data: FormValues): void => {
     // Notes and Scanned Date, QuickBooks, Signature on the right side
     generateNotesSection(doc, data, currentY, currentY, halfPageWidth, pageHeight, margin);
        // Iterate over each child and generate a receipt on a new page
-       data.bills!.forEach((bill, index) => {
+       data.bills!.forEach((bill) => {
         
             doc.addPage();  // New page for each child
 
@@ -226,7 +226,6 @@ const generateReceiptForChild = (doc: jsPDF, bill: Bill, date: string): void => 
 
 const generateCashOnHandSection = (doc: jsPDF, data: FormValues, startY: number, pageHeight: number, margin: number): number => {
     // Format values properly
-    const cashOnHandValue = Number(data.cashOnHand) || 0;
     const totalDepositValue = Number(data.totalDeposit) || 0;
     // Calculate total as sum of cash and check from bills
     const totalOverallValue = data.bills?.reduce((acc, bill) => {
@@ -334,7 +333,6 @@ const generateNotesSection = (doc: jsPDF, data: FormValues, startY: number, left
 
     // Set up text positions
     const boxHeight = 40;  // Define the height for the "Notas" box
-    const boxPadding = 5;
     const boxYPosition = startY;  // Box will start here
 
     // Format date properly

@@ -2,9 +2,7 @@ import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { customLogger } from '../../../configs/logger';
-import { BillsModel } from '../models/BillModel';
 import { LoadingInfo } from '../../../models/AppModels';
-import * as AppModels from '../../../models/AppModels';
 import { useBillTypesByCurrencyCode } from '../../../models/BillTypeAPI';
 import { useChildren } from '../../../models/ChildrenAPI';
 import { CashOnHandByDyAPI } from '../../../models/CashOnHandByDyAPI';
@@ -40,35 +38,6 @@ interface BackendFormValues {
   bills: BackendBill[];
   billTypes: any[];
   cashOnHand: number;
-}
-
-interface CashRegisterDetail {
-  id: number;
-  bill_label: string;
-  bill_value: string;
-  quantity: number;
-  total_amount: string;
-  currency_code: string;
-}
-
-interface CashRegisterData {
-  success: boolean;
-  data: {
-    opening?: {
-      details: CashRegisterDetail[];
-      total_amount: number;
-    };
-    closing?: {
-      details: CashRegisterDetail[];
-      total_amount: number;
-    };
-    summary?: {
-      opening_total: number;
-      closing_total: number;
-      difference: number;
-      currency: string;
-    };
-  };
 }
 
 export interface FormValues {
@@ -142,7 +111,6 @@ export const useBillsViewModel = () => {
   const [sums, setSums] = useState<Sums>({ cash: 0, check: 0, total: 0, cash_on_hand: 0, total_cash_on_hand: 0 });
   
   // Refs for preventing excessive calculations
-  const isFetching = useRef<boolean>(false);
   const recalculateFieldsRef = useRef<boolean>(false);
   const lastSelectedDateRef = useRef<Date | null>(null);
   const toast = useRef<any>(null);
@@ -171,13 +139,6 @@ export const useBillsViewModel = () => {
     }
   });
 
-  const billModel = new BillsModel(getValues, toast, t);
-
-  const { fields: billTypeFields, update: updateBillType } = useFieldArray<FormValues>({
-    control,
-    name: 'billTypes'
-  });
-
   const { fields, append, remove, update } = useFieldArray<FormValues>({
     control,
     name: 'bills',
@@ -187,14 +148,7 @@ export const useBillsViewModel = () => {
   // Memoized bills with proper type assertion
   const billsFields = useMemo(() => fields as Array<Bill>, [fields]);
 
-  // Memoized children data
-  const childrenOptions = useMemo(() => {
-    if (!children) return [];
-    return children.map((child: any) => ({
-      ...child,
-      childName: `${child.first_name} ${child.last_name}`
-    }));
-  }, [children]);
+  // Memoized children data - removed unused childrenOptions
 
   // Memoized sums calculation
   const calculateSums = useCallback((bills: Bill[], cashOnHand: number): Sums => {
@@ -518,12 +472,6 @@ export const useBillsViewModel = () => {
       });
 
       // Prepare data for backend API
-      const formattedDate = data.date ? new Date(data.date).toLocaleDateString('en-US', { 
-        year: 'numeric', 
-        month: '2-digit', 
-        day: '2-digit' 
-      }) : '';
-
       const backendData: BackendFormValues = {
         date: data.date,
         bills: data.bills.map(bill => ({

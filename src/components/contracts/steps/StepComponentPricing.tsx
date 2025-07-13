@@ -59,7 +59,7 @@ const StepComponentPricing: React.FC<StepComponentPricingProps> = ({
   const { t } = useTranslation();
   const hasExistingCounts = contractInformation.serviceCounts && Object.keys(contractInformation.serviceCounts).length > 0;
   
-  const { control, handleSubmit, setValue, watch, formState: { isValid, errors } } = useForm({
+  const { control, handleSubmit, setValue, watch } = useForm({
     defaultValues: hasExistingCounts 
       ? contractInformation.serviceCounts 
       : calculateAgeCounts(contractInformation.children || [])

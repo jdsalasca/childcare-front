@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { Bills } from '../../components/bills/Bills';
@@ -198,11 +198,8 @@ vi.mock('classnames', () => ({
 }));
 
 describe('Bills Component', () => {
-  let mockViewModel: any;
-
   beforeEach(() => {
-    mockViewModel = createMockViewModel();
-    vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(mockViewModel);
+    vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(createMockViewModel());
   });
 
   afterEach(() => {
@@ -216,8 +213,7 @@ describe('Bills Component', () => {
     });
 
     it('displays loading state correctly', () => {
-      mockViewModel.loadingInfo = { loading: true, loadingMessage: 'Loading bills...' };
-      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(mockViewModel);
+      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(createMockViewModel({ loadingInfo: { loading: true, loadingMessage: 'Loading bills...' } }));
 
       renderWithProviders(<Bills />);
       expect(screen.getByTestId('loader')).toBeInTheDocument();
@@ -225,8 +221,7 @@ describe('Bills Component', () => {
     });
 
     it('displays content blocked message when content is blocked', () => {
-      mockViewModel.blockContent = true;
-      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(mockViewModel);
+      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(createMockViewModel({ blockContent: true }));
 
       renderWithProviders(<Bills />);
       expect(screen.getByText('bills.selectDateToContinue')).toBeInTheDocument();
@@ -248,7 +243,7 @@ describe('Bills Component', () => {
     });
 
     it('displays bills with correct headers', () => {
-      mockViewModel.filteredBills = [
+      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(createMockViewModel({ filteredBills: [
         { id: 1, names: 'John Doe', cash: '10.00', check: '5.00', total: 15.00 },
         {
           id: 2,
@@ -258,8 +253,7 @@ describe('Bills Component', () => {
           total: 20.00,
           originalIndex: 1,
         },
-      ];
-      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(mockViewModel);
+      ] }));
 
       renderWithProviders(<Bills />);
       
@@ -273,8 +267,7 @@ describe('Bills Component', () => {
 
     it('calls addNewBill when Add New Bill button is clicked', async () => {
       const addNewBillSpy = vi.fn();
-      mockViewModel.addNewBill = addNewBillSpy;
-      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(mockViewModel);
+      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(createMockViewModel({ addNewBill: addNewBillSpy }));
 
       renderWithProviders(<Bills />);
       
@@ -285,8 +278,7 @@ describe('Bills Component', () => {
     });
 
     it('shows header add button when content is not blocked', () => {
-      mockViewModel.blockContent = false;
-      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(mockViewModel);
+      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(createMockViewModel({ blockContent: false }));
 
       renderWithProviders(<Bills />);
       
@@ -294,8 +286,7 @@ describe('Bills Component', () => {
     });
 
     it('hides header add button when content is blocked', () => {
-      mockViewModel.blockContent = true;
-      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(mockViewModel);
+      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(createMockViewModel({ blockContent: true }));
 
       renderWithProviders(<Bills />);
       
@@ -313,8 +304,7 @@ describe('Bills Component', () => {
 
     it('calls setSearchTerm when search input changes', async () => {
       const setSearchTermSpy = vi.fn();
-      mockViewModel.setSearchTerm = setSearchTermSpy;
-      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(mockViewModel);
+      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(createMockViewModel({ setSearchTerm: setSearchTermSpy }));
 
       renderWithProviders(<Bills />);
 
@@ -327,9 +317,7 @@ describe('Bills Component', () => {
     });
 
     it('displays filtered results message when search term exists', () => {
-      mockViewModel.searchTerm = 'John';
-      mockViewModel.filteredBills = [];
-      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(mockViewModel);
+      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(createMockViewModel({ searchTerm: 'John', filteredBills: [] }));
 
       renderWithProviders(<Bills />);
       expect(screen.getByText('bills.noResultsFound')).toBeInTheDocument();
@@ -362,9 +350,7 @@ describe('Bills Component', () => {
 
     it('calls onDownloadFirstPartPdf when Summary Report button is clicked', async () => {
       const onDownloadFirstPartPdfSpy = vi.fn();
-      mockViewModel.onDownloadFirstPartPdf = onDownloadFirstPartPdfSpy;
-      mockViewModel.exportableCount = 1;
-      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(mockViewModel);
+      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(createMockViewModel({ onDownloadFirstPartPdf: onDownloadFirstPartPdfSpy, exportableCount: 1 }));
 
       renderWithProviders(<Bills />);
       
@@ -376,9 +362,7 @@ describe('Bills Component', () => {
 
     it('calls onDownloadBoxedPdf when Full Report button is clicked', async () => {
       const onDownloadBoxedPdfSpy = vi.fn();
-      mockViewModel.onDownloadBoxedPdf = onDownloadBoxedPdfSpy;
-      mockViewModel.exportableCount = 1;
-      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(mockViewModel);
+      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(createMockViewModel({ onDownloadBoxedPdf: onDownloadBoxedPdfSpy, exportableCount: 1 }));
 
       renderWithProviders(<Bills />);
       
@@ -389,8 +373,7 @@ describe('Bills Component', () => {
     });
 
     it('disables export buttons when exportableCount is 0', () => {
-      mockViewModel.exportableCount = 0;
-      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(mockViewModel);
+      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(createMockViewModel({ exportableCount: 0 }));
 
       renderWithProviders(<Bills />);
       
@@ -415,8 +398,7 @@ describe('Bills Component', () => {
         e?.preventDefault?.();
         await callback({});
       });
-      mockViewModel.handleSubmit = handleSubmitSpy;
-      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(mockViewModel);
+      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(createMockViewModel({ handleSubmit: handleSubmitSpy }));
 
       renderWithProviders(<Bills />);
       
@@ -427,8 +409,7 @@ describe('Bills Component', () => {
     });
 
     it('disables save button when content is blocked', () => {
-      mockViewModel.blockContent = true;
-      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(mockViewModel);
+      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(createMockViewModel({ blockContent: true }));
 
       renderWithProviders(<Bills />);
       
@@ -439,15 +420,13 @@ describe('Bills Component', () => {
 
   describe('Summary Display', () => {
     it('displays summary section with correct values', () => {
-      mockViewModel.sums = {
+      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(createMockViewModel({ sums: {
         cash: 100.50,
         check: 50.25,
         total: 150.75,
         cash_on_hand: 75.00,
         total_cash_on_hand: 25.50,
-      };
-      mockViewModel.getValues = vi.fn(() => ({ cashOnHand: 75.00 }));
-      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(mockViewModel);
+      }, getValues: vi.fn(() => ({ cashOnHand: 75.00 })) }));
 
       renderWithProviders(<Bills />);
       
@@ -461,14 +440,13 @@ describe('Bills Component', () => {
     });
 
     it('handles null/undefined sums gracefully', () => {
-      mockViewModel.sums = {
+      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(createMockViewModel({ sums: {
         cash: null,
         check: undefined,
         total: NaN,
         cash_on_hand: null,
         total_cash_on_hand: 0,
-      };
-      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(mockViewModel);
+      } }));
 
       renderWithProviders(<Bills />);
       
@@ -477,11 +455,10 @@ describe('Bills Component', () => {
     });
 
     it('displays closed money data when available', () => {
-      mockViewModel.closedMoneyData = {
+      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(createMockViewModel({ closedMoneyData: {
         has_closed_money: true,
         total_closing_amount: 200.00,
-      };
-      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(mockViewModel);
+      } }));
 
       renderWithProviders(<Bills />);
       
@@ -491,15 +468,14 @@ describe('Bills Component', () => {
 
   describe('Pagination', () => {
     it('renders paginator when there are many bills', () => {
-      mockViewModel.filteredBills = Array.from({ length: 15 }, (_, i) => ({
+      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(createMockViewModel({ filteredBills: Array.from({ length: 15 }, (_, i) => ({
         id: `bill-${i}`,
         names: `Child ${i}`,
         cash: '10.00',
         check: '5.00',
         total: 15.00,
         originalIndex: i,
-      }));
-      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(mockViewModel);
+      })) }));
 
       renderWithProviders(<Bills />);
       
@@ -507,15 +483,14 @@ describe('Bills Component', () => {
     });
 
     it('does not render paginator when there are few bills', () => {
-      mockViewModel.filteredBills = Array.from({ length: 5 }, (_, i) => ({
+      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(createMockViewModel({ filteredBills: Array.from({ length: 5 }, (_, i) => ({
         id: `bill-${i}`,
         names: `Child ${i}`,
         cash: '10.00',
         check: '5.00',
         total: 15.00,
         originalIndex: i,
-      }));
-      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(mockViewModel);
+      })) }));
 
       renderWithProviders(<Bills />);
       
@@ -525,7 +500,7 @@ describe('Bills Component', () => {
 
   describe('Edge Cases and Error Handling', () => {
     it('handles null/undefined values gracefully', () => {
-      mockViewModel.filteredBills = [
+      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(createMockViewModel({ filteredBills: [
         {
           id: '1',
           names: null,
@@ -534,8 +509,7 @@ describe('Bills Component', () => {
           total: 0,
           originalIndex: 0,
         },
-      ];
-      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(mockViewModel);
+      ] }));
 
       renderWithProviders(<Bills />);
       
@@ -545,11 +519,10 @@ describe('Bills Component', () => {
 
     it('handles empty search results', () => {
       // Mock the search to return no results
-      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue({
-        ...mockViewModel,
+      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(createMockViewModel({
         searchTerm: 'nonexistent',
         filteredBills: [],
-      });
+      }));
 
       renderWithProviders(<Bills />);
       expect(screen.getByText('bills.noResultsFound')).toBeInTheDocument();
@@ -565,11 +538,10 @@ describe('Bills Component', () => {
         program: 'Infant',
       }));
 
-      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue({
-        ...mockViewModel,
+      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(createMockViewModel({
         billsFields: largeBillsList,
         filteredBills: largeBillsList.slice(0, 10), // Paginated
-      });
+      }));
 
       renderWithProviders(<Bills />);
       
@@ -743,7 +715,7 @@ describe('PDF Button Visibility and Colors', () => {
   });
 
   it('disables PDF buttons when no exportable bills exist', async () => {
-    const mockViewModel = createMockViewModel({
+    const _mockViewModel = createMockViewModel({
       exportableCount: 0,
       filteredBills: [
         { 
@@ -765,7 +737,7 @@ describe('PDF Button Visibility and Colors', () => {
       ]
     });
 
-    vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(mockViewModel);
+    vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(_mockViewModel);
 
     const { getByText } = renderWithProviders(<Bills />);
     
@@ -781,7 +753,7 @@ describe('PDF Button Visibility and Colors', () => {
   });
 
   it('updates button state when exportable count changes', async () => {
-    const mockViewModel = createMockViewModel({
+    const _mockViewModel = createMockViewModel({
       exportableCount: 0,
       filteredBills: []
     });

@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { customLogger } from '../../configs/logger';
 import { useGendersCache } from '../../models/GenderAPI';
 import { GenderType } from '../../types/gender';

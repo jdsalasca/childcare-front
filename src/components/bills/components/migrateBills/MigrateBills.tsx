@@ -28,7 +28,7 @@ const MigrateBills: React.FC = () => {
   const initialDayRef = useRef<Date | null>(null);
   const [availableDates, setAvailableDates] = useState<Date[]>([])
   const toast = useRef<Toast>(null);
-  const { control, handleSubmit, formState: { errors }, setValue, getValues,reset,watch } = useForm<MigrateBillsForm>({
+  const { control, handleSubmit, setValue, reset, watch } = useForm<MigrateBillsForm>({
     defaultValues: MigrateBillsModels.initialStateComponent,
   });
   useEffect(() => {

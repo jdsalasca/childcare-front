@@ -10,7 +10,6 @@ We've implemented a comprehensive suite of GitHub tools to improve code quality,
 - **Code Quality Analysis** - ESLint, Prettier, TypeScript checks
 - **Security Scanning** - CodeQL, Snyk, Dependabot
 - **Performance Monitoring** - Bundle size analysis, Lighthouse CI
-- **Code Coverage** - Codecov integration
 - **Dependency Management** - Automated updates and security patches
 - **Project Templates** - PR and issue templates
 
@@ -41,8 +40,7 @@ Add the following secrets in Settings → Secrets and variables → Actions:
 
 #### Required Secrets
 ```bash
-# Code Coverage
-CODECOV_TOKEN=your-codecov-token
+
 
 # Security Scanning
 SNYK_TOKEN=your-snyk-token
@@ -55,12 +53,6 @@ DEPLOY_TOKEN=your-deployment-token
 ```
 
 #### How to Get Tokens
-
-**Codecov Token:**
-1. Go to [codecov.io](https://codecov.io)
-2. Sign up with your GitHub account
-3. Add your repository
-4. Copy the repository token
 
 **Snyk Token:**
 1. Go to [snyk.io](https://snyk.io)
@@ -75,13 +67,6 @@ DEPLOY_TOKEN=your-deployment-token
 4. Go to My Account → Security → Generate Token
 
 ### 3. Third-Party Service Integration
-
-#### Codecov Setup
-1. Visit [codecov.io](https://codecov.io)
-2. Connect your GitHub account
-3. Add your repository
-4. Copy the token to GitHub secrets
-5. Badge will appear in README after first successful run
 
 #### SonarCloud Setup (Optional)
 1. Visit [sonarcloud.io](https://sonarcloud.io)
@@ -210,7 +195,6 @@ Edit `.github/lighthouse/lighthouserc.json`:
 - **Insights Tab** - View repository analytics
 
 #### External Services
-- **Codecov Dashboard** - Detailed coverage reports
 - **SonarCloud Dashboard** - Code quality metrics
 - **Snyk Dashboard** - Security vulnerability tracking
 
@@ -370,7 +354,6 @@ Add Slack/Discord notifications:
 - [GitHub Actions Documentation](https://docs.github.com/en/actions)
 - [CodeQL Documentation](https://codeql.github.com/docs/)
 - [Dependabot Documentation](https://docs.github.com/en/code-security/dependabot)
-- [Codecov Documentation](https://docs.codecov.com/)
 - [SonarCloud Documentation](https://docs.sonarcloud.io/)
 - [Snyk Documentation](https://docs.snyk.io/)
 

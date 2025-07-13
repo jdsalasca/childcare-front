@@ -5,7 +5,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { InputText } from 'primereact/inputtext';
 import { Toast } from 'primereact/toast';
 import { classNames } from 'primereact/utils';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 //import { exportToPDF } from './billsPdf';
@@ -43,7 +43,7 @@ const CombinedBillsForm = () => {
     name: 'bills'
   });
 
-  const { fields: billFields, update: updateBill } = useFieldArray({
+  const { fields: billFields } = useFieldArray({
     control,
     name: 'billUpload'
   });
@@ -69,16 +69,14 @@ const CombinedBillsForm = () => {
     toast.current.show({ severity: 'success', summary: t('bills.saved'), detail: t('bills.savedDetail') });
   };
 
-  useEffect(() => {
-    recalculateFields();
-    
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [childFields]);
-
-  const recalculateFields = (newFields = childFields) => {
+  const recalculateFields = useCallback((newFields = childFields) => {
     const count = newFields.filter(bill => (bill.cash && bill.cash > 0) || (bill.check && bill.check > 0)).length;
     setExportableCount(count);
-  };
+  }, [childFields]);
+
+  useEffect(() => {
+    recalculateFields();
+  }, [recalculateFields]);
 
   useEffect(() => {
     const sum = billFields.reduce((sum, bill) => {
@@ -88,26 +86,6 @@ const CombinedBillsForm = () => {
     }, 0);
     setTotalSum(sum);
   }, [billFields]);
-
-  
-  // eslint-disable-next-line no-unused-vars
-  const handleAmountChange = (index, value) => {
-    const amount = parseFloat(value) || 0;
-    const billValue = billFields[index].value;
-    const total = amount * billValue;
-
-    updateBill(index, { ...billFields[index], amount, total });
-
-    const newTotalSum = billFields.reduce((sum, bill, idx) => {
-      if (idx === index) {
-        return sum + total;
-      }
-      const billAmount = parseFloat(bill.amount) || 0;
-      const billValue = parseFloat(bill.value) || 0;
-      return sum + (billAmount * billValue);
-    }, 0);
-    setTotalSum(newTotalSum);
-  };
 
   const getFormErrorMessage = (name) => {
     return errors[name] && <small className="p-error">{errors[name].message}</small>;
