@@ -252,7 +252,27 @@ const BillSummary: React.FC<{
       color: 'text-purple-600',
       bgColor: 'bg-purple-50'
     },
-    
+    {
+      label: t('bills.cashOnHand', 'Cash on Hand'),
+      value: _cashOnHand || 0,
+      icon: 'pi pi-wallet',
+      color: 'text-orange-600',
+      bgColor: 'bg-orange-50'
+    },
+    {
+      label: t('bills.closedMoney', 'Closed Money'),
+      value: _closedMoneyData?.total || 0,
+      icon: 'pi pi-lock',
+      color: 'text-red-600',
+      bgColor: 'bg-red-50'
+    },
+    {
+      label: t('bills.totalCashCalculations', 'Total Cash Calculations'),
+      value: (sums.cash + sums.check) + (_cashOnHand || 0) + (_closedMoneyData?.total || 0),
+      icon: 'pi pi-chart-line',
+      color: 'text-indigo-600',
+      bgColor: 'bg-indigo-50'
+    }
   ];
 
   return (
@@ -266,7 +286,7 @@ const BillSummary: React.FC<{
         </h3>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
         {summaryItems.map((item, index) => (
           <div 
             key={index}
