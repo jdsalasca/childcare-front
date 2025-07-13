@@ -66,7 +66,8 @@ export const StepComponentFive: React.FC<StepComponentFiveProps> = ({
         customLogger.debug('contractInformation.schedule', contractInformation.schedule);
         customLogger.debug('daysCache', daysCache);
         const formattedSchedule = contractInformation.schedule.reduce((acc, entry) => {
-          const day = daysCache.find((day) => day.id === entry.day_id);
+          // Fix: Coerce both IDs to string for comparison to avoid type mismatch bugs
+          const day = daysCache.find((day) => String(day.id) === String(entry.day_id));
           if (day) {
             const [checkInHours, checkInMinutes] = entry.check_in.split(':').map(Number);
             const [checkOutHours, checkOutMinutes] = entry.check_out.split(':').map(Number);
@@ -146,7 +147,7 @@ export const StepComponentFive: React.FC<StepComponentFiveProps> = ({
       }
       return new ContractDaySchedule(
         contractInformation.contract_id || 13,
-        String(day.id),
+        String(day.id), // Always pass string for day_id
         checkInStr,
         checkOutStr
       );
