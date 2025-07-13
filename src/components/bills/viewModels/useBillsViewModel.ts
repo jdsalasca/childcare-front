@@ -12,6 +12,7 @@ import { ToastInterpreterUtils } from '../../utils/ToastInterpreterUtils';
 import { exportToSummaryPDF } from '../utils/summaryPdf';
 import { exportBoxesToPDF } from '../utils/boxesPdf';
 import ErrorHandler from '../../../utils/errorHandler';
+import { performanceOptimizer } from '../../../utils/PerformanceOptimizer';
 
 // Types
 export interface Bill {
@@ -198,8 +199,8 @@ export const useBillsViewModel = () => {
         clearTimeout(recalculateTimeoutRef.current);
       }
 
-      // Use setTimeout to debounce the calculation
-      recalculateTimeoutRef.current = setTimeout(() => {
+      // Use performance optimizer for debounced calculation
+      const debouncedCalculation = performanceOptimizer.debounce(() => {
         try {
           const fieldsToUse = newFields || getValues('bills') || [];
 
@@ -224,7 +225,9 @@ export const useBillsViewModel = () => {
         } finally {
           recalculateFieldsRef.current = false;
         }
-      }, 100); // 100ms debounce
+      }, 150, 'useBillsViewModel-recalculateFields');
+
+      debouncedCalculation();
     },
     [calculateSums, getValues]
   );
