@@ -72,12 +72,21 @@ const createMockViewModel = (overrides = {}) => ({
   safeRemove: vi.fn(),
   onSubmit: vi.fn(),
   addNewBill: vi.fn(),
-  getValues: vi.fn(() => ({})),
+  getValues: vi.fn((arg?: any) => {
+    const values = { bills: [], billTypes: [], cashOnHand: 0 };
+    if (typeof arg === 'undefined') return values;
+    return values[arg] ?? [];
+  }),
   
   // Data properties
   sums: { cash: 0, check: 0, total: 0, cash_on_hand: 0, total_cash_on_hand: 0 },
   filteredBills: [] as any[],
   closedMoneyData: null,
+  
+  // Required FormValues properties for type compatibility
+  bills: [],
+  billTypes: [],
+  cashOnHand: 0,
   
   // Apply any overrides
   ...overrides,
@@ -461,14 +470,14 @@ describe('Bills Component', () => {
       renderWithProviders(<Bills />);
       
       // Should display $0.00 for invalid values - expect 5 instances (3 summary cards + 2 bottom sections)
-      expect(screen.getAllByText('$0.00')).toHaveLength(6);
+      expect(screen.getAllByText('$0.00')).toHaveLength(5);
     });
 
     it('displays closed money data when available', () => {
       vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(createMockViewModel({ 
         closedMoneyData: {
           has_closed_money: true,
-          total: 200.00, // Use 'total' instead of 'total_closing_amount'
+          total_closing_amount: 200.00, // Use correct property
         },
         getValues: vi.fn(() => ({ cashOnHand: 0 }))
       }));
@@ -584,7 +593,7 @@ describe('Date Picker Value Persistence', () => {
       expect(screen.queryByText(/Loading/)).not.toBeInTheDocument();
     });
 
-    const calendarInput = container.querySelector('input[id="date"]');
+    const calendarInput = container.querySelector('input[id="date"]') as HTMLInputElement;
     expect(calendarInput).toBeInTheDocument();
     
     // Simulate user entering a date
@@ -604,7 +613,7 @@ describe('Date Picker Value Persistence', () => {
       expect(screen.queryByText(/Loading/)).not.toBeInTheDocument();
     });
 
-    const calendarInput = container.querySelector('input[id="date"]');
+    const calendarInput = container.querySelector('input[id="date"]') as HTMLInputElement;
     expect(calendarInput).toBeInTheDocument();
     
     if (calendarInput) {
@@ -623,7 +632,7 @@ describe('Date Picker Value Persistence', () => {
       expect(screen.queryByText(/Loading/)).not.toBeInTheDocument();
     });
 
-    const calendarInput = container.querySelector('input[id="date"]');
+    const calendarInput = container.querySelector('input[id="date"]') as HTMLInputElement;
     expect(calendarInput).toBeInTheDocument();
     
     if (calendarInput) {

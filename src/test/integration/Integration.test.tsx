@@ -1,7 +1,6 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-import { renderWithProviders } from '../utils';
 
 import ChildrenAPI from '../../models/ChildrenAPI';
 
