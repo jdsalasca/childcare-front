@@ -76,7 +76,9 @@ export class PerformanceOptimizer {
     this.lastCalculationTimes.set(context, now);
 
     if (count > 100 && now - lastTime < 1000) {
-      customLogger.warn(`High recalculation frequency detected for ${context}: ${count} times`);
+      customLogger.warn(
+        `High recalculation frequency detected for ${context}: ${count} times`
+      );
     }
   }
 
@@ -111,15 +113,21 @@ export class PerformanceOptimizer {
 
     useEffect(() => {
       renderCount.current += 1;
-      
+
       if (renderCount.current > 50) {
-        customLogger.warn(`Component ${componentName} has rendered ${renderCount.current} times`);
+        customLogger.warn(
+          `Component ${componentName} has rendered ${renderCount.current} times`
+        );
       }
 
       // Check if props have actually changed
-      const propsChanged = props.some((prop, index) => prop !== lastProps.current[index]);
+      const propsChanged = props.some(
+        (prop, index) => prop !== lastProps.current[index]
+      );
       if (!propsChanged && renderCount.current > 10) {
-        customLogger.warn(`Component ${componentName} re-rendering without prop changes`);
+        customLogger.warn(
+          `Component ${componentName} re-rendering without prop changes`
+        );
       }
 
       lastProps.current = [...props];
@@ -135,18 +143,18 @@ export class PerformanceOptimizer {
     cacheKey?: string
   ): T {
     const cache = useRef<Map<string, { value: T; deps: any[] }>>(new Map());
-    
+
     return useMemo(() => {
       const key = cacheKey || JSON.stringify(dependencies);
       const cached = cache.current.get(key);
-      
+
       if (cached && this.arraysEqual(cached.deps, dependencies)) {
         return cached.value;
       }
-      
+
       const result = calculation();
       cache.current.set(key, { value: result, deps: [...dependencies] });
-      
+
       return result;
     }, dependencies);
   }
@@ -179,7 +187,7 @@ export class PerformanceOptimizer {
     loadMore: () => void;
   } {
     const [visibleCount, setVisibleCount] = useState(chunkSize);
-    
+
     const visibleItems = useMemo(() => {
       return items.slice(0, visibleCount);
     }, [items, visibleCount]);
@@ -256,4 +264,3 @@ export const performanceOptimizer = PerformanceOptimizer.getInstance();
 export const usePerformanceOptimizer = () => {
   return performanceOptimizer;
 };
-

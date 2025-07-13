@@ -200,32 +200,36 @@ export const useBillsViewModel = () => {
       }
 
       // Use performance optimizer for debounced calculation
-      const debouncedCalculation = performanceOptimizer.debounce(() => {
-        try {
-          const fieldsToUse = newFields || getValues('bills') || [];
+      const debouncedCalculation = performanceOptimizer.debounce(
+        () => {
+          try {
+            const fieldsToUse = newFields || getValues('bills') || [];
 
-          // Improved exportable count calculation - count bills with any content
-          const count = fieldsToUse.filter(bill => {
-            const cashNum = toNumber(bill.cash);
-            const checkNum = toNumber(bill.check);
-            const hasNames = bill.names && bill.names.trim().length > 0;
+            // Improved exportable count calculation - count bills with any content
+            const count = fieldsToUse.filter(bill => {
+              const cashNum = toNumber(bill.cash);
+              const checkNum = toNumber(bill.check);
+              const hasNames = bill.names && bill.names.trim().length > 0;
 
-            // A bill is exportable if it has names and at least some amount
-            return hasNames && (cashNum > 0 || checkNum > 0);
-          }).length;
+              // A bill is exportable if it has names and at least some amount
+              return hasNames && (cashNum > 0 || checkNum > 0);
+            }).length;
 
-          setExportableCount(count);
+            setExportableCount(count);
 
-          // Update sums
-          const newSums = calculateSums(
-            fieldsToUse,
-            getValues('cashOnHand') || 0
-          );
-          setSums(newSums);
-        } finally {
-          recalculateFieldsRef.current = false;
-        }
-      }, 150, 'useBillsViewModel-recalculateFields');
+            // Update sums
+            const newSums = calculateSums(
+              fieldsToUse,
+              getValues('cashOnHand') || 0
+            );
+            setSums(newSums);
+          } finally {
+            recalculateFieldsRef.current = false;
+          }
+        },
+        150,
+        'useBillsViewModel-recalculateFields'
+      );
 
       debouncedCalculation();
     },

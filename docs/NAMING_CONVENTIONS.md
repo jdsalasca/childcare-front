@@ -11,6 +11,7 @@ This document establishes consistent file naming conventions for the childcare-f
 ## File Naming Rules
 
 ### React Components
+
 - **Pattern**: PascalCase
 - **Extension**: `.tsx` for TypeScript React components
 - **Examples**:
@@ -20,6 +21,7 @@ This document establishes consistent file naming conventions for the childcare-f
   - `GuardianForm.tsx`
 
 ### Hooks and Custom Hooks
+
 - **Pattern**: camelCase with `use` prefix
 - **Extension**: `.ts` for TypeScript hooks
 - **Examples**:
@@ -29,6 +31,7 @@ This document establishes consistent file naming conventions for the childcare-f
   - `useCustomNavigate.ts`
 
 ### Utilities and Services
+
 - **Pattern**: camelCase
 - **Extension**: `.ts` for TypeScript utilities
 - **Examples**:
@@ -38,6 +41,7 @@ This document establishes consistent file naming conventions for the childcare-f
   - `performanceOptimizer.ts`
 
 ### Types and Interfaces
+
 - **Pattern**: PascalCase
 - **Extension**: `.ts` for TypeScript type definitions
 - **Examples**:
@@ -47,6 +51,7 @@ This document establishes consistent file naming conventions for the childcare-f
   - `FormValues.ts`
 
 ### Constants and Configuration
+
 - **Pattern**: camelCase
 - **Extension**: `.ts` for TypeScript constants
 - **Examples**:
@@ -55,6 +60,7 @@ This document establishes consistent file naming conventions for the childcare-f
   - `storageUtils.ts`
 
 ### Test Files
+
 - **Pattern**: Same as source file with `.test` suffix
 - **Extension**: `.tsx` or `.ts` depending on what's being tested
 - **Examples**:
@@ -64,6 +70,7 @@ This document establishes consistent file naming conventions for the childcare-f
 ## Directory Naming
 
 ### Component Directories
+
 - **Pattern**: camelCase
 - **Examples**:
   - `billsUpload/`
@@ -72,6 +79,7 @@ This document establishes consistent file naming conventions for the childcare-f
   - `modelView/`
 
 ### Feature Directories
+
 - **Pattern**: camelCase
 - **Examples**:
   - `bills/`
@@ -92,6 +100,7 @@ When renaming files:
 ## Examples of Corrected Files
 
 ### Before (Inconsistent)
+
 ```
 src/components/bills/components/billsUpload/BillsUpload.jsx
 src/components/bills/components/billsUpload/CombinedBillsForm.jsx
@@ -100,6 +109,7 @@ src/components/contracts/viewModels/useviewModelStepGuardians.ts
 ```
 
 ### After (Consistent)
+
 ```
 src/components/bills/components/billsUpload/BillsUpload.tsx
 src/components/bills/components/billsUpload/CombinedBillsForm.tsx

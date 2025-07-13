@@ -77,26 +77,30 @@ const BillCard: React.FC<{
         onChange(inputValue);
 
         // Use debounced recalculation to prevent excessive updates
-        const debouncedRecalculation = performanceOptimizer.debounce(() => {
-          const numericValue =
-            inputValue === '' ? 0 : parseFloat(inputValue) || 0;
-          const currentCash =
-            fieldType === 'cash'
-              ? numericValue
-              : parseFloat(bill.cash?.toString() || '0') || 0;
-          const currentCheck =
-            fieldType === 'check'
-              ? numericValue
-              : parseFloat(bill.check?.toString() || '0') || 0;
-          const newTotal = currentCash + currentCheck;
+        const debouncedRecalculation = performanceOptimizer.debounce(
+          () => {
+            const numericValue =
+              inputValue === '' ? 0 : parseFloat(inputValue) || 0;
+            const currentCash =
+              fieldType === 'cash'
+                ? numericValue
+                : parseFloat(bill.cash?.toString() || '0') || 0;
+            const currentCheck =
+              fieldType === 'check'
+                ? numericValue
+                : parseFloat(bill.check?.toString() || '0') || 0;
+            const newTotal = currentCash + currentCheck;
 
-          const updatedBill = {
-            ...bill,
-            [fieldType]: inputValue, // Store the actual input value
-            total: newTotal,
-          };
-          onRecalculateAll(bill.originalIndex || index, updatedBill);
-        }, 100, `BillCard-${index}-${fieldType}`);
+            const updatedBill = {
+              ...bill,
+              [fieldType]: inputValue, // Store the actual input value
+              total: newTotal,
+            };
+            onRecalculateAll(bill.originalIndex || index, updatedBill);
+          },
+          100,
+          `BillCard-${index}-${fieldType}`
+        );
 
         debouncedRecalculation();
       },

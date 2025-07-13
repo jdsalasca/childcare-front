@@ -12,7 +12,12 @@ export interface AccessibilityProps {
   'aria-hidden'?: boolean;
   'aria-live'?: 'polite' | 'assertive' | 'off';
   'aria-atomic'?: boolean;
-  'aria-relevant'?: 'additions' | 'additions removals' | 'all' | 'removals' | 'text';
+  'aria-relevant'?:
+    | 'additions'
+    | 'additions removals'
+    | 'all'
+    | 'removals'
+    | 'text';
   'aria-checked'?: boolean;
   role?: string;
   tabIndex?: number;
@@ -243,7 +248,10 @@ export class AccessibilityUtils {
       /**
        * Announces a message to screen readers
        */
-      announce: (message: string, priority: 'polite' | 'assertive' = 'polite') => {
+      announce: (
+        message: string,
+        priority: 'polite' | 'assertive' = 'polite'
+      ) => {
         const announcement = document.createElement('div');
         announcement.setAttribute('aria-live', priority);
         announcement.setAttribute('aria-atomic', 'true');
@@ -296,27 +304,27 @@ export class AccessibilityUtils {
                 props: {
                   href: '#main-content',
                   className: 'skip-link',
-                  children: 'Skip to main content'
-                }
+                  children: 'Skip to main content',
+                },
               },
               {
                 type: 'a',
                 props: {
                   href: '#navigation',
                   className: 'skip-link',
-                  children: 'Skip to navigation'
-                }
+                  children: 'Skip to navigation',
+                },
               },
               {
                 type: 'a',
                 props: {
                   href: '#footer',
                   className: 'skip-link',
-                  children: 'Skip to footer'
-                }
-              }
-            ]
-          }
+                  children: 'Skip to footer',
+                },
+              },
+            ],
+          },
         };
       },
     };
@@ -355,18 +363,22 @@ export class AccessibilityUtils {
     headings.forEach((heading, index) => {
       const level = parseInt(heading.tagName.charAt(1));
       if (level > previousLevel + 1) {
-        issues.push(`Heading structure issue: ${heading.tagName} follows h${previousLevel}`);
+        issues.push(
+          `Heading structure issue: ${heading.tagName} follows h${previousLevel}`
+        );
       }
       previousLevel = level;
     });
 
     // Check for sufficient color contrast (basic check)
-    const textElements = element.querySelectorAll('p, span, div, h1, h2, h3, h4, h5, h6');
+    const textElements = element.querySelectorAll(
+      'p, span, div, h1, h2, h3, h4, h5, h6'
+    );
     textElements.forEach((element, index) => {
       const style = window.getComputedStyle(element);
       const color = style.color;
       const backgroundColor = style.backgroundColor;
-      
+
       // Basic contrast check (this is a simplified version)
       if (color === backgroundColor) {
         issues.push(`Potential contrast issue with text element ${index + 1}`);

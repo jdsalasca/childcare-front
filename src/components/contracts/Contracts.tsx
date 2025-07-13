@@ -49,53 +49,56 @@ export const Contracts: React.FC<ContractsProps> = () => {
     return `${ContractPermissionsValidator.getValidContractPermissions(permissions)}/${totalPermissions}`;
   }, [contractInformation?.terms]);
 
-  const countChildrenWithMedicalInfo = performanceOptimizer.useOptimizedCalculation(
-    () => {
-      return (
-        contractInformation?.children?.filter(
-          child =>
-            child?.medicalInformation?.healthStatus !== '' &&
-            child?.medicalInformation?.healthStatus != null &&
-            child?.medicalInformation?.instructions !== '' &&
-            child?.medicalInformation?.instructions != null
-        ).length || 0
-      );
-    },
-    [contractInformation?.children],
-    'medicalInfo'
-  );
+  const countChildrenWithMedicalInfo =
+    performanceOptimizer.useOptimizedCalculation(
+      () => {
+        return (
+          contractInformation?.children?.filter(
+            child =>
+              child?.medicalInformation?.healthStatus !== '' &&
+              child?.medicalInformation?.healthStatus != null &&
+              child?.medicalInformation?.instructions !== '' &&
+              child?.medicalInformation?.instructions != null
+          ).length || 0
+        );
+      },
+      [contractInformation?.children],
+      'medicalInfo'
+    );
 
-  const countChildrenWithFormulaInfo = performanceOptimizer.useOptimizedCalculation(
-    () => {
-      return (
-        contractInformation?.children?.filter(
-          child =>
-            child?.formulaInformation?.formula !== '' &&
-            child?.formulaInformation?.formula != null
-        ).length || 0
-      );
-    },
-    [contractInformation?.children],
-    'formulaInfo'
-  );
+  const countChildrenWithFormulaInfo =
+    performanceOptimizer.useOptimizedCalculation(
+      () => {
+        return (
+          contractInformation?.children?.filter(
+            child =>
+              child?.formulaInformation?.formula !== '' &&
+              child?.formulaInformation?.formula != null
+          ).length || 0
+        );
+      },
+      [contractInformation?.children],
+      'formulaInfo'
+    );
 
-  const countChildrenWithPermissionsInfo = performanceOptimizer.useOptimizedCalculation(
-    () => {
-      return (
-        contractInformation?.children?.filter(child => {
-          const permissions = child?.permissionsInformation;
-          return (
-            permissions &&
-            Object.entries(permissions)
-              .filter(([key]) => key !== 'other')
-              .some(([, value]) => value === true)
-          );
-        }).length || 0
-      );
-    },
-    [contractInformation?.children],
-    'permissionsInfo'
-  );
+  const countChildrenWithPermissionsInfo =
+    performanceOptimizer.useOptimizedCalculation(
+      () => {
+        return (
+          contractInformation?.children?.filter(child => {
+            const permissions = child?.permissionsInformation;
+            return (
+              permissions &&
+              Object.entries(permissions)
+                .filter(([key]) => key !== 'other')
+                .some(([, value]) => value === true)
+            );
+          }).length || 0
+        );
+      },
+      [contractInformation?.children],
+      'permissionsInfo'
+    );
 
   const getStepClass = useCallback(
     (stepIndex: number) => {

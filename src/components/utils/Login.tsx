@@ -89,20 +89,20 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className='login-container' role="main" aria-label="Login page">
+    <div className='login-container' role='main' aria-label='Login page'>
       {loading && <Loader />}
       <div className='login-form-container'>
         <Card className='login-card'>
           <Lottie
             animationData={animationData}
             className='c-lottie-animation login'
-            aria-label="Login animation"
+            aria-label='Login animation'
           />
 
-          <form 
+          <form
             onSubmit={handleSubmit(handleLogin)}
-            aria-label="Login form"
-            role="form"
+            aria-label='Login form'
+            role='form'
           >
             <h1 id='title'>{t('login')}</h1>
             <InputTextWrapper
@@ -114,7 +114,7 @@ const Login: React.FC = () => {
                 maxLength: { value: 20, message: t('username_max_length') },
               }}
               label={t('userNameOrEmail')}
-              aria-describedby="username-error"
+              aria-describedby='username-error'
             />
             <PasswordWrapper
               name='password'
@@ -123,7 +123,7 @@ const Login: React.FC = () => {
                 required: t('password_is_required'),
               }}
               label={t('password')}
-              aria-describedby="password-error"
+              aria-describedby='password-error'
             />
             <section className='c-section-login-actions'>
               <Button
@@ -131,7 +131,9 @@ const Login: React.FC = () => {
                 label={t('signIn')}
                 className='p-button-success'
                 aria-label={t('signIn')}
-                {...accessibilityUtils.createButtonAccessibilityProps(t('signIn'))}
+                {...accessibilityUtils.createButtonAccessibilityProps(
+                  t('signIn')
+                )}
               />
             </section>
           </form>
