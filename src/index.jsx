@@ -9,6 +9,7 @@ import i18n from './configs/i18n';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
 import RouterLayout from './RouterLayout';
+import { AuthProvider } from './context/AuthContext';
 
 /**
  *  React Query is a powerful data fetching and caching library for React. It provides a simple and flexible API for fetching, caching, and updating server-side data in your React applications.
@@ -26,13 +27,13 @@ const queryClient = new QueryClient({
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    {/* <AuthProvider> */}
-    <I18nextProvider i18n={i18n}>
-      <QueryClientProvider client={queryClient}>
-        <RouterLayout />
-      </QueryClientProvider>
-    </I18nextProvider>
-    {/* </AuthProvider> */}
+    <AuthProvider>
+      <I18nextProvider i18n={i18n}>
+        <QueryClientProvider client={queryClient}>
+          <RouterLayout />
+        </QueryClientProvider>
+      </I18nextProvider>
+    </AuthProvider>
   </React.StrictMode>
 );
 

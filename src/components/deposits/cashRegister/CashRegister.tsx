@@ -221,12 +221,6 @@ const CashRegister: React.FC<CashRegisterProps> = () => {
             maxDate={new Date()}
           />
         </div>
-        {selectedDate && (
-          <div className='text-sm text-gray-500 bg-gray-50 px-3 py-2 rounded-lg'>
-            <i className='pi pi-calendar mr-2'></i>
-            {selectedDate.toLocaleDateString()}
-          </div>
-        )}
       </div>
     </Card>
   );
