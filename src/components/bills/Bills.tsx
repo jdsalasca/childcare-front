@@ -18,6 +18,8 @@ import { useBillsViewModel } from './viewModels/useBillsViewModel';
 import { Bill } from './viewModels/useBillsViewModel';
 import { inputValidator } from '../../utils/InputValidation';
 import { performanceOptimizer } from '../../utils/PerformanceOptimizer';
+import { AccessibleSection, AccessibleCard, AccessibleList, AccessibleListItem } from '../accessibility/AccessibleWrapper';
+import { AccessibilityUtils } from '../../utils/AccessibilityUtils';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -118,9 +120,13 @@ const BillCard: React.FC<{
       [errors.bills, index]
     );
 
+    const accessibility = AccessibilityUtils.getInstance();
+    
     return (
-      <div
+      <AccessibleCard
         id={`bill-card-${index}`}
+        aria-label={`${t('bills.billCard')} ${index + 1}`}
+        aria-describedby={`bill-card-${index}-description`}
         className={classNames(
           'bg-white rounded-lg shadow-sm border border-gray-200 mb-2 p-4',
           {
@@ -260,7 +266,7 @@ const BillCard: React.FC<{
             />
           </div>
         </div>
-      </div>
+      </AccessibleCard>
     );
   },
   (prevProps, nextProps) => {
@@ -678,7 +684,10 @@ export const Bills: React.FC = () => {
 
   return (
     <ErrorBoundary>
-      <div className='max-w-7xl mx-auto p-2 sm:p-4 space-y-4 sm:space-y-6'>
+      <AccessibleSection
+        aria-label={t('bills.mainContent', 'Bills Management Main Content')}
+        className='max-w-7xl mx-auto p-2 sm:p-4 space-y-4 sm:space-y-6'
+      >
         <Toast ref={toast} />
         <ConfirmDialog />
 
@@ -813,7 +822,7 @@ export const Bills: React.FC = () => {
             </div>
           </div>
         </form>
-      </div>
+      </AccessibleSection>
     </ErrorBoundary>
   );
 };
