@@ -6,7 +6,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { Calendar } from 'primereact/calendar';
 import { Toast } from 'primereact/toast';
 import { Card } from 'primereact/card';
-import { motion } from 'framer-motion';
+
 
 // Local constants for now
 const billTypes = [

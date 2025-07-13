@@ -5,7 +5,6 @@ import { customLogger } from '../../../configs/logger';
 import { LoadingInfo } from '../../../models/AppModels';
 import { useBillTypesByCurrencyCode } from '../../../models/BillTypeAPI';
 import { useChildren } from '../../../models/ChildrenAPI';
-import { CashOnHandByDyAPI } from '../../../models/CashOnHandByDyAPI';
 import CashRegisterAPI from '../../../models/CashRegisterAPI';
 import { CashAPI } from '../../../models/CashAPI';
 import { ToastInterpreterUtils } from '../../utils/ToastInterpreterUtils';
@@ -98,8 +97,8 @@ const createBillSums = (bills: Bill[], cashOnHand: number): Sums => {
   const basicSums = calculateBillSums(bills);
   return {
     ...basicSums,
-    cash_on_hand: cashOnHand,
-    total_cash_on_hand: basicSums.cash - cashOnHand,
+    cash_on_hand: 0, // Always 0 since we're not using cash on hand
+    total_cash_on_hand: 0, // Always 0 since we're not using cash on hand
   };
 };
 
@@ -166,8 +165,8 @@ export const useBillsViewModel = () => {
 
   // Memoized sums calculation
   const calculateSums = useCallback(
-    (bills: Bill[], cashOnHand: number): Sums => {
-      return createBillSums(bills, cashOnHand);
+    (bills: Bill[]): Sums => {
+      return createBillSums(bills, 0);
     },
     []
   );
@@ -179,8 +178,9 @@ export const useBillsViewModel = () => {
   useEffect(() => {
     if (billsFields.length > 0) {
       const timeoutId = setTimeout(() => {
-        const newSums = calculateSums(billsFields, cashOnHandValue || 0);
+        const newSums = calculateSums(billsFields);
         setSums(newSums);
+        customLogger.debug('Sums recalculated due to cashOnHand change:', newSums);
       }, 100); // Debounce the calculation
 
       return () => clearTimeout(timeoutId);
@@ -218,10 +218,7 @@ export const useBillsViewModel = () => {
             setExportableCount(count);
 
             // Update sums
-            const newSums = calculateSums(
-              fieldsToUse,
-              getValues('cashOnHand') || 0
-            );
+            const newSums = calculateSums(fieldsToUse);
             setSums(newSums);
           } finally {
             recalculateFieldsRef.current = false;
@@ -265,7 +262,7 @@ export const useBillsViewModel = () => {
 
       // Immediately recalculate sums without triggering the recalculateFields function
       const allBills = getValues('bills') || [];
-      const newSums = calculateSums(allBills, getValues('cashOnHand') || 0);
+      const newSums = calculateSums(allBills);
       setSums(newSums);
 
       // Update exportable count with improved logic
@@ -332,10 +329,7 @@ export const useBillsViewModel = () => {
           });
 
           // Immediately recalculate sums without triggering the recalculateFields function
-          const newSums = calculateSums(
-            updatedBills,
-            getValues('cashOnHand') || 0
-          );
+          const newSums = calculateSums(updatedBills);
           setSums(newSums);
 
           // Update exportable count
@@ -365,7 +359,7 @@ export const useBillsViewModel = () => {
   );
 
   // Optimized form initialization
-  const onStartForm = useCallback(async () => {
+  const onStartForm = useCallback(async (preserveDate?: Date) => {
     if (!children || !currenciesInformation) return;
 
     try {
@@ -374,22 +368,30 @@ export const useBillsViewModel = () => {
         loadingMessage: t('weAreLookingForChildrenInformation'),
       });
 
+      // Get current bills to preserve names if they exist
+      const currentBills = getValues('bills') || [];
+
       // Create bills from children data directly to avoid dependency on childrenOptions
-      const billList: Bill[] = children.map((child: any, index: number) => ({
-        id: child.id?.toString() || `child_${index}`,
-        originalIndex: index,
-        names: child.childName || `${child.first_name} ${child.last_name}`,
-        cash: '',
-        check: '',
-        total: 0,
-        classroom: child.classroom || '',
-        child_id: child.id, // Add child_id for backend
-      }));
+      const billList: Bill[] = children.map((child: any, index: number) => {
+        // Try to find existing bill with same child_id to preserve names
+        const existingBill = currentBills.find(bill => bill.child_id === child.id);
+        
+        return {
+          id: child.id?.toString() || `child_${index}`,
+          originalIndex: index,
+          names: existingBill?.names || child.childName || `${child.first_name} ${child.last_name}`,
+          cash: existingBill?.cash || '', // Preserve existing cash if available
+          check: existingBill?.check || '', // Preserve existing check if available
+          total: existingBill?.total || 0, // Preserve existing total if available
+          classroom: child.classroom || '',
+          child_id: child.id, // Add child_id for backend
+        };
+      });
 
       reset({
         bills: billList,
         billTypes: currenciesInformation || [],
-        date: getValues('date'),
+        date: preserveDate || getValues('date'),
         cashOnHand: getValues('cashOnHand') || 0.0,
       });
 
@@ -429,35 +431,14 @@ export const useBillsViewModel = () => {
     append(newBill);
   }, [append, getValues]);
 
-  // Optimized date handling
+  // Removed cash on hand API call as it's not needed
   const onHandlerSetCashOnHand = useCallback(
     async (date: Date): Promise<number> => {
-      try {
-        const totalCashOnMoney =
-          await CashOnHandByDyAPI.getMoneyUntilDate(date);
-
-        if (toast.current) {
-          ToastInterpreterUtils.toastBackendInterpreter(
-            toast,
-            totalCashOnMoney,
-            t('totalMoneyOnHand'),
-            t('noTotalMoneyOnHandMessage')
-          );
-        }
-
-        const totalCashOnMoneyUnWrapped =
-          totalCashOnMoney.httpStatus !== 200
-            ? 0.0
-            : (totalCashOnMoney.response?.totalAmountUntilNow ?? 0.0);
-
-        setValue('cashOnHand', totalCashOnMoneyUnWrapped);
-        return totalCashOnMoneyUnWrapped;
-      } catch (error) {
-        customLogger.error('Error fetching cash on hand:', error);
-        return 0;
-      }
+      // Always return 0 since we're not using cash on hand anymore
+      setValue('cashOnHand', 0);
+      return 0;
     },
-    [setValue, t]
+    [setValue]
   );
 
   const fetchClosedMoneyData = useCallback(
@@ -479,6 +460,7 @@ export const useBillsViewModel = () => {
     async (date: Date): Promise<void> => {
       try {
         const formattedDate = date.toISOString().slice(0, 10);
+        customLogger.debug('Loading bills for date:', formattedDate);
 
         // Try to load existing bills for the date
         const existingBillsResponse =
@@ -491,6 +473,8 @@ export const useBillsViewModel = () => {
           // If we have existing bills, use them
           const existingBills =
             existingBillsResponse.response.child_cash_records || [];
+          
+          customLogger.debug('Found existing bills:', existingBills.length);
 
           // Transform existing bills to match our Bill interface
           const transformedBills: Bill[] = existingBills.map(
@@ -511,19 +495,110 @@ export const useBillsViewModel = () => {
             bills: transformedBills,
             billTypes: getValues('billTypes') || [],
             date: date,
-            cashOnHand: getValues('cashOnHand') || 0.0,
+            cashOnHand: 0,
           });
+
+          // Recalculate sums and exportable count
+          const newSums = calculateSums(transformedBills);
+          setSums(newSums);
+          
+          // Update exportable count for existing bills
+          const count = transformedBills.filter(bill => {
+            const cashNum = toNumber(bill.cash);
+            const checkNum = toNumber(bill.check);
+            const hasNames = bill.names && bill.names.trim().length > 0;
+            return hasNames && (cashNum > 0 || checkNum > 0);
+          }).length;
+          setExportableCount(count);
         } else {
-          // If no existing bills, initialize with children data
-          await onStartForm();
+          // If no existing bills, preserve current children names and just clear amounts
+          if (!children || !currenciesInformation) return;
+
+          customLogger.debug('No existing bills found, preserving children names. Children count:', children.length);
+
+          // Get current bills to preserve names
+          const currentBills = getValues('bills') || [];
+          
+          // Create bills preserving existing names but clearing amounts
+          const billList: Bill[] = children.map((child: any, index: number) => {
+            // Try to find existing bill with same child_id to preserve names
+            const existingBill = currentBills.find(bill => bill.child_id === child.id);
+            
+            return {
+              id: child.id?.toString() || `child_${index}`,
+              originalIndex: index,
+              names: existingBill?.names || child.childName || [child.first_name, child.last_name].filter(Boolean).join(' ') || 'Unnamed Child',
+              cash: '', // Always clear cash amount
+              check: '', // Always clear check amount
+              total: 0, // Always reset total
+              classroom: child.classroom || '',
+              child_id: child.id,
+            };
+          });
+
+          reset({
+            bills: billList,
+            billTypes: currenciesInformation || [],
+            date: date, // Preserve the selected date
+            cashOnHand: 0,
+          });
+
+          // Set initial sums and exportable count
+          setExportableCount(0);
+          setSums({
+            cash: 0,
+            check: 0,
+            total: 0,
+            cash_on_hand: 0,
+            total_cash_on_hand: 0,
+          });
         }
       } catch (error) {
         customLogger.warn('Error loading bills for date:', error);
-        // Fallback to initializing with children data
-        await onStartForm();
+        // Fallback to preserving children names
+        if (!children || !currenciesInformation) return;
+
+        customLogger.debug('Error fallback: preserving children names. Children count:', children.length);
+
+        // Get current bills to preserve names
+        const currentBills = getValues('bills') || [];
+        
+        // Create bills preserving existing names but clearing amounts
+        const billList: Bill[] = children.map((child: any, index: number) => {
+          // Try to find existing bill with same child_id to preserve names
+          const existingBill = currentBills.find(bill => bill.child_id === child.id);
+          
+          return {
+            id: child.id?.toString() || `child_${index}`,
+            originalIndex: index,
+            names: existingBill?.names || child.childName || [child.first_name, child.last_name].filter(Boolean).join(' ') || 'Unnamed Child',
+            cash: '', // Clear cash amount
+            check: '', // Clear check amount
+            total: 0, // Reset total
+            classroom: child.classroom || '',
+            child_id: child.id,
+          };
+        });
+
+        reset({
+          bills: billList,
+          billTypes: currenciesInformation || [],
+          date: date, // Preserve the selected date
+          cashOnHand: 0,
+        });
+
+        // Set initial sums and exportable count
+        setExportableCount(0);
+        setSums({
+          cash: 0,
+          check: 0,
+          total: 0,
+          cash_on_hand: 0,
+          total_cash_on_hand: 0,
+        });
       }
     },
-    [reset, getValues, onStartForm]
+    [reset, getValues, children, currenciesInformation, calculateSums]
   );
 
   const onHandlerDateChanged = useCallback(
@@ -545,6 +620,8 @@ export const useBillsViewModel = () => {
           return;
         }
 
+        customLogger.debug('Date changed to:', currentDateObj.toISOString());
+
         // Show loader while processing date change
         setLoadingInfo({
           loading: true,
@@ -559,15 +636,24 @@ export const useBillsViewModel = () => {
         // Ensure the date value is properly set in the form before processing
         setValue('date', currentDateObj);
 
-        await Promise.all([
-          onHandlerSetCashOnHand(currentDateObj),
-          fetchClosedMoneyData(currentDateObj),
-        ]);
+        // Get the updated cash on hand for the new date
+        const updatedCashOnHand = await onHandlerSetCashOnHand(currentDateObj);
+        customLogger.debug('Updated cash on hand for new date:', updatedCashOnHand);
+        
+        // Fetch closed money data
+        await fetchClosedMoneyData(currentDateObj);
 
         // Load existing bills for the selected date
         await loadBillsForDate(currentDateObj);
 
-        setBlockContent(false);
+        // Force recalculation of sums
+        // Add a small delay to ensure form state is updated
+        setTimeout(() => {
+          const currentBills = getValues('bills') || [];
+          const newSums = calculateSums(currentBills);
+          setSums(newSums);
+          customLogger.debug('Forced sums recalculation after date change:', newSums);
+        }, 50);
 
         setBlockContent(false);
       } catch (error) {
@@ -588,6 +674,7 @@ export const useBillsViewModel = () => {
       setValue,
       t,
       loadBillsForDate,
+      calculateSums,
     ]
   );
 
@@ -720,8 +807,10 @@ export const useBillsViewModel = () => {
       loadingMessage: t('weAreLookingForChildrenInformation'),
     });
 
-    onStartForm();
-  }, [currenciesInformation, children, t, onStartForm]); // Add onStartForm to dependencies
+    // Pass the current date to preserve it during initialization
+    const currentDate = getValues('date');
+    onStartForm(currentDate);
+  }, [currenciesInformation, children, t, onStartForm, getValues]); // Add getValues to dependencies
 
   useEffect(() => {
     if (children === undefined) {

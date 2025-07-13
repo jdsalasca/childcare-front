@@ -1,6 +1,5 @@
 // src/components/Login.tsx
-import { ApiResponse } from '@models/API';
-import UsersAPI, { User } from '@models/UsersAPI';
+import UsersAPI from '@models/UsersAPI';
 import { customLogger } from 'configs/logger';
 import { SecurityService } from 'configs/storageUtils';
 import { inputValidator } from '../../utils/InputValidation';
@@ -115,17 +114,13 @@ const Login: React.FC = () => {
               control={control}
               rules={{
                 required: t('password_is_required'),
-                validate: (value: string) => {
-                  const result = inputValidator.validate(
-                    value,
-                    inputValidator.getValidationRules().password,
-                    'Password'
-                  );
-                  return result.isValid || result.errors[0];
-                },
+                // Simplified password validation for login - allow any characters
+                minLength: { value: 1, message: t('password_is_required') },
               }}
               label={t('password')}
               aria-describedby='password-error'
+              addFooter={false}
+              addHeader={false}
             />
             <section className='c-section-login-actions'>
               <Button

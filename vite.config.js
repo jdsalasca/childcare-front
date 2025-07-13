@@ -1,10 +1,15 @@
 import react from '@vitejs/plugin-react';
 import path from 'path'; // Import path module
 import { fileURLToPath } from 'url';
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 // Simulate __dirname in ES modules
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-export default defineConfig({
+
+export default defineConfig(({ mode }) => {
+  // Load env file based on `mode` in the current working directory.
+  const env = loadEnv(mode, process.cwd(), '');
+  
+  return {
   plugins: [react()],
   logLevel: 'warn',
   resolve: {
@@ -24,7 +29,7 @@ export default defineConfig({
     },
   },
   define: {
-    'process.env': {},
+    'process.env': process.env,
   },
   build: {
     chunkSizeWarningLimit: 1000, // Increase the warning limit to 1000 kB
@@ -33,4 +38,5 @@ export default defineConfig({
     port: 3000,
   },
   base: '/childadmin/admin/', // Base path for the application
+  };
 });

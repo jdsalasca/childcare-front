@@ -1,5 +1,5 @@
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { Bill, FormValues } from '../viewModels/useBillsViewModel';
 
 // Helper function to format date properly
@@ -122,7 +122,7 @@ const generateChildrenTable = (
     `$${totalOverall.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
   ]);
 
-  doc.autoTable({
+  (autoTable as any)(doc, {
     head: headers,
     body: rows,
     startY: startY,
@@ -138,7 +138,7 @@ const generateChildrenTable = (
     pageBreak: 'auto',
   });
 
-  return doc.autoTable.previous.finalY + 10; // Return the new Y position after the table
+  return (doc as any).lastAutoTable.finalY + 10; // Return the new Y position after the table
 };
 
 const generateCashOnHandSection = (
@@ -245,7 +245,7 @@ const generateCashCountTable = (
     rows.push(['No data', '0', '$0.00']);
   }
 
-  doc.autoTable({
+  (autoTable as any)(doc, {
     head: headers,
     body: rows,
     startY: startY,
@@ -256,7 +256,7 @@ const generateCashCountTable = (
     pageBreak: 'auto',
   });
 
-  return doc.autoTable.previous.finalY + 10; // Return the new Y position after the table
+  return (doc as any).lastAutoTable.finalY + 10; // Return the new Y position after the table
 };
 
 const generateNotesSection = (

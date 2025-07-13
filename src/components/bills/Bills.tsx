@@ -316,13 +316,6 @@ const BillSummary: React.FC<{
       color: 'text-purple-600',
       bgColor: 'bg-purple-50',
     },
-    {
-      label: t('bills.cashOnHand', 'Cash on Hand'),
-      value: cashOnHand || 0,
-      icon: 'pi pi-wallet',
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-50',
-    },
     // Closed Money item will be conditionally added below
   ];
 
@@ -340,20 +333,7 @@ const BillSummary: React.FC<{
     });
   }
 
-  summaryItems.push({
-    label: t('bills.totalCashCalculations', 'Total Cash Calculations'),
-    value:
-      sums.cash +
-      sums.check +
-      (cashOnHand || 0) +
-      (closedMoneyData &&
-      typeof closedMoneyData.total_closing_amount === 'number'
-        ? closedMoneyData.total_closing_amount
-        : 0),
-    icon: 'pi pi-chart-line',
-    color: 'text-indigo-600',
-    bgColor: 'bg-indigo-50',
-  });
+  // Removed Total Cash Calculations as it's not useful
 
   return (
     <div className='bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-sm border border-gray-100 p-6 mb-6'>
