@@ -174,7 +174,11 @@ const BillCard: React.FC<{
                     'p-invalid': errors.bills?.[index]?.cash,
                   })}
                   keyfilter='num'
-                  value={field.value !== undefined ? field.value : ''}
+                  value={
+                    field.value && field.value !== '0' && field.value !== '0.00'
+                      ? field.value
+                      : ''
+                  }
                   onChange={e => {
                     const result = inputValidator.validate(
                       e.target.value,
@@ -185,7 +189,7 @@ const BillCard: React.FC<{
                       handleCashChange(e, field.onChange, 'cash');
                     }
                   }}
-                  placeholder='0.00'
+                  placeholder='Enter amount'
                 />
               )}
             />
@@ -205,7 +209,11 @@ const BillCard: React.FC<{
                     'p-invalid': errors.bills?.[index]?.check,
                   })}
                   keyfilter='num'
-                  value={field.value !== undefined ? field.value : ''}
+                  value={
+                    field.value && field.value !== '0' && field.value !== '0.00'
+                      ? field.value
+                      : ''
+                  }
                   onChange={e => {
                     const result = inputValidator.validate(
                       e.target.value,
@@ -216,7 +224,7 @@ const BillCard: React.FC<{
                       handleCashChange(e, field.onChange, 'check');
                     }
                   }}
-                  placeholder='0.00'
+                  placeholder='Enter amount'
                 />
               )}
             />
