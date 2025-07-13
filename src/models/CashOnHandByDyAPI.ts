@@ -55,10 +55,10 @@ const CashOnHandByDyAPI = {
       );
 
       // Return a structured ApiResponseModel even on error
-      const errorResponse: ApiResponseModel = new ApiResponseModel(
-        400,
-        'Error processing cash on hand data'
-      );
+      const errorResponse: ApiResponse<CashOnHandByDay> = {
+        httpStatus: 400,
+        response: {} as CashOnHandByDay,
+      };
 
       return errorResponse;
     }

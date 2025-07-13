@@ -13,8 +13,8 @@ import { motion } from 'framer-motion';
 interface PermissionsInformationFormProps {
   contractInformation: ContractInfo;
   setContractInformation: (info: ContractInfo) => void;
-  toast: React.RefObject<Toast>;
   setActiveIndex: (index: number) => void;
+  toast: React.RefObject<Toast | null>;
   setLoadingInfo: (info: LoadingInfo) => void;
 }
 
@@ -57,7 +57,7 @@ export const PermissionsInformationForm: React.FC<
     childName: string;
     permissions: PermissionsInformation;
   }) => {
-    toast.current?.show({
+    toast?.current?.show({
       severity: 'info',
       summary: t('permissionsInfoSaved'),
     });
@@ -78,7 +78,7 @@ export const PermissionsInformationForm: React.FC<
         children: updatedChildren,
       });
 
-      toast.current?.show({
+      toast?.current?.show({
         severity: 'success',
         summary: t('permissionsInfoSaved'),
       });

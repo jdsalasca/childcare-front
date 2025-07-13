@@ -5,16 +5,48 @@ import { useTranslation } from 'react-i18next';
 import { customLogger } from '../../../configs/logger';
 import { ApiModels } from '../../../models/ApiModels';
 import UsersAPI from '../../../models/UsersAPI';
+import { RefObject } from 'react';
+import { Toast } from 'primereact/toast';
+
+interface UserFormData {
+  username: string;
+  first_name: string;
+  last_name: string;
+  birth_date: string;
+  email: string;
+  password: string;
+  password_confirmation: string;
+  role_id: number;
+  cashiers_id: number;
+  user_status_id: number;
+}
+
+interface Role {
+  id: number;
+  name: string;
+}
+
+interface Cashier {
+  id: number;
+  cashierNumber: string;
+}
+
+interface EditingUser {
+  id: number;
+  [key: string]: any;
+}
 
 const useRegisterViewModelForm = (
-  onUserCreated,
-  editingUser = null,
-  onCancelEdit = null,
-  toastRef = null
+  onUserCreated?: () => void,
+  editingUser: EditingUser | null = null,
+  onCancelEdit?: () => void,
+  toastRef: RefObject<Toast | null> | null = null
 ) => {
   const { t } = useTranslation();
-  const [roles, setRoles] = useState([]);
-  const [cashiers, setCashiers] = useState([]);
+  const [roles, setRoles] = useState<{ label: string; value: number }[]>([]);
+  const [cashiers, setCashiers] = useState<{ label: string; value: number }[]>(
+    []
+  );
 
   const {
     getValues,
@@ -24,7 +56,7 @@ const useRegisterViewModelForm = (
     setError,
     reset,
     formState: { errors },
-  } = useForm({
+  } = useForm<UserFormData>({
     defaultValues: {
       username: '',
       first_name: '',
@@ -33,8 +65,8 @@ const useRegisterViewModelForm = (
       email: '',
       password: '',
       password_confirmation: '',
-      role_id: '',
-      cashiers_id: '',
+      role_id: 0,
+      cashiers_id: 0,
       user_status_id: 1,
     },
   });
@@ -45,7 +77,7 @@ const useRegisterViewModelForm = (
     if (editingUser) {
       Object.entries(editingUser).forEach(([key, value]) => {
         if (key !== 'password' && key !== 'password_confirmation') {
-          setValue(key, value);
+          setValue(key as keyof UserFormData, value);
         }
       });
       setValue('password', '');
@@ -63,12 +95,12 @@ const useRegisterViewModelForm = (
 
         if (rolesRes?.httpStatus === 200) {
           setRoles(
-            rolesRes.response.map(r => ({ label: r.name, value: r.id }))
+            rolesRes.response.map((r: Role) => ({ label: r.name, value: r.id }))
           );
         }
         if (cashiersRes?.httpStatus === 200) {
           setCashiers(
-            cashiersRes.response.map(c => ({
+            cashiersRes.response.map((c: Cashier) => ({
               label: c.cashierNumber,
               value: c.id,
             }))
@@ -113,18 +145,21 @@ const useRegisterViewModelForm = (
     return false;
   };
 
-  const onSubmit = async data => {
+  const onSubmit = async (data: UserFormData) => {
     const userFormatted = ApiModels.UserBuilder.build(data);
 
     try {
       let result;
 
-      if (isEditing) {
+      if (isEditing && editingUser) {
         if (!data.password) {
-          delete userFormatted.password;
-          delete userFormatted.password_confirmation;
+          delete (userFormatted as any).password;
+          delete (userFormatted as any).password_confirmation;
         }
-        result = await UsersAPI.updateUser(editingUser.id, userFormatted);
+        result = await UsersAPI.updateUser(
+          editingUser.id.toString(),
+          userFormatted
+        );
         if (result?.httpStatus === 200) {
           toastRef?.current?.show({
             severity: 'success',

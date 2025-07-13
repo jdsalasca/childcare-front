@@ -11,7 +11,7 @@ import { CashAPI } from '../../../models/CashAPI';
 import { ToastInterpreterUtils } from '../../utils/ToastInterpreterUtils';
 import { exportToSummaryPDF } from '../utils/summaryPdf';
 import { exportBoxesToPDF } from '../utils/boxesPdf';
-import ErrorHandlerComponent from '../../../utils/ErrorHandler.ts';
+import { ErrorHandlerComponent } from '../../../utils/ErrorHandler';
 import { performanceOptimizer } from '../../../utils/PerformanceOptimizer';
 
 // Types
@@ -489,7 +489,8 @@ export const useBillsViewModel = () => {
           existingBillsResponse.response
         ) {
           // If we have existing bills, use them
-          const existingBills = existingBillsResponse.response.bills || [];
+          const existingBills =
+            existingBillsResponse.response.child_cash_records || [];
 
           // Transform existing bills to match our Bill interface
           const transformedBills: Bill[] = existingBills.map(
@@ -628,12 +629,7 @@ export const useBillsViewModel = () => {
         }
       } catch (error) {
         // Use standardized error handling
-        ErrorHandlerComponent.handleApiError(error, 'Bills submission', {
-          showToast: true,
-          toastRef: toast,
-          redirectOnAuthError: true,
-          logError: true,
-        });
+        ErrorHandlerComponent.handleApiError(error, 'Bills submission');
       } finally {
         setLoadingInfo({
           loading: false,
@@ -672,12 +668,7 @@ export const useBillsViewModel = () => {
       }
     } catch (error) {
       // Use standardized error handling
-      ErrorHandlerComponent.handleApiError(error, 'PDF generation', {
-        showToast: true,
-        toastRef: toast,
-        redirectOnAuthError: false,
-        logError: true,
-      });
+      ErrorHandlerComponent.handleApiError(error, 'PDF generation');
     }
   }, [getValues, t, closedMoneyData]);
 
@@ -708,12 +699,7 @@ export const useBillsViewModel = () => {
       }
     } catch (error) {
       // Use standardized error handling
-      ErrorHandlerComponent.handleApiError(error, 'PDF generation', {
-        showToast: true,
-        toastRef: toast,
-        redirectOnAuthError: false,
-        logError: true,
-      });
+      ErrorHandlerComponent.handleApiError(error, 'PDF generation');
     }
   }, [getValues, t, closedMoneyData]);
 

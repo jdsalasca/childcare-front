@@ -1,7 +1,7 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { SecurityService } from 'configs/storageUtils';
 import NavigationService from '../utils/navigationService';
-import ErrorHandler from '../utils/errorHandler';
+import { ErrorHandlerComponent } from '../utils/ErrorHandler';
 
 // Define the base URL for the API with fallback
 export const BASE_URL =
@@ -111,13 +111,9 @@ const makeRequest = async <T>(
     } as ApiResponse<T>;
   } catch (error) {
     // Use standardized error handling
-    const apiError = ErrorHandler.handleApiError(
+    const apiError = ErrorHandlerComponent.handleApiError(
       error,
-      `API ${method} ${endpoint}`,
-      {
-        redirectOnAuthError: true,
-        logError: true,
-      }
+      `API ${method} ${endpoint}`
     );
     // Re-throw the standardized error
     throw apiError;

@@ -53,11 +53,11 @@ const calculateAgeCounts = (children: ChildType[]) => {
   );
 };
 interface StepComponentPricingProps {
-  setLoadingInfo: (info: LoadingInfo) => void;
-  toast: React.RefObject<Toast>;
   setActiveIndex: (index: number) => void;
   contractInformation: ContractInfo;
   setContractInformation: (info: ContractInfo) => void;
+  toast: React.RefObject<Toast | null>;
+  setLoadingInfo: (info: LoadingInfo) => void;
 }
 
 const StepComponentPricing: React.FC<StepComponentPricingProps> = ({

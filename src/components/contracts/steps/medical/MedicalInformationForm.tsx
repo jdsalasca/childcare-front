@@ -11,7 +11,7 @@ import { motion } from 'framer-motion';
 interface MedicalInformationFormProps {
   contractInformation: ContractInfo;
   setContractInformation: (info: ContractInfo) => void;
-  toast: React.RefObject<Toast>;
+  toast: React.RefObject<Toast | null>;
   setActiveIndex: (index: number) => void;
 }
 
@@ -73,13 +73,16 @@ export const MedicalInformationForm: React.FC<MedicalInformationFormProps> = ({
         children: updatedChildren,
       });
 
-      toast.current?.show({
+      toast?.current?.show({
         severity: 'success',
         summary: t('medicalInfoSaved'),
       });
       /* setActiveIndex(7); */ // Move to the next step or handle as needed
     } else {
-      toast.current?.show({ severity: 'info', summary: t('medicalInfoSaved') });
+      toast?.current?.show({
+        severity: 'info',
+        summary: t('medicalInfoSaved'),
+      });
     }
   };
 

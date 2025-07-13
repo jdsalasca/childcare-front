@@ -1,5 +1,5 @@
 import API, { ApiResponse, BASE_URL } from './API';
-import { errorHandler } from '../utils/ErrorHandler';
+import { ErrorHandlerComponent } from '../utils/ErrorHandler';
 
 export interface User {
   token?: string; // Adjust based on your API response
@@ -35,7 +35,7 @@ const UsersAPI = {
       const response = await API.get<User[]>(BASE_URL, '/users');
       return response;
     } catch (error) {
-      errorHandler.handleApiError(error, 'UsersAPI.getUsers');
+      ErrorHandlerComponent.handleApiError(error, 'UsersAPI.getUsers');
       throw error;
     }
   },
@@ -48,7 +48,7 @@ const UsersAPI = {
       });
       return response;
     } catch (error) {
-      errorHandler.handleApiError(error, 'UsersAPI.getUserByNickname');
+      ErrorHandlerComponent.handleApiError(error, 'UsersAPI.getUserByNickname');
       throw error;
     }
   },
@@ -59,7 +59,7 @@ const UsersAPI = {
       const response = await API.post<User>(BASE_URL, '/users/register', data);
       return response;
     } catch (error) {
-      errorHandler.handleApiError(error, 'UsersAPI.createUser');
+      ErrorHandlerComponent.handleApiError(error, 'UsersAPI.createUser');
       throw error;
     }
   },
@@ -70,7 +70,7 @@ const UsersAPI = {
       const response = await API.post<User>(BASE_URL, '/users/login', data);
       return response;
     } catch (error) {
-      errorHandler.handleAuthError(error);
+      ErrorHandlerComponent.handleAuthError(error);
       throw error;
     }
   },
@@ -83,7 +83,7 @@ const UsersAPI = {
       });
       return response;
     } catch (error) {
-      errorHandler.handleApiError(error, 'UsersAPI.getUserByEmail');
+      ErrorHandlerComponent.handleApiError(error, 'UsersAPI.getUserByEmail');
       throw error;
     }
   },
@@ -97,7 +97,7 @@ const UsersAPI = {
       );
       return response;
     } catch (error) {
-      errorHandler.handleApiError(error, 'UsersAPI.getRoles');
+      ErrorHandlerComponent.handleApiError(error, 'UsersAPI.getRoles');
       throw error;
     }
   },
@@ -113,7 +113,7 @@ const UsersAPI = {
       );
       return response;
     } catch (error) {
-      errorHandler.handleApiError(error, 'UsersAPI.getCashiers');
+      ErrorHandlerComponent.handleApiError(error, 'UsersAPI.getCashiers');
       throw error;
     }
   },
@@ -126,7 +126,7 @@ const UsersAPI = {
       const response = await API.put<User>(BASE_URL, `/users/${id}`, data);
       return response;
     } catch (error) {
-      errorHandler.handleApiError(error, 'UsersAPI.updateUser');
+      ErrorHandlerComponent.handleApiError(error, 'UsersAPI.updateUser');
       throw error;
     }
   },

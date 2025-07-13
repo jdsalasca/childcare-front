@@ -14,7 +14,7 @@ import CalendarWrapper from '../../formsComponents/CalendarWrapper';
 import DropdownWrapper from '../../formsComponents/DropdownWrapper';
 import InputTextWrapper from '../../formsComponents/InputTextWrapper';
 import { ToastInterpreterUtils } from '../../utils/ToastInterpreterUtils';
-import { errorHandler } from '../../../utils/ErrorHandler';
+import { ErrorHandlerComponent } from '../../../utils/ErrorHandler';
 import { ContractService } from '../contractModelView';
 import { ContractInfo } from '../types/ContractInfo';
 import {
@@ -29,7 +29,7 @@ interface StepComponentOneProps {
   setActiveIndex: (index: number) => void;
   contractInformation: ContractInfo;
   setContractInformation: (info: ContractInfo) => void;
-  toast: React.RefObject<Toast>;
+  toast: React.RefObject<Toast | null>;
 }
 
 export const StepComponentOne: React.FC<StepComponentOneProps> = ({
@@ -154,7 +154,7 @@ export const StepComponentOne: React.FC<StepComponentOneProps> = ({
         loading: false,
         loadingMessage: '',
       });
-      errorHandler.handleApiError(
+      ErrorHandlerComponent.handleApiError(
         error,
         'StepComponentOne.onHandlerChildBackendAsync'
       );
@@ -165,7 +165,7 @@ export const StepComponentOne: React.FC<StepComponentOneProps> = ({
   const onSubmit = async (data: { children: ChildType[] }) => {
     if (ContractService.isInvalidFormDataChildren(data)) {
       ToastInterpreterUtils.toastInterpreter(
-        toast,
+        toast as React.RefObject<Toast>,
         'info',
         t('info'),
         t('addAtLeastOneGuardianAndAtLeastOneChild'),
@@ -216,14 +216,14 @@ export const StepComponentOne: React.FC<StepComponentOneProps> = ({
       });
       setActiveIndex(1);
     } catch (error) {
-      const errorInfo = errorHandler.handleApiError(
+      const errorInfo = ErrorHandlerComponent.handleApiError(
         error,
         'StepComponentOne.onSubmit'
       );
       toast?.current?.show({
         severity: 'error',
         summary: 'Error',
-        detail: errorHandler.getUserFriendlyMessage(error),
+        detail: ErrorHandlerComponent.getUserFriendlyMessage(error),
         life: 3000,
       });
     }

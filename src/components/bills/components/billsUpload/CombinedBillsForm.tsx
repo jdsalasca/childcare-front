@@ -1,333 +1,242 @@
-import { Badge } from 'primereact/badge';
+import React, { useRef } from 'react';
+import { useForm } from 'react-hook-form';
 import { Button } from 'primereact/button';
-import { Calendar } from 'primereact/calendar';
-import { Dropdown } from 'primereact/dropdown';
 import { InputText } from 'primereact/inputtext';
+import { Dropdown } from 'primereact/dropdown';
+import { Calendar } from 'primereact/calendar';
 import { Toast } from 'primereact/toast';
-import { classNames } from 'primereact/utils';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { Controller, useFieldArray, useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
-//import { exportToPDF } from './billsPdf';
-import { billTypes, programOptions } from '../../contracts/utilsAndConsts';
-import { childrenOptions } from '../utils/utilsAndConstants';
+import { Card } from 'primereact/card';
+import { motion } from 'framer-motion';
 
-const CombinedBillsForm = () => {
-  const { t } = useTranslation();
-  const toast = useRef(null);
+// Local constants for now
+const billTypes = [
+  { id: 1, label: 'Hundred', name: 'Hundred', value: 100 },
+  { id: 2, label: 'Fifty', name: 'Fifty', value: 50 },
+  { id: 3, label: 'Twenty', name: 'Twenty', value: 20 },
+  { id: 4, label: 'Ten', name: 'Ten', value: 10 },
+  { id: 5, label: 'Five', name: 'Five', value: 5 },
+  { id: 6, label: 'One', name: 'One', value: 1 },
+];
 
+const programOptions = [
+  { label: 'Infant', value: 'Infant', minWeek: 0, maxWeek: 78 },
+  { label: 'Toddler', value: 'Toddler', minWeek: 78, maxWeek: 156 },
+  { label: 'Pre-school', value: 'Preschool', minWeek: 156, maxWeek: 234 },
+];
+
+const childrenOptions = [
+  { id: 1, name: 'Child 1', label: 'Child 1' },
+  { id: 2, name: 'Child 2', label: 'Child 2' },
+  { id: 3, name: 'Child 3', label: 'Child 3' },
+];
+
+interface FormData {
+  bills: Array<{
+    child: any;
+    amount: string;
+    value: string;
+  }>;
+  program: string;
+  date: Date;
+  time: Date;
+  billUpload: Array<{
+    billType: any;
+    quantity: string;
+  }>;
+}
+
+const CombinedBillsForm: React.FC = () => {
+  const toast = useRef<Toast>(null);
   const {
-    control,
+    register,
     handleSubmit,
     formState: { errors },
-  } = useForm({
+    setValue,
+    watch,
+  } = useForm<FormData>({
     defaultValues: {
-      bills: childrenOptions.map((child, index) => ({
-        originalIndex: index,
-        disabled: true,
-        names: child.names,
-        cash: '',
-        check: '',
-        date: new Date().toISOString().split('T')[0],
+      bills: childrenOptions.map((child: any, index: number) => ({
+        child: child.id,
+        amount: '',
+        value: '',
       })),
       program: '',
       date: new Date(),
       time: new Date(),
-      billUpload: billTypes.map(billType => ({
-        bill: billType.label,
-        amount: 0,
-        value: billType.value,
-        total: 0,
+      billUpload: billTypes.map((billType: any) => ({
+        billType: billType.id,
+        quantity: '',
       })),
     },
   });
 
-  const { fields: childFields, update: updateChild } = useFieldArray({
-    control,
-    name: 'bills',
-  });
-
-  const { fields: billFields } = useFieldArray({
-    control,
-    name: 'billUpload',
-  });
-
-  const [searchTerm, setSearchTerm] = useState('');
-  const [exportableCount, setExportableCount] = useState(0);
-  const [totalSum, setTotalSum] = useState(0);
-
-  const onSubmit = data => {
-    console.log('Combined Data:', data);
-
-    if (totalSum <= 0) {
-      toast.current.show({
+  const onSubmit = (data: FormData) => {
+    try {
+      console.log('Form data:', data);
+      toast.current?.show({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Bills uploaded successfully',
+        life: 3000,
+      });
+    } catch (error) {
+      console.error('Error uploading bills:', error);
+      toast.current?.show({
         severity: 'error',
-        summary: t('bills.empty'),
-        detail: t('bills.emptyDetail'),
+        summary: 'Error',
+        detail: 'Failed to upload bills',
+        life: 3000,
       });
-      return;
     }
-
-    data.bills.forEach((bill, index) => {
-      updateChild(index, {
-        ...bill,
-        total: Number(bill.cash) + Number(bill.check),
-      });
-    });
-
-    // Add the code to send the data to the backend here
-
-    toast.current.show({
-      severity: 'success',
-      summary: t('bills.saved'),
-      detail: t('bills.savedDetail'),
-    });
   };
 
-  const recalculateFields = useCallback(
-    (newFields = childFields) => {
-      const count = newFields.filter(
-        bill => (bill.cash && bill.cash > 0) || (bill.check && bill.check > 0)
-      ).length;
-      setExportableCount(count);
-    },
-    [childFields]
-  );
+  const handleAmountChange = (index: number, value: string) => {
+    setValue(`bills.${index}.amount`, value);
+  };
 
-  useEffect(() => {
-    recalculateFields();
-  }, [recalculateFields]);
+  const handleValueChange = (index: number, value: string) => {
+    setValue(`bills.${index}.value`, value);
+  };
 
-  useEffect(() => {
-    const sum = billFields.reduce((sum, bill) => {
-      const amount = parseFloat(bill.amount) || 0;
-      const value = parseFloat(bill.value) || 0;
-      return sum + amount * value;
-    }, 0);
-    setTotalSum(sum);
-  }, [billFields]);
+  const handleQuantityChange = (index: number, value: string) => {
+    setValue(`billUpload.${index}.quantity`, value);
+  };
 
-  const getFormErrorMessage = name => {
+  const getFormErrorMessage = (name: string) => {
     return (
-      errors[name] && <small className='p-error'>{errors[name].message}</small>
+      errors[name as keyof FormData] && (
+        <small className='p-error'>
+          {errors[name as keyof FormData]?.message}
+        </small>
+      )
     );
   };
-
-  const calculateSums = () => {
-    return childFields.reduce(
-      (acc, bill) => {
-        acc.cash += Number(bill.cash) || 0;
-        acc.check += Number(bill.check) || 0;
-        acc.total += Number(bill.total) || 0;
-        return acc;
-      },
-      { cash: 0, check: 0, total: 0 }
-    );
-  };
-
-  const sums = calculateSums();
-
-  const filteredFields = childFields.filter(field =>
-    field.names.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   return (
-    <div className='p-fluid form-container'>
+    <div className='max-w-4xl mx-auto w-full p-4'>
       <Toast ref={toast} />
-
-      <i
-        className='pi pi-receipt p-overlay-badge'
-        style={{
-          fontSize: '2rem',
-          position: 'fixed',
-          right: '20px',
-          top: '20px',
-        }}
-      >
-        <Badge value={exportableCount} severity='info' />
-      </i>
-
-      <div className='p-float-label' style={{ marginBottom: '3rem' }}>
-        <InputText
-          id='child-browser'
-          value={searchTerm}
-          onChange={e => setSearchTerm(e.target.value)}
-        />
-        <label htmlFor={`child-browser`}>{t('bills.searchPlaceholder')}</label>
-      </div>
-
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className='p-field p-col-4'>
-          <span className='p-float-label'>
-            <Controller
-              name='program'
-              control={control}
-              rules={{ required: t('program_required') }}
-              render={({ field }) => (
-                <Dropdown
-                  id={field.name}
-                  {...field}
-                  style={{ minWidth: '15rem' }}
-                  options={programOptions}
-                  placeholder={t('select_program')}
-                />
-              )}
-            />
-            <label htmlFor='program'>{t('program')}</label>
-          </span>
-          {errors.program && (
-            <span className='p-error'>{errors.program.message}</span>
-          )}
-        </div>
-
-        <div className='p-field p-col-4'>
-          <span className='p-float-label'>
-            <Controller
-              name='date'
-              control={control}
-              render={({ field }) => (
-                <Calendar
-                  id={field.name}
-                  {...field}
-                  showIcon
-                  dateFormat='mm/dd/yy'
-                />
-              )}
-            />
-            <label htmlFor='date'>{t('date')}</label>
-          </span>
-        </div>
-
-        <div className='p-field p-col-4'>
-          <span className='p-float-label'>
-            <Controller
-              name='time'
-              control={control}
-              render={({ field }) => (
-                <Calendar
-                  id={field.name}
-                  {...field}
-                  showTime
-                  timeOnly
-                  showIcon
-                />
-              )}
-            />
-            <label htmlFor='time'>{t('time')}</label>
-          </span>
-        </div>
-
-        {filteredFields.map(bill => (
-          <div key={bill.id} className='child-form'>
-            <Controller
-              name={`bills[${bill.originalIndex}].names`}
-              control={control}
-              rules={{ required: t('bills.namesRequired') }}
-              render={({ field }) => (
-                <span className='p-float-label'>
-                  <InputText
-                    id={`names-${bill.originalIndex}`}
-                    {...field}
-                    disabled={bill.disabled}
-                    className={classNames({
-                      'p-invalid':
-                        errors.bills &&
-                        errors.bills[bill.originalIndex] &&
-                        errors.bills[bill.originalIndex].names,
-                    })}
-                    value={field.value}
-                    onChange={e => field.onChange(e.target.value)}
-                  />
-                  <label htmlFor={`names-${bill.originalIndex}`}>
-                    {t('bills.names')}
-                  </label>
-                  {getFormErrorMessage(`bills[${bill.originalIndex}].names`)}
-                </span>
-              )}
-            />
-            <div className='p-grid'>
-              <div className='p-col'>
-                <Controller
-                  name={`bills[${bill.originalIndex}].cash`}
-                  control={control}
-                  rules={{ required: t('bills.cashRequired') }}
-                  render={({ field }) => (
-                    <span className='p-float-label'>
-                      <InputText
-                        id={`cash-${bill.originalIndex}`}
-                        {...field}
-                        className={classNames({
-                          'p-invalid':
-                            errors.bills &&
-                            errors.bills[bill.originalIndex] &&
-                            errors.bills[bill.originalIndex].cash,
-                        })}
-                        keyfilter='num'
-                        onChange={e => field.onChange(e.target.value)}
-                      />
-                      <label htmlFor={`cash-${bill.originalIndex}`}>
-                        {t('bills.cash')}
-                      </label>
-                      {getFormErrorMessage(`bills[${bill.originalIndex}].cash`)}
-                    </span>
-                  )}
-                />
+      <Card title='Upload Bills' className='mb-6'>
+        <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+          {/* Children Bills Section */}
+          <div className='space-y-4'>
+            <h3 className='text-lg font-semibold text-gray-800'>
+              Children Bills
+            </h3>
+            {childrenOptions.map((child: any, index: number) => (
+              <div key={child.id} className='bg-gray-50 rounded-lg p-6 mb-4'>
+                <h4 className='text-md font-medium text-gray-700 mb-4'>
+                  {child.name}
+                </h4>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  <div>
+                    <label className='block text-sm font-medium text-gray-700 mb-2'>
+                      Amount
+                    </label>
+                    <InputText
+                      {...register(`bills.${index}.amount` as const)}
+                      className='w-full'
+                      placeholder='Enter amount'
+                      onChange={e => handleAmountChange(index, e.target.value)}
+                    />
+                    {getFormErrorMessage(`bills.${index}.amount`)}
+                  </div>
+                  <div>
+                    <label className='block text-sm font-medium text-gray-700 mb-2'>
+                      Value
+                    </label>
+                    <InputText
+                      {...register(`bills.${index}.value` as const)}
+                      className='w-full'
+                      placeholder='Enter value'
+                      onChange={e => handleValueChange(index, e.target.value)}
+                    />
+                    {getFormErrorMessage(`bills.${index}.value`)}
+                  </div>
+                </div>
               </div>
-              <div className='p-col'>
-                <Controller
-                  name={`bills[${bill.originalIndex}].check`}
-                  control={control}
-                  rules={{ required: t('bills.checkRequired') }}
-                  render={({ field }) => (
-                    <span className='p-float-label'>
-                      <InputText
-                        id={`check-${bill.originalIndex}`}
-                        {...field}
-                        className={classNames({
-                          'p-invalid':
-                            errors.bills &&
-                            errors.bills[bill.originalIndex] &&
-                            errors.bills[bill.originalIndex].check,
-                        })}
-                        keyfilter='num'
-                        onChange={e => field.onChange(e.target.value)}
-                      />
-                      <label htmlFor={`check-${bill.originalIndex}`}>
-                        {t('bills.check')}
-                      </label>
-                      {getFormErrorMessage(
-                        `bills[${bill.originalIndex}].check`
-                      )}
-                    </span>
-                  )}
-                />
-              </div>
+            ))}
+          </div>
+
+          {/* Program Selection */}
+          <div>
+            <label className='block text-sm font-medium text-gray-700 mb-2'>
+              Program
+            </label>
+            <Dropdown
+              options={programOptions}
+              optionLabel='label'
+              optionValue='value'
+              placeholder='Select a program'
+              className='w-full'
+              {...register('program')}
+            />
+            {getFormErrorMessage('program')}
+          </div>
+
+          {/* Date and Time */}
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+            <div>
+              <label className='block text-sm font-medium text-gray-700 mb-2'>
+                Date
+              </label>
+              <Calendar
+                value={watch('date')}
+                onChange={e => setValue('date', e.value as Date)}
+                className='w-full'
+                showIcon
+              />
+              {getFormErrorMessage('date')}
+            </div>
+            <div>
+              <label className='block text-sm font-medium text-gray-700 mb-2'>
+                Time
+              </label>
+              <Calendar
+                value={watch('time')}
+                onChange={e => setValue('time', e.value as Date)}
+                className='w-full'
+                timeOnly
+                showIcon
+              />
+              {getFormErrorMessage('time')}
             </div>
           </div>
-        ))}
 
-        <div className='p-col-12'>
-          <div className='p-d-flex p-jc-end'>
+          {/* Bill Upload Section */}
+          <div className='space-y-4'>
+            <h3 className='text-lg font-semibold text-gray-800'>Bill Upload</h3>
+            {billTypes.map((billType: any, index: number) => (
+              <div key={billType.id} className='bg-gray-50 rounded-lg p-6 mb-4'>
+                <h4 className='text-md font-medium text-gray-700 mb-4'>
+                  {billType.label}
+                </h4>
+                <div>
+                  <label className='block text-sm font-medium text-gray-700 mb-2'>
+                    Quantity
+                  </label>
+                  <InputText
+                    {...register(`billUpload.${index}.quantity` as const)}
+                    className='w-full'
+                    placeholder='Enter quantity'
+                    onChange={e => handleQuantityChange(index, e.target.value)}
+                  />
+                  {getFormErrorMessage(`billUpload.${index}.quantity`)}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Submit Button */}
+          <div className='flex justify-end'>
             <Button
               type='submit'
-              label={t('bills.submit')}
-              icon='pi pi-check'
+              label='Upload Bills'
+              icon='pi pi-upload'
+              className='bg-blue-600 hover:bg-blue-700'
             />
           </div>
-        </div>
-      </form>
-
-      <div className='p-mt-4'>
-        <h3>
-          {t('bills.totalSum')}: {totalSum.toFixed(2)}
-        </h3>
-        <h3>
-          {t('bills.cashTotal')}: {sums.cash.toFixed(2)}
-        </h3>
-        <h3>
-          {t('bills.checkTotal')}: {sums.check.toFixed(2)}
-        </h3>
-      </div>
+        </form>
+      </Card>
     </div>
   );
 };

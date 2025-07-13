@@ -27,7 +27,7 @@ const MigrateBills: React.FC = () => {
   const [validMigration, setValidMigration] = useState<boolean>(false);
   const initialDayRef = useRef<Date | null>(null);
   const [availableDates, setAvailableDates] = useState<Date[]>([]);
-  const toast = useRef<Toast>(null);
+  const toast = useRef<Toast | null>(null);
   const { control, handleSubmit, setValue, reset, watch } =
     useForm<MigrateBillsForm>({
       defaultValues: MigrateBillsModels.initialStateComponent,
@@ -58,7 +58,7 @@ const MigrateBills: React.FC = () => {
     const dates = await DailyCashRecordsAPI.getAllDates();
     if (dates.httpStatus !== 200) {
       ToastInterpreterUtils.toastBackendInterpreter(
-        toast,
+        toast as React.RefObject<Toast>,
         dates,
         'error',
         t('errorLookingUpAvailableDates')
@@ -124,7 +124,7 @@ const MigrateBills: React.FC = () => {
       if (result.isConfirmed) {
         await mergeMigration(data);
         ToastInterpreterUtils.toastInterpreter(
-          toast,
+          toast as React.RefObject<Toast>,
           'success',
           t('reloaded'),
           t('billsMigratedSuccessfully')
@@ -132,7 +132,7 @@ const MigrateBills: React.FC = () => {
       } else if (result.isDismissed) {
         await overwriteMigration(data);
         ToastInterpreterUtils.toastInterpreter(
-          toast,
+          toast as React.RefObject<Toast>,
           'success',
           t('reloaded'),
           t('billsMigratedSuccessfully')
@@ -168,7 +168,7 @@ const MigrateBills: React.FC = () => {
       setValue('total_check_initial_day', dataByDay.response[0].total_check);
     } else {
       ToastInterpreterUtils.toastInterpreter(
-        toast,
+        toast as React.RefObject<Toast>,
         'success',
         t('notDataForInitialDayTitle'),
         ''
@@ -200,7 +200,7 @@ const MigrateBills: React.FC = () => {
       setValue('total_check_target_day', dataByDay.response[0].total_check);
     } else {
       ToastInterpreterUtils.toastInterpreter(
-        toast,
+        toast as React.RefObject<Toast>,
         'success',
         t('notDataForTargetDayTitle'),
         t('notDataForTargetDay')

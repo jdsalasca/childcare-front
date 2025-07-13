@@ -16,7 +16,7 @@ interface StepComponentThreeProps {
   setActiveIndex: (index: number) => void;
   contractInformation: ContractInfo;
   setContractInformation: (info: ContractInfo) => void;
-  toast: React.RefObject<Toast>;
+  toast: React.RefObject<Toast | null>;
   setLoadingInfo: (info: LoadingInfo) => void;
 }
 
@@ -38,7 +38,7 @@ const StepComponentThree: React.FC<StepComponentThreeProps> = ({
 
     if (contractInformation.contract_id == null) {
       ToastInterpreterUtils.toastInterpreter(
-        toast,
+        toast as React.RefObject<Toast>,
         'info',
         'info',
         t('contractInformationRequiredMessage'),
@@ -59,7 +59,7 @@ const StepComponentThree: React.FC<StepComponentThreeProps> = ({
       await ContractPermissionsAPI.createContractPermissions(termsRegistry);
     if (ApiValidator.invalidResponse(permissionsCreated.httpStatus)) {
       ToastInterpreterUtils.toastInterpreter(
-        toast,
+        toast as React.RefObject<Toast>,
         'error',
         t('permissionsCreationFailed'),
         t('permissionsCreationFailedMessage')
@@ -72,7 +72,7 @@ const StepComponentThree: React.FC<StepComponentThreeProps> = ({
       terms: permissionsCreated.response,
     });
     ToastInterpreterUtils.toastInterpreter(
-      toast,
+      toast as React.RefObject<Toast>,
       'success',
       t('termsUpdated'),
       t('termsUpdatedMessage')

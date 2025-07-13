@@ -14,9 +14,8 @@ import CheckboxWrapper from '@components/formsComponents/CheckboxWrapper';
 interface FormulaInformationFormProps {
   contractInformation: ContractInfo;
   setContractInformation: (info: ContractInfo) => void;
-  toast: React.RefObject<Toast>;
   setActiveIndex: (index: number) => void;
-  setLoadingInfo: (info: LoadingInfo) => void;
+  toast: React.RefObject<Toast | null>;
 }
 
 export const FormulaInformationForm: React.FC<FormulaInformationFormProps> = ({

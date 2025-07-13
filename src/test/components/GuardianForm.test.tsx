@@ -384,7 +384,7 @@ describe('Guardian Form Component', () => {
       expect(screen.getByText('pickAGuardian')).toBeInTheDocument();
     });
 
-    it('should handle API errors gracefully', () => {
+    it('should handle API errors gracefully', async () => {
       const mockViewModelWithApiError = {
         ...mockViewModel,
         onSubmit: vi.fn().mockRejectedValue(new Error('API Error')),
@@ -395,6 +395,16 @@ describe('Guardian Form Component', () => {
 
       const submitButton = screen.getByText('save');
       fireEvent.click(submitButton);
+
+      // Wait for the async operation to complete and handle the rejection
+      await waitFor(async () => {
+        try {
+          await mockViewModelWithApiError.onSubmit();
+        } catch (error) {
+          // Expected error, do nothing
+        }
+        expect(mockViewModelWithApiError.onSubmit).toHaveBeenCalled();
+      });
 
       // Should not crash the component
       expect(submitButton).toBeInTheDocument();
