@@ -1,226 +1,187 @@
-// Standardized error handling utility
-import React from 'react';
-import { customLogger } from '../configs/logger';
-import NavigationService from './navigationService';
+import { customLogger } from 'configs/logger';
 
-export interface ApiError {
-  httpStatus: number;
+export interface ErrorInfo {
   message: string;
-  response?: unknown;
-  isNetworkError?: boolean;
+  code?: string;
+  status?: number;
+  details?: any;
 }
 
 export interface ErrorHandlerOptions {
   showToast?: boolean;
-  toastRef?: React.RefObject<{
-    show: (options: {
-      severity: string;
-      summary: string;
-      detail?: string;
-      life?: number;
-    }) => void;
-  }>;
-  redirectOnAuthError?: boolean;
   logError?: boolean;
+  throwError?: boolean;
+  context?: string;
 }
 
 export class ErrorHandler {
+  private static instance: ErrorHandler;
+
+  private constructor() {}
+
+  public static getInstance(): ErrorHandler {
+    if (!ErrorHandler.instance) {
+      ErrorHandler.instance = new ErrorHandler();
+    }
+    return ErrorHandler.instance;
+  }
+
   /**
-   * Standardized error handling for API responses
+   * Handles errors in a consistent way across the application
    */
-  static handleApiError(
-    error: unknown,
-    context: string,
-    options: ErrorHandlerOptions = {}
-  ): ApiError {
+  public handleError(error: any, options: ErrorHandlerOptions = {}): ErrorInfo {
     const {
-      showToast = true,
-      toastRef,
-      redirectOnAuthError = true,
+      showToast = false,
       logError = true,
+      throwError = false,
+      context = 'Unknown',
     } = options;
 
-    let apiError: ApiError;
+    // Extract error information
+    const errorInfo = this.extractErrorInfo(error);
 
-    // Handle different types of errors
-    if (this.isAxiosError(error)) {
-      apiError = this.handleAxiosError(error);
-    } else if (error instanceof Error) {
-      apiError = this.handleGenericError(error);
-    } else {
-      apiError = this.handleUnknownError(error);
-    }
-
-    // Log error if enabled
+    // Log error if requested
     if (logError) {
-      customLogger.error(`Error in ${context}:`, apiError);
+      this.logError(errorInfo, context);
     }
 
-    // Handle authentication errors
-    if (apiError.httpStatus === 401 && redirectOnAuthError) {
-      NavigationService.navigateToSessionExpired();
+    // Show toast if requested
+    if (showToast) {
+      this.showErrorToast(errorInfo);
     }
 
-    // Show toast notification if enabled and toast ref is provided
-    if (showToast && toastRef?.current) {
-      toastRef.current.show({
-        severity: 'error',
-        summary: 'Error',
-        detail: apiError.message,
-        life: 5000,
-      });
+    // Throw error if requested
+    if (throwError) {
+      throw new Error(errorInfo.message);
     }
 
-    return apiError;
+    return errorInfo;
   }
 
   /**
-   * Handle successful API responses
+   * Extracts error information from various error types
    */
-  static handleApiSuccess<T>(
-    response: T,
-    context: string,
-    options: ErrorHandlerOptions = {}
-  ): T {
-    const { showToast = false, toastRef } = options;
-
-    // Log success if needed
-    customLogger.debug(`Success in ${context}:`, response);
-
-    // Show success toast if enabled
-    if (showToast && toastRef?.current) {
-      toastRef.current.show({
-        severity: 'success',
-        summary: 'Success',
-        detail: 'Operation completed successfully',
-        life: 3000,
-      });
-    }
-
-    return response;
-  }
-
-  /**
-   * Check if error is an Axios error
-   */
-  private static isAxiosError(
-    error: unknown
-  ): error is { response?: { status: number; data: unknown } } {
-    return typeof error === 'object' && error !== null && 'response' in error;
-  }
-
-  /**
-   * Handle Axios-specific errors
-   */
-  private static handleAxiosError(error: {
-    response?: { status: number; data: unknown };
-  }): ApiError {
-    if (error.response) {
-      const { status, data } = error.response;
-
-      switch (status) {
-        case 400:
-          return {
-            httpStatus: status,
-            message: 'Bad request. Please check your input.',
-            response: data,
-          };
-        case 401:
-          return {
-            httpStatus: status,
-            message: 'Authentication required. Please log in again.',
-            response: data,
-          };
-        case 403:
-          return {
-            httpStatus: status,
-            message:
-              'Access denied. You do not have permission for this action.',
-            response: data,
-          };
-        case 404:
-          return {
-            httpStatus: status,
-            message: 'Resource not found.',
-            response: data,
-          };
-        case 422:
-          return {
-            httpStatus: status,
-            message: 'Validation error. Please check your input.',
-            response: data,
-          };
-        case 500:
-          return {
-            httpStatus: status,
-            message: 'Server error. Please try again later.',
-            response: data,
-          };
-        default:
-          return {
-            httpStatus: status,
-            message: `Request failed with status ${status}`,
-            response: data,
-          };
-      }
-    } else {
+  private extractErrorInfo(error: any): ErrorInfo {
+    // Handle API response errors
+    if (error && typeof error === 'object' && 'httpStatus' in error) {
       return {
-        httpStatus: 0,
-        message: 'Network error. Please check your connection.',
-        isNetworkError: true,
+        message:
+          error.response?.error || error.response?.message || 'API Error',
+        code: error.response?.errorType || 'API_ERROR',
+        status: error.httpStatus,
+        details: error.response,
       };
     }
-  }
 
-  /**
-   * Handle generic JavaScript errors
-   */
-  private static handleGenericError(error: Error): ApiError {
+    // Handle Axios errors
+    if (error && error.isAxiosError) {
+      return {
+        message:
+          error.response?.data?.message || error.message || 'Network Error',
+        code: 'NETWORK_ERROR',
+        status: error.response?.status,
+        details: error.response?.data,
+      };
+    }
+
+    // Handle standard Error objects
+    if (error instanceof Error) {
+      return {
+        message: error.message,
+        code: 'STANDARD_ERROR',
+        details: error.stack,
+      };
+    }
+
+    // Handle string errors
+    if (typeof error === 'string') {
+      return {
+        message: error,
+        code: 'STRING_ERROR',
+      };
+    }
+
+    // Handle unknown errors
     return {
-      httpStatus: 0,
-      message: error.message || 'An unexpected error occurred.',
-      response: error,
+      message: 'An unexpected error occurred',
+      code: 'UNKNOWN_ERROR',
+      details: error,
     };
   }
 
   /**
-   * Handle unknown error types
+   * Logs error information consistently
    */
-  private static handleUnknownError(error: unknown): ApiError {
-    return {
-      httpStatus: 0,
-      message: 'An unknown error occurred.',
-      response: error,
-    };
+  private logError(errorInfo: ErrorInfo, context: string): void {
+    const logMessage = `[${context}] ${errorInfo.message}`;
+
+    if (errorInfo.status && errorInfo.status >= 500) {
+      customLogger.error(logMessage, errorInfo.details);
+    } else if (errorInfo.status && errorInfo.status >= 400) {
+      customLogger.warn(logMessage, errorInfo.details);
+    } else {
+      customLogger.debug(logMessage, errorInfo.details);
+    }
   }
 
   /**
-   * Create a standardized error message for user display
+   * Shows error toast notification
    */
-  static getUserFriendlyMessage(error: ApiError): string {
-    return error.message || 'An error occurred. Please try again.';
+  private showErrorToast(errorInfo: ErrorInfo): void {
+    // This will be implemented when we have access to toast context
+    // For now, we'll use console.error as fallback
+    console.error('Error Toast:', errorInfo.message);
   }
 
   /**
-   * Check if error is recoverable (user can retry)
+   * Creates a user-friendly error message
    */
-  static isRecoverableError(error: ApiError): boolean {
-    return error.httpStatus >= 500 || error.isNetworkError === true;
+  public getUserFriendlyMessage(error: any): string {
+    const errorInfo = this.extractErrorInfo(error);
+
+    // Map error codes to user-friendly messages
+    switch (errorInfo.code) {
+      case 'NETWORK_ERROR':
+        return 'Connection error. Please check your internet connection.';
+      case 'API_ERROR':
+        return errorInfo.message || 'Server error. Please try again later.';
+      case 'AUTH_ERROR':
+        return 'Authentication failed. Please log in again.';
+      default:
+        return errorInfo.message || 'An unexpected error occurred.';
+    }
   }
 
   /**
-   * Check if error is a validation error
+   * Handles API errors specifically
    */
-  static isValidationError(error: ApiError): boolean {
-    return error.httpStatus === 400 || error.httpStatus === 422;
+  public handleApiError(error: any, context: string = 'API'): ErrorInfo {
+    return this.handleError(error, {
+      logError: true,
+      context,
+    });
   }
 
   /**
-   * Check if error is an authentication error
+   * Handles form validation errors
    */
-  static isAuthError(error: ApiError): boolean {
-    return error.httpStatus === 401 || error.httpStatus === 403;
+  public handleValidationError(error: any, fieldName: string): ErrorInfo {
+    return this.handleError(error, {
+      logError: false,
+      context: `Validation: ${fieldName}`,
+    });
+  }
+
+  /**
+   * Handles authentication errors
+   */
+  public handleAuthError(error: any): ErrorInfo {
+    return this.handleError(error, {
+      logError: true,
+      context: 'Authentication',
+    });
   }
 }
 
-export default ErrorHandler;
+// Export a default instance for easy use
+export const errorHandler = ErrorHandler.getInstance();

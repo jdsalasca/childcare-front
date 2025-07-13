@@ -10,6 +10,7 @@ import SelectWrapper from '../../../formsComponents/SelectWrapper';
 import useRegisterViewModelForm from '../../modelView/useRegisterViewModelForm';
 import UsersAPI from '../../../../models/UsersAPI';
 import { useTranslation } from 'react-i18next';
+import { inputValidator } from '../../../../utils/InputValidation';
 
 const FormRegister = () => {
   const { t } = useTranslation();
@@ -66,21 +67,51 @@ const FormRegister = () => {
           control={control}
           label={t('userName')}
           onBlur={userNameExist}
-          rules={{ required: t('username_is_required') }}
+          rules={{
+            required: t('username_is_required'),
+            validate: value => {
+              const result = inputValidator.validate(
+                value,
+                inputValidator.getValidationRules().username,
+                'Username'
+              );
+              return result.isValid || result.errors[0];
+            },
+          }}
         />
 
         <InputTextWrapper
           name='first_name'
           control={control}
           label={t('first_name')}
-          rules={{ required: t('first_name_is_required') }}
+          rules={{
+            required: t('first_name_is_required'),
+            validate: value => {
+              const result = inputValidator.validate(
+                value,
+                inputValidator.getValidationRules().name,
+                'First Name'
+              );
+              return result.isValid || result.errors[0];
+            },
+          }}
         />
 
         <InputTextWrapper
           name='last_name'
           control={control}
           label={t('last_name')}
-          rules={{ required: t('last_name_is_required') }}
+          rules={{
+            required: t('last_name_is_required'),
+            validate: value => {
+              const result = inputValidator.validate(
+                value,
+                inputValidator.getValidationRules().name,
+                'Last Name'
+              );
+              return result.isValid || result.errors[0];
+            },
+          }}
         />
 
         <InputTextWrapper
@@ -88,7 +119,17 @@ const FormRegister = () => {
           control={control}
           label={t('email')}
           onBlur={emailExist}
-          rules={{ required: t('emailRequired') }}
+          rules={{
+            required: t('emailRequired'),
+            validate: value => {
+              const result = inputValidator.validate(
+                value,
+                inputValidator.getValidationRules().email,
+                'Email'
+              );
+              return result.isValid || result.errors[0];
+            },
+          }}
         />
 
         <CalendarWrapper
@@ -123,7 +164,17 @@ const FormRegister = () => {
               name='password'
               control={control}
               label={t('password')}
-              rules={{ required: t('password_is_required') }}
+              rules={{
+                required: t('password_is_required'),
+                validate: value => {
+                  const result = inputValidator.validate(
+                    value,
+                    inputValidator.getValidationRules().password,
+                    'Password'
+                  );
+                  return result.isValid || result.errors[0];
+                },
+              }}
             />
             <PasswordWrapper
               name='password_confirmation'
@@ -131,9 +182,20 @@ const FormRegister = () => {
               label={t('password_confirmation')}
               rules={{
                 required: t('password_is_required'),
-                validate: value =>
-                  value === getValues('password') ||
-                  t('passwords_do_not_match'),
+                validate: value => {
+                  const passwordResult = inputValidator.validate(
+                    value,
+                    inputValidator.getValidationRules().password,
+                    'Password'
+                  );
+                  if (!passwordResult.isValid) {
+                    return passwordResult.errors[0];
+                  }
+                  return (
+                    value === getValues('password') ||
+                    t('passwords_do_not_match')
+                  );
+                },
               }}
             />
           </>
