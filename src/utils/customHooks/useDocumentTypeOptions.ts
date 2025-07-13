@@ -9,7 +9,7 @@ const useDocumentTypeOptions = () => {
   const documentTypeOptions = useMemo(() => {
     if (!documentTypes || isLoading) return [];
 
-    console.log('documentTypes', documentTypes);
+
 
     // Filter document types where status is "Active"
     const activeDocumentTypes = documentTypes.response.filter(

@@ -78,8 +78,7 @@ const OpenRegisterForm: React.FC<Props> = ({ date, onSuccess }) => {
 
   const watchedBills = watch('bills');
 
-  // Debugging para identificar el problema
-  console.log('OpenRegisterForm - watchedBills:', watchedBills);
+
 
   // Ensure watchedBills is always an array with valid values
   const safeBills = Array.isArray(watchedBills)
@@ -91,13 +90,7 @@ const OpenRegisterForm: React.FC<Props> = ({ date, onSuccess }) => {
 
   const totalAmount = calculateBillTotal(safeBills);
 
-  // Debugging del resultado
-  console.log(
-    'OpenRegisterForm - totalAmount:',
-    totalAmount,
-    'isNaN:',
-    isNaN(totalAmount)
-  );
+
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
@@ -212,10 +205,7 @@ const OpenRegisterForm: React.FC<Props> = ({ date, onSuccess }) => {
                           isNaN(Number(e.value))
                             ? 0
                             : Number(e.value);
-                        console.log(`InputNumber ${idx} - onValueChange:`, {
-                          original: e.value,
-                          processed: newValue,
-                        });
+
                         field.onChange(newValue);
                       }}
                       onBlur={() => {
@@ -227,12 +217,7 @@ const OpenRegisterForm: React.FC<Props> = ({ date, onSuccess }) => {
                             ? 0
                             : Number(field.value);
                         if (blurValue !== field.value) {
-                          console.log(
-                            `InputNumber ${idx} - onBlur fixing value:`,
-                            field.value,
-                            'to',
-                            blurValue
-                          );
+
                           field.onChange(blurValue);
                         }
                       }}
