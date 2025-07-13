@@ -2186,7 +2186,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^1.7.2":
+"axios@npm:^1.8.3":
   version: 1.10.0
   resolution: "axios@npm:1.10.0"
   dependencies:
@@ -2584,7 +2584,7 @@ __metadata:
     "@vitest/coverage-v8": "npm:^3.2.4"
     "@vitest/ui": "npm:^3.2.4"
     autoprefixer: "npm:^10.4.21"
-    axios: "npm:^1.7.2"
+    axios: "npm:^1.8.3"
     buffer: "npm:^6.0.3"
     crypto-js: "npm:^4.2.0"
     eslint: "npm:^8.57.0"
