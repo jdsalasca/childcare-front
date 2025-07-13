@@ -1,4 +1,4 @@
-// src/pages/Users/modelView/useRegisterViewModelForm.js
+// src/components/users/modelView/useRegisterViewModelForm.ts
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
