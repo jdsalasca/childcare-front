@@ -154,7 +154,10 @@ export const StepComponentOne: React.FC<StepComponentOneProps> = ({
         loading: false,
         loadingMessage: '',
       });
-      errorHandler.handleApiError(error, 'StepComponentOne.onHandlerChildBackendAsync');
+      errorHandler.handleApiError(
+        error,
+        'StepComponentOne.onHandlerChildBackendAsync'
+      );
       throw error;
     }
   };
@@ -213,7 +216,10 @@ export const StepComponentOne: React.FC<StepComponentOneProps> = ({
       });
       setActiveIndex(1);
     } catch (error) {
-      const errorInfo = errorHandler.handleApiError(error, 'StepComponentOne.onSubmit');
+      const errorInfo = errorHandler.handleApiError(
+        error,
+        'StepComponentOne.onSubmit'
+      );
       toast?.current?.show({
         severity: 'error',
         summary: 'Error',

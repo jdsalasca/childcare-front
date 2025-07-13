@@ -10,7 +10,9 @@ export class SecurityService {
     // Retrieve secret key from environment variables - fail fast if not configured
     const envSecretKey = import.meta.env.VITE_SECRET_KEY;
     if (!envSecretKey) {
-      throw new Error('VITE_SECRET_KEY environment variable is required for secure token storage');
+      throw new Error(
+        'VITE_SECRET_KEY environment variable is required for secure token storage'
+      );
     }
     this.secretKey = envSecretKey;
   }
