@@ -216,7 +216,7 @@ const BillSummary: React.FC<{
   };
   cashOnHand: number;
   closedMoneyData?: any;
-}> = ({ sums, cashOnHand: _cashOnHand, closedMoneyData: _closedMoneyData }) => {
+}> = ({ sums, cashOnHand, closedMoneyData }) => {
   const { t } = useTranslation();
 
   const formatCurrency = (amount: number): string => {
@@ -254,26 +254,32 @@ const BillSummary: React.FC<{
     },
     {
       label: t('bills.cashOnHand', 'Cash on Hand'),
-      value: _cashOnHand || 0,
+      value: cashOnHand || 0,
       icon: 'pi pi-wallet',
       color: 'text-orange-600',
       bgColor: 'bg-orange-50'
     },
-    {
+    // Closed Money item will be conditionally added below
+  ];
+
+  // Conditionally add Closed Money summary item
+  if (closedMoneyData && typeof closedMoneyData.total_closing_amount === 'number') {
+    summaryItems.push({
       label: t('bills.closedMoney', 'Closed Money'),
-      value: _closedMoneyData?.total || 0,
+      value: closedMoneyData.total_closing_amount,
       icon: 'pi pi-lock',
       color: 'text-red-600',
       bgColor: 'bg-red-50'
-    },
-    {
-      label: t('bills.totalCashCalculations', 'Total Cash Calculations'),
-      value: (sums.cash + sums.check) + (_cashOnHand || 0) + (_closedMoneyData?.total || 0),
-      icon: 'pi pi-chart-line',
-      color: 'text-indigo-600',
-      bgColor: 'bg-indigo-50'
-    }
-  ];
+    });
+  }
+
+  summaryItems.push({
+    label: t('bills.totalCashCalculations', 'Total Cash Calculations'),
+    value: (sums.cash + sums.check) + (cashOnHand || 0) + (closedMoneyData && typeof closedMoneyData.total_closing_amount === 'number' ? closedMoneyData.total_closing_amount : 0),
+    icon: 'pi pi-chart-line',
+    color: 'text-indigo-600',
+    bgColor: 'bg-indigo-50'
+  });
 
   return (
     <div className="bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
@@ -306,10 +312,6 @@ const BillSummary: React.FC<{
           </div>
         ))}
       </div>
-
-   
-
-
     </div>
   );
 };

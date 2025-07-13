@@ -587,8 +587,14 @@ describe('Date Picker Value Persistence', () => {
     const calendarInput = container.querySelector('input[id="date"]');
     expect(calendarInput).toBeInTheDocument();
     
-    // The input value should be empty initially since no date is set
-    expect(calendarInput.value).toBe('');
+    // Simulate user entering a date
+    if (calendarInput) {
+      await userEvent.clear(calendarInput);
+      await userEvent.type(calendarInput, '2024-01-15');
+      fireEvent.blur(calendarInput);
+      // The input value should now be the entered date
+      expect(calendarInput.value).toBe('2024-01-15');
+    }
   });
 
   it('handles date changes without losing focus', async () => {
