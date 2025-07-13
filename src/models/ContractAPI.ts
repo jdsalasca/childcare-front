@@ -1,10 +1,30 @@
 import { useQuery } from '@tanstack/react-query';
 import API, { ApiResponse, BASE_URL } from './API';
 import { ContractDaySchedule } from './ApiModels';
+import { ChildType } from '../types/child';
+import { Guardian } from '../types/guardian';
 
 interface Contract {
   contract_id?: string;
-  [key: string]: any; // Add specific fields as needed
+  guardian_id_titular?: number;
+  contract_number?: string;
+  start_date?: string;
+  end_date?: string;
+  status?: string;
+  total_to_pay?: number;
+  weekly_payment?: number;
+  serviceCounts?: {
+    registrationCount?: number;
+    activityCount?: number;
+    infantCount?: number;
+    toddlerCount?: number;
+    preschoolCount?: number;
+    schoolCount?: number;
+    transportationCount?: number;
+  };
+  children?: ChildType[];
+  guardians?: Guardian[];
+  schedule?: ContractDaySchedule[];
 }
 
 const ContractAPI = {
@@ -28,7 +48,7 @@ const ContractAPI = {
   // Create a contract schedule
   createContractSchedule: async (
     contract: ContractDaySchedule
-  ): Promise<ApiResponse<Contract>> => {
+  ): Promise<ApiResponse<ContractDaySchedule[]>> => {
     try {
       const response = await API.post<ContractDaySchedule[]>(
         BASE_URL,
@@ -147,9 +167,9 @@ class ContractModel {
 
 // Contract builder class for creating contracts
 class ContractBuilder {
-  private guardians: any[]; // Define a proper type for guardians
+  private guardians: Guardian[]; // Define a proper type for guardians
 
-  constructor(guardians: any[]) {
+  constructor(guardians: Guardian[]) {
     this.guardians = guardians;
   }
 

@@ -13,6 +13,7 @@ import { exportToSummaryPDF } from '../utils/summaryPdf';
 import { exportBoxesToPDF } from '../utils/boxesPdf';
 import { ErrorHandlerComponent } from '../../../utils/ErrorHandler';
 import { performanceOptimizer } from '../../../utils/PerformanceOptimizer';
+import { ChildType } from '../../../types/child';
 
 // Types
 export interface Bill {
@@ -35,20 +36,66 @@ interface BackendBill {
   total: number;
 }
 
+interface BillType {
+  id: number;
+  name: string;
+  value: number;
+  currency_code: string;
+  status: string;
+}
+
+interface ClosedMoneyData {
+  opening_details: Array<{
+    bill_type_id: number;
+    quantity: number;
+    value: number;
+  }>;
+  closing_details: Array<{
+    bill_type_id: number;
+    quantity: number;
+    value: number;
+  }>;
+  total_opening: number;
+  total_closing: number;
+}
+
+interface BillType {
+  id: number;
+  name: string;
+  value: number;
+  currency_code: string;
+  status: string;
+}
+
+interface ClosedMoneyData {
+  opening_details: Array<{
+    bill_type_id: number;
+    quantity: number;
+    value: number;
+  }>;
+  closing_details: Array<{
+    bill_type_id: number;
+    quantity: number;
+    value: number;
+  }>;
+  total_opening: number;
+  total_closing: number;
+}
+
 interface BackendFormValues {
   date?: Date;
   bills: BackendBill[];
-  billTypes: any[];
+  billTypes: BillType[];
   cashOnHand: number;
 }
 
 export interface FormValues {
   bills: Bill[];
-  billTypes: any[];
+  billTypes: BillType[];
   date?: Date;
   program?: string;
   cashOnHand: number;
-  closedMoneyData?: any; // Keep as any for now to match existing structure
+  closedMoneyData?: ClosedMoneyData;
   totalDeposit?: number;
   notes?: string;
 }
@@ -61,7 +108,7 @@ interface Sums {
   total_cash_on_hand: number;
 }
 
-const toNumber = (value: any): number => {
+const toNumber = (value: string | number | undefined | null): number => {
   if (typeof value === 'number') return value;
   if (typeof value === 'string' && value !== '') {
     const parsed = parseFloat(value);
@@ -108,7 +155,7 @@ export const useBillsViewModel = () => {
 
   // State
   const [exportableCount, setExportableCount] = useState<number>(0);
-  const [closedMoneyData, setClosedMoneyData] = useState<any>(null);
+  const [closedMoneyData, setClosedMoneyData] = useState<ClosedMoneyData | null>(null);
   const [loadingInfo, setLoadingInfo] = useState<LoadingInfo>({
     loading: false,
     loadingMessage: '',
@@ -127,7 +174,7 @@ export const useBillsViewModel = () => {
   // Refs for preventing excessive calculations
   const recalculateFieldsRef = useRef<boolean>(false);
   const lastSelectedDateRef = useRef<Date | null>(null);
-  const toast = useRef<any>(null);
+  const toast = useRef<{ current: any }>(null);
   const recalculateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const updateIndicesTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -375,7 +422,7 @@ export const useBillsViewModel = () => {
       });
 
       // Create bills from children data directly to avoid dependency on childrenOptions
-      const billList: Bill[] = children.map((child: any, index: number) => ({
+      const billList: Bill[] = children.map((child: ChildType, index: number) => ({
         id: child.id?.toString() || `child_${index}`,
         originalIndex: index,
         names: child.childName || `${child.first_name} ${child.last_name}`,
