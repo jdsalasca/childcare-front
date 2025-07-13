@@ -1,6 +1,6 @@
 @use 'constants.scss' as c;
-.p-button-icon-only{
-    background-color: c.$color-buttons;
+.p-button-icon-only {
+  background-color: c.$color-buttons;
 }
 // Common styles for buttons on tables
 @mixin button-common-styles {
@@ -11,28 +11,26 @@
 
 // #region Buttons customization
 .rounded-button {
-    border-radius: 20px; /* Adjust as needed */
-  }
-  
-  .p-button-primary {
-    background-color: c.$color-buttons;
-    color: white;
-  }
-  
-  .p-button-secondary {
-    background-color: c.$color-institutional-gray;
-    border-color: c.$color-institutional-gray;
-    color: white;
-  }
+  border-radius: 20px; /* Adjust as needed */
+}
 
-  .p-float-label {
-    flex: 1;
-    margin-bottom: 0.5rem;
-    display: flex;
-    flex-direction: column;
-  }
-    
-  
+.p-button-primary {
+  background-color: c.$color-buttons;
+  color: white;
+}
+
+.p-button-secondary {
+  background-color: c.$color-institutional-gray;
+  border-color: c.$color-institutional-gray;
+  color: white;
+}
+
+.p-float-label {
+  flex: 1;
+  margin-bottom: 0.5rem;
+  display: flex;
+  flex-direction: column;
+}
 
 // Apply the mixin to buttons
 .p-button-danger {
@@ -45,44 +43,42 @@
   background-color: c.$color-buttons-success;
 }
 
-  .p-button-success {
-    background-color: c.$color-buttons-success;
-    color: white;
-  }
-  .p-float-label > .p-invalid + label{
-    color: c.$color-label-errors;
-  }
+.p-button-success {
+  background-color: c.$color-buttons-success;
+  color: white;
+}
+.p-float-label > .p-invalid + label {
+  color: c.$color-label-errors;
+}
 
+.p-error {
+  color: c.$color-message-error;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
 
-  .p-error {
-    color:c.$color-message-error;
-    font-size: 0.75rem;
-    margin-top: 0.25rem;
-  }
-  
 // Add the following CSS to your stylesheet (e.g., src/App.css or src/Contracts.css)
 .step-valid .p-steps-title {
-    color: c.$color-institutional-green;
-  }
+  color: c.$color-institutional-green;
+}
 
-  .step-invalid .p-steps-title {
-    color: c.$color-institutional-red;
-  }
-  
-  .step-default .p-steps-title {
-    color: c.$color-institutional-gray;
+.step-invalid .p-steps-title {
+  color: c.$color-institutional-red;
+}
 
+.step-default .p-steps-title {
+  color: c.$color-institutional-gray;
+}
+.step-default.block {
+  pointer-events: none; // Disable all pointer interactions
+  user-select: none; // Prevent text selection
+
+  :focus {
+    outline: none; // Disable focus outline
   }
-  .step-default.block {
-    pointer-events: none; // Disable all pointer interactions
-    user-select: none;    // Prevent text selection
-  
-    :focus {
-      outline: none;      // Disable focus outline
-    }
-  }
+}
 .p-field.p-col-4 {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-  }
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}

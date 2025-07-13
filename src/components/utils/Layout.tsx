@@ -31,26 +31,40 @@ const Layout: React.FC<LayoutProps> = ({ insideAuthApplication = false }) => {
     LayoutModels.languageModel(handleLanguageChange, t),
   ];
 
-  const items : MenuItem[]= [
+  const items: MenuItem[] = [
     LayoutModels.iconModel,
     LayoutModels.homeModel(handleHomeClick),
-    {label: t('Admin user'), items: [
-      {label: t('New user'), command: () => customNavigate('/users')},
-      
-    ]},
+    {
+      label: t('Admin user'),
+      items: [
+        { label: t('New user'), command: () => customNavigate('/users') },
+      ],
+    },
     {
       label: t('contracts'), // Ensure this is a string
       items: [
-        { label: t('generateContract'), command: () => customNavigate('/contracts') },
-        { label: t('reviewContracts'), command: () => customNavigate('/review-contracts') },
+        {
+          label: t('generateContract'),
+          command: () => customNavigate('/contracts'),
+        },
+        {
+          label: t('reviewContracts'),
+          command: () => customNavigate('/review-contracts'),
+        },
       ],
     },
     {
       label: t('deposits'), // Ensure this is a string
       items: [
         { label: t('manageBills'), command: () => customNavigate('/bills') },
-        { label: t('migrateBills'), command: () => customNavigate('/migrate/bills') },
-        { label: t('cashRegister.title'), command: () => customNavigate('/deposits/cash-register') },
+        {
+          label: t('migrateBills'),
+          command: () => customNavigate('/migrate/bills'),
+        },
+        {
+          label: t('cashRegister.title'),
+          command: () => customNavigate('/deposits/cash-register'),
+        },
       ],
     },
     {
@@ -66,9 +80,13 @@ const Layout: React.FC<LayoutProps> = ({ insideAuthApplication = false }) => {
   ];
 
   return (
-    <div className="layout">
-      <Menubar model={insideAuthApplication ? items : basicItems} style={{ justifyContent: 'center', zIndex: "1000" }} className='c-menubar' />
-      <div className="main-content">
+    <div className='layout'>
+      <Menubar
+        model={insideAuthApplication ? items : basicItems}
+        style={{ justifyContent: 'center', zIndex: '1000' }}
+        className='c-menubar'
+      />
+      <div className='main-content'>
         <Outlet />
       </div>
     </div>

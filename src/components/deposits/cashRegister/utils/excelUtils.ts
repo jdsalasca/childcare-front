@@ -1,5 +1,8 @@
 import * as XLSX from 'xlsx';
-import { CashRegisterReportResponse, CashRegisterReportDay } from '../../../../types/cashRegister';
+import {
+  CashRegisterReportResponse,
+  CashRegisterReportDay,
+} from '../../../../types/cashRegister';
 
 interface ExcelReportData {
   date: string;
@@ -18,9 +21,15 @@ const formatDateTime = (dateTime: string): string => {
   return new Date(dateTime).toLocaleString();
 };
 
-export const generateCashRegisterExcel = (reportData: CashRegisterReportResponse): void => {
+export const generateCashRegisterExcel = (
+  reportData: CashRegisterReportResponse
+): void => {
   try {
-    if (!reportData.success || !reportData.data.days || reportData.data.days.length === 0) {
+    if (
+      !reportData.success ||
+      !reportData.data.days ||
+      reportData.data.days.length === 0
+    ) {
       throw new Error('No data available for export');
     }
 
@@ -28,18 +37,24 @@ export const generateCashRegisterExcel = (reportData: CashRegisterReportResponse
     const workbook = XLSX.utils.book_new();
 
     // Prepare data for the main sheet
-    const excelData: ExcelReportData[] = reportData.data.days.map((day: CashRegisterReportDay) => ({
-      date: day.date,
-      status: day.status.charAt(0).toUpperCase() + day.status.slice(1),
-      openingTime: day.opening.time ? formatDateTime(day.opening.time) : 'N/A',
-      openingAmount: day.opening.amount || 0,
-      openingCashier: day.opening.cashier?.name || 'N/A',
-      closingTime: day.closing.time ? formatDateTime(day.closing.time) : 'N/A',
-      closingAmount: day.closing.amount || 0,
-      closingCashier: day.closing.cashier?.name || 'N/A',
-      difference: day.difference || 0,
-      currency: day.currency || 'USD',
-    }));
+    const excelData: ExcelReportData[] = reportData.data.days.map(
+      (day: CashRegisterReportDay) => ({
+        date: day.date,
+        status: day.status.charAt(0).toUpperCase() + day.status.slice(1),
+        openingTime: day.opening.time
+          ? formatDateTime(day.opening.time)
+          : 'N/A',
+        openingAmount: day.opening.amount || 0,
+        openingCashier: day.opening.cashier?.name || 'N/A',
+        closingTime: day.closing.time
+          ? formatDateTime(day.closing.time)
+          : 'N/A',
+        closingAmount: day.closing.amount || 0,
+        closingCashier: day.closing.cashier?.name || 'N/A',
+        difference: day.difference || 0,
+        currency: day.currency || 'USD',
+      })
+    );
 
     // Create main data worksheet
     const worksheet = XLSX.utils.json_to_sheet(excelData, {
@@ -102,11 +117,35 @@ export const generateCashRegisterExcel = (reportData: CashRegisterReportResponse
     const summaryData = [
       ['Summary Statistics'],
       ['Total Days', reportData.data.days.length],
-      ['Total Opening Amount', reportData.data.days.reduce((sum, day) => sum + (day.opening.amount || 0), 0)],
-      ['Total Closing Amount', reportData.data.days.reduce((sum, day) => sum + (day.closing.amount || 0), 0)],
-      ['Total Difference', reportData.data.days.reduce((sum, day) => sum + (day.difference || 0), 0)],
-      ['Opened Days', reportData.data.days.filter(day => day.status === 'opened').length],
-      ['Closed Days', reportData.data.days.filter(day => day.status === 'closed').length],
+      [
+        'Total Opening Amount',
+        reportData.data.days.reduce(
+          (sum, day) => sum + (day.opening.amount || 0),
+          0
+        ),
+      ],
+      [
+        'Total Closing Amount',
+        reportData.data.days.reduce(
+          (sum, day) => sum + (day.closing.amount || 0),
+          0
+        ),
+      ],
+      [
+        'Total Difference',
+        reportData.data.days.reduce(
+          (sum, day) => sum + (day.difference || 0),
+          0
+        ),
+      ],
+      [
+        'Opened Days',
+        reportData.data.days.filter(day => day.status === 'opened').length,
+      ],
+      [
+        'Closed Days',
+        reportData.data.days.filter(day => day.status === 'closed').length,
+      ],
     ];
 
     const summaryWorksheet = XLSX.utils.aoa_to_sheet(summaryData);
@@ -119,16 +158,18 @@ export const generateCashRegisterExcel = (reportData: CashRegisterReportResponse
 
     // Save file
     XLSX.writeFile(workbook, filename);
-
   } catch (error) {
     console.error('Error generating Excel file:', error);
     throw error;
   }
 };
 
-export const formatCurrency = (amount: number, currency: string = 'USD'): string => {
+export const formatCurrency = (
+  amount: number,
+  currency: string = 'USD'
+): string => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: currency,
   }).format(amount);
-}; 
+};

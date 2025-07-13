@@ -10,7 +10,10 @@ import { ProgressSpinner } from 'primereact/progressspinner';
 import { Message } from 'primereact/message';
 import { Divider } from 'primereact/divider';
 import CashRegisterAPI from '../../../models/CashRegisterAPI';
-import { RegisterDetailsResponse, BillDetail } from '../../../types/cashRegister';
+import {
+  RegisterDetailsResponse,
+  BillDetail,
+} from '../../../types/cashRegister';
 import EditOpenRegisterForm from './EditOpenRegisterForm';
 
 interface Props {
@@ -22,7 +25,11 @@ const RegisterDetailsPanel: React.FC<Props> = ({ date }) => {
   const [editingOpening, setEditingOpening] = useState(false);
   const [editingClosing, setEditingClosing] = useState(false);
 
-  const { data: detailsData, isLoading, isError } = useQuery<RegisterDetailsResponse>({
+  const {
+    data: detailsData,
+    isLoading,
+    isError,
+  } = useQuery<RegisterDetailsResponse>({
     queryKey: ['cashRegisterDetails', date],
     queryFn: () => CashRegisterAPI.getDetails(date),
     enabled: !!date,
@@ -31,9 +38,11 @@ const RegisterDetailsPanel: React.FC<Props> = ({ date }) => {
   if (isLoading) {
     return (
       <Card>
-        <div className="flex items-center justify-center py-8">
+        <div className='flex items-center justify-center py-8'>
           <ProgressSpinner style={{ width: '50px', height: '50px' }} />
-          <span className="ml-3 text-gray-600">{t('cashRegister.loading')}</span>
+          <span className='ml-3 text-gray-600'>
+            {t('cashRegister.loading')}
+          </span>
         </div>
       </Card>
     );
@@ -42,10 +51,10 @@ const RegisterDetailsPanel: React.FC<Props> = ({ date }) => {
   if (isError || !detailsData?.success || !detailsData.data) {
     return (
       <Card>
-        <Message 
-          severity="error" 
+        <Message
+          severity='error'
           text={t('cashRegister.error')}
-          className="w-full"
+          className='w-full'
         />
       </Card>
     );
@@ -82,51 +91,53 @@ const RegisterDetailsPanel: React.FC<Props> = ({ date }) => {
       field: 'bill_label',
       header: t('cashRegister.denomination'),
       body: (rowData: BillDetail) => (
-        <span className="font-medium">{rowData.bill_label}</span>
-      )
+        <span className='font-medium'>{rowData.bill_label}</span>
+      ),
     },
     {
       field: 'quantity',
       header: t('cashRegister.quantity'),
       body: (rowData: BillDetail) => (
-        <span className="text-center block font-medium">{rowData.quantity}</span>
-      )
+        <span className='text-center block font-medium'>
+          {rowData.quantity}
+        </span>
+      ),
     },
     {
       field: 'bill_value',
       header: t('cashRegister.unitValue'),
       body: (rowData: BillDetail) => (
-        <span className="text-blue-700 font-medium">
+        <span className='text-blue-700 font-medium'>
           {formatCurrency(parseFloat(rowData.bill_value))}
         </span>
-      )
+      ),
     },
     {
       field: 'total_amount',
       header: t('cashRegister.subtotal'),
       body: (rowData: BillDetail) => (
-        <span className="font-bold text-green-700">
+        <span className='font-bold text-green-700'>
           {formatCurrency(parseFloat(rowData.total_amount))}
         </span>
-      )
-    }
+      ),
+    },
   ];
 
   return (
-    <div className="space-y-6">
+    <div className='space-y-6'>
       {/* Header */}
-      <div className="text-center">
-        <h3 className="text-2xl font-bold text-gray-800 mb-2">
+      <div className='text-center'>
+        <h3 className='text-2xl font-bold text-gray-800 mb-2'>
           {t('cashRegister.viewDetails')}
         </h3>
-        <p className="text-gray-600">
-          {t('cashRegister.date')}: <span className="font-medium">{date}</span>
+        <p className='text-gray-600'>
+          {t('cashRegister.date')}: <span className='font-medium'>{date}</span>
         </p>
-        <div className="mt-2">
-          <Tag 
+        <div className='mt-2'>
+          <Tag
             value={t(`cashRegister.status_${data.status.status}`)}
-            severity="success"
-            className="text-sm"
+            severity='success'
+            className='text-sm'
           />
         </div>
       </div>
@@ -134,43 +145,43 @@ const RegisterDetailsPanel: React.FC<Props> = ({ date }) => {
       <Divider />
 
       {/* Daily Summary */}
-      <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
-        <h4 className="text-lg font-semibold text-gray-800 mb-4 text-center">
+      <Card className='bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200'>
+        <h4 className='text-lg font-semibold text-gray-800 mb-4 text-center'>
           {t('cashRegister.dailySummary')}
         </h4>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="text-center">
-            <h5 className="text-sm font-medium text-gray-600 mb-1">
+        <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
+          <div className='text-center'>
+            <h5 className='text-sm font-medium text-gray-600 mb-1'>
               {t('cashRegister.openingAmount')}
             </h5>
-            <p className="text-2xl font-bold text-blue-800">
+            <p className='text-2xl font-bold text-blue-800'>
               {formatCurrency(data.summary.opening_total)}
             </p>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className='text-xs text-gray-500 mt-1'>
               {formatDateTime(data.status.opening_time)}
             </p>
           </div>
-          <div className="text-center">
-            <h5 className="text-sm font-medium text-gray-600 mb-1">
+          <div className='text-center'>
+            <h5 className='text-sm font-medium text-gray-600 mb-1'>
               {t('cashRegister.closingAmount')}
             </h5>
-            <p className="text-2xl font-bold text-green-800">
+            <p className='text-2xl font-bold text-green-800'>
               {formatCurrency(data.summary.closing_total)}
             </p>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className='text-xs text-gray-500 mt-1'>
               {formatDateTime(data.status.closing_time)}
             </p>
           </div>
-          <div className="text-center">
-            <h5 className="text-sm font-medium text-gray-600 mb-1">
+          <div className='text-center'>
+            <h5 className='text-sm font-medium text-gray-600 mb-1'>
               {t('cashRegister.dailyDifference')}
             </h5>
-            <Tag 
+            <Tag
               value={formatCurrency(data.summary.difference)}
               severity={getDifferenceSeverity(data.summary.difference)}
-              className="text-lg font-bold"
+              className='text-lg font-bold'
             />
-            <p className="text-sm text-gray-500 mt-1">
+            <p className='text-sm text-gray-500 mt-1'>
               {getDifferenceLabel(data.summary.difference)}
             </p>
           </div>
@@ -185,7 +196,7 @@ const RegisterDetailsPanel: React.FC<Props> = ({ date }) => {
               date={date}
               currentData={{
                 cashier: data.opening.cashier,
-                details: data.opening.details
+                details: data.opening.details,
               }}
               onSuccess={() => {
                 setEditingOpening(false);
@@ -196,50 +207,56 @@ const RegisterDetailsPanel: React.FC<Props> = ({ date }) => {
             />
           ) : (
             <>
-              <div className="mb-4">
-                <h4 className="text-xl font-semibold text-gray-800 mb-3 flex items-center justify-between">
-                  <span className="flex items-center">
-                    <i className="pi pi-play-circle text-blue-600 mr-2"></i>
+              <div className='mb-4'>
+                <h4 className='text-xl font-semibold text-gray-800 mb-3 flex items-center justify-between'>
+                  <span className='flex items-center'>
+                    <i className='pi pi-play-circle text-blue-600 mr-2'></i>
                     {t('cashRegister.opening')}
                   </span>
                   <Button
-                    icon="pi pi-pencil"
+                    icon='pi pi-pencil'
                     label={t('cashRegister.edit')}
-                    className="p-button-sm p-button-outlined"
+                    className='p-button-sm p-button-outlined'
                     onClick={() => setEditingOpening(true)}
                     disabled={editingOpening}
                   />
                 </h4>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 bg-blue-50 p-4 rounded-lg">
+                <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 bg-blue-50 p-4 rounded-lg'>
                   <div>
-                    <span className="text-sm font-medium text-gray-600">
+                    <span className='text-sm font-medium text-gray-600'>
                       {t('cashRegister.cashier')}:
                     </span>
-                    <p className="text-gray-800 font-medium">{data.opening.cashier.name}</p>
+                    <p className='text-gray-800 font-medium'>
+                      {data.opening.cashier.name}
+                    </p>
                   </div>
                   <div>
-                    <span className="text-sm font-medium text-gray-600">
+                    <span className='text-sm font-medium text-gray-600'>
                       {t('cashRegister.time')}:
                     </span>
-                    <p className="text-gray-800 font-medium">{formatDateTime(data.opening.time)}</p>
+                    <p className='text-gray-800 font-medium'>
+                      {formatDateTime(data.opening.time)}
+                    </p>
                   </div>
                   <div>
-                    <span className="text-sm font-medium text-gray-600">
+                    <span className='text-sm font-medium text-gray-600'>
                       {t('cashRegister.total')}:
                     </span>
-                    <p className="text-gray-800 font-bold text-lg">{formatCurrency(data.opening.total_amount)}</p>
+                    <p className='text-gray-800 font-bold text-lg'>
+                      {formatCurrency(data.opening.total_amount)}
+                    </p>
                   </div>
                 </div>
               </div>
-              
-              <DataTable 
-                value={data.opening.details} 
-                className="border rounded-lg overflow-hidden"
+
+              <DataTable
+                value={data.opening.details}
+                className='border rounded-lg overflow-hidden'
                 stripedRows
                 emptyMessage={t('cashRegister.noData')}
               >
                 {billDetailColumns.map((col, index) => (
-                  <Column 
+                  <Column
                     key={index}
                     field={col.field}
                     header={col.header}
@@ -255,50 +272,56 @@ const RegisterDetailsPanel: React.FC<Props> = ({ date }) => {
       {/* Closing Information */}
       {data.closing && (
         <Card>
-          <div className="mb-4">
-            <h4 className="text-xl font-semibold text-gray-800 mb-3 flex items-center justify-between">
-              <span className="flex items-center">
-                <i className="pi pi-stop-circle text-red-600 mr-2"></i>
+          <div className='mb-4'>
+            <h4 className='text-xl font-semibold text-gray-800 mb-3 flex items-center justify-between'>
+              <span className='flex items-center'>
+                <i className='pi pi-stop-circle text-red-600 mr-2'></i>
                 {t('cashRegister.closing')}
               </span>
               <Button
-                icon="pi pi-pencil"
+                icon='pi pi-pencil'
                 label={t('cashRegister.edit')}
-                className="p-button-sm p-button-outlined"
+                className='p-button-sm p-button-outlined'
                 onClick={() => setEditingClosing(true)}
                 disabled={editingClosing}
               />
             </h4>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 bg-green-50 p-4 rounded-lg">
+            <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 bg-green-50 p-4 rounded-lg'>
               <div>
-                <span className="text-sm font-medium text-gray-600">
+                <span className='text-sm font-medium text-gray-600'>
                   {t('cashRegister.cashier')}:
                 </span>
-                <p className="text-gray-800 font-medium">{data.closing.cashier.name}</p>
+                <p className='text-gray-800 font-medium'>
+                  {data.closing.cashier.name}
+                </p>
               </div>
               <div>
-                <span className="text-sm font-medium text-gray-600">
+                <span className='text-sm font-medium text-gray-600'>
                   {t('cashRegister.time')}:
                 </span>
-                <p className="text-gray-800 font-medium">{formatDateTime(data.closing.time)}</p>
+                <p className='text-gray-800 font-medium'>
+                  {formatDateTime(data.closing.time)}
+                </p>
               </div>
               <div>
-                <span className="text-sm font-medium text-gray-600">
+                <span className='text-sm font-medium text-gray-600'>
                   {t('cashRegister.total')}:
                 </span>
-                <p className="text-gray-800 font-bold text-lg">{formatCurrency(data.closing.total_amount)}</p>
+                <p className='text-gray-800 font-bold text-lg'>
+                  {formatCurrency(data.closing.total_amount)}
+                </p>
               </div>
             </div>
           </div>
-          
-          <DataTable 
-            value={data.closing.details} 
-            className="border rounded-lg overflow-hidden"
+
+          <DataTable
+            value={data.closing.details}
+            className='border rounded-lg overflow-hidden'
             stripedRows
             emptyMessage={t('cashRegister.noData')}
           >
             {billDetailColumns.map((col, index) => (
-              <Column 
+              <Column
                 key={index}
                 field={col.field}
                 header={col.header}
@@ -310,34 +333,38 @@ const RegisterDetailsPanel: React.FC<Props> = ({ date }) => {
       )}
 
       {/* Additional Information */}
-      <Card className="bg-gray-50">
-        <h4 className="text-lg font-semibold text-gray-800 mb-3">
+      <Card className='bg-gray-50'>
+        <h4 className='text-lg font-semibold text-gray-800 mb-3'>
           {t('cashRegister.additionalInfo')}
         </h4>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-4 text-sm'>
           <div>
-            <span className="font-medium text-gray-600">
+            <span className='font-medium text-gray-600'>
               {t('cashRegister.recordId')}:
             </span>
-            <span className="ml-2 text-gray-800">#{data.record_id}</span>
+            <span className='ml-2 text-gray-800'>#{data.record_id}</span>
           </div>
           <div>
-            <span className="font-medium text-gray-600">
+            <span className='font-medium text-gray-600'>
               {t('cashRegister.currency')}:
             </span>
-            <span className="ml-2 text-gray-800">{data.summary.currency}</span>
+            <span className='ml-2 text-gray-800'>{data.summary.currency}</span>
           </div>
           <div>
-            <span className="font-medium text-gray-600">
+            <span className='font-medium text-gray-600'>
               {t('cashRegister.openingCashier')}:
             </span>
-            <span className="ml-2 text-gray-800">{data.status.opening_cashier.name}</span>
+            <span className='ml-2 text-gray-800'>
+              {data.status.opening_cashier.name}
+            </span>
           </div>
           <div>
-            <span className="font-medium text-gray-600">
+            <span className='font-medium text-gray-600'>
               {t('cashRegister.closingCashier')}:
             </span>
-            <span className="ml-2 text-gray-800">{data.status.closing_cashier.name}</span>
+            <span className='ml-2 text-gray-800'>
+              {data.status.closing_cashier.name}
+            </span>
           </div>
         </div>
       </Card>
@@ -345,4 +372,4 @@ const RegisterDetailsPanel: React.FC<Props> = ({ date }) => {
   );
 };
 
-export default RegisterDetailsPanel; 
+export default RegisterDetailsPanel;

@@ -1,7 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
-import { Guardian } from "../../types/guardian";
-import { ApiResponse } from "../API";
-import { GuardiansAPI } from "../GuardiansAPI";
+import { useQuery } from '@tanstack/react-query';
+import { Guardian } from '../../types/guardian';
+import { ApiResponse } from '../API';
+import { GuardiansAPI } from '../GuardiansAPI';
 
 const useGuardiansCache = () => {
   return useQuery<ApiResponse<Guardian[]>>({
@@ -20,4 +20,3 @@ const useGuardianById = (id: string | undefined) => {
 };
 
 export { useGuardianById, useGuardiansCache };
-

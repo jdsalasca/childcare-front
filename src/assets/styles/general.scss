@@ -1,8 +1,8 @@
 // Import PrimeReact styles
-@use "primeicons/primeicons.css"; // PrimeIcons for PrimeReact icons
-@use "primereact/resources/themes/saga-blue/theme.css"; // Replace with your desired theme
-@use "primereact/resources/primereact.min.css"; // PrimeReact core styles
-@use "react-phone-number-input/style.css"; // Styles for the phone number input component
+@use 'primeicons/primeicons.css'; // PrimeIcons for PrimeReact icons
+@use 'primereact/resources/themes/saga-blue/theme.css'; // Replace with your desired theme
+@use 'primereact/resources/primereact.min.css'; // PrimeReact core styles
+@use 'react-phone-number-input/style.css'; // Styles for the phone number input component
 @use './ReviewContracts'; // Custom styles for review contracts component
 @use 'HtmlOverrides'; // Custom HTML overrides
 @use 'media'; // Media queries for responsive design
@@ -14,7 +14,6 @@
 @use 'scrollCustomization.scss'; // Custom scrollbar styles
 @use 'phone-input-wrapper-custom.scss'; // Custom styles for phone input wrapper
 @use 'layout.scss'; // Custom styles for layout
-
 
 // Mixins
 // Centering flex container
@@ -56,7 +55,6 @@
 }
 
 .login-card {
-
   .login-button {
     width: 100%;
     padding: 0.75rem;
@@ -88,14 +86,16 @@
   cursor: pointer;
   display: inline-block;
 
-
   &:hover {
     background-color: c.$primary-color;
   }
 }
-.p-menubar .p-menubar-root-list > .p-menuitem.c-logout-item > .p-menuitem-content {
-  background-color: c.$primary-color ;
-  .p-menuitem-text{
+.p-menubar
+  .p-menubar-root-list
+  > .p-menuitem.c-logout-item
+  > .p-menuitem-content {
+  background-color: c.$primary-color;
+  .p-menuitem-text {
     color: c.$secondary-color;
   }
 }
@@ -110,7 +110,7 @@
   flex: 1;
   padding: 20px;
 }
-.button-form-pdf{
+.button-form-pdf {
   margin: auto;
   display: flex;
   align-self: center;
@@ -119,10 +119,9 @@
   border-color: c.$secondary-color;
   border-radius: 10px;
 }
-.p-steps .p-steps-item .p-menuitem-link{
+.p-steps .p-steps-item .p-menuitem-link {
   background-color: transparent !important;
 }
-
 
 .form-container {
   padding: 2rem;
@@ -131,24 +130,23 @@
   background-color: #f9f9f9;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  .child-form{
+  .child-form {
     display: flex;
     flex-wrap: wrap;
     border: gray solid 1px;
-    border-radius: 0.20rem;
-    
+    border-radius: 0.2rem;
   }
-  &.children-health{
+  &.children-health {
     display: flex;
     justify-content: center;
-    gap:2rem;
-    h4{
+    gap: 2rem;
+    h4 {
       text-align: center;
     }
-    .p-fluid{
+    .p-fluid {
       display: flex;
       flex-direction: column;
-        gap: 2rem;
+      gap: 2rem;
     }
   }
   &.schedule {
@@ -156,16 +154,16 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    
-    .child-form{
+
+    .child-form {
       flex-direction: column;
-      .form-days{
-        .day-schedule{
+      .form-days {
+        .day-schedule {
           display: flex;
           flex-direction: row;
           gap: 5rem;
           margin-bottom: 1rem;
-          .label-day{
+          .label-day {
             display: flex;
             max-width: 10%;
             min-width: 10%;
@@ -176,13 +174,13 @@
           }
         }
       }
-    .button-group{
-      justify-content: right;
+      .button-group {
+        justify-content: right;
+      }
     }
   }
-  }
 
-  &.terms{
+  &.terms {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -198,12 +196,9 @@
         display: flex;
         flex-direction: column;
       }
-      
     }
-    
   }
 }
-
 
 .step-disabled {
   position: relative;
@@ -233,8 +228,6 @@
   opacity: 1;
 }
 
-
-
 .bills-container {
   display: flex;
   flex-wrap: wrap;
@@ -244,7 +237,7 @@
 .form-row {
   display: flex;
   gap: 1rem;
-  padding: left 2rem right 2rem ;
+  padding: left 2rem right 2rem;
   justify-content: space-between;
   margin-bottom: 2rem;
 }
@@ -278,14 +271,13 @@
   max-height: 5rem;
   padding: 2rem 1rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  display: flex;  
-  flex-direction: row ;
+  display: flex;
+  flex-direction: row;
   justify-content: space-between;
-  .row{
+  .row {
     flex-direction: row;
     display: flex;
     justify-content: space-between;
-
   }
 }
 .bill-card .p-field p {
@@ -330,7 +322,7 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
- 
+
   padding: 2rem;
 
   .error-container,

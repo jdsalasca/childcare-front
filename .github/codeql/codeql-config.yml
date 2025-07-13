@@ -1,4 +1,4 @@
-name: "CodeQL Configuration"
+name: 'CodeQL Configuration'
 
 disable-default-queries: false
 
@@ -9,20 +9,19 @@ queries:
     uses: security-and-quality
 
 paths-ignore:
-  - "node_modules"
-  - "dist"
-  - "build"
-  - "coverage"
-  - "**/*.test.js"
-  - "**/*.test.ts"
-  - "**/*.test.tsx"
-  - "**/*.spec.js"
-  - "**/*.spec.ts"
-  - "**/*.spec.tsx"
+  - 'node_modules'
+  - 'dist'
+  - 'build'
+  - 'coverage'
+  - '**/*.test.js'
+  - '**/*.test.ts'
+  - '**/*.test.tsx'
+  - '**/*.spec.js'
+  - '**/*.spec.ts'
+  - '**/*.spec.tsx'
 
 paths:
-  - "src"
-  - "public"
-
+  - 'src'
+  - 'public'
 # Removed problematic packs section that was causing the fatal error
-# The default query packs will be used instead 
+# The default query packs will be used instead

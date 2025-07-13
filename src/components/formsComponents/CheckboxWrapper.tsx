@@ -49,7 +49,12 @@ const CheckboxWrapper: React.FC<CheckboxWrapperProps> = ({
       render={({ field, fieldState: { error } }) => (
         <span
           className={`inline-flex items-center max-w-5 break-words ${spanClassName} ${labelPosition === 'left' ? 'flex-row' : 'flex-row-reverse'} ${className}`}
-          style={{ maxWidth: '15rem', wordBreak: 'break-word', overflowWrap: 'break-word', width: '100%' }}
+          style={{
+            maxWidth: '15rem',
+            wordBreak: 'break-word',
+            overflowWrap: 'break-word',
+            width: '100%',
+          }}
         >
           {labelPosition === 'left' && (
             <p className={`mr-auto ${labelClassName}`}>{label}</p>
@@ -58,29 +63,26 @@ const CheckboxWrapper: React.FC<CheckboxWrapperProps> = ({
             id={name}
             {...field}
             checked={field.value}
-            className={classNames(
-              { 'p-invalid': error },
-              checkboxClassName
-            )}
+            className={classNames({ 'p-invalid': error }, checkboxClassName)}
             disabled={disabled}
-            onChange={(e) => field.onChange(e.checked)}
+            onChange={e => field.onChange(e.checked)}
             {...checkboxProps}
           />
           {labelPosition === 'right' && (
-            <p 
+            <p
               className={`ml-2 break-all whitespace-normal ${labelClassName}`}
-              style={{ 
+              style={{
                 flexGrow: 1,
                 flexShrink: 1,
                 minWidth: 0,
                 wordBreak: 'break-word',
-                overflowWrap: 'break-word'
+                overflowWrap: 'break-word',
               }}
             >
               {label}
             </p>
           )}
-          {error && <small className="p-error">{error.message}</small>}
+          {error && <small className='p-error'>{error.message}</small>}
         </span>
       )}
     />

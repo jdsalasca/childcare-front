@@ -1,20 +1,20 @@
-import { WorkInformation } from "@components/contracts/types/ContractInfo";
+import { WorkInformation } from '@components/contracts/types/ContractInfo';
 
 export interface Guardian {
-  id?:               number;
-  name:             string;
-  last_name:        string;
-  address:          string;
-  city:             string;
-  phone:            string;
+  id?: number;
+  name: string;
+  last_name: string;
+  address: string;
+  city: string;
+  phone: string;
   guardian_type_id?: number;
-  created_at:       Date|string;
-  updated_at:       Date|string;
-  email:            string;
-  status:           'Active' | 'Inactive';
+  created_at: Date | string;
+  updated_at: Date | string;
+  email: string;
+  status: 'Active' | 'Inactive';
   id_static?: string;
   value?: number;
-  titular:          boolean;
+  titular: boolean;
   telephone?: string;
   workInformation?: WorkInformation;
 }

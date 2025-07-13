@@ -44,7 +44,7 @@ const SelectWrapper: React.FC<SelectWrapperProps> = ({
             id={name}
             value={field.value || ''}
             options={options}
-            onChange={(e) => field.onChange(e.value)}
+            onChange={e => field.onChange(e.value)}
             disabled={disabled}
             readOnly={readOnly}
             placeholder={placeholder || label}
@@ -52,7 +52,7 @@ const SelectWrapper: React.FC<SelectWrapperProps> = ({
             {...rest}
           />
           <label htmlFor={name}>{label}</label>
-          {error && <small className="p-error">{error.message}</small>}
+          {error && <small className='p-error'>{error.message}</small>}
         </span>
       )}
     />

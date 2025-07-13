@@ -74,26 +74,31 @@ const debounce = <T extends (...args: any[]) => void>(
 };
 
 // Memoized calculation functions
-const calculateBillSums = (bills: OptimizedBill[]): { cash: number; check: number; total: number } => {
+const calculateBillSums = (
+  bills: OptimizedBill[]
+): { cash: number; check: number; total: number } => {
   let cash = 0;
   let check = 0;
   let total = 0;
-  
+
   for (const bill of bills) {
     cash += toNumber(bill.cash);
     check += toNumber(bill.check);
     total += toNumber(bill.total);
   }
-  
+
   return { cash, check, total };
 };
 
-const createBillSums = (bills: OptimizedBill[], cashOnHand: number): OptimizedSums => {
+const createBillSums = (
+  bills: OptimizedBill[],
+  cashOnHand: number
+): OptimizedSums => {
   const basicSums = calculateBillSums(bills);
   return {
     ...basicSums,
     cash_on_hand: cashOnHand,
-    total_cash_on_hand: basicSums.cash - cashOnHand
+    total_cash_on_hand: basicSums.cash - cashOnHand,
   };
 };
 
@@ -108,7 +113,13 @@ export const useBillsViewModelOptimized = () => {
     searchTerm: '',
     searchedProgram: null,
     blockContent: true,
-    sums: { cash: 0, check: 0, total: 0, cash_on_hand: 0, total_cash_on_hand: 0 }
+    sums: {
+      cash: 0,
+      check: 0,
+      total: 0,
+      cash_on_hand: 0,
+      total_cash_on_hand: 0,
+    },
   });
 
   // Refs for performance optimization
@@ -129,21 +140,21 @@ export const useBillsViewModelOptimized = () => {
     reset,
     setValue,
     getValues,
-    watch
+    watch,
   } = useForm<OptimizedFormValues>({
     defaultValues: {
       bills: [],
       billTypes: [],
       date: undefined,
-      cashOnHand: 0.0
+      cashOnHand: 0.0,
     },
-    mode: 'onBlur' // Optimize validation frequency
+    mode: 'onBlur', // Optimize validation frequency
   });
 
   const { fields, append, remove, update } = useFieldArray({
     control,
     name: 'bills',
-    keyName: 'id'
+    keyName: 'id',
   });
 
   // Memoized children data with stable reference
@@ -154,7 +165,7 @@ export const useBillsViewModelOptimized = () => {
       childName: `${child.first_name} ${child.last_name}`,
       classroom: child.classroom || '',
       first_name: child.first_name,
-      last_name: child.last_name
+      last_name: child.last_name,
     }));
   }, [children]);
 
@@ -163,142 +174,165 @@ export const useBillsViewModelOptimized = () => {
     setState(prev => ({ ...prev, ...updates }));
   }, []);
 
-  const setLoadingInfo = useCallback((loadingInfo: LoadingInfo) => {
-    updateState({ loadingInfo });
-  }, [updateState]);
+  const setLoadingInfo = useCallback(
+    (loadingInfo: LoadingInfo) => {
+      updateState({ loadingInfo });
+    },
+    [updateState]
+  );
 
-  const setBlockContent = useCallback((blockContent: boolean) => {
-    updateState({ blockContent });
-  }, [updateState]);
+  const setBlockContent = useCallback(
+    (blockContent: boolean) => {
+      updateState({ blockContent });
+    },
+    [updateState]
+  );
 
   // Debounced recalculation function
   const debouncedRecalculate = useMemo(
-    () => debounce((bills: OptimizedBill[], cashOnHand: number) => {
-      try {
-        // Calculate exportable count
-        const count = bills.reduce((acc, bill) => {
-          const cashNum = toNumber(bill.cash);
-          const checkNum = toNumber(bill.check);
-          return acc + ((cashNum > 0 || checkNum > 0) ? 1 : 0);
-        }, 0);
+    () =>
+      debounce((bills: OptimizedBill[], cashOnHand: number) => {
+        try {
+          // Calculate exportable count
+          const count = bills.reduce((acc, bill) => {
+            const cashNum = toNumber(bill.cash);
+            const checkNum = toNumber(bill.check);
+            return acc + (cashNum > 0 || checkNum > 0 ? 1 : 0);
+          }, 0);
 
-        // Calculate sums
-        const newSums = createBillSums(bills, cashOnHand);
+          // Calculate sums
+          const newSums = createBillSums(bills, cashOnHand);
 
-        // Update state in batch
-        updateState({
-          exportableCount: count,
-          sums: newSums
-        });
-      } catch (error) {
-        customLogger.error('Error in debounced recalculation:', error);
-      }
-    }, 150),
+          // Update state in batch
+          updateState({
+            exportableCount: count,
+            sums: newSums,
+          });
+        } catch (error) {
+          customLogger.error('Error in debounced recalculation:', error);
+        }
+      }, 150),
     [updateState]
   );
 
   // Optimized recalculation function
-  const recalculateFields = useCallback((newFields?: OptimizedBill[]) => {
-    const bills = newFields || getValues('bills') || [];
-    const cashOnHand = getValues('cashOnHand') || 0;
-    
-    debouncedRecalculate(bills, cashOnHand);
-  }, [getValues, debouncedRecalculate]);
+  const recalculateFields = useCallback(
+    (newFields?: OptimizedBill[]) => {
+      const bills = newFields || getValues('bills') || [];
+      const cashOnHand = getValues('cashOnHand') || 0;
+
+      debouncedRecalculate(bills, cashOnHand);
+    },
+    [getValues, debouncedRecalculate]
+  );
 
   // Optimized bill update function
-  const onRecalculateAll = useCallback((_index: number, bill: OptimizedBill): void => {
-    if (!bill?.id || bill.originalIndex == null) {
-      customLogger.error("Invalid bill data for recalculation");
-      return;
-    }
+  const onRecalculateAll = useCallback(
+    (_index: number, bill: OptimizedBill): void => {
+      if (!bill?.id || bill.originalIndex == null) {
+        customLogger.error('Invalid bill data for recalculation');
+        return;
+      }
 
-    const cashValue = toNumber(bill.cash);
-    const checkValue = toNumber(bill.check);
-    const newTotal = Number((cashValue + checkValue).toFixed(2));
+      const cashValue = toNumber(bill.cash);
+      const checkValue = toNumber(bill.check);
+      const newTotal = Number((cashValue + checkValue).toFixed(2));
 
-    // Only update if total actually changed
-    const currentBill = getValues(`bills.${bill.originalIndex}`);
-    if (currentBill && Math.abs((currentBill.total || 0) - newTotal) < 0.01) {
-      return;
-    }
+      // Only update if total actually changed
+      const currentBill = getValues(`bills.${bill.originalIndex}`);
+      if (currentBill && Math.abs((currentBill.total || 0) - newTotal) < 0.01) {
+        return;
+      }
 
-    const updatedBill = {
-      ...bill,
-      total: newTotal
-    };
+      const updatedBill = {
+        ...bill,
+        total: newTotal,
+      };
 
-    update(bill.originalIndex, updatedBill);
-    recalculateFields();
-  }, [getValues, update, recalculateFields]);
+      update(bill.originalIndex, updatedBill);
+      recalculateFields();
+    },
+    [getValues, update, recalculateFields]
+  );
 
   // Memoized filtered bills with optimized filtering
   const filteredBills = useMemo(() => {
     const bills = fields as OptimizedBill[];
-    
+
     if (!state.searchTerm && !state.searchedProgram) {
       return bills;
     }
 
-         const searchLower = state.searchTerm.toLowerCase();
-     const programLower = state.searchedProgram?.toLowerCase() || '';
+    const searchLower = state.searchTerm.toLowerCase();
+    const programLower = state.searchedProgram?.toLowerCase() || '';
 
     return bills.filter(bill => {
-      const matchesSearch = !state.searchTerm || 
+      const matchesSearch =
+        !state.searchTerm ||
         (bill.names && bill.names.toLowerCase().includes(searchLower));
-      const matchesProgram = !state.searchedProgram || 
+      const matchesProgram =
+        !state.searchedProgram ||
         (bill.classroom && bill.classroom.toLowerCase().includes(programLower));
-      
+
       return matchesSearch && matchesProgram;
     });
   }, [fields, state.searchTerm, state.searchedProgram]);
 
   // Optimized search handlers
-  const handleSearchChange = useCallback((searchTerm: string) => {
-    updateState({ searchTerm });
-  }, [updateState]);
+  const handleSearchChange = useCallback(
+    (searchTerm: string) => {
+      updateState({ searchTerm });
+    },
+    [updateState]
+  );
 
-  const handleProgramChange = useCallback((program: string | null) => {
-    updateState({ searchedProgram: program });
-  }, [updateState]);
+  const handleProgramChange = useCallback(
+    (program: string | null) => {
+      updateState({ searchedProgram: program });
+    },
+    [updateState]
+  );
 
   // Optimized remove function
-  const safeRemove = useCallback((index: number): void => {
-    try {
-      const bills = getValues('bills') || [];
-      const billIndex = bills.findIndex(bill => bill.originalIndex === index);
-      
-      if (billIndex === -1) {
-        customLogger.error(`Bill with index ${index} not found`);
-        return;
-      }
+  const safeRemove = useCallback(
+    (index: number): void => {
+      try {
+        const bills = getValues('bills') || [];
+        const billIndex = bills.findIndex(bill => bill.originalIndex === index);
 
-      remove(billIndex);
-      
-      // Update indices after removal with debounce
-      if (recalculateTimeoutRef.current) {
-        clearTimeout(recalculateTimeoutRef.current);
-      }
-      
-      recalculateTimeoutRef.current = setTimeout(() => {
-        const updatedBills = getValues('bills');
-        updatedBills.forEach((bill, i) => {
-          update(i, { ...bill, originalIndex: i });
-        });
-        recalculateFields();
-      }, 50);
+        if (billIndex === -1) {
+          customLogger.error(`Bill with index ${index} not found`);
+          return;
+        }
 
-    } catch (error) {
-      customLogger.error('Error removing bill:', error);
-      if (toast.current) {
-        toast.current.show({
-          severity: 'error',
-          summary: t('bills.errorRemoving'),
-          detail: t('bills.errorRemovingDetail'),
-          life: 5000
-        });
+        remove(billIndex);
+
+        // Update indices after removal with debounce
+        if (recalculateTimeoutRef.current) {
+          clearTimeout(recalculateTimeoutRef.current);
+        }
+
+        recalculateTimeoutRef.current = setTimeout(() => {
+          const updatedBills = getValues('bills');
+          updatedBills.forEach((bill, i) => {
+            update(i, { ...bill, originalIndex: i });
+          });
+          recalculateFields();
+        }, 50);
+      } catch (error) {
+        customLogger.error('Error removing bill:', error);
+        if (toast.current) {
+          toast.current.show({
+            severity: 'error',
+            summary: t('bills.errorRemoving'),
+            detail: t('bills.errorRemovingDetail'),
+            life: 5000,
+          });
+        }
       }
-    }
-  }, [getValues, remove, update, recalculateFields, t]);
+    },
+    [getValues, remove, update, recalculateFields, t]
+  );
 
   // Optimized form initialization
   const onStartForm = useCallback(async () => {
@@ -307,7 +341,7 @@ export const useBillsViewModelOptimized = () => {
     try {
       setLoadingInfo({
         loading: true,
-        loadingMessage: t('weAreLookingForChildrenInformation')
+        loadingMessage: t('weAreLookingForChildrenInformation'),
       });
 
       const billList: OptimizedBill[] = childrenOptions.map((child, index) => ({
@@ -317,28 +351,36 @@ export const useBillsViewModelOptimized = () => {
         cash: '',
         check: '',
         total: 0,
-        classroom: child.classroom
+        classroom: child.classroom,
       }));
 
       reset({
         bills: billList,
         billTypes: currenciesInformation || [],
         date: getValues('date'),
-        cashOnHand: getValues('cashOnHand') || 0.0
+        cashOnHand: getValues('cashOnHand') || 0.0,
       });
 
       isInitializedRef.current = true;
       recalculateFields(billList);
-
     } catch (error) {
       customLogger.error('Error in onStartForm:', error);
     } finally {
       setLoadingInfo({
         loading: false,
-        loadingMessage: ''
+        loadingMessage: '',
       });
     }
-  }, [children, currenciesInformation, childrenOptions, reset, getValues, recalculateFields, t, setLoadingInfo]);
+  }, [
+    children,
+    currenciesInformation,
+    childrenOptions,
+    reset,
+    getValues,
+    recalculateFields,
+    t,
+    setLoadingInfo,
+  ]);
 
   // Optimized add bill function
   const addNewBill = useCallback(() => {
@@ -350,116 +392,133 @@ export const useBillsViewModelOptimized = () => {
       check: '',
       total: 0,
       originalIndex: bills.length,
-      classroom: ''
+      classroom: '',
     };
-    
+
     append(newBill);
     recalculateFields();
   }, [getValues, append, recalculateFields]);
 
   // Optimized cash on hand fetching
-  const onHandlerSetCashOnHand = useCallback(async (date: Date): Promise<number> => {
-    try {
-      const totalCashOnMoney = await CashOnHandByDyAPI.getMoneyUntilDate(date);
-      
-      if (toast.current) {
-        ToastInterpreterUtils.toastBackendInterpreter(
-          toast, 
-          totalCashOnMoney, 
-          t('totalMoneyOnHand'), 
-          t('noTotalMoneyOnHandMessage')
-        );
+  const onHandlerSetCashOnHand = useCallback(
+    async (date: Date): Promise<number> => {
+      try {
+        const totalCashOnMoney =
+          await CashOnHandByDyAPI.getMoneyUntilDate(date);
+
+        if (toast.current) {
+          ToastInterpreterUtils.toastBackendInterpreter(
+            toast,
+            totalCashOnMoney,
+            t('totalMoneyOnHand'),
+            t('noTotalMoneyOnHandMessage')
+          );
+        }
+
+        const totalAmount =
+          totalCashOnMoney.httpStatus !== 200
+            ? 0.0
+            : (totalCashOnMoney.response?.totalAmountUntilNow ?? 0.0);
+
+        setValue('cashOnHand', totalAmount);
+        return totalAmount;
+      } catch (error) {
+        customLogger.error('Error fetching cash on hand:', error);
+        return 0;
       }
-      
-      const totalAmount = (totalCashOnMoney.httpStatus !== 200)
-        ? 0.0 
-        : totalCashOnMoney.response?.totalAmountUntilNow ?? 0.0;
+    },
+    [setValue, t]
+  );
 
-      setValue('cashOnHand', totalAmount);
-      return totalAmount;
-    } catch (error) {
-      customLogger.error('Error fetching cash on hand:', error);
-      return 0;
-    }
-  }, [setValue, t]);
-
-  const fetchClosedMoneyData = useCallback(async (date: Date): Promise<void> => {
-    try {
-      const formattedDate = date.toISOString().slice(0, 10);
-      const response = await CashRegisterAPI.getClosedMoney(formattedDate);
-      updateState({ closedMoneyData: response.data });
-    } catch (error) {
-      customLogger.warn("Error fetching closed money data:", error);
-      updateState({ closedMoneyData: null });
-    }
-  }, [updateState]);
+  const fetchClosedMoneyData = useCallback(
+    async (date: Date): Promise<void> => {
+      try {
+        const formattedDate = date.toISOString().slice(0, 10);
+        const response = await CashRegisterAPI.getClosedMoney(formattedDate);
+        updateState({ closedMoneyData: response.data });
+      } catch (error) {
+        customLogger.warn('Error fetching closed money data:', error);
+        updateState({ closedMoneyData: null });
+      }
+    },
+    [updateState]
+  );
 
   // Optimized date change handler
-  const onHandlerDateChanged = useCallback(async (date: Date | null) => {
-    if (date === null) {
-      setBlockContent(true);
-      return;
-    }
+  const onHandlerDateChanged = useCallback(
+    async (date: Date | null) => {
+      if (date === null) {
+        setBlockContent(true);
+        return;
+      }
 
-    const currentDateObj = new Date(date);
-    
-    // Prevent duplicate processing
-    if (lastSelectedDateRef.current && 
-        lastSelectedDateRef.current.toDateString() === currentDateObj.toDateString()) {
-      return;
-    }
+      const currentDateObj = new Date(date);
 
-    lastSelectedDateRef.current = new Date(currentDateObj);
-    isInitializedRef.current = false; // Reset initialization flag
+      // Prevent duplicate processing
+      if (
+        lastSelectedDateRef.current &&
+        lastSelectedDateRef.current.toDateString() ===
+          currentDateObj.toDateString()
+      ) {
+        return;
+      }
 
-    try {
-      await Promise.all([
-        onHandlerSetCashOnHand(currentDateObj),
-        fetchClosedMoneyData(currentDateObj)
-      ]);
-      
-      await onStartForm();
-      setBlockContent(false);
-    } catch (error) {
-      customLogger.error("Error on date changed", error);
-      setBlockContent(true);
-    }
-  }, [onHandlerSetCashOnHand, fetchClosedMoneyData, onStartForm, setBlockContent]);
+      lastSelectedDateRef.current = new Date(currentDateObj);
+      isInitializedRef.current = false; // Reset initialization flag
+
+      try {
+        await Promise.all([
+          onHandlerSetCashOnHand(currentDateObj),
+          fetchClosedMoneyData(currentDateObj),
+        ]);
+
+        await onStartForm();
+        setBlockContent(false);
+      } catch (error) {
+        customLogger.error('Error on date changed', error);
+        setBlockContent(true);
+      }
+    },
+    [onHandlerSetCashOnHand, fetchClosedMoneyData, onStartForm, setBlockContent]
+  );
 
   // Optimized submit handler
-  const onSubmit = useCallback(async (_data: OptimizedFormValues) => {
-    try {
-      setLoadingInfo({
-        loading: true,
-        loadingMessage: t('weAreProcessingYourInformation')
-      });
+  const onSubmit = useCallback(
+    async (_data: OptimizedFormValues) => {
+      try {
+        setLoadingInfo({
+          loading: true,
+          loadingMessage: t('weAreProcessingYourInformation'),
+        });
 
-      // Process bills data - you might need to implement this based on your BillsModel
-      // const result = await billModel.processBillsData(data);
-      
-      if (toast.current) {
-        toast.current.show({
-          severity: 'success',
-          summary: t('billsProcessedSuccessfully'),
-          life: 3000
+        // Process bills data - you might need to implement this based on your BillsModel
+        // const result = await billModel.processBillsData(data);
+
+        if (toast.current) {
+          toast.current.show({
+            severity: 'success',
+            summary: t('billsProcessedSuccessfully'),
+            life: 3000,
+          });
+        }
+      } catch (error) {
+        customLogger.error('Error submitting bills:', error);
+        if (toast.current) {
+          toast.current.show({
+            severity: 'error',
+            summary: t('errorProcessingBills'),
+            life: 5000,
+          });
+        }
+      } finally {
+        setLoadingInfo({
+          loading: false,
+          loadingMessage: '',
         });
       }
-    } catch (error) {
-      customLogger.error('Error submitting bills:', error);
-      if (toast.current) {
-        toast.current.show({
-          severity: 'error',
-          summary: t('errorProcessingBills'),
-          life: 5000
-        });
-      }
-    } finally {
-      setLoadingInfo({
-        loading: false,
-        loadingMessage: ''
-      });
-    }
-  }, [t, setLoadingInfo]);
+    },
+    [t, setLoadingInfo]
+  );
 
   // Cleanup effect
   useEffect(() => {
@@ -481,7 +540,7 @@ export const useBillsViewModelOptimized = () => {
   return {
     // State
     ...state,
-    
+
     // Form
     control,
     handleSubmit,
@@ -490,11 +549,11 @@ export const useBillsViewModelOptimized = () => {
     setValue,
     getValues,
     watch,
-    
+
     // Bills
     billsFields: fields as OptimizedBill[],
     filteredBills,
-    
+
     // Handlers
     onRecalculateAll,
     safeRemove,
@@ -503,12 +562,12 @@ export const useBillsViewModelOptimized = () => {
     onSubmit,
     handleSearchChange,
     handleProgramChange,
-    
+
     // Data
     childrenOptions,
     toast,
-    
+
     // Utils
-    recalculateFields
+    recalculateFields,
   };
-}; 
+};

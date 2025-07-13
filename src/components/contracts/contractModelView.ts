@@ -7,10 +7,12 @@ import { ChildrenGuardiansAPI } from '../../models/ChildrenGuardiansAPI';
 import { ContractAPI } from '../../models/ContractAPI';
 import { ChildType, defaultChild } from '../../types/child';
 import { defaultGuardian, Guardian } from '../../types/guardian';
-import { ChildrenValidations, GuardiansValidations } from './utils/contractValidations';
+import {
+  ChildrenValidations,
+  GuardiansValidations,
+} from './utils/contractValidations';
 import { ContractInfo } from './types/ContractInfo';
 import { GuardiansFactory } from '@models/factories/GuardiansFactory';
-
 
 /**
  * ContractService provides methods for managing contracts, validating them,
@@ -18,7 +20,13 @@ import { GuardiansFactory } from '@models/factories/GuardiansFactory';
  */
 export class ContractService {
   static isInvalidFormData(data: any, formData: any): boolean {
-    return !data || !data.guardians || data.guardians.length === 0 || !formData.children || formData.children.length === 0;
+    return (
+      !data ||
+      !data.guardians ||
+      data.guardians.length === 0 ||
+      !formData.children ||
+      formData.children.length === 0
+    );
   }
 
   /**
@@ -40,23 +48,23 @@ export class ContractService {
    * @throws {Error} Throws an error if validation fails.
    */
   static async validateContractData(
-    children: ChildType[] =  Array.of(defaultChild),
-    guardians: any[] =  Array.of(defaultGuardian),
+    children: ChildType[] = Array.of(defaultChild),
+    guardians: any[] = Array.of(defaultGuardian),
     t: (key: string) => string
   ): Promise<ApiResponseModel> {
     if (!GuardiansValidations.allHaveUniqueGuardianTypes(guardians)) {
-      return new ApiResponseModel(400, t('uniqueGuardianType') );
+      return new ApiResponseModel(400, t('uniqueGuardianType'));
     }
     if (children == null || children.length === 0) {
-      return new ApiResponseModel(400, t('atLeastOneChild') );
+      return new ApiResponseModel(400, t('atLeastOneChild'));
     }
 
     if (!ChildrenValidations.allChildrenHaveName(children)) {
-      return new ApiResponseModel(400,  t('childrenHaveName') );
+      return new ApiResponseModel(400, t('childrenHaveName'));
     }
 
     // If everything is fine
-    return new ApiResponseModel(200, t('success') );
+    return new ApiResponseModel(200, t('success'));
   }
 
   /**
@@ -67,7 +75,7 @@ export class ContractService {
    * @returns A promise with the result of the API call.
    */
   static async createChildrenGuardianRelationships(
-    children: ChildType[] ,
+    children: ChildType[],
     guardians: any[],
     t: (key: string) => string
   ): Promise<any> {
@@ -75,7 +83,10 @@ export class ContractService {
     if (validations.httpStatus !== 200) {
       return validations;
     }
-    const childrenGuardians = new ChildrenGuardiansBuilder(children, guardians).build();
+    const childrenGuardians = new ChildrenGuardiansBuilder(
+      children,
+      guardians
+    ).build();
     const creations = childrenGuardians.map(childGuardian => {
       console.log('childGuardian', childGuardian);
       return ChildrenGuardiansAPI.createChildrenGuardians(childGuardian);
@@ -107,11 +118,15 @@ export class ContractService {
     if (!titularGuardian) {
       throw new Error('No titular guardian found');
     }
-  
+
     try {
       // Create relationships first
-      const relationships = await this.createChildrenGuardianRelationships(children, guardians, t);
-  
+      const relationships = await this.createChildrenGuardianRelationships(
+        children,
+        guardians,
+        t
+      );
+
       // Only create new contract if one doesn't exist
       if (!contractInformation.contract_id) {
         const contractBuild = {
@@ -119,11 +134,11 @@ export class ContractService {
           status: 'Active',
           // Add any other required contract fields
         };
-  
+
         const contractData = await ContractAPI.createContract(contractBuild);
         return { guardianChildren: relationships, contractInfo: contractData };
       }
-  
+
       return { guardianChildren: relationships, contractInfo: null };
     } catch (error) {
       console.error('Error creating contract:', error);
@@ -131,9 +146,12 @@ export class ContractService {
     }
   }
 
-  static async createContractSchedule(schedules: ContractDaySchedule[]): Promise<any[]> {
-    
-    const days = schedules.map(schedule => ContractAPI.createContractSchedule(schedule));
+  static async createContractSchedule(
+    schedules: ContractDaySchedule[]
+  ): Promise<any[]> {
+    const days = schedules.map(schedule =>
+      ContractAPI.createContractSchedule(schedule)
+    );
     return await Promise.all(days);
   }
 }

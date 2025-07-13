@@ -4,4 +4,4 @@ export interface DayType {
   abbreviation?: string;
   laboral_day: boolean;
   translationLabel?: string;
-}  
+}

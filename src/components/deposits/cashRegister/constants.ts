@@ -8,14 +8,18 @@ export const BILL_TYPES = [
 ];
 
 export const getBillTypeLabel = (billTypeId: number): string => {
-  return BILL_TYPES.find(bt => bt.id === billTypeId)?.label || `Type ${billTypeId}`;
+  return (
+    BILL_TYPES.find(bt => bt.id === billTypeId)?.label || `Type ${billTypeId}`
+  );
 };
 
 export const getBillTypeValue = (billTypeId: number): number => {
   return BILL_TYPES.find(bt => bt.id === billTypeId)?.value || 0;
 };
 
-export const calculateBillTotal = (bills: Array<{ bill_type_id: number; quantity: number }>): number => {
+export const calculateBillTotal = (
+  bills: Array<{ bill_type_id: number; quantity: number }>
+): number => {
   // Validación de entrada
   if (!Array.isArray(bills)) {
     console.warn('calculateBillTotal: bills is not an array', bills);
@@ -32,7 +36,10 @@ export const calculateBillTotal = (bills: Array<{ bill_type_id: number; quantity
     // Validar bill_type_id
     const billTypeId = Number(bill.bill_type_id);
     if (isNaN(billTypeId)) {
-      console.warn('calculateBillTotal: invalid bill_type_id', bill.bill_type_id);
+      console.warn(
+        'calculateBillTotal: invalid bill_type_id',
+        bill.bill_type_id
+      );
       return total;
     }
 
@@ -45,16 +52,20 @@ export const calculateBillTotal = (bills: Array<{ bill_type_id: number; quantity
 
     // Obtener denominación
     const denomination = getBillTypeValue(billTypeId);
-    
+
     // Calcular subtotal
     const subtotal = quantity * denomination;
-    
+
     // Validar que el subtotal sea un número válido
     if (isNaN(subtotal)) {
-      console.warn('calculateBillTotal: subtotal is NaN', { quantity, denomination, subtotal });
+      console.warn('calculateBillTotal: subtotal is NaN', {
+        quantity,
+        denomination,
+        subtotal,
+      });
       return total;
     }
 
     return total + subtotal;
   }, 0);
-}; 
+};

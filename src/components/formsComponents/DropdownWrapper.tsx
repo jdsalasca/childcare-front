@@ -8,7 +8,8 @@ interface DropdownOption {
   [key: string]: any; // Define the shape of your dropdown options
 }
 
-interface DropdownWrapperProps extends Omit<DropdownProps, 'onChange' | 'value'> {
+interface DropdownWrapperProps
+  extends Omit<DropdownProps, 'onChange' | 'value'> {
   name: string;
   control: Control<any>;
   options: DropdownOption[];
@@ -46,20 +47,24 @@ const DropdownWrapper: React.FC<DropdownWrapperProps> = ({
   // Validate that all options have a valid value
   useEffect(() => {
     if (options && options.length > 0) {
-      const invalidOptions = options.filter(option => option[optionValue] == null);
+      const invalidOptions = options.filter(
+        option => option[optionValue] == null
+      );
       if (invalidOptions.length > 0) {
         console.error(`Dropdown options must have a value for ${optionValue}`);
       }
     }
   }, [options, optionValue]);
   // Helper function to handle option display
- // Helper function to handle option display
- const displayOption = (option: DropdownOption) => {
-  if (!option) return '';
-  const text = internationalization ? t(option[optionLabel]) : option[optionLabel];
-  // Return the text wrapped in a div that matches PrimeReact's default styling
-  return <div className="p-dropdown-item">{text}</div>;
-};
+  // Helper function to handle option display
+  const displayOption = (option: DropdownOption) => {
+    if (!option) return '';
+    const text = internationalization
+      ? t(option[optionLabel])
+      : option[optionLabel];
+    // Return the text wrapped in a div that matches PrimeReact's default styling
+    return <div className='p-dropdown-item'>{text}</div>;
+  };
   return (
     <Controller
       name={name}
@@ -74,22 +79,24 @@ const DropdownWrapper: React.FC<DropdownWrapperProps> = ({
             filter={filter}
             emptyMessage={t('dropdownEmptyMessage')}
             optionLabel={optionLabel}
-            itemTemplate={internationalization ? (option) => displayOption(option) : undefined}
-            valueTemplate={internationalization ? (option) => displayOption(option) : undefined}
-          
+            itemTemplate={
+              internationalization ? option => displayOption(option) : undefined
+            }
+            valueTemplate={
+              internationalization ? option => displayOption(option) : undefined
+            }
             optionValue={optionValue}
             className={classNames(
               { 'p-invalid': error },
               'p-dropdown-item-container' // Add PrimeReact's container class
-            )
-          }
+            )}
             disabled={disabled}
             placeholder={placeholder}
             style={{ minHeight: '2.2em', ...dropdownStyle }} // Set a minimum height
             {...rest}
           />
           <label htmlFor={name}>{label}</label>
-          {error && <small className="p-error h">{error.message}</small>}
+          {error && <small className='p-error h'>{error.message}</small>}
         </span>
       )}
     />

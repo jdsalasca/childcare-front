@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import { renderWithProviders } from '../utils'
-import { Bills } from '../../components/bills/Bills'
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { renderWithProviders } from '../utils';
+import { Bills } from '../../components/bills/Bills';
 
 // Helper function to create a proper mock for useBillsViewModel
 const createMockBillsViewModel = (overrides = {}) => ({
@@ -83,71 +83,103 @@ const createMockBillsViewModel = (overrides = {}) => ({
   getValues: vi.fn(),
   closedMoneyData: null,
   ...overrides,
-})
+});
 
 // Mock the view models
 vi.mock('../../components/bills/viewModels/useBillsViewModel', () => ({
   useBillsViewModel: vi.fn(),
-}))
+}));
 
 describe('Integration Tests', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
-  })
+    vi.clearAllMocks();
+  });
 
   describe('Bills Integration', () => {
     it('should handle complete bills workflow', async () => {
       const mockBillsViewModel = createMockBillsViewModel({
         filteredBills: [
-          { id: 1, names: 'John Doe', cash: '10.00', check: '5.00', total: 15.00 },
+          {
+            id: 1,
+            names: 'John Doe',
+            cash: '10.00',
+            check: '5.00',
+            total: 15.0,
+          },
         ],
-        sums: { cash: 10, check: 5, total: 15, cash_on_hand: 100, total_cash_on_hand: -85 },
+        sums: {
+          cash: 10,
+          check: 5,
+          total: 15,
+          cash_on_hand: 100,
+          total_cash_on_hand: -85,
+        },
         exportableCount: 1,
-      })
+      });
 
-      const useBillsViewModelModule = await import('../../components/bills/viewModels/useBillsViewModel')
-      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(mockBillsViewModel)
+      const useBillsViewModelModule = await import(
+        '../../components/bills/viewModels/useBillsViewModel'
+      );
+      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(
+        mockBillsViewModel
+      );
 
-      renderWithProviders(<Bills />)
+      renderWithProviders(<Bills />);
 
       // Verify initial render
-      expect(screen.getByText('bills.title')).toBeInTheDocument()
-      expect(screen.getByText('bills.summary')).toBeInTheDocument()
+      expect(screen.getByText('bills.title')).toBeInTheDocument();
+      expect(screen.getByText('bills.summary')).toBeInTheDocument();
 
       // Test adding a new bill
-      const addButton = screen.getByTestId('header-add-bill-button')
-      await userEvent.click(addButton)
-      expect(mockBillsViewModel.addNewBill).toHaveBeenCalled()
+      const addButton = screen.getByTestId('header-add-bill-button');
+      await userEvent.click(addButton);
+      expect(mockBillsViewModel.addNewBill).toHaveBeenCalled();
 
       // Test form submission
-      const saveButton = screen.getByText('bills.save')
-      await userEvent.click(saveButton)
-      expect(mockBillsViewModel.handleSubmit).toHaveBeenCalled()
-    })
+      const saveButton = screen.getByText('bills.save');
+      await userEvent.click(saveButton);
+      expect(mockBillsViewModel.handleSubmit).toHaveBeenCalled();
+    });
 
     it('should handle search and filtering', async () => {
       const mockBillsViewModel = createMockBillsViewModel({
         filteredBills: [
-          { id: 1, names: 'John Doe', cash: '10.00', check: '5.00', total: 15.00 },
+          {
+            id: 1,
+            names: 'John Doe',
+            cash: '10.00',
+            check: '5.00',
+            total: 15.0,
+          },
         ],
-        sums: { cash: 10, check: 5, total: 15, cash_on_hand: 100, total_cash_on_hand: -85 },
+        sums: {
+          cash: 10,
+          check: 5,
+          total: 15,
+          cash_on_hand: 100,
+          total_cash_on_hand: -85,
+        },
         searchTerm: 'John',
         exportableCount: 1,
-      })
+      });
 
-      const useBillsViewModelModule = await import('../../components/bills/viewModels/useBillsViewModel')
-      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(mockBillsViewModel)
+      const useBillsViewModelModule = await import(
+        '../../components/bills/viewModels/useBillsViewModel'
+      );
+      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(
+        mockBillsViewModel
+      );
 
-      renderWithProviders(<Bills />)
+      renderWithProviders(<Bills />);
 
       // Test search functionality - use a more specific selector
-      const searchInput = screen.getByDisplayValue('John')
-      expect(searchInput).toBeInTheDocument()
-      
+      const searchInput = screen.getByDisplayValue('John');
+      expect(searchInput).toBeInTheDocument();
+
       // Verify the search term is properly set
-      expect(mockBillsViewModel.searchTerm).toBe('John')
-    })
-  })
+      expect(mockBillsViewModel.searchTerm).toBe('John');
+    });
+  });
 
   describe('Error Handling Integration', () => {
     it('should handle API errors gracefully', async () => {
@@ -155,17 +187,27 @@ describe('Integration Tests', () => {
       const mockBillsViewModel = createMockBillsViewModel({
         loadingInfo: { loading: false, loadingMessage: '' },
         filteredBills: [],
-        sums: { cash: 0, check: 0, total: 0, cash_on_hand: 0, total_cash_on_hand: 0 },
-      })
+        sums: {
+          cash: 0,
+          check: 0,
+          total: 0,
+          cash_on_hand: 0,
+          total_cash_on_hand: 0,
+        },
+      });
 
-      const useBillsViewModelModule = await import('../../components/bills/viewModels/useBillsViewModel')
-      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(mockBillsViewModel)
+      const useBillsViewModelModule = await import(
+        '../../components/bills/viewModels/useBillsViewModel'
+      );
+      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(
+        mockBillsViewModel
+      );
 
-      renderWithProviders(<Bills />)
+      renderWithProviders(<Bills />);
 
       // Verify error states are handled gracefully
-      expect(screen.getByText('bills.noBills')).toBeInTheDocument()
-      expect(screen.getByText('bills.addFirstBill')).toBeInTheDocument()
-    })
-  })
-}) 
+      expect(screen.getByText('bills.noBills')).toBeInTheDocument();
+      expect(screen.getByText('bills.addFirstBill')).toBeInTheDocument();
+    });
+  });
+});

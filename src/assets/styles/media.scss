@@ -1,7 +1,6 @@
 $layout-breakpoint-small: 480px;
 
 @media (max-width: $layout-breakpoint-small) {
-
   p,
   label {
     font-size: 1rem;
@@ -21,7 +20,7 @@ $layout-breakpoint-small: 480px;
     margin-top: 1rem;
   }
 
-  .child-form .p-inputtext{
+  .child-form .p-inputtext {
     pointer-events: none;
   }
 
@@ -29,5 +28,4 @@ $layout-breakpoint-small: 480px;
     max-width: 470px;
     max-height: 470px;
   }
-
 }

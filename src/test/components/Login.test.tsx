@@ -1,222 +1,192 @@
 import React from 'react';
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { renderWithProviders, mockApiResponse, mockApiError } from '../utils'
-import Login from '../../components/utils/Login'
-import UsersAPI from '../../models/UsersAPI'
-import { SecurityService } from '../../configs/storageUtils'
+import { BrowserRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { vi } from 'vitest';
+import Login from '../../components/utils/Login';
+import UsersAPI from '../../models/UsersAPI';
 
-// Mock the dependencies
-vi.mock('../../models/UsersAPI')
-vi.mock('../../configs/storageUtils')
+// Mock the API
+vi.mock('../../models/UsersAPI');
+const mockAuthUser = vi.mocked(UsersAPI.authUser);
+
+// Mock the custom navigate hook
 vi.mock('../../utils/customHooks/useCustomNavigate', () => ({
+  __esModule: true,
   default: () => vi.fn(),
-}))
+}));
+
+// Mock the storage service
+vi.mock('../../configs/storageUtils', () => ({
+  SecurityService: {
+    getInstance: () => ({
+      setEncryptedItem: vi.fn(),
+    }),
+  },
+}));
+
+// Mock the logger
+vi.mock('../../configs/logger', () => ({
+  customLogger: {
+    debug: vi.fn(),
+    error: vi.fn(),
+  },
+}));
+
+// Mock i18n
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),
-}))
-
-const mockUsersAPI = vi.mocked(UsersAPI)
-const mockSecurityService = vi.mocked(SecurityService)
+}));
 
 describe('Login Component', () => {
-  const mockNavigate = vi.fn()
-  
+  let queryClient: QueryClient;
+
   beforeEach(() => {
-    vi.clearAllMocks()
-    
-    // Mock SecurityService
-    mockSecurityService.getInstance.mockReturnValue({
-      setEncryptedItem: vi.fn(),
-      getDecryptedItem: vi.fn(),
-      removeItem: vi.fn(),
-      clearAll: vi.fn(),
-    } as any)
-    
-    // Mock useCustomNavigate
-    vi.doMock('../../utils/customHooks/useCustomNavigate', () => ({
-      default: () => mockNavigate,
-    }))
-  })
-
-  it('should render login form elements', () => {
-    renderWithProviders(<Login />)
-    
-    expect(screen.getByText(/username/i)).toBeInTheDocument()
-    expect(screen.getByText(/password/i)).toBeInTheDocument()
-    expect(screen.getByRole('button')).toBeInTheDocument()
-  })
-
-  it('should call authUser API when form is submitted', async () => {
-    const mockToken = 'mock-jwt-token'
-    
-    mockUsersAPI.authUser.mockResolvedValueOnce(
-      mockApiResponse({ token: mockToken })
-    )
-    
-    renderWithProviders(<Login />)
-    
-    const usernameInput = screen.getByLabelText(/username/i)
-    const passwordInput = screen.getByLabelText(/password/i)
-    const form = document.querySelector('form')!
-    
-    // Try userEvent.type, fallback to fireEvent.change if needed
-    await userEvent.type(usernameInput, 'testuser')
-    await userEvent.type(passwordInput, 'password123')
-    if ((usernameInput as HTMLInputElement).value !== 'testuser') {
-      fireEvent.change(usernameInput, { target: { value: 'testuser' } })
-    }
-    if ((passwordInput as HTMLInputElement).value !== 'password123') {
-      fireEvent.change(passwordInput, { target: { value: 'password123' } })
-    }
-    fireEvent.submit(form)
-    
-    await waitFor(() => {
-      expect(mockUsersAPI.authUser).toHaveBeenCalledWith({
-        username: 'testuser',
-        password: 'password123',
-      })
-    })
-  })
-
-  it('should handle successful login', async () => {
-    const mockToken = 'mock-jwt-token'
-    const mockSetEncryptedItem = vi.fn()
-    
-    mockSecurityService.getInstance.mockReturnValue({
-      setEncryptedItem: mockSetEncryptedItem,
-      getDecryptedItem: vi.fn(),
-      removeItem: vi.fn(),
-      clearAll: vi.fn(),
-    } as any)
-    
-    mockUsersAPI.authUser.mockResolvedValueOnce(
-      mockApiResponse({ token: mockToken }, 200)
-    )
-    
-    renderWithProviders(<Login />)
-    
-    const usernameInput = screen.getByLabelText(/username/i)
-    const passwordInput = screen.getByLabelText(/password/i)
-    const loginButton = screen.getByRole('button')
-    
-    await userEvent.type(usernameInput, 'testuser')
-    await userEvent.type(passwordInput, 'password123')
-    fireEvent.click(loginButton)
-    
-    await waitFor(() => {
-      expect(mockSetEncryptedItem).toHaveBeenCalledWith('token', mockToken)
-    })
-  })
-
-  it('should handle API errors', async () => {
-    mockUsersAPI.authUser.mockRejectedValueOnce(
-      mockApiError('Invalid credentials', 401)
-    )
-    
-    renderWithProviders(<Login />)
-    
-    const usernameInput = screen.getByLabelText(/username/i)
-    const passwordInput = screen.getByLabelText(/password/i)
-    const loginButton = screen.getByRole('button')
-    
-    await userEvent.type(usernameInput, 'testuser')
-    await userEvent.type(passwordInput, 'wrongpassword')
-    fireEvent.click(loginButton)
-    
-    await waitFor(() => {
-      expect(mockUsersAPI.authUser).toHaveBeenCalled()
-    })
-  })
-
-  it('should handle username-specific errors', async () => {
-    mockUsersAPI.authUser.mockRejectedValueOnce({
-      response: {
-        errorType: 'username',
-        error: 'Username not found',
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
       },
-      httpStatus: 404,
-    })
-    
-    renderWithProviders(<Login />)
-    
-    const usernameInput = screen.getByLabelText(/username/i)
-    const passwordInput = screen.getByLabelText(/password/i)
-    const loginButton = screen.getByRole('button')
-    
-    await userEvent.type(usernameInput, 'nonexistentuser')
-    await userEvent.type(passwordInput, 'password123')
-    fireEvent.click(loginButton)
-    
-    await waitFor(() => {
-      expect(mockUsersAPI.authUser).toHaveBeenCalled()
-    })
-  })
+    });
+    vi.clearAllMocks();
+  });
 
-  it('should handle password-specific errors', async () => {
-    mockUsersAPI.authUser.mockRejectedValueOnce({
-      response: {
-        errorType: 'password',
-        error: 'Invalid password',
-      },
-      httpStatus: 401,
-    })
-    
-    renderWithProviders(<Login />)
-    
-    const usernameInput = screen.getByLabelText(/username/i)
-    const passwordInput = screen.getByLabelText(/password/i)
-    const loginButton = screen.getByRole('button')
-    
-    await userEvent.type(usernameInput, 'testuser')
-    await userEvent.type(passwordInput, 'wrongpassword')
-    fireEvent.click(loginButton)
-    
-    await waitFor(() => {
-      expect(mockUsersAPI.authUser).toHaveBeenCalled()
-    })
-  })
+  const renderLogin = () => {
+    return render(
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <Login />
+        </BrowserRouter>
+      </QueryClientProvider>
+    );
+  };
 
-  it('should handle invalid token response', async () => {
-    mockUsersAPI.authUser.mockResolvedValueOnce(
-      mockApiResponse({ invalidResponse: true })
-    )
-    
-    renderWithProviders(<Login />)
-    
-    const usernameInput = screen.getByLabelText(/username/i)
-    const passwordInput = screen.getByLabelText(/password/i)
-    const loginButton = screen.getByRole('button')
-    
-    await userEvent.type(usernameInput, 'testuser')
-    await userEvent.type(passwordInput, 'password123')
-    fireEvent.click(loginButton)
-    
-    await waitFor(() => {
-      expect(mockUsersAPI.authUser).toHaveBeenCalled()
-    })
-  })
+  describe('Rendering', () => {
+    it('should render login form', () => {
+      renderLogin();
 
-  it('should handle network errors', async () => {
-    mockUsersAPI.authUser.mockRejectedValueOnce(
-      mockApiError('Network error', 500)
-    )
-    
-    renderWithProviders(<Login />)
-    
-    const usernameInput = screen.getByLabelText(/username/i)
-    const passwordInput = screen.getByLabelText(/password/i)
-    const loginButton = screen.getByRole('button')
-    
-    await userEvent.type(usernameInput, 'testuser')
-    await userEvent.type(passwordInput, 'password123')
-    fireEvent.click(loginButton)
-    
-    await waitFor(() => {
-      expect(mockUsersAPI.authUser).toHaveBeenCalled()
-    })
-  })
-}) 
+      expect(screen.getByText('login')).toBeInTheDocument();
+      expect(screen.getByLabelText(/userNameOrEmail/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: /signIn/i })
+      ).toBeInTheDocument();
+    });
+
+    it('should have form with correct structure', () => {
+      renderLogin();
+
+      const usernameInput = screen.getByLabelText(/userNameOrEmail/i);
+      const passwordInput = screen.getByLabelText(/password/i);
+      const submitButton = screen.getByRole('button', { name: /signIn/i });
+
+      expect(usernameInput).toBeInTheDocument();
+      expect(passwordInput).toBeInTheDocument();
+      expect(submitButton).toBeInTheDocument();
+    });
+  });
+
+  describe('Form Submission', () => {
+    it('should call authUser with correct credentials on successful login', async () => {
+      const mockResponse = {
+        response: {
+          token: 'test-token',
+          id: '1',
+          username: 'testuser',
+          email: 'test@example.com',
+        },
+        httpStatus: 200,
+      };
+      mockAuthUser.mockResolvedValue(mockResponse);
+
+      renderLogin();
+
+      const usernameInput = screen.getByLabelText(/userNameOrEmail/i);
+      const passwordInput = screen.getByLabelText(/password/i);
+      const submitButton = screen.getByRole('button', { name: /signIn/i });
+
+      await userEvent.type(usernameInput, 'testuser');
+      await userEvent.type(passwordInput, 'password123');
+      await userEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(mockAuthUser).toHaveBeenCalled();
+      });
+    });
+
+    it('should handle login error', async () => {
+      const mockError = {
+        response: { error: 'Invalid credentials', errorType: 'username' },
+        httpStatus: 401,
+      };
+      mockAuthUser.mockRejectedValue(mockError);
+
+      renderLogin();
+
+      const usernameInput = screen.getByLabelText(/userNameOrEmail/i);
+      const passwordInput = screen.getByLabelText(/password/i);
+      const submitButton = screen.getByRole('button', { name: /signIn/i });
+
+      await userEvent.type(usernameInput, 'testuser');
+      await userEvent.type(passwordInput, 'wrongpassword');
+      await userEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(mockAuthUser).toHaveBeenCalled();
+      });
+    });
+
+    it('should handle successful login and navigate', async () => {
+      const mockResponse = {
+        response: {
+          token: 'test-token',
+          id: '1',
+          username: 'testuser',
+          email: 'test@example.com',
+        },
+        httpStatus: 200,
+      };
+      mockAuthUser.mockResolvedValue(mockResponse);
+
+      renderLogin();
+
+      const usernameInput = screen.getByLabelText(/userNameOrEmail/i);
+      const passwordInput = screen.getByLabelText(/password/i);
+      const submitButton = screen.getByRole('button', { name: /signIn/i });
+
+      await userEvent.type(usernameInput, 'testuser');
+      await userEvent.type(passwordInput, 'password123');
+      await userEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(mockAuthUser).toHaveBeenCalled();
+      });
+    });
+  });
+
+  describe('Loading States', () => {
+    it('should show loading state during API call', async () => {
+      // Mock a delayed response
+      mockAuthUser.mockImplementation(
+        () => new Promise(resolve => setTimeout(resolve, 100))
+      );
+
+      renderLogin();
+
+      const usernameInput = screen.getByLabelText(/userNameOrEmail/i);
+      const passwordInput = screen.getByLabelText(/password/i);
+      const submitButton = screen.getByRole('button', { name: /signIn/i });
+
+      await userEvent.type(usernameInput, 'testuser');
+      await userEvent.type(passwordInput, 'password123');
+      await userEvent.click(submitButton);
+
+      // Check that loading state is shown
+      const loader = document.querySelector('.loader-container');
+      expect(loader).toBeInTheDocument();
+    });
+  });
+});

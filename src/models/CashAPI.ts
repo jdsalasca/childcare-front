@@ -28,32 +28,39 @@ interface BackendFormValues {
   cashOnHand: number;
 }
 
-
-
 const CashAPI = {
   // Get Daily Cash Record details by date
   getDetailsByDate: async (date: string): Promise<ApiResponse<CashByDay>> => {
     try {
-      const response = await API.get<CashByDay>(BASE_URL, `/daily-cash/details_by_date`, { params: { date } });
+      const response = await API.get<CashByDay>(
+        BASE_URL,
+        `/daily-cash/details_by_date`,
+        { params: { date } }
+      );
       return response;
     } catch (error) {
       console.error('Error fetching cash details by date:', error);
       // You might want to create a custom error response model
-      return new ApiResponseModel(500, "error"); // Return a proper error response
+      return new ApiResponseModel(500, 'error'); // Return a proper error response
     }
   },
 
   // Process Daily Cash Data
-  processCashData: async (cashData: FormValues | BackendFormValues): Promise<ApiResponse<CashRecordDetails>> => {
+  processCashData: async (
+    cashData: FormValues | BackendFormValues
+  ): Promise<ApiResponse<CashRecordDetails>> => {
     try {
-      const response = await API.post<CashRecordDetails>(BASE_URL, '/daily-cash/process', cashData);
+      const response = await API.post<CashRecordDetails>(
+        BASE_URL,
+        '/daily-cash/process',
+        cashData
+      );
       return response;
     } catch (error) {
       console.error('Error processing daily cash data:', error);
-      return new ApiResponseModel(404, "error"); // Adjust based on your needs
+      return new ApiResponseModel(404, 'error'); // Adjust based on your needs
     }
   },
 };
 
 export { CashAPI };
-

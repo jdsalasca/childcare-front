@@ -13,12 +13,12 @@ interface EmergencyContactCardProps {
 export const EmergencyContactCard: React.FC<EmergencyContactCardProps> = ({
   control,
   type,
-  maxContacts = 4
+  maxContacts = 4,
 }) => {
   const { t } = useTranslation();
   const { fields, append, remove } = useFieldArray({
     control,
-    name: type === 'emergency' ? 'emergencyContacts' : 'releasedToPersons'
+    name: type === 'emergency' ? 'emergencyContacts' : 'releasedToPersons',
   });
 
   const addContact = () => {
@@ -28,14 +28,14 @@ export const EmergencyContactCard: React.FC<EmergencyContactCardProps> = ({
         address: '',
         city: '',
         phone: '',
-        type
+        type,
       });
     }
   };
 
   return (
-    <motion.div 
-      className="bg-white rounded-xl shadow-md p-6 mb-6"
+    <motion.div
+      className='bg-white rounded-xl shadow-md p-6 mb-6'
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
     >
@@ -44,12 +44,12 @@ export const EmergencyContactCard: React.FC<EmergencyContactCardProps> = ({
       </h4>
 
       {fields.map((field, index) => (
-        <motion.div 
+        <motion.div
           key={field.id}
-          className="bg-gray-50 rounded-lg p-6 mb-4"
+          className='bg-gray-50 rounded-lg p-6 mb-4'
           whileHover={{ scale: 1.01 }}
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
             <InputTextWrapper
               name={`${type === 'emergency' ? 'emergencyContacts' : 'releasedToPersons'}.${index}.name`}
               control={control}
@@ -76,8 +76,8 @@ export const EmergencyContactCard: React.FC<EmergencyContactCardProps> = ({
             />
           </div>
           <Button
-            icon="pi pi-trash"
-            className="p-button-danger p-button-text mt-2"
+            icon='pi pi-trash'
+            className='p-button-danger p-button-text mt-2'
             onClick={() => remove(index)}
           />
         </motion.div>
@@ -86,9 +86,9 @@ export const EmergencyContactCard: React.FC<EmergencyContactCardProps> = ({
       {fields.length < maxContacts && (
         <Button
           label={t('addContact')}
-          icon="pi pi-plus"
-          className="p-button-secondary mt-4"
-          onClick={(e) => {
+          icon='pi pi-plus'
+          className='p-button-secondary mt-4'
+          onClick={e => {
             e.preventDefault();
             e.stopPropagation();
             addContact();

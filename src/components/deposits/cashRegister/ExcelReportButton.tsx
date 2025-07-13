@@ -23,8 +23,11 @@ const ExcelReportButton: React.FC<Props> = ({ filters, className = '' }) => {
   const [isGenerating, setIsGenerating] = useState(false);
 
   const reportMutation = useMutation({
-    mutationFn: (params?: { start_date?: string; end_date?: string; status?: string }) =>
-      CashRegisterAPI.getReport(params),
+    mutationFn: (params?: {
+      start_date?: string;
+      end_date?: string;
+      status?: string;
+    }) => CashRegisterAPI.getReport(params),
     onSuccess: (data: CashRegisterReportResponse) => {
       try {
         // Check if data is valid
@@ -44,7 +47,7 @@ const ExcelReportButton: React.FC<Props> = ({ filters, className = '' }) => {
 
         // Generate Excel file
         generateCashRegisterExcel(data);
-        
+
         toast.current?.show({
           severity: 'success',
           summary: t('cashRegister.downloadSuccess'),
@@ -65,7 +68,7 @@ const ExcelReportButton: React.FC<Props> = ({ filters, className = '' }) => {
     },
     onError: (error: any) => {
       console.error('Error fetching report data:', error);
-      
+
       // Handle specific error cases
       if (error?.response?.status === 404) {
         toast.current?.show({
@@ -89,7 +92,7 @@ const ExcelReportButton: React.FC<Props> = ({ filters, className = '' }) => {
           life: 5000,
         });
       }
-      
+
       setIsGenerating(false);
     },
   });
@@ -97,7 +100,7 @@ const ExcelReportButton: React.FC<Props> = ({ filters, className = '' }) => {
   const handleDownload = async () => {
     try {
       setIsGenerating(true);
-      
+
       // Show loading toast
       toast.current?.show({
         severity: 'info',
@@ -115,9 +118,9 @@ const ExcelReportButton: React.FC<Props> = ({ filters, className = '' }) => {
 
   return (
     <>
-      <Toast ref={toast} position="top-right" />
+      <Toast ref={toast} position='top-right' />
       <Button
-        icon="pi pi-download"
+        icon='pi pi-download'
         label={t('cashRegister.downloadExcel')}
         onClick={handleDownload}
         loading={isGenerating || reportMutation.isPending}
@@ -130,4 +133,4 @@ const ExcelReportButton: React.FC<Props> = ({ filters, className = '' }) => {
   );
 };
 
-export default ExcelReportButton; 
+export default ExcelReportButton;

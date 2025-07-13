@@ -133,4 +133,4 @@ export interface CashRegisterReportResponse {
     end_date: string | null;
     status: CashRegisterStatus | null;
   };
-} 
+}

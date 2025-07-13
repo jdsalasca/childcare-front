@@ -2,10 +2,9 @@ import { useQuery } from '@tanstack/react-query';
 import API, { ApiResponse, BASE_URL } from './API';
 import { DayType } from '../types/day';
 
-
 const DaysAPI = {
   // Get all days
-  getAllDays: async (): Promise<ApiResponse<DayType[]>>  => {
+  getAllDays: async (): Promise<ApiResponse<DayType[]>> => {
     try {
       const response = await API.get<DayType[]>(BASE_URL, '/days');
       return response;
@@ -29,10 +28,9 @@ const DaysAPI = {
 
 export const useDaysCache = () => {
   return useQuery({
-    queryKey: ['days'],  // Unique key for caching
-    queryFn: () => DaysAPI.getAllDays(),  // API function
+    queryKey: ['days'], // Unique key for caching
+    queryFn: () => DaysAPI.getAllDays(), // API function
   });
 };
 
 export { DaysAPI };
-

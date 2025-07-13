@@ -1,12 +1,12 @@
 import { describe, it, expect, vi } from 'vitest';
-import { 
+import {
   validateSchedule,
   programOptions,
-  billTypes
+  billTypes,
 } from '../../components/contracts/utilsAndConstants';
-import { 
+import {
   ChildrenValidations,
-  GuardiansValidations 
+  GuardiansValidations,
 } from '../../components/contracts/utils/contractValidations';
 
 // Mock dependencies
@@ -194,7 +194,9 @@ describe('Contract Validations', () => {
 
         const result = ChildrenValidations.validateChild(invalidChild);
         expect(result.isValid).toBe(false);
-        expect(result.errors).toContain('Date of birth cannot be in the future');
+        expect(result.errors).toContain(
+          'Date of birth cannot be in the future'
+        );
       });
     });
 
@@ -262,7 +264,9 @@ describe('Contract Validations', () => {
           },
         ];
 
-        const result = ChildrenValidations.validateChildrenList(childrenWithDuplicates);
+        const result = ChildrenValidations.validateChildrenList(
+          childrenWithDuplicates
+        );
         expect(result.isValid).toBe(false);
         expect(result.errors).toContain('Duplicate document numbers found');
       });
@@ -293,7 +297,8 @@ describe('Contract Validations', () => {
           },
         ];
 
-        const result = ChildrenValidations.validateChildrenList(childrenWithErrors);
+        const result =
+          ChildrenValidations.validateChildrenList(childrenWithErrors);
         expect(result.isValid).toBe(false);
         expect(result.errors.length).toBeGreaterThan(1);
       });
@@ -383,7 +388,9 @@ describe('Contract Validations', () => {
 
         const result = GuardiansValidations.validateGuardian(invalidGuardian);
         expect(result.isValid).toBe(false);
-        expect(result.errors).toContain('Phone number must be at least 10 digits');
+        expect(result.errors).toContain(
+          'Phone number must be at least 10 digits'
+        );
       });
 
       it('rejects guardian with invalid zip code format', () => {
@@ -443,7 +450,8 @@ describe('Contract Validations', () => {
           },
         ];
 
-        const result = GuardiansValidations.validateGuardiansList(validGuardians);
+        const result =
+          GuardiansValidations.validateGuardiansList(validGuardians);
         expect(result.isValid).toBe(true);
         expect(result.errors).toHaveLength(0);
       });
@@ -473,9 +481,13 @@ describe('Contract Validations', () => {
           },
         ];
 
-        const result = GuardiansValidations.validateGuardiansList(guardiansWithoutTitular);
+        const result = GuardiansValidations.validateGuardiansList(
+          guardiansWithoutTitular
+        );
         expect(result.isValid).toBe(false);
-        expect(result.errors).toContain('At least one guardian must be titular');
+        expect(result.errors).toContain(
+          'At least one guardian must be titular'
+        );
       });
 
       it('rejects list with multiple titular guardians', () => {
@@ -512,7 +524,9 @@ describe('Contract Validations', () => {
           },
         ];
 
-        const result = GuardiansValidations.validateGuardiansList(guardiansWithMultipleTitular);
+        const result = GuardiansValidations.validateGuardiansList(
+          guardiansWithMultipleTitular
+        );
         expect(result.isValid).toBe(false);
         expect(result.errors).toContain('Only one guardian can be titular');
       });
@@ -551,7 +565,9 @@ describe('Contract Validations', () => {
           },
         ];
 
-        const result = GuardiansValidations.validateGuardiansList(guardiansWithDuplicateEmails);
+        const result = GuardiansValidations.validateGuardiansList(
+          guardiansWithDuplicateEmails
+        );
         expect(result.isValid).toBe(false);
         expect(result.errors).toContain('Duplicate email addresses found');
       });
@@ -567,7 +583,11 @@ describe('Contract Validations', () => {
       ];
 
       it('returns all guardian types when no guardians exist', () => {
-        const result = GuardiansValidations.availableGuardianTypes(mockGuardianTypes, [], 0);
+        const result = GuardiansValidations.availableGuardianTypes(
+          mockGuardianTypes,
+          [],
+          0
+        );
         expect(result).toHaveLength(mockGuardianTypes.length);
       });
 
@@ -577,7 +597,11 @@ describe('Contract Validations', () => {
           { guardian_type_id: 2 }, // Father already selected
         ];
 
-        const result = GuardiansValidations.availableGuardianTypes(mockGuardianTypes, existingGuardians, 2);
+        const result = GuardiansValidations.availableGuardianTypes(
+          mockGuardianTypes,
+          existingGuardians,
+          2
+        );
         expect(result).toHaveLength(3); // Should exclude Mother and Father
         expect(result.find(type => type.id === 1)).toBeUndefined();
         expect(result.find(type => type.id === 2)).toBeUndefined();
@@ -589,7 +613,11 @@ describe('Contract Validations', () => {
           { guardian_type_id: 2 }, // Father at index 1
         ];
 
-        const result = GuardiansValidations.availableGuardianTypes(mockGuardianTypes, existingGuardians, 0);
+        const result = GuardiansValidations.availableGuardianTypes(
+          mockGuardianTypes,
+          existingGuardians,
+          0
+        );
         expect(result.find(type => type.id === 1)).toBeDefined(); // Should include Mother for editing
         expect(result.find(type => type.id === 2)).toBeUndefined(); // Should exclude Father
       });
@@ -602,7 +630,11 @@ describe('Contract Validations', () => {
           { guardian_type_id: 4 },
         ];
 
-        const result = GuardiansValidations.availableGuardianTypes(mockGuardianTypes, existingGuardians, 4);
+        const result = GuardiansValidations.availableGuardianTypes(
+          mockGuardianTypes,
+          existingGuardians,
+          4
+        );
         expect(result.find(type => type.id === 5)).toBeDefined(); // Other should always be available
       });
     });
@@ -613,7 +645,7 @@ describe('Contract Validations', () => {
       expect(programOptions).toBeDefined();
       expect(Array.isArray(programOptions)).toBe(true);
       expect(programOptions.length).toBeGreaterThan(0);
-      
+
       programOptions.forEach(option => {
         expect(option).toHaveProperty('label');
         expect(option).toHaveProperty('value');
@@ -634,7 +666,7 @@ describe('Contract Validations', () => {
       expect(billTypes).toBeDefined();
       expect(Array.isArray(billTypes)).toBe(true);
       expect(billTypes.length).toBeGreaterThan(0);
-      
+
       billTypes.forEach(billType => {
         expect(billType).toHaveProperty('label');
         expect(billType).toHaveProperty('value');
@@ -645,7 +677,9 @@ describe('Contract Validations', () => {
 
     it('has bill types in descending order by value', () => {
       for (let i = 0; i < billTypes.length - 1; i++) {
-        expect(billTypes[i].value).toBeGreaterThanOrEqual(billTypes[i + 1].value);
+        expect(billTypes[i].value).toBeGreaterThanOrEqual(
+          billTypes[i + 1].value
+        );
       }
     });
 
@@ -659,20 +693,28 @@ describe('Contract Validations', () => {
   describe('Edge Cases', () => {
     it('handles null input gracefully', () => {
       expect(() => validateSchedule(null, null)).not.toThrow();
-      expect(() => ChildrenValidations.validateChildrenList(null as any)).not.toThrow();
-      expect(() => GuardiansValidations.validateGuardiansList(null as any)).not.toThrow();
+      expect(() =>
+        ChildrenValidations.validateChildrenList(null as any)
+      ).not.toThrow();
+      expect(() =>
+        GuardiansValidations.validateGuardiansList(null as any)
+      ).not.toThrow();
     });
 
     it('handles undefined input gracefully', () => {
       expect(() => validateSchedule(undefined, undefined)).not.toThrow();
-      expect(() => ChildrenValidations.validateChildrenList(undefined as any)).not.toThrow();
-      expect(() => GuardiansValidations.validateGuardiansList(undefined as any)).not.toThrow();
+      expect(() =>
+        ChildrenValidations.validateChildrenList(undefined as any)
+      ).not.toThrow();
+      expect(() =>
+        GuardiansValidations.validateGuardiansList(undefined as any)
+      ).not.toThrow();
     });
 
     it('handles empty objects gracefully', () => {
       const result1 = ChildrenValidations.validateChild({} as any);
       expect(result1.isValid).toBe(false);
-      
+
       const result2 = GuardiansValidations.validateGuardian({} as any);
       expect(result2.isValid).toBe(false);
     });
@@ -707,7 +749,8 @@ describe('Contract Validations', () => {
       }));
 
       const startTime = performance.now();
-      const result = ChildrenValidations.validateChildrenList(largeChildrenList);
+      const result =
+        ChildrenValidations.validateChildrenList(largeChildrenList);
       const endTime = performance.now();
 
       expect(result.isValid).toBe(true);
@@ -732,11 +775,12 @@ describe('Contract Validations', () => {
       }));
 
       const startTime = performance.now();
-      const result = GuardiansValidations.validateGuardiansList(largeGuardiansList);
+      const result =
+        GuardiansValidations.validateGuardiansList(largeGuardiansList);
       const endTime = performance.now();
 
       expect(result.isValid).toBe(true);
       expect(endTime - startTime).toBeLessThan(100); // Should complete in under 100ms
     });
   });
-}); 
+});

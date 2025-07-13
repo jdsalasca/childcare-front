@@ -36,39 +36,51 @@ const Login: React.FC = () => {
   // const { login } = useAuth();
 
   // Define the handleLogin function
-  const handleLogin: SubmitHandler<LoginFormData> = async (data) => {
-    customLogger.debug("data", data);
+  const handleLogin: SubmitHandler<LoginFormData> = async data => {
+    customLogger.debug('data', data);
     setLoading(true);
     try {
       const token = await UsersAPI.authUser(data);
-      customLogger.debug("token", token);
-      
+      customLogger.debug('token', token);
+
       // Check if token response exists and has token property
       if (token.response && token.response.token) {
-        SecurityService.getInstance().setEncryptedItem("token", token.response.token);
+        SecurityService.getInstance().setEncryptedItem(
+          'token',
+          token.response.token
+        );
         if (token.httpStatus === 200) {
           customNavigate('/homepage');
         } else {
-          customLogger.error("error on login", token);
+          customLogger.error('error on login', token);
         }
       } else {
-        customLogger.error("Invalid token response", token);
-        setError("username", { type: 'manual', message: t("invalid_login_response") });
+        customLogger.error('Invalid token response', token);
+        setError('username', {
+          type: 'manual',
+          message: t('invalid_login_response'),
+        });
       }
     } catch (error) {
       const errorcasted = error as ApiResponse<User>;
-      customLogger.error("error on login", error);
-      
+      customLogger.error('error on login', error);
+
       // Check if error response exists before accessing properties
       if (errorcasted.response && errorcasted.response.errorType) {
-        if (errorcasted.response.errorType === "username") {
-          setError("username", { type: 'manual', message: errorcasted.response.error || t("username_error") });
+        if (errorcasted.response.errorType === 'username') {
+          setError('username', {
+            type: 'manual',
+            message: errorcasted.response.error || t('username_error'),
+          });
         } else {
-          setError("password", { type: 'manual', message: errorcasted.response.error || t("password_error") });
+          setError('password', {
+            type: 'manual',
+            message: errorcasted.response.error || t('password_error'),
+          });
         }
       } else {
         // General error fallback
-        setError("username", { type: 'manual', message: t("login_error") });
+        setError('username', { type: 'manual', message: t('login_error') });
       }
     } finally {
       setLoading(false);
@@ -76,35 +88,41 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="login-container">
+    <div className='login-container'>
       {loading && <Loader />}
-      <div className="login-form-container">
-        <Card className="login-card">
-        <Lottie animationData={animationData} className='c-lottie-animation login' />
+      <div className='login-form-container'>
+        <Card className='login-card'>
+          <Lottie
+            animationData={animationData}
+            className='c-lottie-animation login'
+          />
 
           <form onSubmit={handleSubmit(handleLogin)}>
-            <h3 id='title'>{t("login")}</h3>
+            <h3 id='title'>{t('login')}</h3>
             <InputTextWrapper
-              name="username"
+              name='username'
               control={control}
               rules={{
-                required: t("username_is_required"),
-                minLength: { value: 3, message: t("username_min_length") },
-                maxLength: { value: 20, message: t("username_max_length") },
+                required: t('username_is_required'),
+                minLength: { value: 3, message: t('username_min_length') },
+                maxLength: { value: 20, message: t('username_max_length') },
               }}
-              label={t("userNameOrEmail")}
+              label={t('userNameOrEmail')}
             />
             <PasswordWrapper
-              name="password"
+              name='password'
               control={control}
               rules={{
-                required: t("password_is_required"),
+                required: t('password_is_required'),
               }}
-              label={t("password")}
+              label={t('password')}
             />
-            <section className="c-section-login-actions">
-              <Button type="submit" label={t('signIn')} className="p-button-success" />
-              
+            <section className='c-section-login-actions'>
+              <Button
+                type='submit'
+                label={t('signIn')}
+                className='p-button-success'
+              />
             </section>
           </form>
         </Card>

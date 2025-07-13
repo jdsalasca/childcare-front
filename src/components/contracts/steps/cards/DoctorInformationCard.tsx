@@ -9,36 +9,36 @@ interface DoctorInformationCardProps {
 }
 
 export const DoctorInformationCard: React.FC<DoctorInformationCardProps> = ({
-  control
+  control,
 }) => {
   const { t } = useTranslation();
 
   return (
-    <Card className="mb-4">
+    <Card className='mb-4'>
       <h5>{t('doctorInformation')}</h5>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
         <InputTextWrapper
-          name="doctorInformation.name"
+          name='doctorInformation.name'
           control={control}
           label={t('doctorName')}
         />
         <InputTextWrapper
-          name="doctorInformation.phone"
+          name='doctorInformation.phone'
           control={control}
           label={t('doctorPhone')}
         />
         <InputTextWrapper
-          name="doctorInformation.address"
+          name='doctorInformation.address'
           control={control}
           label={t('doctorAddress')}
         />
         <InputTextWrapper
-          name="doctorInformation.city"
+          name='doctorInformation.city'
           control={control}
           label={t('doctorCity')}
         />
         <InputTextWrapper
-          name="doctorInformation.clinic"
+          name='doctorInformation.clinic'
           control={control}
           label={t('clinic')}
         />

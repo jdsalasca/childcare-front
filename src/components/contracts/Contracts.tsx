@@ -33,7 +33,8 @@ export const Contracts: React.FC<ContractsProps> = () => {
   const [loadingInfo, setLoadingInfo] = useState(LoadingInfo.DEFAULT_MESSAGE);
   const { t } = useTranslation();
   const [activeIndex, setActiveIndex] = useState(0);
-  const [contractInformation, setContractInformation] = useState<ContractInfo>(defaultContractInfo);
+  const [contractInformation, setContractInformation] =
+    useState<ContractInfo>(defaultContractInfo);
   const { laboralDays: daysCache } = useDays();
   const toast = useRef<Toast | null>(null);
 
@@ -43,131 +44,170 @@ export const Contracts: React.FC<ContractsProps> = () => {
       return `0/${ContractModel.CONTRACT_PERMISSIONS.length}`;
     }
     const totalPermissions = ContractModel.CONTRACT_PERMISSIONS.length;
-    customLogger.debug("permissions", permissions);
+    customLogger.debug('permissions', permissions);
     return `${ContractPermissionsValidator.getValidContractPermissions(permissions)}/${totalPermissions}`;
   }, [contractInformation?.terms]);
 
   const countChildrenWithMedicalInfo = useMemo(() => {
-    return contractInformation?.children?.filter(child => 
-      child?.medicalInformation?.healthStatus !== '' &&
-      child?.medicalInformation?.healthStatus != null &&
-      child?.medicalInformation?.instructions !== '' &&
-      child?.medicalInformation?.instructions != null
-    ).length || 0;
+    return (
+      contractInformation?.children?.filter(
+        child =>
+          child?.medicalInformation?.healthStatus !== '' &&
+          child?.medicalInformation?.healthStatus != null &&
+          child?.medicalInformation?.instructions !== '' &&
+          child?.medicalInformation?.instructions != null
+      ).length || 0
+    );
   }, [contractInformation?.children]);
 
   const countChildrenWithFormulaInfo = useMemo(() => {
-    return contractInformation?.children?.filter(child => 
-      child?.formulaInformation?.formula !== '' &&
-      child?.formulaInformation?.formula != null
-    ).length || 0;
+    return (
+      contractInformation?.children?.filter(
+        child =>
+          child?.formulaInformation?.formula !== '' &&
+          child?.formulaInformation?.formula != null
+      ).length || 0
+    );
   }, [contractInformation?.children]);
 
   const countChildrenWithPermissionsInfo = useMemo(() => {
-    return contractInformation?.children?.filter(child => {
-      const permissions = child?.permissionsInformation;
-      return permissions && Object.entries(permissions)
-        .filter(([key]) => key !== 'other')
-        .some(([, value]) => value === true);
-    }).length || 0;
+    return (
+      contractInformation?.children?.filter(child => {
+        const permissions = child?.permissionsInformation;
+        return (
+          permissions &&
+          Object.entries(permissions)
+            .filter(([key]) => key !== 'other')
+            .some(([, value]) => value === true)
+        );
+      }).length || 0
+    );
   }, [contractInformation?.children]);
 
-  const getStepClass = useCallback((stepIndex: number) => {
-    switch (stepIndex) {
-      case 0:
-        return contractInformation.children?.[0]?.first_name ? 'step-valid' : 'step-invalid';
-      case 1:
-        return contractInformation.guardians?.[0]?.name ? 'step-valid' : 'step-invalid';
-      case 2:
-        return (ContractPermissionsValidator.getValidContractPermissions(contractInformation.terms) > 1) ? 'step-valid' : 'step-invalid';
-      case 3:
-        const { total_to_pay, payment_method_id, start_date } = contractInformation;
-        const isStep3Valid = (total_to_pay && payment_method_id && start_date);
-        return isStep3Valid ? 'step-valid' : 'step-invalid';
-      case 4:
-        return contractInformation.guardians?.[0]?.name ? 'step-valid' : 'step-valid';
-      case 5:
-        return validateSchedule(contractInformation?.schedule, daysCache) ? 'step-valid' : 'step-invalid';
-      case 6:
-        return countChildrenWithMedicalInfo === (contractInformation.children?.length || 0) ? 'step-valid' : 'step-invalid';
-      case 7:
-        return countChildrenWithFormulaInfo === (contractInformation.children?.length || 0) ? 'step-valid' : 'step-invalid';
-      case 8:
-        return countChildrenWithPermissionsInfo === (contractInformation.children?.length || 0) ? 'step-valid' : 'step-invalid';
-      case 9:
-        return validateSchedule(contractInformation?.schedule, daysCache) ? 'step-valid' : 'step-invalid';
-      default:
-        return 'step-default';
-    }
-  }, [
-    contractInformation.children,
-    contractInformation.guardians,
-    contractInformation.terms,
-    contractInformation.total_to_pay,
-    contractInformation.payment_method_id,
-    contractInformation.start_date,
-    contractInformation.schedule,
-    daysCache,
-    countChildrenWithMedicalInfo,
-    countChildrenWithFormulaInfo,
-    countChildrenWithPermissionsInfo
-  ]);
+  const getStepClass = useCallback(
+    (stepIndex: number) => {
+      switch (stepIndex) {
+        case 0:
+          return contractInformation.children?.[0]?.first_name
+            ? 'step-valid'
+            : 'step-invalid';
+        case 1:
+          return contractInformation.guardians?.[0]?.name
+            ? 'step-valid'
+            : 'step-invalid';
+        case 2:
+          return ContractPermissionsValidator.getValidContractPermissions(
+            contractInformation.terms
+          ) > 1
+            ? 'step-valid'
+            : 'step-invalid';
+        case 3:
+          const { total_to_pay, payment_method_id, start_date } =
+            contractInformation;
+          const isStep3Valid = total_to_pay && payment_method_id && start_date;
+          return isStep3Valid ? 'step-valid' : 'step-invalid';
+        case 4:
+          return contractInformation.guardians?.[0]?.name
+            ? 'step-valid'
+            : 'step-valid';
+        case 5:
+          return validateSchedule(contractInformation?.schedule, daysCache)
+            ? 'step-valid'
+            : 'step-invalid';
+        case 6:
+          return countChildrenWithMedicalInfo ===
+            (contractInformation.children?.length || 0)
+            ? 'step-valid'
+            : 'step-invalid';
+        case 7:
+          return countChildrenWithFormulaInfo ===
+            (contractInformation.children?.length || 0)
+            ? 'step-valid'
+            : 'step-invalid';
+        case 8:
+          return countChildrenWithPermissionsInfo ===
+            (contractInformation.children?.length || 0)
+            ? 'step-valid'
+            : 'step-invalid';
+        case 9:
+          return validateSchedule(contractInformation?.schedule, daysCache)
+            ? 'step-valid'
+            : 'step-invalid';
+        default:
+          return 'step-default';
+      }
+    },
+    [
+      contractInformation.children,
+      contractInformation.guardians,
+      contractInformation.terms,
+      contractInformation.total_to_pay,
+      contractInformation.payment_method_id,
+      contractInformation.start_date,
+      contractInformation.schedule,
+      daysCache,
+      countChildrenWithMedicalInfo,
+      countChildrenWithFormulaInfo,
+      countChildrenWithPermissionsInfo,
+    ]
+  );
 
-  const items = useMemo(() => [
-    {
-      label: `${t('children')} (${contractInformation.children?.length || 0})`,
-      command: () => setActiveIndex(0),
-    },
-    {
-      label: `${t('guardians')} (${contractInformation.guardians?.length || 0})`,
-      command: () => setActiveIndex(1),
-    },
-    {
-      label: `${t('permissions')} (${getAcceptedPermissionsCount()})`,
-      command: () => setActiveIndex(2),
-    },
-    {
-      label: t('contract'),
-      command: () => setActiveIndex(3),
-    },
-    {
-      label: t('pricing'),
-      command: () => setActiveIndex(4),
-    },
-    {
-      label: t('schedule'),
-      command: () => setActiveIndex(5),
-    },
-    {
-      label: `${t('medicalInformation')} (${countChildrenWithMedicalInfo}/${contractInformation.children?.length || 0})`,
-      command: () => setActiveIndex(6),
-      /* disabled: contractInformation.children.length === 0, */
-    },
-    {
-      label: `${t('formulaInformation')} (${countChildrenWithFormulaInfo}/${contractInformation.children?.length || 0})`,
-      command: () => setActiveIndex(7),
-      /* disabled: contractInformation.children.length === 0, */
-    },
-    {
-      label: `${t('permissionsInformation')}(${countChildrenWithPermissionsInfo}/${contractInformation.children?.length || 0})`,
-      command: () => setActiveIndex(8),
-      /* disabled: contractInformation.children.length === 0, */
-    },
-    {
-      label: t('contractGenerator'),
-      command: () => setActiveIndex(9),
-    },
-   
-  
-  ], [
-    t,
-    contractInformation.children?.length,
-    contractInformation.guardians?.length,
-    getAcceptedPermissionsCount,
-    countChildrenWithMedicalInfo,
-    countChildrenWithFormulaInfo,
-    countChildrenWithPermissionsInfo
-  ]);
+  const items = useMemo(
+    () => [
+      {
+        label: `${t('children')} (${contractInformation.children?.length || 0})`,
+        command: () => setActiveIndex(0),
+      },
+      {
+        label: `${t('guardians')} (${contractInformation.guardians?.length || 0})`,
+        command: () => setActiveIndex(1),
+      },
+      {
+        label: `${t('permissions')} (${getAcceptedPermissionsCount()})`,
+        command: () => setActiveIndex(2),
+      },
+      {
+        label: t('contract'),
+        command: () => setActiveIndex(3),
+      },
+      {
+        label: t('pricing'),
+        command: () => setActiveIndex(4),
+      },
+      {
+        label: t('schedule'),
+        command: () => setActiveIndex(5),
+      },
+      {
+        label: `${t('medicalInformation')} (${countChildrenWithMedicalInfo}/${contractInformation.children?.length || 0})`,
+        command: () => setActiveIndex(6),
+        /* disabled: contractInformation.children.length === 0, */
+      },
+      {
+        label: `${t('formulaInformation')} (${countChildrenWithFormulaInfo}/${contractInformation.children?.length || 0})`,
+        command: () => setActiveIndex(7),
+        /* disabled: contractInformation.children.length === 0, */
+      },
+      {
+        label: `${t('permissionsInformation')}(${countChildrenWithPermissionsInfo}/${contractInformation.children?.length || 0})`,
+        command: () => setActiveIndex(8),
+        /* disabled: contractInformation.children.length === 0, */
+      },
+      {
+        label: t('contractGenerator'),
+        command: () => setActiveIndex(9),
+      },
+    ],
+    [
+      t,
+      contractInformation.children?.length,
+      contractInformation.guardians?.length,
+      getAcceptedPermissionsCount,
+      countChildrenWithMedicalInfo,
+      countChildrenWithFormulaInfo,
+      countChildrenWithPermissionsInfo,
+    ]
+  );
 
   const renderContent = useMemo(() => {
     const commonProps = {
@@ -175,7 +215,7 @@ export const Contracts: React.FC<ContractsProps> = () => {
       toast,
       setActiveIndex,
       contractInformation,
-      setContractInformation
+      setContractInformation,
     };
 
     switch (activeIndex) {
@@ -192,7 +232,7 @@ export const Contracts: React.FC<ContractsProps> = () => {
       case 5:
         return <StepComponentFive {...commonProps} />;
       case 6:
-         return <MedicalInformationForm {...commonProps} />;
+        return <MedicalInformationForm {...commonProps} />;
       case 7:
         return <FormulaInformationForm {...commonProps} />;
       case 8:
@@ -202,22 +242,29 @@ export const Contracts: React.FC<ContractsProps> = () => {
       default:
         return null;
     }
-  }, [activeIndex, contractInformation, loadingInfo, setLoadingInfo, toast, setContractInformation]);
+  }, [
+    activeIndex,
+    contractInformation,
+    loadingInfo,
+    setLoadingInfo,
+    toast,
+    setContractInformation,
+  ]);
 
   return (
     <ContractsErrorBoundary>
       <Toast ref={toast} />
       {loadingInfo.loading && <Loader message={loadingInfo.loadingMessage} />}
-      <div className="steps-wrapper my-2 px-2">
+      <div className='steps-wrapper my-2 px-2'>
         <Steps
           model={items.map((item, index) => ({
             ...item,
             className: `${getStepClass(index)} whitespace-nowrap text-xs`, // Added text-xs
           }))}
-          className="c-steps-component overflow-x-auto"
+          className='c-steps-component overflow-x-auto'
           activeIndex={activeIndex}
           readOnly={false}
-          onSelect={(e) => setActiveIndex(e.index)}
+          onSelect={e => setActiveIndex(e.index)}
           pt={{
             root: { className: 'border-none' },
             step: { className: 'min-w-[120px] px-1' }, // Reduced min-width and padding

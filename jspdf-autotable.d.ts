@@ -2,7 +2,7 @@
 import 'jspdf';
 
 declare module 'jspdf' {
-    interface jsPDF {
-        autoTable: typeof import('jspdf-autotable').autoTable;
-    }
+  interface jsPDF {
+    autoTable: typeof import('jspdf-autotable').autoTable;
+  }
 }

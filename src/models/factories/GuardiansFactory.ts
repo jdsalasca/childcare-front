@@ -1,4 +1,4 @@
-import { Guardian } from "../../types/guardian";
+import { Guardian } from '../../types/guardian';
 
 export class GuardiansFactory {
   static getTitularGuardian(guardians: Guardian[]): Guardian | undefined {
@@ -11,14 +11,14 @@ export class GuardiansFactory {
     if (titularGuardians.length !== 1) {
       return false;
     }
-  
+
     // Check for unique guardian types
     const guardianTypes = guardians.map(g => g.guardian_type_id);
     const uniqueTypes = new Set(guardianTypes);
     if (uniqueTypes.size !== guardians.length) {
       return false;
     }
-  
+
     return true;
   }
 
@@ -28,11 +28,14 @@ export class GuardiansFactory {
   ): Guardian[] {
     return updatedGuardians.map(guardian => ({
       ...guardian,
-      titular: originalGuardians.find(og => og.id === guardian.id)?.titular || false,
+      titular:
+        originalGuardians.find(og => og.id === guardian.id)?.titular || false,
     }));
   }
 
-  static createGuardiansAllWithTitularStatus(guardians: Guardian[]): Guardian[] {
+  static createGuardiansAllWithTitularStatus(
+    guardians: Guardian[]
+  ): Guardian[] {
     return guardians.map(guardian => ({
       ...guardian,
       titular: guardian.titular || false,

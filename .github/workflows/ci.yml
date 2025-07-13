@@ -2,9 +2,9 @@ name: 🚀 CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, master, develop ]
+    branches: [main, master, develop]
   pull_request:
-    branches: [ main, master, develop ]
+    branches: [main, master, develop]
 
 env:
   NODE_VERSION: '18'
@@ -63,7 +63,6 @@ jobs:
       - name: 🧪 Run tests
         run: yarn test --coverage
         continue-on-error: false
-
 
   # Job 3: Security Scanning
   security:
@@ -160,4 +159,4 @@ jobs:
       - name: 📢 Notify on failure
         if: failure()
         run: |
-          echo "❌ Pipeline failed. Please check the logs." 
+          echo "❌ Pipeline failed. Please check the logs."

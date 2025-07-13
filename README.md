@@ -26,7 +26,7 @@
 
 ### Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - Yarn package manager
 - Git
 

@@ -1,4 +1,7 @@
-import { CashOnHandByDay, CashOnHandByDayResponse } from 'types/cashOnHandByDay';
+import {
+  CashOnHandByDay,
+  CashOnHandByDayResponse,
+} from 'types/cashOnHandByDay';
 import { customLogger } from '../configs/logger';
 import { Functions } from '../utils/functions';
 import API, { ApiResponse, ApiResponseModel, BASE_URL } from './API';
@@ -10,9 +13,14 @@ interface CashOnHandResponse {
 
 const CashOnHandByDyAPI = {
   // Get Daily Cash Record details by date
-  getDetailsByDate: async (date: string): Promise<CashOnHandResponse | Error> => {
+  getDetailsByDate: async (
+    date: string
+  ): Promise<CashOnHandResponse | Error> => {
     try {
-      const response = await API.get<CashOnHandResponse>(BASE_URL, `/cash-on-hand-by-day/day/${date}`);
+      const response = await API.get<CashOnHandResponse>(
+        BASE_URL,
+        `/cash-on-hand-by-day/day/${date}`
+      );
       return response;
     } catch (error) {
       customLogger.info('Error fetching daily cash details by date:', error);
@@ -26,41 +34,57 @@ const CashOnHandByDyAPI = {
    * @returns {Promise<ApiResponseModel>}
    */
   processCashOnHandByDay: async (
-    cashData: CashOnHandByDyModel = new CashOnHandByDyModel(new Date(), 0, new Date())
+    cashData: CashOnHandByDyModel = new CashOnHandByDyModel(
+      new Date(),
+      0,
+      new Date()
+    )
   ): Promise<ApiResponse<CashOnHandByDay>> => {
     try {
       cashData.isValid();
-      const response = await API.post<CashOnHandByDay>(BASE_URL,'/cash-on-hand-by-day',cashData.build()
+      const response = await API.post<CashOnHandByDay>(
+        BASE_URL,
+        '/cash-on-hand-by-day',
+        cashData.build()
       );
       return response;
     } catch (error) {
-      customLogger.info('Error processing daily cash data on processCashData:', error);
-  
+      customLogger.info(
+        'Error processing daily cash data on processCashData:',
+        error
+      );
+
       // Return a structured ApiResponseModel even on error
-      const errorResponse: ApiResponseModel = new ApiResponseModel(400,  'Error processing cash on hand data',);
-  
+      const errorResponse: ApiResponseModel = new ApiResponseModel(
+        400,
+        'Error processing cash on hand data'
+      );
+
       return errorResponse;
     }
   },
-  
-  
 
   /**
    *
    * @param {Date} date - The date for which the money is received
    * @returns {Promise<ApiResponseModel>} - The response from the API.
    */
-  getMoneyUntilDate: async (date: Date = new Date()): Promise<ApiResponse<CashOnHandByDayResponse>> => {
+  getMoneyUntilDate: async (
+    date: Date = new Date()
+  ): Promise<ApiResponse<CashOnHandByDayResponse>> => {
     try {
       const formattedDate = Functions.formatDateToYYYYMMDD(date);
-      const response = await API.get<CashOnHandByDayResponse>(BASE_URL, `/cash-on-hand-by-day/money/until/${formattedDate}`);
+      const response = await API.get<CashOnHandByDayResponse>(
+        BASE_URL,
+        `/cash-on-hand-by-day/money/until/${formattedDate}`
+      );
       return response;
     } catch (error) {
       customLogger.info('Error processing daily cash data:', error);
-      return new ApiResponseModel(400,  'Error processing cash on hand data',);
+      return new ApiResponseModel(400, 'Error processing cash on hand data');
     }
   },
-}
+};
 /**
  * This class represents the cash on hand by day model
  */
@@ -69,7 +93,11 @@ export class CashOnHandByDyModel {
   private _cash_received: number;
   private _date_of_income_registered: Date;
 
-  constructor(date_of_income: Date | string, cash_received: number, date_of_income_registered: Date) {
+  constructor(
+    date_of_income: Date | string,
+    cash_received: number,
+    date_of_income_registered: Date
+  ) {
     this._date_of_income = date_of_income;
     this._cash_received = cash_received;
     this._date_of_income_registered = date_of_income_registered;
@@ -86,7 +114,7 @@ export class CashOnHandByDyModel {
 
   build() {
     return {
-      date_of_income: this.date_of_income,  // Access the formatted date
+      date_of_income: this.date_of_income, // Access the formatted date
       cash_received: this._cash_received,
       date_of_income_registered: this.date_of_income_registered, // Access the formatted date
     };
@@ -106,4 +134,3 @@ export class CashOnHandByDyModel {
 }
 
 export { CashOnHandByDyAPI };
-

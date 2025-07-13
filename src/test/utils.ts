@@ -1,14 +1,14 @@
-import { render, RenderOptions } from '@testing-library/react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { BrowserRouter } from 'react-router-dom'
-import { I18nextProvider } from 'react-i18next'
-import { ReactElement, ReactNode, createElement } from 'react'
-import { vi } from 'vitest'
-import i18n from '../configs/i18n'
+import { render, RenderOptions } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { BrowserRouter } from 'react-router-dom';
+import { I18nextProvider } from 'react-i18next';
+import { ReactElement, ReactNode, createElement } from 'react';
+import { vi } from 'vitest';
+import i18n from '../configs/i18n';
 
 // Create a custom render function that includes all providers
 interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {
-  queryClient?: QueryClient
+  queryClient?: QueryClient;
 }
 
 export function renderWithProviders(
@@ -29,7 +29,7 @@ export function renderWithProviders(
       },
     }),
     ...renderOptions
-  } = options
+  } = options;
 
   function Wrapper({ children }: { children: ReactNode }) {
     return createElement(
@@ -38,19 +38,15 @@ export function renderWithProviders(
       createElement(
         I18nextProvider,
         { i18n },
-        createElement(
-          QueryClientProvider,
-          { client: queryClient },
-          children
-        )
+        createElement(QueryClientProvider, { client: queryClient }, children)
       )
-    )
+    );
   }
 
   return {
     ...render(ui, { wrapper: Wrapper, ...renderOptions }),
     queryClient,
-  }
+  };
 }
 
 // Mock data factories
@@ -59,7 +55,7 @@ export const mockUser = {
   username: 'testuser',
   email: 'test@example.com',
   token: 'mock-token',
-}
+};
 
 export const mockChild = {
   id: 1,
@@ -76,7 +72,7 @@ export const mockChild = {
   email: 'child@test.com',
   emergencyContact: 'Test Contact',
   emergencyPhone: '987-654-3210',
-}
+};
 
 export const mockGuardian = {
   id: 1,
@@ -91,7 +87,7 @@ export const mockGuardian = {
   state: 'Guardian State',
   zipCode: '54321',
   guardianType: 1,
-}
+};
 
 export const mockContract = {
   id: 1,
@@ -103,7 +99,7 @@ export const mockContract = {
   registrationFee: 100,
   status: 'active',
   terms: 'Test terms and conditions',
-}
+};
 
 export const mockBill = {
   id: 1,
@@ -114,7 +110,7 @@ export const mockBill = {
   description: 'Monthly tuition',
   billType: 1,
   paymentMethod: 1,
-}
+};
 
 export const mockCashRegister = {
   id: 1,
@@ -126,18 +122,18 @@ export const mockCashRegister = {
   totalExpenses: 200,
   status: 'open',
   userId: 1,
-}
+};
 
 // API Response mocks
 export const mockApiResponse = (data: any, status = 200) => ({
   response: data,
   httpStatus: status,
-})
+});
 
 export const mockApiError = (message = 'API Error', status = 400) => ({
   response: { error: message },
   httpStatus: status,
-})
+});
 
 // Mock Axios for API calls
 export const mockAxios = {
@@ -159,16 +155,16 @@ export const mockAxios = {
       patch: {},
     },
   },
-}
+};
 
 // Mock React Router hooks
-export const mockNavigate = vi.fn()
-export const mockUseNavigate = () => mockNavigate
+export const mockNavigate = vi.fn();
+export const mockUseNavigate = () => mockNavigate;
 
 // Mock React Hook Form
 export const mockUseForm = () => ({
   control: {},
-  handleSubmit: vi.fn((fn) => fn),
+  handleSubmit: vi.fn(fn => fn),
   setError: vi.fn(),
   clearErrors: vi.fn(),
   formState: {
@@ -180,17 +176,17 @@ export const mockUseForm = () => ({
   setValue: vi.fn(),
   getValues: vi.fn(),
   reset: vi.fn(),
-})
+});
 
 // Mock i18n
-export const mockT = vi.fn((key: string) => key)
+export const mockT = vi.fn((key: string) => key);
 export const mockUseTranslation = () => ({
   t: mockT,
   i18n: {
     changeLanguage: vi.fn(),
     language: 'en',
   },
-})
+});
 
 // Mock PrimeReact Toast
 export const mockToast = {
@@ -198,11 +194,11 @@ export const mockToast = {
     show: vi.fn(),
     clear: vi.fn(),
   },
-}
+};
 
 // Mock file operations
 export const mockFile = (name = 'test.pdf', type = 'application/pdf') =>
-  new File(['test content'], name, { type })
+  new File(['test content'], name, { type });
 
 // Mock PDF generation
 export const mockJsPDF = {
@@ -213,7 +209,7 @@ export const mockJsPDF = {
   setFont: vi.fn(),
   autoTable: vi.fn(),
   output: vi.fn(() => 'mock-pdf-output'),
-}
+};
 
 // Mock localStorage operations
 export const mockLocalStorage = {
@@ -221,7 +217,7 @@ export const mockLocalStorage = {
   setItem: vi.fn(),
   removeItem: vi.fn(),
   clear: vi.fn(),
-}
+};
 
 // Mock SecurityService
 export const mockSecurityService = {
@@ -231,33 +227,34 @@ export const mockSecurityService = {
     removeItem: vi.fn(),
     clearAll: vi.fn(),
   })),
-}
+};
 
 // Test utilities for async operations
-export const waitForNextUpdate = () => new Promise(resolve => setTimeout(resolve, 0))
+export const waitForNextUpdate = () =>
+  new Promise(resolve => setTimeout(resolve, 0));
 
 export const createMockPromise = (data: any, delay = 0) =>
-  new Promise(resolve => setTimeout(() => resolve(data), delay))
+  new Promise(resolve => setTimeout(() => resolve(data), delay));
 
 export const createMockRejection = (error: any, delay = 0) =>
-  new Promise((_, reject) => setTimeout(() => reject(error), delay))
+  new Promise((_, reject) => setTimeout(() => reject(error), delay));
 
 // Custom matchers for better assertions
 export const expectToBeInDocument = (element: HTMLElement | null) => {
-  expect(element).toBeInTheDocument()
-}
+  expect(element).toBeInTheDocument();
+};
 
 export const expectToHaveText = (element: HTMLElement | null, text: string) => {
-  expect(element).toHaveTextContent(text)
-}
+  expect(element).toHaveTextContent(text);
+};
 
 export const expectToBeVisible = (element: HTMLElement | null) => {
-  expect(element).toBeVisible()
-}
+  expect(element).toBeVisible();
+};
 
 export const expectToBeDisabled = (element: HTMLElement | null) => {
-  expect(element).toBeDisabled()
-}
+  expect(element).toBeDisabled();
+};
 
 // Mock window methods
 export const mockWindowMethods = {
@@ -267,27 +264,27 @@ export const mockWindowMethods = {
   open: vi.fn(),
   close: vi.fn(),
   print: vi.fn(),
-}
+};
 
 // Setup window mocks
 export const setupWindowMocks = () => {
-  Object.assign(window, mockWindowMethods)
-}
+  Object.assign(window, mockWindowMethods);
+};
 
 // Cleanup function for tests
 export const cleanupAfterTest = () => {
-  vi.clearAllMocks()
-  vi.clearAllTimers()
-  vi.restoreAllMocks()
-}
+  vi.clearAllMocks();
+  vi.clearAllTimers();
+  vi.restoreAllMocks();
+};
 
 // Export all utilities
-export * from '@testing-library/react'
-export * from '@testing-library/user-event'
-export { vi } from 'vitest'
+export * from '@testing-library/react';
+export * from '@testing-library/user-event';
+export { vi } from 'vitest';
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
   Trans: ({ children }: any) => children,
   initReactI18next: { type: '3rdParty', init: () => {} },
   I18nextProvider: ({ children }: any) => children,
-})); 
+}));
