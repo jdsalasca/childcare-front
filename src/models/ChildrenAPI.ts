@@ -1,5 +1,4 @@
-import { useQuery, useQueryClient, UseQueryResult } from '@tanstack/react-query';
-import { useMemo } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ChildType } from 'types/child';
 import API, { ApiResponse, BASE_URL } from './API';
 import { AppModels } from './AppModels';

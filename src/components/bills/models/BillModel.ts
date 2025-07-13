@@ -8,6 +8,7 @@ import ChildrenAPI from "../../../models/ChildrenAPI";
  * This class provides the communication between the Bills component and the backend of the childcare API.
  */
 export class BillsModel {
+
     private _getValues: () => any;
     private _toastRef: RefObject<Toast>; // Change this if necessary
     private _t: (key: string) => string;

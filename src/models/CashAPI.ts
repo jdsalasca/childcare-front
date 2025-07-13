@@ -28,13 +28,7 @@ interface BackendFormValues {
   cashOnHand: number;
 }
 
-// Define the properties based on the data structure being processed
-interface CashData {
-  // Example properties based on expected data
-  amount: number;
-  date?: string;
-  description: string;
-}
+
 
 const CashAPI = {
   // Get Daily Cash Record details by date

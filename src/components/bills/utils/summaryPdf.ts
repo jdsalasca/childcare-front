@@ -1,7 +1,7 @@
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import { Bill, FormValues } from '../viewModels/useBillsViewModel';
-import { educando } from './assets/educando_logo';
+
 
 // Helper function to format date properly
 const formatDate = (date: Date | string | undefined): string => {
@@ -20,11 +20,7 @@ const formatDate = (date: Date | string | undefined): string => {
     });
 };
 
-interface BillType {
-    bill: string;
-    amount: number;
-    total: number;
-}
+
 
 export const exportToSummaryPDF = (data: FormValues): void => {
     const doc = new jsPDF();
