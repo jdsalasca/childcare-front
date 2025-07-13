@@ -9,6 +9,7 @@ import CalendarWrapper from '../../formsComponents/CalendarWrapper';
 import DropdownWrapper from '../../formsComponents/DropdownWrapper';
 import InputTextWrapper from '../../formsComponents/InputTextWrapper';
 import { ToastInterpreterUtils } from '../../utils/ToastInterpreterUtils';
+import { inputValidator } from '../../../utils/InputValidation';
 import { ContractInfo } from '../types/ContractInfo';
 import { DoctorInformationCard } from './cards/DoctorInformationCard';
 import { WorkInformationCard } from './cards/WorkInformationCard';
