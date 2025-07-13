@@ -15,6 +15,7 @@ import { programOptions } from '../contracts/utilsAndConstants';
 import Loader from '../utils/Loader';
 import { useBillsViewModel } from './viewModels/useBillsViewModel';
 import { Bill } from './viewModels/useBillsViewModel';
+import { performanceOptimizer } from '../../utils/PerformanceOptimizer';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -74,8 +75,8 @@ const BillCard: React.FC<{
         // Store the input value as-is for the form
         onChange(inputValue);
 
-        // Use requestAnimationFrame to defer the recalculation to avoid focus loss
-        requestAnimationFrame(() => {
+        // Use debounced recalculation to prevent excessive updates
+        const debouncedRecalculation = performanceOptimizer.debounce(() => {
           const numericValue =
             inputValue === '' ? 0 : parseFloat(inputValue) || 0;
           const currentCash =
@@ -94,7 +95,9 @@ const BillCard: React.FC<{
             total: newTotal,
           };
           onRecalculateAll(bill.originalIndex || index, updatedBill);
-        });
+        }, 100, `BillCard-${index}-${fieldType}`);
+
+        debouncedRecalculation();
       },
       [bill, onRecalculateAll, index]
     );
