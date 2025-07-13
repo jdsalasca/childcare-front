@@ -3,18 +3,23 @@ import { Controller, Control, RegisterOptions } from 'react-hook-form';
 import { Dropdown } from 'primereact/dropdown';
 import { classNames } from 'primereact/utils';
 
+interface SelectOption {
+  label: string;
+  value: string | number;
+}
+
 interface SelectWrapperProps {
   name: string;
-  control: Control<any>;
+  control: Control<Record<string, unknown>>;
   rules?: RegisterOptions;
-  options: { label: string; value: any }[];
+  options: SelectOption[];
   label: string;
   disabled?: boolean;
   placeholder?: string;
   className?: string;
   spanClassName?: string;
   readOnly?: boolean;
-  [key: string]: any; // Para aceptar props adicionales
+  [key: string]: unknown; // Para aceptar props adicionales
 }
 
 /**

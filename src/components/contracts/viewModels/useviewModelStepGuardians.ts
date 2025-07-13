@@ -11,6 +11,8 @@ import { ToastInterpreterUtils } from "../../utils/ToastInterpreterUtils"
 import { ContractService } from "../contractModelView"
 import { ContractInfo } from "../types/ContractInfo"
 import { GuardiansValidations } from "../utils/contractValidations"
+import { Child, ContractResponse } from "../../../types/contract"
+import { GuardianType } from "../../../types/guardianType"
 
 // Improved type definitions
 interface GuardianFormData {
@@ -23,7 +25,7 @@ interface ExtendedGuardian extends Guardian {
 
 
 interface UseViewModelStepGuardiansProps {
-  toast: any; // Consider using a specific toast type
+  toast: React.RefObject<{ show: (options: { severity: string; summary: string; detail?: string; life?: number }) => void }>;
   setActiveIndex: (index: number) => void;
   contractInformation: ContractInfo;
   setContractInformation: (info: ContractInfo) => void;
@@ -33,11 +35,11 @@ interface UseViewModelStepGuardiansProps {
 interface UseViewModelStepGuardiansReturn {
   onSubmit: (data: GuardianFormData) => Promise<void>;
   addGuardian: () => void;
-  errors: Record<string, any>;
+  errors: Record<string, unknown>;
   removeGuardian: (index: number) => void;
-  getAvailableGuardianTypes: (index: number) => any[];
+  getAvailableGuardianTypes: (index: number) => GuardianType[];
   handleGuardianSelect: (e: { value: number }) => void;
-  t: (key: string, options?: any) => string;
+  t: (key: string, options?: Record<string, unknown>) => string;
   guardianOptions: Guardian[];
   control: Control<GuardianFormData>;
   fields: FieldArrayWithId<GuardianFormData, "guardians", "id">[];
@@ -164,7 +166,7 @@ const onCreateGuardian = async (data: Guardian): Promise<ExtendedGuardian | unde
     }
   };
 
-  const onCreateContract = async (children: any[], guardians: Guardian[]): Promise<any> => {
+  const onCreateContract = async (children: Child[], guardians: Guardian[]): Promise<ContractResponse | null> => {
     try {
     const result = await Swal.fire({
       title: t('areYouSure'),

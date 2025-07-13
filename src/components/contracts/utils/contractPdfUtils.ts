@@ -21,9 +21,23 @@ interface Options {
   contentHeight: number;
 }
 
+interface ContractProcessed {
+  [key: string]: PageContent;
+}
+
+interface TextObject {
+  text?: string;
+  fontStyle?: string;
+}
+
+interface SignOptions {
+  showParentName: boolean;
+  showEducandoName: boolean;
+}
+
 const addPageContent = (
   doc: jsPDF,
-  contractProcessed: any,
+  contractProcessed: ContractProcessed,
   options: Options,
   pageName: string,
   createPage: boolean = false,
@@ -66,22 +80,23 @@ const addInputField = (doc: jsPDF, content: string, options: Options, contractIn
   doc.text(inputValue, options.marginLeft + doc.getTextWidth(content) + 5, options.yPosition);
   options.yPosition += 10;
 };
-const addHeaderFontStyle = (textObject: any, type: string): string => {
+const addHeaderFontStyle = (textObject: TextObject | string, type: string): string => {
   if (typeof textObject === "string") {
     return type === 'title' ? 'bold' : 'italic';
   } else if (typeof textObject === "object") {
-    return textObject.fontStyle;
+    return textObject.fontStyle || 'normal';
   }
   return 'normal';
 };
 
-const addHeader = (doc: jsPDF, text: any, options: Options, type: string = 'subtitle') => {
+const addHeader = (doc: jsPDF, text: TextObject | string, options: Options, type: string = 'subtitle') => {
   const fontStyle = addHeaderFontStyle(text, type);
-  text = preprocessText(text.text ?? text);
+  const textContent = typeof text === 'string' ? text : text.text || '';
+  const processedText = preprocessText(textContent);
   const fontSize = type === 'title' ? 16 : 14;
   doc.setFontSize(fontSize);
   doc.setFont("Arial", fontStyle);
-  renderFormattedLine(doc, text.text ?? text, options, true);
+  renderFormattedLine(doc, processedText, options, true);
   doc.setFont("Arial", "normal");
   doc.setFontSize(12);
   options.yPosition += 10;
@@ -135,8 +150,13 @@ const DefaultSignOptions = {
 };
 
 
-const addSignSpaces = (doc: jsPDF = new jsPDF(), _text: any, options: Options, contractInformation: any, 
-signOptions: any = DefaultSignOptions, language : Language = Language.Spanish) => {
+const addSignSpaces = (doc: jsPDF = new jsPDF(), _text: string, options: Options, contractInformation: ContractInfo | undefined, 
+signOptions: SignOptions = DefaultSignOptions, language : Language = Language.Spanish) => {
+  if (!contractInformation) {
+    console.warn('Contract information is undefined');
+    return;
+  }
+  
   const titularName = contractInformation.titularName;
   const totalWidth = options.contentWidth;
   const nameFieldWidth = totalWidth * 0.3;

@@ -1,26 +1,27 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { SecurityService } from 'configs/storageUtils';
 
-
 // Define the base URL for the API with fallback
 export const BASE_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:8000/childadmin';
 
 // Alternative URLs for different environments:
 // Production: 'https://www.educandochildcare.com/childadmin'
 // Development: 'http://localhost:8000/childadmin'
+
 // Define the types for the makeRequest function parameters
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
-type RequestOptions = {
-    params?: Record<string, any>; // Define as needed
-    [key: string]: any; // Allow other options
-};
+
+interface RequestOptions {
+    params?: Record<string, string | number | boolean>;
+    [key: string]: unknown;
+}
 
 export interface ApiResponse<T> {
   httpStatus: number;
   response: T;
 }
 
-export class ApiResponseModel<T = any> implements ApiResponse<T> {
+export class ApiResponseModel<T = unknown> implements ApiResponse<T> {
     httpStatus: number;
     response: T;
     message: string | null;
@@ -47,18 +48,19 @@ export class ApiResponseModel<T = any> implements ApiResponse<T> {
 
         if (typeof responseOrMessage === 'string') {
             this.message = responseOrMessage;
-            this.response = null as any; // or a default value if needed
+            this.response = null as T;
         } else {
             this.message = message;
             this.response = responseOrMessage as T;
         }
     }
 }
+
 // Change the return type to have httpStatus as number | undefined
-type ErrorData = {
-    response: any;
+interface ErrorData {
+    response: unknown;
     httpStatus?: number; // Allow httpStatus to be undefined
-};
+}
 
 // Make the makeRequest method generic using <T>
 const makeRequest = async <T>(
@@ -66,7 +68,7 @@ const makeRequest = async <T>(
     method: HttpMethod,
     endpoint: string,
     headers: Record<string, string> = {},
-    body?: any,
+    body?: unknown,
     options: RequestOptions = {},
     withPayload: boolean = false
 ): Promise<ApiResponse<T>> => {
@@ -96,7 +98,7 @@ const makeRequest = async <T>(
 
         if (response.status === 401) {
             window.location.href = './session-expired';
-            return { response: null, httpStatus: 401 } as ApiResponse<T>;
+            return { response: null as T, httpStatus: 401 } as ApiResponse<T>;
         }
 
         return { response: response.data, httpStatus: response.status } as ApiResponse<T>;
@@ -111,7 +113,7 @@ const makeRequest = async <T>(
                 errorData.response = error.response.data; // Error data for 404
             } else if (error.response.status === 401) {
                 window.location.href = './session-expired';
-                return { response: null, httpStatus: 401 } as ApiResponse<T>;
+                return { response: null as T, httpStatus: 401 } as ApiResponse<T>;
             } else {
                 console.error(`Error ${error.response.status}:`, error.response.data);
                 errorData.response = error.response.data; // General error data
@@ -133,15 +135,15 @@ const API = {
         return makeRequest<T>(url, 'GET', endpoint, {}, {}, options, withPayload);
     },
 
-    post<T>(url: string, endpoint: string, body: any, options?: RequestOptions) {
+    post<T>(url: string, endpoint: string, body: unknown, options?: RequestOptions) {
         return makeRequest<T>(url, 'POST', endpoint, {}, body, options);
     },
 
-    put<T>(url: string, endpoint: string, body: any, options?: RequestOptions) {
+    put<T>(url: string, endpoint: string, body: unknown, options?: RequestOptions) {
         return makeRequest<T>(url, 'PUT', endpoint, {}, body, options);
     },
 
-    patch<T>(url: string, endpoint: string, body: any, options?: RequestOptions) {
+    patch<T>(url: string, endpoint: string, body: unknown, options?: RequestOptions) {
         return makeRequest<T>(url, 'PATCH', endpoint, {}, body, options);
     },
 

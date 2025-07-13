@@ -11,8 +11,8 @@ import { Controller } from 'react-hook-form';
 interface ChildFormFieldProps {
     bill: Bill;
     index: number;
-    control: any; // Replace `any` with the correct type from react-hook-form if possible
-    errors: any; // Replace `any` with the correct type if possible
+    control: any; // Keep as any for now to avoid import issues
+    errors: any; // Keep as any for now to avoid import issues
     t: (key: string) => string; // Translation function type
     onRecalculateAll: (index: number, bill: Bill) => void;
     remove: (index: number) => void;

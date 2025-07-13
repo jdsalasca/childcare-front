@@ -11,6 +11,7 @@ import { CashAPI } from '../../../models/CashAPI';
 import { ToastInterpreterUtils } from '../../utils/ToastInterpreterUtils';
 import { exportToSummaryPDF } from '../utils/summaryPdf';
 import { exportBoxesToPDF } from '../utils/boxesPdf';
+import { Toast } from 'primereact/toast';
 
 // Types
 export interface Bill {
@@ -22,6 +23,21 @@ export interface Bill {
   total?: number;
   originalIndex?: number;
   classroom?: string;
+}
+
+// Define the structure for closed money data based on usage patterns
+interface ClosedMoneyData {
+  has_closed_money: boolean;
+  total?: number;
+  total_closing_amount?: number;
+  closing_details?: Array<{
+    amount: number;
+    description: string;
+  }>;
+  opening_details?: Array<{
+    amount: number;
+    description: string;
+  }>;
 }
 
 // Backend data structure for API
@@ -59,13 +75,12 @@ interface Sums {
   total_cash_on_hand: number;
 }
 
-const toNumber = (value: any): number => {
-  if (typeof value === 'number') return value;
-  if (typeof value === 'string' && value !== '') {
-    const parsed = parseFloat(value);
-    return isNaN(parsed) ? 0 : parsed;
+const toNumber = (value: string | number | undefined): number => {
+  if (value === undefined || value === null || value === '') {
+    return 0;
   }
-  return 0;
+  const num = typeof value === 'string' ? parseFloat(value) : value;
+  return isNaN(num) ? 0 : num;
 };
 
 // Memoized calculation functions
@@ -100,7 +115,7 @@ export const useBillsViewModel = () => {
 
   // State
   const [exportableCount, setExportableCount] = useState<number>(0);
-  const [closedMoneyData, setClosedMoneyData] = useState<any>(null);
+  const [closedMoneyData, setClosedMoneyData] = useState<ClosedMoneyData | null>(null);
   const [loadingInfo, setLoadingInfo] = useState<LoadingInfo>({
     loading: false,
     loadingMessage: ''
@@ -113,7 +128,7 @@ export const useBillsViewModel = () => {
   // Refs for preventing excessive calculations
   const recalculateFieldsRef = useRef<boolean>(false);
   const lastSelectedDateRef = useRef<Date | null>(null);
-  const toast = useRef<any>(null);
+  const toast = useRef<Toast | null>(null);
   const recalculateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const updateIndicesTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -327,7 +342,7 @@ export const useBillsViewModel = () => {
       });
 
       // Create bills from children data directly to avoid dependency on childrenOptions
-      const billList: Bill[] = children.map((child: any, index: number) => ({
+      const billList: Bill[] = children.map((child: { id?: number; childName?: string; first_name?: string; last_name?: string; classroom?: string }, index: number) => ({
         id: child.id?.toString() || `child_${index}`,
         originalIndex: index,
         names: child.childName || `${child.first_name} ${child.last_name}`,
