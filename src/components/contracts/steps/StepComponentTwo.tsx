@@ -8,6 +8,7 @@ import DropdownWrapper from '../../formsComponents/DropdownWrapper';
 import InputTextWrapper from '../../formsComponents/InputTextWrapper';
 import { ContractInfo } from '../types/ContractInfo';
 import useViewModelStepGuardians from '../viewModels/useviewModelStepGuardians';
+import { GuardianType } from '../../../types/guardianType';
 
 interface StepComponentTwoProps {
   setActiveIndex: (index: number) => void;

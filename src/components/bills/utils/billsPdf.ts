@@ -2,6 +2,7 @@ import jsPDF from 'jspdf';
 import { addFonts } from '../../contracts/utils/jsPdfArial';
 import { FormValues } from '../viewModels/useBillsViewModel';
 import { logoImg } from './assets/logoimg';
+import { Bill } from '../../../types/bill';
 
 
 export const exportToPDF = (data : FormValues): void => {

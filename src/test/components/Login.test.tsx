@@ -1,5 +1,7 @@
+import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { screen, fireEvent, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event';
 import { renderWithProviders, mockApiResponse, mockApiError } from '../utils'
 import Login from '../../components/utils/Login'
 import UsersAPI from '../../models/UsersAPI'
@@ -57,13 +59,20 @@ describe('Login Component', () => {
     
     renderWithProviders(<Login />)
     
-    const usernameInput = screen.getByDisplayValue('') // Get first input
-    const passwordInput = screen.getAllByDisplayValue('')[1] // Get second input
-    const loginButton = screen.getByRole('button')
+    const usernameInput = screen.getByLabelText(/username/i)
+    const passwordInput = screen.getByLabelText(/password/i)
+    const form = document.querySelector('form')!
     
-    fireEvent.change(usernameInput, { target: { value: 'testuser' } })
-    fireEvent.change(passwordInput, { target: { value: 'password123' } })
-    fireEvent.click(loginButton)
+    // Try userEvent.type, fallback to fireEvent.change if needed
+    await userEvent.type(usernameInput, 'testuser')
+    await userEvent.type(passwordInput, 'password123')
+    if ((usernameInput as HTMLInputElement).value !== 'testuser') {
+      fireEvent.change(usernameInput, { target: { value: 'testuser' } })
+    }
+    if ((passwordInput as HTMLInputElement).value !== 'password123') {
+      fireEvent.change(passwordInput, { target: { value: 'password123' } })
+    }
+    fireEvent.submit(form)
     
     await waitFor(() => {
       expect(mockUsersAPI.authUser).toHaveBeenCalledWith({
@@ -90,12 +99,12 @@ describe('Login Component', () => {
     
     renderWithProviders(<Login />)
     
-    const usernameInput = screen.getByDisplayValue('')
-    const passwordInput = screen.getAllByDisplayValue('')[1]
+    const usernameInput = screen.getByLabelText(/username/i)
+    const passwordInput = screen.getByLabelText(/password/i)
     const loginButton = screen.getByRole('button')
     
-    fireEvent.change(usernameInput, { target: { value: 'testuser' } })
-    fireEvent.change(passwordInput, { target: { value: 'password123' } })
+    await userEvent.type(usernameInput, 'testuser')
+    await userEvent.type(passwordInput, 'password123')
     fireEvent.click(loginButton)
     
     await waitFor(() => {
@@ -110,12 +119,12 @@ describe('Login Component', () => {
     
     renderWithProviders(<Login />)
     
-    const usernameInput = screen.getByDisplayValue('')
-    const passwordInput = screen.getAllByDisplayValue('')[1]
+    const usernameInput = screen.getByLabelText(/username/i)
+    const passwordInput = screen.getByLabelText(/password/i)
     const loginButton = screen.getByRole('button')
     
-    fireEvent.change(usernameInput, { target: { value: 'testuser' } })
-    fireEvent.change(passwordInput, { target: { value: 'wrongpassword' } })
+    await userEvent.type(usernameInput, 'testuser')
+    await userEvent.type(passwordInput, 'wrongpassword')
     fireEvent.click(loginButton)
     
     await waitFor(() => {
@@ -134,12 +143,12 @@ describe('Login Component', () => {
     
     renderWithProviders(<Login />)
     
-    const usernameInput = screen.getByDisplayValue('')
-    const passwordInput = screen.getAllByDisplayValue('')[1]
+    const usernameInput = screen.getByLabelText(/username/i)
+    const passwordInput = screen.getByLabelText(/password/i)
     const loginButton = screen.getByRole('button')
     
-    fireEvent.change(usernameInput, { target: { value: 'nonexistentuser' } })
-    fireEvent.change(passwordInput, { target: { value: 'password123' } })
+    await userEvent.type(usernameInput, 'nonexistentuser')
+    await userEvent.type(passwordInput, 'password123')
     fireEvent.click(loginButton)
     
     await waitFor(() => {
@@ -158,12 +167,12 @@ describe('Login Component', () => {
     
     renderWithProviders(<Login />)
     
-    const usernameInput = screen.getByDisplayValue('')
-    const passwordInput = screen.getAllByDisplayValue('')[1]
+    const usernameInput = screen.getByLabelText(/username/i)
+    const passwordInput = screen.getByLabelText(/password/i)
     const loginButton = screen.getByRole('button')
     
-    fireEvent.change(usernameInput, { target: { value: 'testuser' } })
-    fireEvent.change(passwordInput, { target: { value: 'wrongpassword' } })
+    await userEvent.type(usernameInput, 'testuser')
+    await userEvent.type(passwordInput, 'wrongpassword')
     fireEvent.click(loginButton)
     
     await waitFor(() => {
@@ -178,12 +187,12 @@ describe('Login Component', () => {
     
     renderWithProviders(<Login />)
     
-    const usernameInput = screen.getByDisplayValue('')
-    const passwordInput = screen.getAllByDisplayValue('')[1]
+    const usernameInput = screen.getByLabelText(/username/i)
+    const passwordInput = screen.getByLabelText(/password/i)
     const loginButton = screen.getByRole('button')
     
-    fireEvent.change(usernameInput, { target: { value: 'testuser' } })
-    fireEvent.change(passwordInput, { target: { value: 'password123' } })
+    await userEvent.type(usernameInput, 'testuser')
+    await userEvent.type(passwordInput, 'password123')
     fireEvent.click(loginButton)
     
     await waitFor(() => {
@@ -198,12 +207,12 @@ describe('Login Component', () => {
     
     renderWithProviders(<Login />)
     
-    const usernameInput = screen.getByDisplayValue('')
-    const passwordInput = screen.getAllByDisplayValue('')[1]
+    const usernameInput = screen.getByLabelText(/username/i)
+    const passwordInput = screen.getByLabelText(/password/i)
     const loginButton = screen.getByRole('button')
     
-    fireEvent.change(usernameInput, { target: { value: 'testuser' } })
-    fireEvent.change(passwordInput, { target: { value: 'password123' } })
+    await userEvent.type(usernameInput, 'testuser')
+    await userEvent.type(passwordInput, 'password123')
     fireEvent.click(loginButton)
     
     await waitFor(() => {

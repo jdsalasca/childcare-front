@@ -1,4 +1,4 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { Component, ErrorInfo, ReactNode } from 'react';
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
 import { customLogger } from 'configs/logger';

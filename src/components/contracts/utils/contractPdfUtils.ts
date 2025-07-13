@@ -135,7 +135,7 @@ const DefaultSignOptions = {
 };
 
 
-const addSignSpaces = (doc: jsPDF = new jsPDF(), text: any, options: Options, contractInformation: any, 
+const addSignSpaces = (doc: jsPDF = new jsPDF(), _text: any, options: Options, contractInformation: any, 
 signOptions: any = DefaultSignOptions, language : Language = Language.Spanish) => {
   const titularName = contractInformation.titularName;
   const totalWidth = options.contentWidth;
@@ -387,7 +387,7 @@ export class ContractPdf {
 }
 
   // Function to add the first page
-  const addFirstPage = (doc: jsPDF, options: Options,contractInfo :any ,contractInformation :ContractInfo, language : Language) => {
+  const addFirstPage = (doc: jsPDF, options: Options,contractInfo :any ,_contractInformation :ContractInfo, language : Language) => {
     options.yPosition = options.yPosition - 10
     const contractLabel: string = language === Language.English ? "Contract" : "Contrato"
     addHeader(doc, "Educando Childcare Center", options,"title");

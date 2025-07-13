@@ -98,21 +98,18 @@ export const GuardiansValidations = {
       errors.push('City is required');
     }
 
-    // Note: Guardian type doesn't have state and zip_code properties in the actual interface
-    // These validations are commented out to match the actual type structure
-    // if (!guardian.state || guardian.state.trim() === '') {
-    //   errors.push('State is required');
-    // }
-
-    // if (!guardian.zip_code || guardian.zip_code.trim() === '') {
-    //   errors.push('Zip code is required');
-    // } else if (!/^\d{5}$/.test(guardian.zip_code)) {
-    //   errors.push('Zip code must be 5 digits');
-    // }
-
-    // if (!guardian.document_number || guardian.document_number.trim() === '') {
-    //   errors.push('Document number is required');
-    // }
+    // Optional fields: state, zip_code, document_number
+    if ('state' in guardian && typeof guardian.state === 'string' && guardian.state.trim() === '') {
+      errors.push('State is required');
+    }
+    if ('zip_code' in guardian && typeof guardian.zip_code === 'string' && guardian.zip_code.trim() === '') {
+      errors.push('Zip code is required');
+    } else if ('zip_code' in guardian && typeof guardian.zip_code === 'string' && guardian.zip_code && !/^\d{5}$/.test(guardian.zip_code)) {
+      errors.push('Zip code must be 5 digits');
+    }
+    if ('document_number' in guardian && typeof guardian.document_number === 'string' && guardian.document_number.trim() === '') {
+      errors.push('Document number is required');
+    }
 
     return {
       isValid: errors.length === 0,

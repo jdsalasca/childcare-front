@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { ApiResponse } from "../API"; // Import your ApiResponse type
 import GuardianTypesAPI from "../GuardianTypesAPI";
+import { GuardianType } from "../../types/guardianType";
 
 // Hook to fetch all guardian types
 export const useGuardianTypes = () => {

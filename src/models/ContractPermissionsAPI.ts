@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import API, { BASE_URL } from "./API";
 import { ContractModel } from "./ContractAPI";
+import { ContractPermission } from "../types/contractPermission";
 
 
 export const ContractPermissionsAPI = {
@@ -90,7 +91,7 @@ export class ContractPermissionsValidator {
     }
     const permissionValidKeys = Object.keys(permissions).filter((key) => {
       const typedKey = key as ContractPermissionKeys; // Assert the key type
-      return permissions[typedKey] === true && ContractModel.CONTRACT_PERMISSIONS.includes(typedKey);
+      return permissions[typedKey] === true && ContractModel.CONTRACT_PERMISSIONS.includes(key as string);
     });
     return permissionValidKeys.length; // Returns count of valid permissions
   }

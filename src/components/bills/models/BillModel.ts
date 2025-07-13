@@ -9,7 +9,6 @@ import ChildrenAPI from "../../../models/ChildrenAPI";
  */
 export class BillsModel {
 
-    private _getValues: () => any;
     private _toastRef: RefObject<Toast>; // Change this if necessary
     private _t: (key: string) => string;
 
@@ -18,8 +17,7 @@ export class BillsModel {
      * @param {RefObject<Toast>} toastRef - Reference to the Toast component for showing notifications.
      * @param {Function} t - Function to translate the messages.
      */
-    constructor(getValues: () => any, toastRef: RefObject<Toast>, t: (key: string) => string) {
-        this._getValues = getValues;
+    constructor(toastRef: RefObject<Toast>, t: (key: string) => string) {
         this._toastRef = toastRef;
         this._t = t;
     }

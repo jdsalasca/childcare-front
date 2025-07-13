@@ -5,9 +5,7 @@ import { ContractInfo, Language } from '../types/ContractInfo';
 import { calculateWeeksOld, determineProgram, fontStyles } from '../utilsAndConstants';
 import { mockContract } from '../../../data/mockContract';
 export const contractInfo = (contractData: ContractInfo= mockContract, language:Language = Language.English) => {
-  const _todayDate = Functions.formatDateToMMDDYY(contractData.todayDate);
-  const _startDate = Functions.formatDateToMMDDYY(contractData.start_date!);
-  const _endDate = Functions.formatDateToMMDDYY(contractData.end_date!);
+  // Removed unused variables: _todayDate, _startDate, _endDate
   const _GUARDIAN_TYPE_ID = 1;
   let {weekly_payment} = contractData
   const MOTHER_GUARDIAN_TYPE_ID = 2;
@@ -44,7 +42,7 @@ contractData.guardians.find(g => g.guardian_type_id === _GUARDIAN_TYPE_ID)?.emai
     child.program = determineProgram(calculateWeeksOld(child.born_date!));
   });
 
-  const _guardians = contractData.guardians.map(g => g.name).join(', ');
+  // Removed unused variable: _guardians
   const children = contractData.children
     .map(child =>
       Language.Spanish === language ? `- Nombre del niño: ${child.first_name} ${child.last_name}, fecha de nacimiento: ${Functions.formatDateToMMDDYY(child.born_date!)}` : `- Child's name: ${child.first_name} ${child.last_name}, birth date: ${Functions.formatDateToMMDDYY(child.born_date!)}`
@@ -74,7 +72,7 @@ contractData.guardians.find(g => g.guardian_type_id === _GUARDIAN_TYPE_ID)?.emai
 
   const registrationFee = 25;
   const activityFee = 25;
-  const _totalCost =
+  // Removed unused variable: _totalCost
     registrationFee +
     activityFee * (programCounts['Toddler'] || 0) +
     activityFee * (programCounts['Preschool'] || 0) +
@@ -596,9 +594,4 @@ page19: {
 
   return contract;
 }
-interface _ChildIterationMarkers {
-  iterateChildren?: {
-    start: boolean;
-    end: boolean;
-  }
-}
+// Removed unused interface _ChildIterationMarkers

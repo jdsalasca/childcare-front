@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import API, { ApiResponse, BASE_URL } from './API';
+import { DayType } from '../types/day';
 
 
 const DaysAPI = {

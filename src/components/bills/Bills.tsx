@@ -216,7 +216,7 @@ const BillSummary: React.FC<{
   };
   cashOnHand: number;
   closedMoneyData?: any;
-}> = ({ sums, cashOnHand, closedMoneyData }) => {
+}> = ({ sums, cashOnHand: _cashOnHand, closedMoneyData: _closedMoneyData }) => {
   const { t } = useTranslation();
 
   const formatCurrency = (amount: number): string => {
@@ -252,7 +252,27 @@ const BillSummary: React.FC<{
       color: 'text-purple-600',
       bgColor: 'bg-purple-50'
     },
-    
+    {
+      label: t('bills.cashOnHand', 'Cash on Hand'),
+      value: _cashOnHand || 0,
+      icon: 'pi pi-wallet',
+      color: 'text-orange-600',
+      bgColor: 'bg-orange-50'
+    },
+    {
+      label: t('bills.closedMoney', 'Closed Money'),
+      value: _closedMoneyData?.total || 0,
+      icon: 'pi pi-lock',
+      color: 'text-red-600',
+      bgColor: 'bg-red-50'
+    },
+    {
+      label: t('bills.totalCashCalculations', 'Total Cash Calculations'),
+      value: (sums.cash + sums.check) + (_cashOnHand || 0) + (_closedMoneyData?.total || 0),
+      icon: 'pi pi-chart-line',
+      color: 'text-indigo-600',
+      bgColor: 'bg-indigo-50'
+    }
   ];
 
   return (
@@ -266,7 +286,7 @@ const BillSummary: React.FC<{
         </h3>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
         {summaryItems.map((item, index) => (
           <div 
             key={index}
@@ -287,43 +307,7 @@ const BillSummary: React.FC<{
         ))}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-        <div className="text-center">
-          <div className="text-2xl font-bold text-blue-600 mb-1">
-            {formatCurrency(cashOnHand)}
-          </div>
-          <div className="text-sm text-gray-600">
-            {t('bills.cash_on_hand')}
-          </div>
-          <div className="text-xs text-gray-500 mt-1">
-            {t('bills.cashOnHandNote')}
-          </div>
-        </div>
-
-        {/* Closed Money Display */}
-        {closedMoneyData?.has_closed_money && (
-          <div className="text-center">
-            <div className="text-2xl font-bold text-green-600 mb-1">
-              {formatCurrency(closedMoneyData.total_closing_amount)}
-            </div>
-            <div className="text-sm text-gray-600">
-              {t('bills.closedMoney')}
-            </div>
-            <div className="text-xs text-gray-500 mt-1">
-              {t('bills.closedMoneyNote')}
-            </div>
-          </div>
-        )}
-
-        <div className="text-center">
-          <div className="text-2xl font-bold text-emerald-600 mb-1">
-            {formatCurrency(sums.total_cash_on_hand)}
-          </div>
-          <div className="text-sm text-gray-600">
-            {t('bills.total_not_cash_on_hand')}
-          </div>
-        </div>
-      </div>
+   
 
 
     </div>

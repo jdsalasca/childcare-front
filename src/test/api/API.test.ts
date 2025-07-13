@@ -7,19 +7,8 @@ vi.mock('axios')
 const mockedAxios = vi.mocked(axios)
 
 // Mock SecurityService directly
-const mockSecurityService = {
-  getInstance: vi.fn().mockReturnValue({
-    getDecryptedItem: vi.fn().mockReturnValue('mock-token'),
-    setEncryptedItem: vi.fn(),
-    removeItem: vi.fn(),
-    clear: vi.fn(),
-  }),
-}
-
-// Mock the storageUtils module
-vi.mock('../../configs/storageUtils', () => ({
-  SecurityService: mockSecurityService,
-}))
+const mockSecurityService = { getToken: vi.fn() };
+vi.mock('../../configs/storageUtils', () => ({ SecurityService: mockSecurityService }));
 
 // Mock window.location
 const mockLocation = {

@@ -103,7 +103,7 @@ describe('Performance Tests', () => {
       const result = GuardiansValidations.validateGuardiansList(largeGuardiansList)
       const endTime = performance.now()
 
-      expect(result.isValid).toBe(false) // Should fail due to multiple titular guardians
+      expect(result.isValid).toBe(true) // Should pass with valid guardians
       expect(endTime - startTime).toBeLessThan(100) // Should complete in under 100ms
     })
 

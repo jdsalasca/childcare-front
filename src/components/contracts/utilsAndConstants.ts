@@ -6,11 +6,7 @@ interface ScheduleEntry {
   check_out: string;
 }
 
-interface DayType {
-  id: number;
-  name: string;
-  abbreviation: string;
-}
+// Removed local DayType interface - using the one from types/day.ts
 
 // Interfaces
 interface ProgramOption {
@@ -60,6 +56,8 @@ export const fontStyles = {
   BOLD: "bold",
   NORMAL: "normal"
 };
+
+import { DayType } from '../../types/day';
 
 export const validateSchedule = (schedule: ScheduleEntry[] | null | undefined, days: DayType[] | null): boolean => {
   // Handle null/undefined inputs
