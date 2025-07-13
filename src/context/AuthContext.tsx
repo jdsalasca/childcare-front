@@ -4,9 +4,9 @@ import React, {
   ReactNode,
   useContext,
   useEffect,
-  useState,
 } from 'react';
 import { SecurityService } from '../configs/storageUtils';
+import { useUnifiedState } from '../utils/stateManagement/useUnifiedState';
 
 // Define the context type
 interface AuthContextType {
@@ -21,35 +21,40 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [token, setToken] = useState<string | null>(null);
+  const { state: authState, setState: setAuthState } = useUnifiedState({
+    initialState: {
+      token: null as string | null,
+    },
+  });
+
   const securityService = SecurityService.getInstance();
 
   useEffect(() => {
     // Load token from encrypted storage on component mount
     const storedToken = securityService.getDecryptedItem('token');
     if (storedToken) {
-      setToken(storedToken);
+      setAuthState({ token: storedToken });
     }
-  }, []);
+  }, [setAuthState]);
 
   useEffect(() => {
     // Store token using encrypted storage when token changes
-    if (token) {
-      securityService.setEncryptedItem('token', token);
+    if (authState.token) {
+      securityService.setEncryptedItem('token', authState.token);
     }
-  }, [token]);
+  }, [authState.token]);
 
   const login = (newToken: string) => {
-    setToken(newToken);
+    setAuthState({ token: newToken });
   };
 
   const logout = () => {
-    setToken(null);
-    localStorage.removeItem('token'); // Clear token from localStorage on logout
+    setAuthState({ token: null });
+    securityService.removeEncryptedItem('token'); // Use SecurityService consistently
   };
 
   return (
-    <AuthContext.Provider value={{ token, login, logout }}>
+    <AuthContext.Provider value={{ token: authState.token, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
