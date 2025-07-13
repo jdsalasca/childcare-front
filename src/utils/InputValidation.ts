@@ -49,7 +49,10 @@ export class InputValidator {
     }
 
     // Required validation
-    if (rules.required && (!sanitizedValue || sanitizedValue.toString().trim() === '')) {
+    if (
+      rules.required &&
+      (!sanitizedValue || sanitizedValue.toString().trim() === '')
+    ) {
       errors.push(`${fieldName} is required`);
     }
 
@@ -64,11 +67,15 @@ export class InputValidator {
 
     // Length validations
     if (rules.minLength && sanitizedValue.toString().length < rules.minLength) {
-      errors.push(`${fieldName} must be at least ${rules.minLength} characters`);
+      errors.push(
+        `${fieldName} must be at least ${rules.minLength} characters`
+      );
     }
 
     if (rules.maxLength && sanitizedValue.toString().length > rules.maxLength) {
-      errors.push(`${fieldName} must be no more than ${rules.maxLength} characters`);
+      errors.push(
+        `${fieldName} must be no more than ${rules.maxLength} characters`
+      );
     }
 
     // Pattern validation
@@ -103,7 +110,7 @@ export class InputValidator {
    */
   public sanitizeHtml(input: string): string {
     if (!input || typeof input !== 'string') return '';
-    
+
     return input
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
@@ -118,7 +125,7 @@ export class InputValidator {
    */
   public sanitizeEmail(input: string): string {
     if (!input || typeof input !== 'string') return '';
-    
+
     return input.trim().toLowerCase();
   }
 
@@ -127,7 +134,7 @@ export class InputValidator {
    */
   public sanitizeNumber(input: any): number | null {
     if (input === null || input === undefined || input === '') return null;
-    
+
     const num = parseFloat(input.toString());
     return isNaN(num) ? null : num;
   }
@@ -137,7 +144,7 @@ export class InputValidator {
    */
   public sanitizeText(input: string): string {
     if (!input || typeof input !== 'string') return '';
-    
+
     return input.trim().replace(/\s+/g, ' ');
   }
 
@@ -154,27 +161,27 @@ export class InputValidator {
    */
   public validatePassword(password: string): ValidationResult {
     const errors: string[] = [];
-    
+
     if (password.length < 8) {
       errors.push('Password must be at least 8 characters long');
     }
-    
+
     if (!/[A-Z]/.test(password)) {
       errors.push('Password must contain at least one uppercase letter');
     }
-    
+
     if (!/[a-z]/.test(password)) {
       errors.push('Password must contain at least one lowercase letter');
     }
-    
+
     if (!/\d/.test(password)) {
       errors.push('Password must contain at least one number');
     }
-    
+
     if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
       errors.push('Password must contain at least one special character');
     }
-    
+
     return {
       isValid: errors.length === 0,
       errors,
@@ -195,7 +202,7 @@ export class InputValidator {
    */
   public validateDate(date: any): boolean {
     if (!date) return false;
-    
+
     const dateObj = new Date(date);
     return dateObj instanceof Date && !isNaN(dateObj.getTime());
   }
@@ -205,7 +212,7 @@ export class InputValidator {
    */
   public validateCurrency(amount: any): boolean {
     if (amount === null || amount === undefined || amount === '') return false;
-    
+
     const num = parseFloat(amount.toString());
     return !isNaN(num) && num >= 0;
   }
@@ -219,7 +226,8 @@ export class InputValidator {
         required: true,
         pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
         sanitize: this.sanitizeEmail.bind(this),
-        custom: (value: string) => this.validateEmail(value) || 'Invalid email format',
+        custom: (value: string) =>
+          this.validateEmail(value) || 'Invalid email format',
       },
       password: {
         required: true,
@@ -238,12 +246,15 @@ export class InputValidator {
       },
       phone: {
         required: false,
-        custom: (value: string) => !value || this.validatePhone(value) || 'Invalid phone format',
-        sanitize: (value: string) => value ? value.replace(/[\s\-\(\)]/g, '') : '',
+        custom: (value: string) =>
+          !value || this.validatePhone(value) || 'Invalid phone format',
+        sanitize: (value: string) =>
+          value ? value.replace(/[\s\-\(\)]/g, '') : '',
       },
       currency: {
         required: false,
-        custom: (value: any) => !value || this.validateCurrency(value) || 'Invalid amount',
+        custom: (value: any) =>
+          !value || this.validateCurrency(value) || 'Invalid amount',
         sanitize: this.sanitizeNumber.bind(this),
       },
       text: {

@@ -215,6 +215,13 @@ export const useBillsViewModelOptimized = () => {
     [updateState]
   );
 
+  // Cleanup debounced function on unmount
+  useEffect(() => {
+    return () => {
+      debouncedRecalculate.cancel();
+    };
+  }, [debouncedRecalculate]);
+
   // Optimized recalculation function
   const recalculateFields = useCallback(
     (newFields?: OptimizedBill[]) => {

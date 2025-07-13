@@ -67,12 +67,16 @@ const FormRegister = () => {
           control={control}
           label={t('userName')}
           onBlur={userNameExist}
-          rules={{ 
+          rules={{
             required: t('username_is_required'),
-            validate: (value) => {
-              const result = inputValidator.validate(value, inputValidator.getValidationRules().username, 'Username');
+            validate: value => {
+              const result = inputValidator.validate(
+                value,
+                inputValidator.getValidationRules().username,
+                'Username'
+              );
               return result.isValid || result.errors[0];
-            }
+            },
           }}
         />
 
@@ -80,12 +84,16 @@ const FormRegister = () => {
           name='first_name'
           control={control}
           label={t('first_name')}
-          rules={{ 
+          rules={{
             required: t('first_name_is_required'),
-            validate: (value) => {
-              const result = inputValidator.validate(value, inputValidator.getValidationRules().name, 'First Name');
+            validate: value => {
+              const result = inputValidator.validate(
+                value,
+                inputValidator.getValidationRules().name,
+                'First Name'
+              );
               return result.isValid || result.errors[0];
-            }
+            },
           }}
         />
 
@@ -93,12 +101,16 @@ const FormRegister = () => {
           name='last_name'
           control={control}
           label={t('last_name')}
-          rules={{ 
+          rules={{
             required: t('last_name_is_required'),
-            validate: (value) => {
-              const result = inputValidator.validate(value, inputValidator.getValidationRules().name, 'Last Name');
+            validate: value => {
+              const result = inputValidator.validate(
+                value,
+                inputValidator.getValidationRules().name,
+                'Last Name'
+              );
               return result.isValid || result.errors[0];
-            }
+            },
           }}
         />
 
@@ -107,12 +119,16 @@ const FormRegister = () => {
           control={control}
           label={t('email')}
           onBlur={emailExist}
-          rules={{ 
+          rules={{
             required: t('emailRequired'),
-            validate: (value) => {
-              const result = inputValidator.validate(value, inputValidator.getValidationRules().email, 'Email');
+            validate: value => {
+              const result = inputValidator.validate(
+                value,
+                inputValidator.getValidationRules().email,
+                'Email'
+              );
               return result.isValid || result.errors[0];
-            }
+            },
           }}
         />
 
@@ -148,12 +164,16 @@ const FormRegister = () => {
               name='password'
               control={control}
               label={t('password')}
-              rules={{ 
+              rules={{
                 required: t('password_is_required'),
-                validate: (value) => {
-                  const result = inputValidator.validate(value, inputValidator.getValidationRules().password, 'Password');
+                validate: value => {
+                  const result = inputValidator.validate(
+                    value,
+                    inputValidator.getValidationRules().password,
+                    'Password'
+                  );
                   return result.isValid || result.errors[0];
-                }
+                },
               }}
             />
             <PasswordWrapper
@@ -162,13 +182,20 @@ const FormRegister = () => {
               label={t('password_confirmation')}
               rules={{
                 required: t('password_is_required'),
-                validate: (value) => {
-                  const passwordResult = inputValidator.validate(value, inputValidator.getValidationRules().password, 'Password');
+                validate: value => {
+                  const passwordResult = inputValidator.validate(
+                    value,
+                    inputValidator.getValidationRules().password,
+                    'Password'
+                  );
                   if (!passwordResult.isValid) {
                     return passwordResult.errors[0];
                   }
-                  return value === getValues('password') || t('passwords_do_not_match');
-                }
+                  return (
+                    value === getValues('password') ||
+                    t('passwords_do_not_match')
+                  );
+                },
               }}
             />
           </>

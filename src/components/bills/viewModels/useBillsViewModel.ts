@@ -11,6 +11,8 @@ import { CashAPI } from '../../../models/CashAPI';
 import { ToastInterpreterUtils } from '../../utils/ToastInterpreterUtils';
 import { exportToSummaryPDF } from '../utils/summaryPdf';
 import { exportBoxesToPDF } from '../utils/boxesPdf';
+import ErrorHandler from '../../../utils/errorHandler';
+import { performanceOptimizer } from '../../../utils/PerformanceOptimizer';
 
 // Types
 export interface Bill {
@@ -183,7 +185,7 @@ export const useBillsViewModel = () => {
 
       return () => clearTimeout(timeoutId);
     }
-  }, [cashOnHandValue]); // Remove calculateSums from dependencies to prevent infinite loop
+  }, [cashOnHandValue, billsFields, calculateSums]);
 
   // Optimized recalculation with debouncing
   const recalculateFields = useCallback(
@@ -197,33 +199,39 @@ export const useBillsViewModel = () => {
         clearTimeout(recalculateTimeoutRef.current);
       }
 
-      // Use setTimeout to debounce the calculation
-      recalculateTimeoutRef.current = setTimeout(() => {
-        try {
-          const fieldsToUse = newFields || getValues('bills') || [];
+      // Use performance optimizer for debounced calculation
+      const debouncedCalculation = performanceOptimizer.debounce(
+        () => {
+          try {
+            const fieldsToUse = newFields || getValues('bills') || [];
 
-          // Improved exportable count calculation - count bills with any content
-          const count = fieldsToUse.filter(bill => {
-            const cashNum = toNumber(bill.cash);
-            const checkNum = toNumber(bill.check);
-            const hasNames = bill.names && bill.names.trim().length > 0;
+            // Improved exportable count calculation - count bills with any content
+            const count = fieldsToUse.filter(bill => {
+              const cashNum = toNumber(bill.cash);
+              const checkNum = toNumber(bill.check);
+              const hasNames = bill.names && bill.names.trim().length > 0;
 
-            // A bill is exportable if it has names and at least some amount
-            return hasNames && (cashNum > 0 || checkNum > 0);
-          }).length;
+              // A bill is exportable if it has names and at least some amount
+              return hasNames && (cashNum > 0 || checkNum > 0);
+            }).length;
 
-          setExportableCount(count);
+            setExportableCount(count);
 
-          // Update sums
-          const newSums = calculateSums(
-            fieldsToUse,
-            getValues('cashOnHand') || 0
-          );
-          setSums(newSums);
-        } finally {
-          recalculateFieldsRef.current = false;
-        }
-      }, 100); // 100ms debounce
+            // Update sums
+            const newSums = calculateSums(
+              fieldsToUse,
+              getValues('cashOnHand') || 0
+            );
+            setSums(newSums);
+          } finally {
+            recalculateFieldsRef.current = false;
+          }
+        },
+        150,
+        'useBillsViewModel-recalculateFields'
+      );
+
+      debouncedCalculation();
     },
     [calculateSums, getValues]
   );
@@ -466,6 +474,57 @@ export const useBillsViewModel = () => {
     []
   );
 
+  // Load existing bills for a specific date
+  const loadBillsForDate = useCallback(
+    async (date: Date): Promise<void> => {
+      try {
+        const formattedDate = date.toISOString().slice(0, 10);
+
+        // Try to load existing bills for the date
+        const existingBillsResponse =
+          await CashAPI.getDetailsByDate(formattedDate);
+
+        if (
+          existingBillsResponse.httpStatus === 200 &&
+          existingBillsResponse.response
+        ) {
+          // If we have existing bills, use them
+          const existingBills = existingBillsResponse.response.bills || [];
+
+          // Transform existing bills to match our Bill interface
+          const transformedBills: Bill[] = existingBills.map(
+            (bill: any, index: number) => ({
+              id: bill.id?.toString() || `bill_${index}`,
+              originalIndex: index,
+              names: bill.names || '',
+              cash: bill.cash || '',
+              check: bill.check || '',
+              total: bill.total || 0,
+              classroom: bill.classroom || '',
+              child_id: bill.child_id || 0,
+            })
+          );
+
+          // Reset form with existing bills
+          reset({
+            bills: transformedBills,
+            billTypes: getValues('billTypes') || [],
+            date: date,
+            cashOnHand: getValues('cashOnHand') || 0.0,
+          });
+        } else {
+          // If no existing bills, initialize with children data
+          await onStartForm();
+        }
+      } catch (error) {
+        customLogger.warn('Error loading bills for date:', error);
+        // Fallback to initializing with children data
+        await onStartForm();
+      }
+    },
+    [reset, getValues, onStartForm]
+  );
+
   const onHandlerDateChanged = useCallback(
     async (date: Date | null) => {
       if (date === null) {
@@ -504,6 +563,11 @@ export const useBillsViewModel = () => {
           fetchClosedMoneyData(currentDateObj),
         ]);
 
+        // Load existing bills for the selected date
+        await loadBillsForDate(currentDateObj);
+
+        setBlockContent(false);
+
         setBlockContent(false);
       } catch (error) {
         customLogger.error('Error on date changed', error);
@@ -516,7 +580,14 @@ export const useBillsViewModel = () => {
         });
       }
     },
-    [onHandlerSetCashOnHand, fetchClosedMoneyData, setLoadingInfo, setValue, t]
+    [
+      onHandlerSetCashOnHand,
+      fetchClosedMoneyData,
+      setLoadingInfo,
+      setValue,
+      t,
+      loadBillsForDate,
+    ]
   );
 
   // Submit handler
@@ -525,10 +596,10 @@ export const useBillsViewModel = () => {
       try {
         setLoadingInfo({
           loading: true,
-          loadingMessage: t('weAreProcessingYourInformation'),
+          loadingMessage: t('processingBills'),
         });
 
-        // Prepare data for backend API
+        // Transform data for backend
         const backendData: BackendFormValues = {
           date: data.date,
           bills: data.bills
@@ -556,15 +627,13 @@ export const useBillsViewModel = () => {
           );
         }
       } catch (error) {
-        customLogger.error('Error submitting bills:', error);
-        if (toast.current) {
-          toast.current.show({
-            severity: 'error',
-            summary: t('errorProcessingBills'),
-            detail: t('errorProcessingBillsDetail'),
-            life: 5000,
-          });
-        }
+        // Use standardized error handling
+        ErrorHandler.handleApiError(error, 'Bills submission', {
+          showToast: true,
+          toastRef: toast,
+          redirectOnAuthError: true,
+          logError: true,
+        });
       } finally {
         setLoadingInfo({
           loading: false,
@@ -602,18 +671,13 @@ export const useBillsViewModel = () => {
         });
       }
     } catch (error) {
-      customLogger.error('Error generating PDF:', error);
-      if (toast.current) {
-        toast.current.show({
-          severity: 'error',
-          summary: t('bills.errorGeneratingPDF', 'Error generating PDF'),
-          detail: t(
-            'bills.errorGeneratingPDFDetail',
-            'There was an error generating the PDF report'
-          ),
-          life: 5000,
-        });
-      }
+      // Use standardized error handling
+      ErrorHandler.handleApiError(error, 'PDF generation', {
+        showToast: true,
+        toastRef: toast,
+        redirectOnAuthError: false,
+        logError: true,
+      });
     }
   }, [getValues, t, closedMoneyData]);
 
@@ -643,18 +707,13 @@ export const useBillsViewModel = () => {
         });
       }
     } catch (error) {
-      customLogger.error('Error generating PDF:', error);
-      if (toast.current) {
-        toast.current.show({
-          severity: 'error',
-          summary: t('bills.errorGeneratingPDF', 'Error generating PDF'),
-          detail: t(
-            'bills.errorGeneratingPDFDetail',
-            'There was an error generating the PDF report'
-          ),
-          life: 5000,
-        });
-      }
+      // Use standardized error handling
+      ErrorHandler.handleApiError(error, 'PDF generation', {
+        showToast: true,
+        toastRef: toast,
+        redirectOnAuthError: false,
+        logError: true,
+      });
     }
   }, [getValues, t, closedMoneyData]);
 

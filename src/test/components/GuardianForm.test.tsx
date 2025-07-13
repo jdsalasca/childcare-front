@@ -3,11 +3,11 @@ import { screen, fireEvent, waitFor } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { renderWithProviders } from '../utils';
 import { StepComponentTwo } from '../../components/contracts/steps/StepComponentTwo';
-import useViewModelStepGuardians from '../../components/contracts/viewModels/useviewModelStepGuardians';
+import useViewModelStepGuardians from '../../components/contracts/viewModels/useViewModelStepGuardians';
 import userEvent from '@testing-library/user-event';
 
 // Mock the view model hook
-vi.mock('../../components/contracts/viewModels/useviewModelStepGuardians');
+vi.mock('../../components/contracts/viewModels/useViewModelStepGuardians');
 
 const mockUseViewModelStepGuardians = vi.mocked(useViewModelStepGuardians);
 

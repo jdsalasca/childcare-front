@@ -13,9 +13,11 @@ import { Tooltip } from 'primereact/tooltip';
 import classNames from 'classnames';
 import { programOptions } from '../contracts/utilsAndConstants';
 import Loader from '../utils/Loader';
+import ErrorBoundary from '../utils/ErrorBoundary';
 import { useBillsViewModel } from './viewModels/useBillsViewModel';
 import { Bill } from './viewModels/useBillsViewModel';
 import { inputValidator } from '../../utils/InputValidation';
+import { performanceOptimizer } from '../../utils/PerformanceOptimizer';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -75,27 +77,33 @@ const BillCard: React.FC<{
         // Store the input value as-is for the form
         onChange(inputValue);
 
-        // Use requestAnimationFrame to defer the recalculation to avoid focus loss
-        requestAnimationFrame(() => {
-          const numericValue =
-            inputValue === '' ? 0 : parseFloat(inputValue) || 0;
-          const currentCash =
-            fieldType === 'cash'
-              ? numericValue
-              : parseFloat(bill.cash?.toString() || '0') || 0;
-          const currentCheck =
-            fieldType === 'check'
-              ? numericValue
-              : parseFloat(bill.check?.toString() || '0') || 0;
-          const newTotal = currentCash + currentCheck;
+        // Use debounced recalculation to prevent excessive updates
+        const debouncedRecalculation = performanceOptimizer.debounce(
+          () => {
+            const numericValue =
+              inputValue === '' ? 0 : parseFloat(inputValue) || 0;
+            const currentCash =
+              fieldType === 'cash'
+                ? numericValue
+                : parseFloat(bill.cash?.toString() || '0') || 0;
+            const currentCheck =
+              fieldType === 'check'
+                ? numericValue
+                : parseFloat(bill.check?.toString() || '0') || 0;
+            const newTotal = currentCash + currentCheck;
 
-          const updatedBill = {
-            ...bill,
-            [fieldType]: inputValue, // Store the actual input value
-            total: newTotal,
-          };
-          onRecalculateAll(bill.originalIndex || index, updatedBill);
-        });
+            const updatedBill = {
+              ...bill,
+              [fieldType]: inputValue, // Store the actual input value
+              total: newTotal,
+            };
+            onRecalculateAll(bill.originalIndex || index, updatedBill);
+          },
+          100,
+          `BillCard-${index}-${fieldType}`
+        );
+
+        debouncedRecalculation();
       },
       [bill, onRecalculateAll, index]
     );
@@ -168,7 +176,11 @@ const BillCard: React.FC<{
                   keyfilter='num'
                   value={field.value !== undefined ? field.value : ''}
                   onChange={e => {
-                    const result = inputValidator.validate(e.target.value, inputValidator.getValidationRules().currency, 'Cash Amount');
+                    const result = inputValidator.validate(
+                      e.target.value,
+                      inputValidator.getValidationRules().currency,
+                      'Cash Amount'
+                    );
                     if (result.isValid) {
                       handleCashChange(e, field.onChange, 'cash');
                     }
@@ -195,7 +207,11 @@ const BillCard: React.FC<{
                   keyfilter='num'
                   value={field.value !== undefined ? field.value : ''}
                   onChange={e => {
-                    const result = inputValidator.validate(e.target.value, inputValidator.getValidationRules().currency, 'Check Amount');
+                    const result = inputValidator.validate(
+                      e.target.value,
+                      inputValidator.getValidationRules().currency,
+                      'Check Amount'
+                    );
                     if (result.isValid) {
                       handleCashChange(e, field.onChange, 'check');
                     }
@@ -673,104 +689,108 @@ export const Bills: React.FC = () => {
   }
 
   return (
-    <div className='max-w-7xl mx-auto p-2 sm:p-4 space-y-4 sm:space-y-6'>
-      <Toast ref={toast} />
-      <ConfirmDialog />
+    <ErrorBoundary>
+      <div className='max-w-7xl mx-auto p-2 sm:p-4 space-y-4 sm:space-y-6'>
+        <Toast ref={toast} />
+        <ConfirmDialog />
 
-      {/* Header */}
-      <div className='mb-8'>{headerToolbar}</div>
+        {/* Header */}
+        <div className='mb-8'>{headerToolbar}</div>
 
-      {/* Content blocked overlay */}
-      {blockContent && (
-        <div className='bg-yellow-50 border border-yellow-200 rounded-lg p-4'>
-          <div className='flex items-center gap-3'>
-            <i className='pi pi-exclamation-triangle text-yellow-600 text-xl'></i>
-            <div>
-              <h4 className='text-yellow-800 font-medium m-0'>
-                {t('bills.blockContent')}
-              </h4>
-              <p className='text-yellow-700 text-sm m-0 mt-1'>
-                {t(
-                  'bills.selectDateToContinue',
-                  'Please select a date to continue managing bills'
-                )}
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Filters */}
-      {filtersPanel}
-
-      {/* Bills Form */}
-      <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
-        {/* Bills List */}
-        <div className='bg-white rounded-xl shadow-sm border border-gray-100 p-6'>
-          {paginatedBills.length > 0 && (
-            <div className='grid grid-cols-12 gap-3 items-center mb-4 pb-3 border-b border-gray-200'>
-              <div className='col-span-4 text-sm font-semibold text-gray-700 uppercase tracking-wide'>
-                {t('bills.names')}
-              </div>
-              <div className='col-span-2 text-sm font-semibold text-gray-700 uppercase tracking-wide'>
-                {t('bills.cash')}
-              </div>
-              <div className='col-span-2 text-sm font-semibold text-gray-700 uppercase tracking-wide'>
-                {t('bills.check')}
-              </div>
-              <div className='col-span-3 text-sm font-semibold text-gray-700 uppercase tracking-wide'>
-                {t('bills.total')}
-              </div>
-              <div className='col-span-1 text-sm font-semibold text-gray-700 uppercase tracking-wide text-center'>
-                {t('actions', 'Actions')}
+        {/* Content blocked overlay */}
+        {blockContent && (
+          <div className='bg-yellow-50 border border-yellow-200 rounded-lg p-4'>
+            <div className='flex items-center gap-3'>
+              <i className='pi pi-exclamation-triangle text-yellow-600 text-xl'></i>
+              <div>
+                <h4 className='text-yellow-800 font-medium m-0'>
+                  {t('bills.blockContent')}
+                </h4>
+                <p className='text-yellow-700 text-sm m-0 mt-1'>
+                  {t(
+                    'bills.selectDateToContinue',
+                    'Please select a date to continue managing bills'
+                  )}
+                </p>
               </div>
             </div>
-          )}
-          <div className='space-y-2'>
-            {paginatedBills.length > 0
-              ? paginatedBills.map((bill, index) => renderBillItem(bill, index))
-              : emptyTemplate}
+          </div>
+        )}
+
+        {/* Filters */}
+        {filtersPanel}
+
+        {/* Bills Form */}
+        <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+          {/* Bills List */}
+          <div className='bg-white rounded-xl shadow-sm border border-gray-100 p-6'>
+            {paginatedBills.length > 0 && (
+              <div className='grid grid-cols-12 gap-3 items-center mb-4 pb-3 border-b border-gray-200'>
+                <div className='col-span-4 text-sm font-semibold text-gray-700 uppercase tracking-wide'>
+                  {t('bills.names')}
+                </div>
+                <div className='col-span-2 text-sm font-semibold text-gray-700 uppercase tracking-wide'>
+                  {t('bills.cash')}
+                </div>
+                <div className='col-span-2 text-sm font-semibold text-gray-700 uppercase tracking-wide'>
+                  {t('bills.check')}
+                </div>
+                <div className='col-span-3 text-sm font-semibold text-gray-700 uppercase tracking-wide'>
+                  {t('bills.total')}
+                </div>
+                <div className='col-span-1 text-sm font-semibold text-gray-700 uppercase tracking-wide text-center'>
+                  {t('actions', 'Actions')}
+                </div>
+              </div>
+            )}
+            <div className='space-y-2'>
+              {paginatedBills.length > 0
+                ? paginatedBills.map((bill, index) =>
+                    renderBillItem(bill, index)
+                  )
+                : emptyTemplate}
+            </div>
+
+            {/* Pagination */}
+            {filteredBills.length > ITEMS_PER_PAGE && (
+              <div className='mt-6 pt-4 border-t border-gray-200'>
+                <Paginator
+                  first={first}
+                  rows={rows}
+                  totalRecords={filteredBills.length}
+                  rowsPerPageOptions={[5, 10, 20, 50]}
+                  onPageChange={onPageChange}
+                  template='FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport'
+                  currentPageReportTemplate={t(
+                    'bills.paginationTemplate',
+                    'Showing {first} to {last} of {totalRecords} bills'
+                  )}
+                />
+              </div>
+            )}
           </div>
 
-          {/* Pagination */}
-          {filteredBills.length > ITEMS_PER_PAGE && (
-            <div className='mt-6 pt-4 border-t border-gray-200'>
-              <Paginator
-                first={first}
-                rows={rows}
-                totalRecords={filteredBills.length}
-                rowsPerPageOptions={[5, 10, 20, 50]}
-                onPageChange={onPageChange}
-                template='FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport'
-                currentPageReportTemplate={t(
-                  'bills.paginationTemplate',
-                  'Showing {first} to {last} of {totalRecords} bills'
-                )}
+          {/* Summary */}
+          <BillSummary
+            sums={sums}
+            cashOnHand={getValues('cashOnHand')}
+            closedMoneyData={closedMoneyData}
+          />
+
+          {/* Actions */}
+          <div className='bg-white rounded-xl shadow-sm border border-gray-100 p-6'>
+            <div className='flex justify-center'>
+              <Button
+                type='submit'
+                label={t('bills.save')}
+                icon='pi pi-save'
+                className='bg-blue-600 hover:bg-blue-700 border-blue-600 text-white px-8 py-3 text-lg font-semibold'
+                disabled={blockContent}
               />
             </div>
-          )}
-        </div>
-
-        {/* Summary */}
-        <BillSummary
-          sums={sums}
-          cashOnHand={getValues('cashOnHand')}
-          closedMoneyData={closedMoneyData}
-        />
-
-        {/* Actions */}
-        <div className='bg-white rounded-xl shadow-sm border border-gray-100 p-6'>
-          <div className='flex justify-center'>
-            <Button
-              type='submit'
-              label={t('bills.save')}
-              icon='pi pi-save'
-              className='bg-blue-600 hover:bg-blue-700 border-blue-600 text-white px-8 py-3 text-lg font-semibold'
-              disabled={blockContent}
-            />
           </div>
-        </div>
-      </form>
-    </div>
+        </form>
+      </div>
+    </ErrorBoundary>
   );
 };
