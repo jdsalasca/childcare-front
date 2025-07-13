@@ -68,7 +68,8 @@
     "tailwindcss": "^3.4.0",
     "typescript": "^5.5.4",
     "vite": "^5.4.0",
-    "vitest": "^2.1.2"
+    "vitest": "^2.1.2",
+    "husky": "^8.0.0"
   },
   "scripts": {
     "dev": "vite",
@@ -78,7 +79,8 @@
     "preview": "vite preview",
     "test": "vitest",
     "test:coverage": "vitest --coverage",
-    "test:watch": "vitest --watch"
+    "test:watch": "vitest --watch",
+    "prepare": "husky install"
   },
   "browserslist": {
     "production": [
