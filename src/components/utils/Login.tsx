@@ -11,6 +11,7 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import animationData from '../../assets/lottie/hellow_login.json';
 import useCustomNavigate from '../../utils/customHooks/useCustomNavigate';
+import { accessibilityUtils } from '../../utils/AccessibilityUtils';
 import InputTextWrapper from '../formsComponents/InputTextWrapper';
 import PasswordWrapper from '../formsComponents/PasswordWrapper';
 import Loader from './Loader';
@@ -88,17 +89,22 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className='login-container'>
+    <div className='login-container' role="main" aria-label="Login page">
       {loading && <Loader />}
       <div className='login-form-container'>
         <Card className='login-card'>
           <Lottie
             animationData={animationData}
             className='c-lottie-animation login'
+            aria-label="Login animation"
           />
 
-          <form onSubmit={handleSubmit(handleLogin)}>
-            <h3 id='title'>{t('login')}</h3>
+          <form 
+            onSubmit={handleSubmit(handleLogin)}
+            aria-label="Login form"
+            role="form"
+          >
+            <h1 id='title'>{t('login')}</h1>
             <InputTextWrapper
               name='username'
               control={control}
@@ -108,6 +114,7 @@ const Login: React.FC = () => {
                 maxLength: { value: 20, message: t('username_max_length') },
               }}
               label={t('userNameOrEmail')}
+              aria-describedby="username-error"
             />
             <PasswordWrapper
               name='password'
@@ -116,12 +123,15 @@ const Login: React.FC = () => {
                 required: t('password_is_required'),
               }}
               label={t('password')}
+              aria-describedby="password-error"
             />
             <section className='c-section-login-actions'>
               <Button
                 type='submit'
                 label={t('signIn')}
                 className='p-button-success'
+                aria-label={t('signIn')}
+                {...accessibilityUtils.createButtonAccessibilityProps(t('signIn'))}
               />
             </section>
           </form>
