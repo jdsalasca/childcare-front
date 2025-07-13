@@ -8,16 +8,18 @@ const useDocumentTypeOptions = () => {
   // Use useMemo to transform document type options and prevent unnecessary re-renders
   const documentTypeOptions = useMemo(() => {
     if (!documentTypes || isLoading) return [];
-    
-    console.log("documentTypes", documentTypes);
-    
+
+    console.log('documentTypes', documentTypes);
+
     // Filter document types where status is "Active"
-    const activeDocumentTypes = documentTypes.response.filter((docType: DocumentType) => docType.status === 'Active');
-    
+    const activeDocumentTypes = documentTypes.response.filter(
+      (docType: DocumentType) => docType.status === 'Active'
+    );
+
     return activeDocumentTypes.map(docType => ({
       ...docType,
-      label: docType.name,  // Adjust according to your data structure
-      value: docType.id     // Adjust according to your data structure
+      label: docType.name, // Adjust according to your data structure
+      value: docType.id, // Adjust according to your data structure
     }));
   }, [documentTypes, isLoading]);
 

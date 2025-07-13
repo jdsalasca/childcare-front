@@ -21,11 +21,18 @@ interface Props {
   onCancel: () => void;
 }
 
-const EditOpenRegisterForm: React.FC<Props> = ({ date, currentData, onSuccess, onCancel }) => {
+const EditOpenRegisterForm: React.FC<Props> = ({
+  date,
+  currentData,
+  onSuccess,
+  onCancel,
+}) => {
   const { t } = useTranslation();
   const toast = useRef<Toast>(null);
-  
-  const [selectedCashier, setSelectedCashier] = useState<number>(currentData.cashier.id);
+
+  const [selectedCashier, setSelectedCashier] = useState<number>(
+    currentData.cashier.id
+  );
   const [bills, setBills] = useState<BillInput[]>([]);
 
   const { data: cashiers } = useQuery({
@@ -35,7 +42,7 @@ const EditOpenRegisterForm: React.FC<Props> = ({ date, currentData, onSuccess, o
 
   // Convert current details to editable bills format
   useEffect(() => {
-    const convertedBills = currentData.details.map((detail) => ({
+    const convertedBills = currentData.details.map(detail => ({
       bill_type_id: detail.bill_type_id,
       quantity: detail.quantity,
     }));
@@ -43,7 +50,7 @@ const EditOpenRegisterForm: React.FC<Props> = ({ date, currentData, onSuccess, o
   }, [currentData.details]);
 
   const updateMutation = useMutation({
-    mutationFn: ({ date, data }: { date: string; data: any }) => 
+    mutationFn: ({ date, data }: { date: string; data: any }) =>
       CashRegisterAPI.updateOpenRegister(date, data),
     onSuccess: () => {
       toast.current?.show({
@@ -64,7 +71,11 @@ const EditOpenRegisterForm: React.FC<Props> = ({ date, currentData, onSuccess, o
     },
   });
 
-  const handleUpdateBill = (index: number, field: keyof BillInput, value: any) => {
+  const handleUpdateBill = (
+    index: number,
+    field: keyof BillInput,
+    value: any
+  ) => {
     const newBills = [...bills];
     newBills[index] = { ...newBills[index], [field]: value };
     setBills(newBills);
@@ -72,7 +83,7 @@ const EditOpenRegisterForm: React.FC<Props> = ({ date, currentData, onSuccess, o
 
   const handleSubmit = async () => {
     const validBills = bills.filter(bill => bill.quantity > 0);
-    
+
     if (validBills.length === 0) {
       toast.current?.show({
         severity: 'warn',
@@ -91,81 +102,91 @@ const EditOpenRegisterForm: React.FC<Props> = ({ date, currentData, onSuccess, o
     updateMutation.mutate({ date, data: requestData });
   };
 
-  const cashierOptions = cashiers?.data?.map((cashier: any) => ({
-    label: `${cashier.name} (#${cashier.cashierNumber})`,
-    value: cashier.id,
-  })) || [];
+  const cashierOptions =
+    cashiers?.data?.map((cashier: any) => ({
+      label: `${cashier.name} (#${cashier.cashierNumber})`,
+      value: cashier.id,
+    })) || [];
 
   const quantityTemplate = (rowData: BillDetail, _options: any) => {
-    const billIndex = bills.findIndex(b => b.bill_type_id === rowData.bill_type_id);
+    const billIndex = bills.findIndex(
+      b => b.bill_type_id === rowData.bill_type_id
+    );
     const currentBill = bills[billIndex];
-    
+
     return (
       <InputNumber
         value={currentBill?.quantity || 0}
-        onValueChange={(e) => handleUpdateBill(billIndex, 'quantity', e.value || 0)}
+        onValueChange={e =>
+          handleUpdateBill(billIndex, 'quantity', e.value || 0)
+        }
         min={0}
-        className="w-full"
+        className='w-full'
         showButtons
-        buttonLayout="horizontal"
-        decrementButtonClassName="p-button-secondary"
-        incrementButtonClassName="p-button-secondary"
+        buttonLayout='horizontal'
+        decrementButtonClassName='p-button-secondary'
+        incrementButtonClassName='p-button-secondary'
       />
     );
   };
 
   return (
-    <div className="space-y-4">
-      <Toast ref={toast} position="top-right" />
-      
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-        <div className="flex items-center gap-3 mb-3">
-          <i className="pi pi-pencil text-yellow-600"></i>
-          <h4 className="text-lg font-semibold text-yellow-800 m-0">
+    <div className='space-y-4'>
+      <Toast ref={toast} position='top-right' />
+
+      <div className='bg-yellow-50 border border-yellow-200 rounded-lg p-4'>
+        <div className='flex items-center gap-3 mb-3'>
+          <i className='pi pi-pencil text-yellow-600'></i>
+          <h4 className='text-lg font-semibold text-yellow-800 m-0'>
             {t('cashRegister.editOpening')}
           </h4>
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-4'>
           <div>
-            <label htmlFor="cashier" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor='cashier'
+              className='block text-sm font-medium text-gray-700 mb-2'
+            >
               {t('cashRegister.selectCashier')} *
             </label>
             <Dropdown
-              id="cashier"
+              id='cashier'
               value={selectedCashier}
-              onChange={(e) => setSelectedCashier(e.value)}
+              onChange={e => setSelectedCashier(e.value)}
               options={cashierOptions}
               placeholder={t('cashRegister.selectCashier')}
-              className="w-full"
+              className='w-full'
             />
           </div>
         </div>
 
-        <div className="mb-4">
-          <h5 className="text-sm font-medium text-gray-700 mb-2">
+        <div className='mb-4'>
+          <h5 className='text-sm font-medium text-gray-700 mb-2'>
             {t('cashRegister.bills')}
           </h5>
-          <DataTable 
+          <DataTable
             value={currentData.details}
-            className="border rounded-lg overflow-hidden"
+            className='border rounded-lg overflow-hidden'
             emptyMessage={t('cashRegister.noData')}
           >
-            <Column 
-              field="bill_label" 
+            <Column
+              field='bill_label'
               header={t('cashRegister.denomination')}
-              body={(rowData) => <span className="font-medium">{rowData.bill_label}</span>}
+              body={rowData => (
+                <span className='font-medium'>{rowData.bill_label}</span>
+              )}
             />
-            <Column 
-              field="quantity" 
+            <Column
+              field='quantity'
               header={t('cashRegister.quantity')}
               body={quantityTemplate}
             />
-            <Column 
-              field="bill_value" 
+            <Column
+              field='bill_value'
               header={t('cashRegister.unitValue')}
-              body={(rowData) => (
-                <span className="text-blue-700 font-medium">
+              body={rowData => (
+                <span className='text-blue-700 font-medium'>
                   ${parseFloat(rowData.bill_value).toFixed(2)}
                 </span>
               )}
@@ -173,17 +194,17 @@ const EditOpenRegisterForm: React.FC<Props> = ({ date, currentData, onSuccess, o
           </DataTable>
         </div>
 
-        <div className="flex justify-end gap-2">
+        <div className='flex justify-end gap-2'>
           <Button
             label={t('cancel')}
-            icon="pi pi-times"
-            className="p-button-secondary p-button-sm"
+            icon='pi pi-times'
+            className='p-button-secondary p-button-sm'
             onClick={onCancel}
           />
           <Button
             label={t('save')}
-            icon="pi pi-check"
-            className="p-button-success p-button-sm"
+            icon='pi pi-check'
+            className='p-button-success p-button-sm'
             onClick={handleSubmit}
             loading={updateMutation.isPending}
           />
@@ -193,4 +214,4 @@ const EditOpenRegisterForm: React.FC<Props> = ({ date, currentData, onSuccess, o
   );
 };
 
-export default EditOpenRegisterForm; 
+export default EditOpenRegisterForm;

@@ -45,14 +45,15 @@ export const StepComponentFive: React.FC<StepComponentFiveProps> = ({
     getValues,
   } = useForm<ScheduleFormValues>({
     defaultValues: {} as ScheduleFormValues, // Initially empty or predefined
-    
   });
 
   // INITIALIZATION OF THE COMPONENT
   useEffect(() => {
     if (daysCache) {
-      if (!contractInformation.schedule || contractInformation.schedule.length === 0) {
-        
+      if (
+        !contractInformation.schedule ||
+        contractInformation.schedule.length === 0
+      ) {
         const initialValues = daysCache.reduce((acc, day) => {
           const currentDate = new Date();
           const checkInTime = new Date(currentDate.setHours(8, 0, 0, 0));
@@ -63,26 +64,38 @@ export const StepComponentFive: React.FC<StepComponentFiveProps> = ({
         }, {} as ScheduleFormValues);
         reset(initialValues);
       } else {
-        customLogger.debug('contractInformation.schedule', contractInformation.schedule);
+        customLogger.debug(
+          'contractInformation.schedule',
+          contractInformation.schedule
+        );
         customLogger.debug('daysCache', daysCache);
-        const formattedSchedule = contractInformation.schedule.reduce((acc, entry) => {
-          // Fix: Coerce both IDs to string for comparison to avoid type mismatch bugs
-          const day = daysCache.find((day) => String(day.id) === String(entry.day_id));
-          if (day) {
-            const [checkInHours, checkInMinutes] = entry.check_in.split(':').map(Number);
-            const [checkOutHours, checkOutMinutes] = entry.check_out.split(':').map(Number);
+        const formattedSchedule = contractInformation.schedule.reduce(
+          (acc, entry) => {
+            // Fix: Coerce both IDs to string for comparison to avoid type mismatch bugs
+            const day = daysCache.find(
+              day => String(day.id) === String(entry.day_id)
+            );
+            if (day) {
+              const [checkInHours, checkInMinutes] = entry.check_in
+                .split(':')
+                .map(Number);
+              const [checkOutHours, checkOutMinutes] = entry.check_out
+                .split(':')
+                .map(Number);
 
-            const checkInDate = new Date();
-            checkInDate.setHours(checkInHours, checkInMinutes, 0, 0);
+              const checkInDate = new Date();
+              checkInDate.setHours(checkInHours, checkInMinutes, 0, 0);
 
-            const checkOutDate = new Date();
-            checkOutDate.setHours(checkOutHours, checkOutMinutes, 0, 0);
+              const checkOutDate = new Date();
+              checkOutDate.setHours(checkOutHours, checkOutMinutes, 0, 0);
 
-            acc[`${day.name.toLowerCase()}check_in`] = checkInDate;
-            acc[`${day.name.toLowerCase()}check_out`] = checkOutDate;
-          }
-          return acc;
-        }, {} as ScheduleFormValues);
+              acc[`${day.name.toLowerCase()}check_in`] = checkInDate;
+              acc[`${day.name.toLowerCase()}check_out`] = checkOutDate;
+            }
+            return acc;
+          },
+          {} as ScheduleFormValues
+        );
         customLogger.debug('formattedSchedule', formattedSchedule);
         reset(formattedSchedule);
       }
@@ -90,7 +103,10 @@ export const StepComponentFive: React.FC<StepComponentFiveProps> = ({
   }, [daysCache, contractInformation.schedule, reset]);
 
   const watchFields = daysCache.reduce((acc, day) => {
-    acc.push(`${day.name.toLowerCase()}check_in`, `${day.name.toLowerCase()}check_out`);
+    acc.push(
+      `${day.name.toLowerCase()}check_in`,
+      `${day.name.toLowerCase()}check_out`
+    );
     return acc;
   }, [] as string[]);
 
@@ -99,7 +115,7 @@ export const StepComponentFive: React.FC<StepComponentFiveProps> = ({
 
   const customValidation = () => {
     let formIsValid = true;
-    daysCache.forEach((day) => {
+    daysCache.forEach(day => {
       const checkIn = getValues()?.[`${day.name.toLowerCase()}check_in`];
       const checkOut = getValues()?.[`${day.name.toLowerCase()}check_out`];
       if (checkIn && checkOut) {
@@ -111,7 +127,7 @@ export const StepComponentFive: React.FC<StepComponentFiveProps> = ({
             message: t('checkOutAfterCheckInMessage'),
           });
           formIsValid = false;
-        }else {
+        } else {
           clearErrors(`${day.name.toLowerCase()}check_out`);
         }
       }
@@ -120,18 +136,20 @@ export const StepComponentFive: React.FC<StepComponentFiveProps> = ({
   };
 
   useEffect(() => {
-    if (JSON.stringify(prevWatchValues.current) !== JSON.stringify(watchValues)) {
+    if (
+      JSON.stringify(prevWatchValues.current) !== JSON.stringify(watchValues)
+    ) {
       customValidation();
       prevWatchValues.current = watchValues; // Update ref to current values
     }
   }, [daysCache, getValues, setError, clearErrors, t, watchValues]);
 
-  const onSubmit: SubmitHandler<ScheduleFormValues> = async (data) => {
-    if (!await customValidation()) {
+  const onSubmit: SubmitHandler<ScheduleFormValues> = async data => {
+    if (!(await customValidation())) {
       customLogger.error('Form has validation errors:', errors);
       return; // Stop submission if there are errors
     }
-    const scheduleData = daysCache.map((day) => {
+    const scheduleData = daysCache.map(day => {
       const checkInKey = `${day.name.toLowerCase()}check_in`;
       const checkOutKey = `${day.name.toLowerCase()}check_out`;
       let checkIn = data[checkInKey];
@@ -152,16 +170,22 @@ export const StepComponentFive: React.FC<StepComponentFiveProps> = ({
         checkOutStr
       );
     });
-    
+
     setLoadingInfo({
       loading: true,
       loadingMessage: t('weAreSavingContract'),
     });
     const days = await ContractService.createContractSchedule(scheduleData);
     setLoadingInfo(LoadingInfo.DEFAULT_MESSAGE);
-    const newSchedule = days.map((day) => day.response);
+    const newSchedule = days.map(day => day.response);
     setContractInformation({ ...contractInformation, schedule: newSchedule });
-    ToastInterpreterUtils.toastInterpreter(toast, 'success', t('success'), t('scheduleUpdated'), 3000);
+    ToastInterpreterUtils.toastInterpreter(
+      toast,
+      'success',
+      t('success'),
+      t('scheduleUpdated'),
+      3000
+    );
     setActiveIndex(6); // Move to the next step or handle as needed
   };
 
@@ -171,7 +195,7 @@ export const StepComponentFive: React.FC<StepComponentFiveProps> = ({
     <div className='form-container schedule'>
       <form className='child-form' onSubmit={handleSubmit(onSubmit)}>
         <div className='form-days'>
-          {daysCache.map((day) => (
+          {daysCache.map(day => (
             <div key={day.id} className='day-schedule'>
               <p className='label-day'>
                 {t('schedule')} {t(day.translationLabel || day.name)}

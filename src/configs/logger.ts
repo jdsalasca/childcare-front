@@ -18,7 +18,9 @@ const setLogLevel = (): void => {
       log.setLevel('info');
       break;
     default:
-      console.log(`⚠️ Unknown environment (${env}): Setting log level to ERROR`);
+      console.log(
+        `⚠️ Unknown environment (${env}): Setting log level to ERROR`
+      );
       log.setLevel('error');
       break;
   }
@@ -43,16 +45,21 @@ prefix.apply(log, {
     return `${emojiMap[level] || ''} ${level.toUpperCase()}`;
   },
   nameFormatter: () => '🐻🎓Kayne West 🤴🏿 said:',
-  format: (level: string, name: string | undefined, timestamp: Date) => 
+  format: (level: string, name: string | undefined, timestamp: Date) =>
     `[${timestamp.toISOString()}] ${level.toUpperCase()} ${name || 'Global'}`,
 });
 
 // Custom template for including file and line info
 prefix.apply(log, {
-  format: (level: string, name: string | undefined, timestamp: Date | string) => {
+  format: (
+    level: string,
+    name: string | undefined,
+    timestamp: Date | string
+  ) => {
     // Check if timestamp is a string and convert it to Date if necessary
-    const date = typeof timestamp === 'string' ? new Date(timestamp) : timestamp;
-    
+    const date =
+      typeof timestamp === 'string' ? new Date(timestamp) : timestamp;
+
     // Ensure date is a valid Date object
     if (!(date instanceof Date) || isNaN(date.getTime())) {
       console.error('Invalid timestamp:', timestamp);
@@ -60,9 +67,8 @@ prefix.apply(log, {
     }
 
     return `[${date.toISOString()}] ${level.toUpperCase()} ${name || 'Global'}`;
-  }
+  },
 });
-
 
 // Optionally, set up multiple custom loggers
 const customLogger = log.getLogger('myCustomLogger');
@@ -73,4 +79,3 @@ anotherLogger.setLevel('info');
 
 // Export the default logger and custom loggers
 export { anotherLogger, customLogger, log };
-

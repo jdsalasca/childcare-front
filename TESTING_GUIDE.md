@@ -102,10 +102,10 @@ describe('MyComponent', () => {
 
   it('should handle user interactions', async () => {
     renderWithProviders(<MyComponent />)
-    
+
     const button = screen.getByRole('button')
     fireEvent.click(button)
-    
+
     await waitFor(() => {
       expect(screen.getByText('Updated Text')).toBeInTheDocument()
     })
@@ -116,37 +116,37 @@ describe('MyComponent', () => {
 ### API Testing
 
 ```typescript
-import { describe, it, expect, vi } from 'vitest'
-import { mockApiResponse, mockApiError } from '../utils'
-import API from '../../models/API'
+import { describe, it, expect, vi } from 'vitest';
+import { mockApiResponse, mockApiError } from '../utils';
+import API from '../../models/API';
 
-vi.mock('axios')
+vi.mock('axios');
 
 describe('API', () => {
   it('should make successful GET request', async () => {
-    const mockData = { id: 1, name: 'test' }
+    const mockData = { id: 1, name: 'test' };
     // Mock implementation
-    
-    const result = await API.get('/endpoint')
-    expect(result).toEqual(mockApiResponse(mockData))
-  })
-})
+
+    const result = await API.get('/endpoint');
+    expect(result).toEqual(mockApiResponse(mockData));
+  });
+});
 ```
 
 ### Utility Testing
 
 ```typescript
-import { describe, it, expect } from 'vitest'
-import { Validations } from '../../utils/validations'
+import { describe, it, expect } from 'vitest';
+import { Validations } from '../../utils/validations';
 
 describe('Validations', () => {
   describe('isValidEmail', () => {
     it('should validate correct email addresses', () => {
-      expect(Validations.isValidEmail('test@example.com')).toBe(true)
-      expect(Validations.isValidEmail('invalid-email')).toBe(false)
-    })
-  })
-})
+      expect(Validations.isValidEmail('test@example.com')).toBe(true);
+      expect(Validations.isValidEmail('invalid-email')).toBe(false);
+    });
+  });
+});
 ```
 
 ## Test Utilities
@@ -169,22 +169,22 @@ renderWithProviders(<MyComponent />, {
 Pre-built mock data for consistent testing:
 
 ```typescript
-import { mockUser, mockChild, mockContract } from '../test/utils'
+import { mockUser, mockChild, mockContract } from '../test/utils';
 
-const testUser = mockUser
-const testChild = { ...mockChild, name: 'Custom Name' }
+const testUser = mockUser;
+const testChild = { ...mockChild, name: 'Custom Name' };
 ```
 
 ### API Response Mocks
 
 ```typescript
-import { mockApiResponse, mockApiError } from '../test/utils'
+import { mockApiResponse, mockApiError } from '../test/utils';
 
 // Success response
-mockApiResponse({ data: 'success' }, 200)
+mockApiResponse({ data: 'success' }, 200);
 
 // Error response
-mockApiError('Error message', 400)
+mockApiError('Error message', 400);
 ```
 
 ## Mocking Strategies
@@ -193,15 +193,15 @@ mockApiError('Error message', 400)
 
 ```typescript
 // Mock entire modules
-vi.mock('axios')
-vi.mock('react-router-dom')
+vi.mock('axios');
+vi.mock('react-router-dom');
 
 // Mock specific functions
 vi.mock('../../utils/functions', () => ({
   Functions: {
-    formatDate: vi.fn(() => '2024-01-01')
-  }
-}))
+    formatDate: vi.fn(() => '2024-01-01'),
+  },
+}));
 ```
 
 ### Component Dependencies
@@ -219,8 +219,8 @@ vi.mock('../../components/ChildComponent', () => ({
 // Mock window methods
 Object.defineProperty(window, 'location', {
   value: { href: 'http://localhost:3000' },
-  writable: true
-})
+  writable: true,
+});
 ```
 
 ## Coverage Configuration
@@ -273,7 +273,7 @@ coverage: {
 ```typescript
 it('should submit form with valid data', async () => {
   renderWithProviders(<LoginForm />)
-  
+
   fireEvent.change(screen.getByLabelText('Username'), {
     target: { value: 'testuser' }
   })
@@ -281,7 +281,7 @@ it('should submit form with valid data', async () => {
     target: { value: 'password123' }
   })
   fireEvent.click(screen.getByRole('button', { name: 'Login' }))
-  
+
   await waitFor(() => {
     expect(mockApiCall).toHaveBeenCalledWith({
       username: 'testuser',
@@ -296,10 +296,10 @@ it('should submit form with valid data', async () => {
 ```typescript
 it('should display error message on API failure', async () => {
   mockAPI.mockRejectedValueOnce(mockApiError('Network error'))
-  
+
   renderWithProviders(<MyComponent />)
   fireEvent.click(screen.getByRole('button'))
-  
+
   await waitFor(() => {
     expect(screen.getByText('Network error')).toBeInTheDocument()
   })
@@ -310,14 +310,14 @@ it('should display error message on API failure', async () => {
 
 ```typescript
 it('should show loading spinner during API call', async () => {
-  const slowPromise = new Promise(resolve => 
+  const slowPromise = new Promise(resolve =>
     setTimeout(() => resolve(mockApiResponse({})), 1000)
   )
   mockAPI.mockReturnValueOnce(slowPromise)
-  
+
   renderWithProviders(<MyComponent />)
   fireEvent.click(screen.getByRole('button'))
-  
+
   expect(screen.getByText('Loading...')).toBeInTheDocument()
 })
 ```
@@ -335,13 +335,13 @@ it('should show loading spinner during API call', async () => {
 
 ```typescript
 // Add debugging output
-screen.debug() // Shows current DOM state
+screen.debug(); // Shows current DOM state
 
 // Log specific elements
-console.log(screen.getByRole('button'))
+console.log(screen.getByRole('button'));
 
 // Check what's available
-screen.logTestingPlaygroundURL()
+screen.logTestingPlaygroundURL();
 ```
 
 ## Performance Considerations
@@ -360,6 +360,7 @@ yarn test:run --coverage
 ```
 
 This provides:
+
 - Test results
 - Coverage reports
 - Exit codes for CI/CD integration
@@ -376,4 +377,4 @@ This provides:
 - [Vitest Documentation](https://vitest.dev/)
 - [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)
 - [Testing Best Practices](https://kentcdodds.com/blog/common-mistakes-with-react-testing-library)
-- [Mocking Strategies](https://vitest.dev/guide/mocking.html) 
+- [Mocking Strategies](https://vitest.dev/guide/mocking.html)

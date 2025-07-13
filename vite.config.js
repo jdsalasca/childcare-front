@@ -5,9 +5,7 @@ import { defineConfig } from 'vite';
 // Simulate __dirname in ES modules
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export default defineConfig({
-  plugins: [
-    react(),
-  ],
+  plugins: [react()],
   logLevel: 'warn',
   resolve: {
     alias: {
@@ -15,14 +13,14 @@ export default defineConfig({
       stream: 'stream-browserify',
       util: 'util',
       // Correct alias setup for "types"
-      'types': path.resolve(__dirname, './src/types'),  // This resolves "types" to "src/types"
-      'configs': path.resolve(__dirname, './src/configs'),  // This resolves "config" to "src/configs"
-      "components": path.resolve(__dirname, "./src/components"),
-      "models": path.resolve(__dirname, "./src/models"),
-      "@models": path.resolve(__dirname, "./src/models"),
-      "@components": path.resolve(__dirname, "./src/components"),
-      "@utils": path.resolve(__dirname, "./src/utils"),
-      "utils": path.resolve(__dirname, "./src/utils"),
+      types: path.resolve(__dirname, './src/types'), // This resolves "types" to "src/types"
+      configs: path.resolve(__dirname, './src/configs'), // This resolves "config" to "src/configs"
+      components: path.resolve(__dirname, './src/components'),
+      models: path.resolve(__dirname, './src/models'),
+      '@models': path.resolve(__dirname, './src/models'),
+      '@components': path.resolve(__dirname, './src/components'),
+      '@utils': path.resolve(__dirname, './src/utils'),
+      utils: path.resolve(__dirname, './src/utils'),
     },
   },
   define: {
@@ -34,5 +32,5 @@ export default defineConfig({
   server: {
     port: 3000,
   },
-  base: '/childadmin/admin/',  // Base path for the application
+  base: '/childadmin/admin/', // Base path for the application
 });

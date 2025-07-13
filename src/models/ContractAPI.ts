@@ -1,18 +1,23 @@
-import { useQuery } from "@tanstack/react-query";
-import API, { ApiResponse, BASE_URL } from "./API";
-import { ContractDaySchedule } from "./ApiModels";
+import { useQuery } from '@tanstack/react-query';
+import API, { ApiResponse, BASE_URL } from './API';
+import { ContractDaySchedule } from './ApiModels';
 
 interface Contract {
   contract_id?: string;
   [key: string]: any; // Add specific fields as needed
 }
 
-
 const ContractAPI = {
   // Create a contract
-  createContract: async (contract: Contract): Promise<ApiResponse<Contract>> => {
+  createContract: async (
+    contract: Contract
+  ): Promise<ApiResponse<Contract>> => {
     try {
-      const response = await API.post<Contract>(BASE_URL, '/contracts', contract);
+      const response = await API.post<Contract>(
+        BASE_URL,
+        '/contracts',
+        contract
+      );
       return response;
     } catch (error) {
       console.error('Error creating contract:', error);
@@ -21,9 +26,15 @@ const ContractAPI = {
   },
 
   // Create a contract schedule
-  createContractSchedule: async (contract: ContractDaySchedule): Promise<ApiResponse<Contract>>  => {
+  createContractSchedule: async (
+    contract: ContractDaySchedule
+  ): Promise<ApiResponse<Contract>> => {
     try {
-      const response = await API.post<ContractDaySchedule[]>(BASE_URL, '/contracts/schedule', contract);
+      const response = await API.post<ContractDaySchedule[]>(
+        BASE_URL,
+        '/contracts/schedule',
+        contract
+      );
       return response;
     } catch (error) {
       console.error('Error creating contract schedule:', error);
@@ -32,11 +43,17 @@ const ContractAPI = {
   },
 
   // Update contract payment details
-  updateContractPaymentDetails: async (contract: Contract):Promise<ApiResponse<Contract>>  => {
+  updateContractPaymentDetails: async (
+    contract: Contract
+  ): Promise<ApiResponse<Contract>> => {
     console.log('contract on createContract', contract);
 
     try {
-      const response = await API.put<Contract>(BASE_URL, `/contracts/payment_details/${contract.contract_id}`, contract);
+      const response = await API.put<Contract>(
+        BASE_URL,
+        `/contracts/payment_details/${contract.contract_id}`,
+        contract
+      );
       return response;
     } catch (error) {
       console.error('Error updating contract payment details:', error);
@@ -45,9 +62,13 @@ const ContractAPI = {
   },
 
   // Update contract
-  updateContract: async (contract: Contract): Promise<ApiResponse<Contract>>  => {
+  updateContract: async (
+    contract: Contract
+  ): Promise<ApiResponse<Contract>> => {
     try {
-      const response = await API.put<Contract>(BASE_URL, '/contracts', { contract });
+      const response = await API.put<Contract>(BASE_URL, '/contracts', {
+        contract,
+      });
       return response;
     } catch (error) {
       console.error('Error updating contract:', error);
@@ -56,7 +77,7 @@ const ContractAPI = {
   },
 
   // Get all contracts
-  getAllContracts: async (): Promise<ApiResponse<Contract>>  => {
+  getAllContracts: async (): Promise<ApiResponse<Contract>> => {
     try {
       const response = await API.get<Contract>(BASE_URL, '/contracts');
       return response;
@@ -67,7 +88,7 @@ const ContractAPI = {
   },
 
   // Get contract by ID
-  getContractById: async (id: string):Promise<ApiResponse<Contract>>  => {
+  getContractById: async (id: string): Promise<ApiResponse<Contract>> => {
     try {
       const response = await API.get<Contract>(BASE_URL, `/contracts/${id}`);
       return response;
@@ -78,7 +99,7 @@ const ContractAPI = {
   },
 
   // Delete contract
-  deleteContract: async (id: string): Promise<ApiResponse<Contract>>  => {
+  deleteContract: async (id: string): Promise<ApiResponse<Contract>> => {
     try {
       const response = await API.delete<Contract>(BASE_URL, `/contracts/${id}`);
       return response;
@@ -95,7 +116,7 @@ const ContractAPI = {
  * @returns The result of the query
  */
 export const useContractById = (id: string) => {
-  return useQuery<ApiResponse<Contract> >({
+  return useQuery<ApiResponse<Contract>>({
     queryKey: ['contract', id], // Unique key for caching
     queryFn: () => ContractAPI.getContractById(id), // API function
     enabled: !!id, // Only run the query if ID is provided
@@ -104,7 +125,7 @@ export const useContractById = (id: string) => {
 
 // Create a custom hook to use all contracts
 export const useContractsCache = () => {
-  return useQuery<ApiResponse<Contract> >({
+  return useQuery<ApiResponse<Contract>>({
     queryKey: ['contracts'], // Unique key for caching
     queryFn: () => ContractAPI.getAllContracts(), // API function
   });
@@ -133,7 +154,7 @@ class ContractBuilder {
   }
 
   build() {
-    const titularGuardian = this.guardians.find((g) => g.titular);
+    const titularGuardian = this.guardians.find(g => g.titular);
     if (!titularGuardian) {
       throw new Error('No titular guardian found');
     }
@@ -145,4 +166,3 @@ class ContractBuilder {
 }
 
 export { ContractAPI, ContractBuilder, ContractModel };
-

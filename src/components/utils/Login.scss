@@ -12,24 +12,24 @@
     display: flex;
     justify-content: center; /* Center horizontally */
     align-items: center; /* Center vertically */
-    padding:  0 2rem;
+    padding: 0 2rem;
     height: fit-content;
-    
+
     .login-card {
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      padding:  0 2rem;
+      padding: 0 2rem;
       width: 100%;
       gap: 4rem;
       max-width: 400px;
       background: linear-gradient(135deg, #fff, c.$color-background);
       border-radius: 10px;
     }
-    .p-card-content form{
+    .p-card-content form {
       display: flex;
       flex-direction: column;
       gap: 2rem;
     }
-    #title{
+    #title {
       text-align: center;
       margin-bottom: 20px;
     }

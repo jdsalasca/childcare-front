@@ -8,4 +8,4 @@ export interface Bill {
   originalIndex?: number;
   classroom?: string;
   date?: string;
-} 
+}

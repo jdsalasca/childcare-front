@@ -1,4 +1,3 @@
-
 import { InputText } from 'primereact/inputtext';
 import { KeyFilterType } from 'primereact/keyfilter';
 import { classNames } from 'primereact/utils';
@@ -9,7 +8,7 @@ interface InputTextWrapperProps {
   rules?: RegisterOptions;
   label: string;
   disabled?: boolean;
-  keyFilter?:KeyFilterType ;
+  keyFilter?: KeyFilterType;
   onChangeCustom?: (value: string) => string;
   placeholder?: string;
   onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void; // Updated type
@@ -47,7 +46,7 @@ const InputTextWrapper: React.FC<InputTextWrapperProps> = ({
             id={name}
             {...field}
             value={field.value || ''}
-            onBlur={(event) => {
+            onBlur={event => {
               if (onBlur) {
                 onBlur(event); // Call the onBlur function with the event
               }
@@ -58,15 +57,17 @@ const InputTextWrapper: React.FC<InputTextWrapperProps> = ({
             readOnly={readOnly}
             keyfilter={keyFilter}
             placeholder={placeholder}
-            onChange={(e) => {
+            onChange={e => {
               const value = e.target.value;
-              const formattedValue = onChangeCustom ? onChangeCustom(value) : value;
+              const formattedValue = onChangeCustom
+                ? onChangeCustom(value)
+                : value;
               field.onChange(formattedValue);
             }}
             {...rest}
           />
           <label htmlFor={name}>{label}</label>
-          {error && <small className="p-error">{error.message}</small>}
+          {error && <small className='p-error'>{error.message}</small>}
         </span>
       )}
     />

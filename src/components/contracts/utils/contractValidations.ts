@@ -1,6 +1,6 @@
-import { ChildType, defaultChild } from "types/child";
-import { defaultGuardian, Guardian } from "../../../types/guardian";
-import { Validations } from "../../../utils/validations";
+import { ChildType, defaultChild } from 'types/child';
+import { defaultGuardian, Guardian } from '../../../types/guardian';
+import { Validations } from '../../../utils/validations';
 
 interface GuardianType {
   id: number;
@@ -20,9 +20,11 @@ interface SingleValidationResult {
 }
 
 export const GuardiansValidations = {
-  allHaveUniqueGuardianTypes: (guardians: Guardian[] = [defaultGuardian]): boolean => { 
+  allHaveUniqueGuardianTypes: (
+    guardians: Guardian[] = [defaultGuardian]
+  ): boolean => {
     if (!guardians || guardians.length === 0) return false;
-    
+
     const uniqueGuardianTypes = new Set(
       guardians
         .filter(guardian => guardian.guardian_type_id != null)
@@ -30,7 +32,7 @@ export const GuardiansValidations = {
     );
     return uniqueGuardianTypes.size === guardians.length;
   },
-  
+
   availableGuardianTypes: (
     guardianTypeOptions: GuardianType[],
     guardians: Guardian[],
@@ -39,7 +41,7 @@ export const GuardiansValidations = {
     if (!guardianTypeOptions) {
       return [];
     }
-    
+
     if (!guardians || guardians.length === 0) {
       return guardianTypeOptions;
     }
@@ -48,25 +50,30 @@ export const GuardiansValidations = {
     if (index !== undefined && (index < 0 || index >= guardians.length)) {
       // For new guardian, exclude all already assigned types
       return guardianTypeOptions.filter(guardianType => {
-        const isAssigned = guardians.some(guardian => guardian.guardian_type_id === guardianType.id);
+        const isAssigned = guardians.some(
+          guardian => guardian.guardian_type_id === guardianType.id
+        );
         return !isAssigned;
       });
     }
-    
+
     // Get the selected guardian type for the specified index
-    const selectedType = index !== undefined ? guardians[index]?.guardian_type_id : null;
-  
+    const selectedType =
+      index !== undefined ? guardians[index]?.guardian_type_id : null;
+
     // Filter out guardian types that are already selected by other guardians
     const availableGuardianTypes = guardianTypeOptions.filter(guardianType => {
       // Check if the guardian type is not already assigned to other guardians
-      const isAssigned = guardians.some((guardian, guardianIndex) => 
-        guardianIndex !== index && guardian.guardian_type_id === guardianType.id
+      const isAssigned = guardians.some(
+        (guardian, guardianIndex) =>
+          guardianIndex !== index &&
+          guardian.guardian_type_id === guardianType.id
       );
-      
+
       // Include the selected type from the current index
       return !isAssigned || guardianType.id === selectedType;
     });
-  
+
     return availableGuardianTypes;
   },
 
@@ -99,21 +106,38 @@ export const GuardiansValidations = {
     }
 
     // Optional fields: state, zip_code, document_number
-    if ('state' in guardian && typeof guardian.state === 'string' && guardian.state.trim() === '') {
+    if (
+      'state' in guardian &&
+      typeof guardian.state === 'string' &&
+      guardian.state.trim() === ''
+    ) {
       errors.push('State is required');
     }
-    if ('zip_code' in guardian && typeof guardian.zip_code === 'string' && guardian.zip_code.trim() === '') {
+    if (
+      'zip_code' in guardian &&
+      typeof guardian.zip_code === 'string' &&
+      guardian.zip_code.trim() === ''
+    ) {
       errors.push('Zip code is required');
-    } else if ('zip_code' in guardian && typeof guardian.zip_code === 'string' && guardian.zip_code && !/^\d{5}$/.test(guardian.zip_code)) {
+    } else if (
+      'zip_code' in guardian &&
+      typeof guardian.zip_code === 'string' &&
+      guardian.zip_code &&
+      !/^\d{5}$/.test(guardian.zip_code)
+    ) {
       errors.push('Zip code must be 5 digits');
     }
-    if ('document_number' in guardian && typeof guardian.document_number === 'string' && guardian.document_number.trim() === '') {
+    if (
+      'document_number' in guardian &&
+      typeof guardian.document_number === 'string' &&
+      guardian.document_number.trim() === ''
+    ) {
       errors.push('Document number is required');
     }
 
     return {
       isValid: errors.length === 0,
-      errors
+      errors,
     };
   },
 
@@ -129,7 +153,11 @@ export const GuardiansValidations = {
     guardians.forEach((guardian, index) => {
       const validationResult = GuardiansValidations.validateGuardian(guardian);
       if (!validationResult.isValid) {
-        errors.push(...validationResult.errors.map(error => `Guardian ${index + 1}: ${error}`));
+        errors.push(
+          ...validationResult.errors.map(
+            error => `Guardian ${index + 1}: ${error}`
+          )
+        );
       }
     });
 
@@ -142,7 +170,9 @@ export const GuardiansValidations = {
     }
 
     // Check for duplicate emails
-    const emails = guardians.map(g => g.email).filter(email => email && email.trim() !== '');
+    const emails = guardians
+      .map(g => g.email)
+      .filter(email => email && email.trim() !== '');
     const uniqueEmails = new Set(emails);
     if (emails.length !== uniqueEmails.size) {
       errors.push('Duplicate email addresses found');
@@ -150,7 +180,7 @@ export const GuardiansValidations = {
 
     return {
       isValid: errors.length === 0,
-      errors
+      errors,
     };
   },
 
@@ -160,8 +190,8 @@ export const GuardiansValidations = {
     }
 
     // Check if all guardians have names
-    const guardiansWithoutNames = guardians.filter(guardian => 
-      !guardian.name || guardian.name.trim() === ''
+    const guardiansWithoutNames = guardians.filter(
+      guardian => !guardian.name || guardian.name.trim() === ''
     );
     if (guardiansWithoutNames.length > 0) {
       return { isValid: false, errorKey: 'allGuardiansMustHaveNames' };
@@ -179,13 +209,18 @@ export const GuardiansValidations = {
     }
 
     return { isValid: true };
-  }
+  },
 };
 
 export const ChildrenValidations = {
   allChildrenHaveName: (children: ChildType[] = [defaultChild]): boolean => {
-    return children != null && children.length > 0 && 
-           !children.some(child => !child.first_name || child.first_name.trim() === '');
+    return (
+      children != null &&
+      children.length > 0 &&
+      !children.some(
+        child => !child.first_name || child.first_name.trim() === ''
+      )
+    );
   },
 
   validateChild: (child: ChildType): ValidationResult => {
@@ -198,11 +233,19 @@ export const ChildrenValidations = {
     }
 
     // Required fields validation with proper type checking
-    if (!child.first_name || typeof child.first_name !== 'string' || child.first_name.trim() === '') {
+    if (
+      !child.first_name ||
+      typeof child.first_name !== 'string' ||
+      child.first_name.trim() === ''
+    ) {
       errors.push('First name is required');
     }
 
-    if (!child.last_name || typeof child.last_name !== 'string' || child.last_name.trim() === '') {
+    if (
+      !child.last_name ||
+      typeof child.last_name !== 'string' ||
+      child.last_name.trim() === ''
+    ) {
       errors.push('Last name is required');
     }
 
@@ -240,7 +283,7 @@ export const ChildrenValidations = {
 
     return {
       isValid: errors.length === 0,
-      errors
+      errors,
     };
   },
 
@@ -256,7 +299,11 @@ export const ChildrenValidations = {
     children.forEach((child, index) => {
       const validationResult = ChildrenValidations.validateChild(child);
       if (!validationResult.isValid) {
-        errors.push(...validationResult.errors.map(error => `Child ${index + 1}: ${error}`));
+        errors.push(
+          ...validationResult.errors.map(
+            error => `Child ${index + 1}: ${error}`
+          )
+        );
       }
     });
 
@@ -271,7 +318,7 @@ export const ChildrenValidations = {
 
     return {
       isValid: errors.length === 0,
-      errors
+      errors,
     };
   },
 
@@ -281,20 +328,21 @@ export const ChildrenValidations = {
     }
 
     // Check if all children have first names
-    const childrenWithoutNames = children.filter(child => 
-      !child.first_name || child.first_name.trim() === ''
+    const childrenWithoutNames = children.filter(
+      child => !child.first_name || child.first_name.trim() === ''
     );
     if (childrenWithoutNames.length > 0) {
       return { isValid: false, errorKey: 'allChildrenMustHaveNames' };
     }
 
     // Check if all children have birth dates
-    const childrenWithoutBirthDates = children.filter(child => !child.born_date);
+    const childrenWithoutBirthDates = children.filter(
+      child => !child.born_date
+    );
     if (childrenWithoutBirthDates.length > 0) {
       return { isValid: false, errorKey: 'allChildrenMustHaveBirthDates' };
     }
 
     return { isValid: true };
-  }
+  },
 };
-  

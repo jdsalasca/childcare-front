@@ -11,5 +11,10 @@
     "isolatedModules": true,
     "jsx": "react-jsx"
   },
-  "include": ["vite.config.js", "vitest.config.ts", "tailwind.config.js", "eslint.config.cjs"]
-} 
+  "include": [
+    "vite.config.js",
+    "vitest.config.ts",
+    "tailwind.config.js",
+    "eslint.config.cjs"
+  ]
+}

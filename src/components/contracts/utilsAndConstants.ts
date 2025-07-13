@@ -27,16 +27,21 @@ export const programOptions: ProgramOption[] = [
 
 export const determineProgram = (weeksOld: number): string => {
   return (
-    programOptions.find(program => weeksOld >= program.minWeek && weeksOld <= program.maxWeek)?.value || ''
+    programOptions.find(
+      program => weeksOld >= program.minWeek && weeksOld <= program.maxWeek
+    )?.value || ''
   );
 };
 
-export const calculateAge = (bornDate: string | Date): number  => {
+export const calculateAge = (bornDate: string | Date): number => {
   const today = new Date();
   const birthDate = new Date(bornDate);
   let age = today.getFullYear() - birthDate.getFullYear();
   const monthDifference = today.getMonth() - birthDate.getMonth();
-  if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+  if (
+    monthDifference < 0 ||
+    (monthDifference === 0 && today.getDate() < birthDate.getDate())
+  ) {
     age--;
   }
   return age;
@@ -52,14 +57,17 @@ export const calculateWeeksOld = (bornDate: string | Date | null): number => {
 };
 
 export const fontStyles = {
-  ITALIC: "italic",
-  BOLD: "bold",
-  NORMAL: "normal"
+  ITALIC: 'italic',
+  BOLD: 'bold',
+  NORMAL: 'normal',
 };
 
 import { DayType } from '../../types/day';
 
-export const validateSchedule = (schedule: ScheduleEntry[] | null | undefined, days: DayType[] | null): boolean => {
+export const validateSchedule = (
+  schedule: ScheduleEntry[] | null | undefined,
+  days: DayType[] | null
+): boolean => {
   // Handle null/undefined inputs
   if (!schedule || !days || schedule.length === 0) {
     return false;
@@ -105,30 +113,36 @@ export const validateSchedule = (schedule: ScheduleEntry[] | null | undefined, d
 function parseTime(timeString: string): number | null {
   const timeRegex = /^([01]?[0-9]|2[0-3]):([0-5][0-9])$/;
   const match = timeString.match(timeRegex);
-  
+
   if (!match) {
     return null;
   }
 
   const hours = parseInt(match[1], 10);
   const minutes = parseInt(match[2], 10);
-  
+
   // Create a date object for today with the specified time
   const today = new Date();
-  const timeDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), hours, minutes);
-  
+  const timeDate = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate(),
+    hours,
+    minutes
+  );
+
   return timeDate.getTime();
 }
 
 export const formatTime = (date: Date | null): string => {
   if (!date) return '';
-  
-  const options: Intl.DateTimeFormatOptions = { 
-    hour: '2-digit', 
-    minute: '2-digit', 
-    hour12: true 
+
+  const options: Intl.DateTimeFormatOptions = {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
   };
-  
+
   return new Intl.DateTimeFormat('en-US', options).format(date);
 };
 

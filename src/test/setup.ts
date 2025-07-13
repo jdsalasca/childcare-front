@@ -1,9 +1,9 @@
-import '@testing-library/jest-dom'
-import { vi } from 'vitest'
+import '@testing-library/jest-dom';
+import { vi } from 'vitest';
 
 // Mock react-i18next
 vi.mock('react-i18next', async () => {
-  const actual = await vi.importActual('react-i18next')
+  const actual = await vi.importActual('react-i18next');
   return {
     ...actual,
     useTranslation: () => ({
@@ -17,8 +17,8 @@ vi.mock('react-i18next', async () => {
       type: '3rdParty',
       init: vi.fn(),
     },
-  }
-})
+  };
+});
 
 // Mock react-hook-form
 vi.mock('react-hook-form', () => ({
@@ -101,26 +101,26 @@ vi.mock('react-hook-form', () => ({
       isValid: true,
     },
   }),
-}))
+}));
 
 // Mock environment variables
-vi.stubEnv('VITE_BASE_URL', 'http://localhost:8000/childadmin')
-vi.stubEnv('VITE_ENV', 'test')
+vi.stubEnv('VITE_BASE_URL', 'http://localhost:8000/childadmin');
+vi.stubEnv('VITE_ENV', 'test');
 
 // Mock HTMLFormElement.prototype.requestSubmit
-HTMLFormElement.prototype.requestSubmit = vi.fn()
+HTMLFormElement.prototype.requestSubmit = vi.fn();
 
 // Mock HTMLFormElement.prototype.reportValidity
-HTMLFormElement.prototype.reportValidity = vi.fn().mockReturnValue(true)
+HTMLFormElement.prototype.reportValidity = vi.fn().mockReturnValue(true);
 
 // Mock HTMLInputElement.prototype.reportValidity
-HTMLInputElement.prototype.reportValidity = vi.fn().mockReturnValue(true)
+HTMLInputElement.prototype.reportValidity = vi.fn().mockReturnValue(true);
 
 // Mock HTMLSelectElement.prototype.reportValidity
-HTMLSelectElement.prototype.reportValidity = vi.fn().mockReturnValue(true)
+HTMLSelectElement.prototype.reportValidity = vi.fn().mockReturnValue(true);
 
 // Mock HTMLTextAreaElement.prototype.reportValidity
-HTMLTextAreaElement.prototype.reportValidity = vi.fn().mockReturnValue(true)
+HTMLTextAreaElement.prototype.reportValidity = vi.fn().mockReturnValue(true);
 
 // Mock window.matchMedia
 Object.defineProperty(window, 'matchMedia', {
@@ -135,7 +135,7 @@ Object.defineProperty(window, 'matchMedia', {
     removeEventListener: vi.fn(),
     dispatchEvent: vi.fn(),
   })),
-})
+});
 
 // Mock window.location
 Object.defineProperty(window, 'location', {
@@ -153,21 +153,21 @@ Object.defineProperty(window, 'location', {
     replace: vi.fn(),
   },
   writable: true,
-})
+});
 
 // Mock ResizeObserver
 global.ResizeObserver = vi.fn().mockImplementation(() => ({
   observe: vi.fn(),
   unobserve: vi.fn(),
   disconnect: vi.fn(),
-}))
+}));
 
 // Mock IntersectionObserver
 global.IntersectionObserver = vi.fn().mockImplementation(() => ({
   observe: vi.fn(),
   unobserve: vi.fn(),
   disconnect: vi.fn(),
-}))
+}));
 
 // Mock HTMLCanvasElement.getContext
 HTMLCanvasElement.prototype.getContext = vi.fn().mockReturnValue({
@@ -199,18 +199,18 @@ HTMLCanvasElement.prototype.getContext = vi.fn().mockReturnValue({
   transform: vi.fn(),
   rect: vi.fn(),
   clip: vi.fn(),
-})
+});
 
 // Mock URL.createObjectURL
-global.URL.createObjectURL = vi.fn(() => 'mocked-url')
-global.URL.revokeObjectURL = vi.fn()
+global.URL.createObjectURL = vi.fn(() => 'mocked-url');
+global.URL.revokeObjectURL = vi.fn();
 
 // Mock File and FileReader
 global.File = vi.fn().mockImplementation(() => ({
   name: 'test.pdf',
   size: 1024,
   type: 'application/pdf',
-}))
+}));
 
 global.FileReader = vi.fn().mockImplementation(() => ({
   readAsDataURL: vi.fn(),
@@ -229,7 +229,7 @@ global.FileReader = vi.fn().mockImplementation(() => ({
   onloadstart: null,
   onloadend: null,
   onprogress: null,
-})) as any
+})) as any;
 
 // Mock crypto for testing
 Object.defineProperty(global, 'crypto', {
@@ -239,7 +239,7 @@ Object.defineProperty(global, 'crypto', {
       digest: vi.fn().mockResolvedValue(new ArrayBuffer(32)),
     },
   },
-})
+});
 
 // Mock localStorage
 const localStorageMock = {
@@ -249,11 +249,11 @@ const localStorageMock = {
   clear: vi.fn(),
   length: 0,
   key: vi.fn(),
-}
+};
 Object.defineProperty(window, 'localStorage', {
   value: localStorageMock,
   writable: true,
-})
+});
 
 // Mock sessionStorage
 const sessionStorageMock = {
@@ -263,11 +263,11 @@ const sessionStorageMock = {
   clear: vi.fn(),
   length: 0,
   key: vi.fn(),
-}
+};
 Object.defineProperty(window, 'sessionStorage', {
   value: sessionStorageMock,
   writable: true,
-})
+});
 
 // Mock console methods for cleaner test output
 global.console = {
@@ -277,7 +277,7 @@ global.console = {
   info: vi.fn(),
   warn: vi.fn(),
   error: vi.fn(),
-}
+};
 
 // Mock process.env for Node.js compatibility
 if (typeof process === 'undefined') {
@@ -287,22 +287,22 @@ if (typeof process === 'undefined') {
       VITE_BASE_URL: 'http://localhost:8000/childadmin',
       VITE_ENV: 'test',
     },
-  } as any
+  } as any;
 }
 
 // Mock requestAnimationFrame and cancelAnimationFrame
-global.requestAnimationFrame = vi.fn().mockImplementation((cb) => {
-  setTimeout(cb, 0)
-  return 1
-})
-global.cancelAnimationFrame = vi.fn()
+global.requestAnimationFrame = vi.fn().mockImplementation(cb => {
+  setTimeout(cb, 0);
+  return 1;
+});
+global.cancelAnimationFrame = vi.fn();
 
 // Mock setTimeout and clearTimeout for better control in tests
 // Note: Using vi.useFakeTimers() in individual tests for better control
 
 // Clean up after each test
 afterEach(() => {
-  vi.clearAllMocks()
-  vi.clearAllTimers()
-  vi.unstubAllEnvs()
-}) 
+  vi.clearAllMocks();
+  vi.clearAllTimers();
+  vi.unstubAllEnvs();
+});

@@ -1,14 +1,14 @@
-import { useQuery } from "@tanstack/react-query";
-import { ApiResponse } from "../API"; // Import your ApiResponse type
-import GuardianTypesAPI from "../GuardianTypesAPI";
-import { GuardianType } from "../../types/guardianType";
+import { useQuery } from '@tanstack/react-query';
+import { ApiResponse } from '../API'; // Import your ApiResponse type
+import GuardianTypesAPI from '../GuardianTypesAPI';
+import { GuardianType } from '../../types/guardianType';
 
 // Hook to fetch all guardian types
 export const useGuardianTypes = () => {
   return useQuery<ApiResponse<GuardianType[]>, Error>({
     queryKey: ['guardianTypes'],
     queryFn: () => GuardianTypesAPI.getGuardianTypes(),
-    staleTime: 1000 * 60 * 20,  // Cache time in milliseconds (20 minutes)
+    staleTime: 1000 * 60 * 20, // Cache time in milliseconds (20 minutes)
   });
 };
 
@@ -17,7 +17,7 @@ export const useActiveGuardianTypes = () => {
   return useQuery<ApiResponse<GuardianType[]>, Error>({
     queryKey: ['activeGuardianTypes'],
     queryFn: () => GuardianTypesAPI.getActiveGuardianTypes(),
-    staleTime: 1000 * 60 * 20,  // Cache time in milliseconds (20 minutes)
+    staleTime: 1000 * 60 * 20, // Cache time in milliseconds (20 minutes)
   });
 };
 
@@ -29,4 +29,3 @@ export const useGuardianTypeById = (id: string | undefined) => {
     enabled: !!id, // Only run the query if ID is provided
   });
 };
-

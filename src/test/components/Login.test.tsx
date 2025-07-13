@@ -67,20 +67,22 @@ describe('Login Component', () => {
   describe('Rendering', () => {
     it('should render login form', () => {
       renderLogin();
-      
+
       expect(screen.getByText('login')).toBeInTheDocument();
       expect(screen.getByLabelText(/userNameOrEmail/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /signIn/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: /signIn/i })
+      ).toBeInTheDocument();
     });
 
     it('should have form with correct structure', () => {
       renderLogin();
-      
+
       const usernameInput = screen.getByLabelText(/userNameOrEmail/i);
       const passwordInput = screen.getByLabelText(/password/i);
       const submitButton = screen.getByRole('button', { name: /signIn/i });
-      
+
       expect(usernameInput).toBeInTheDocument();
       expect(passwordInput).toBeInTheDocument();
       expect(submitButton).toBeInTheDocument();
@@ -90,11 +92,11 @@ describe('Login Component', () => {
   describe('Form Submission', () => {
     it('should call authUser with correct credentials on successful login', async () => {
       const mockResponse = {
-        response: { 
+        response: {
           token: 'test-token',
           id: '1',
           username: 'testuser',
-          email: 'test@example.com'
+          email: 'test@example.com',
         },
         httpStatus: 200,
       };
@@ -139,11 +141,11 @@ describe('Login Component', () => {
 
     it('should handle successful login and navigate', async () => {
       const mockResponse = {
-        response: { 
+        response: {
           token: 'test-token',
           id: '1',
           username: 'testuser',
-          email: 'test@example.com'
+          email: 'test@example.com',
         },
         httpStatus: 200,
       };
@@ -168,7 +170,9 @@ describe('Login Component', () => {
   describe('Loading States', () => {
     it('should show loading state during API call', async () => {
       // Mock a delayed response
-      mockAuthUser.mockImplementation(() => new Promise(resolve => setTimeout(resolve, 100)));
+      mockAuthUser.mockImplementation(
+        () => new Promise(resolve => setTimeout(resolve, 100))
+      );
 
       renderLogin();
 
@@ -185,4 +189,4 @@ describe('Login Component', () => {
       expect(loader).toBeInTheDocument();
     });
   });
-}); 
+});

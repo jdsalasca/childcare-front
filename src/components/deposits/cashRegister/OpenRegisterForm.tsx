@@ -19,7 +19,13 @@ interface Props {
 
 const OpenRegisterForm: React.FC<Props> = ({ date, onSuccess }) => {
   const { t } = useTranslation();
-  const { control, handleSubmit, setValue, watch, formState: { errors } } = useForm<OpenRegisterRequest>({
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm<OpenRegisterRequest>({
     defaultValues: {
       date,
       cashier_id: undefined,
@@ -46,7 +52,8 @@ const OpenRegisterForm: React.FC<Props> = ({ date, onSuccess }) => {
 
   // Mutación para abrir caja
   const mutation = useMutation({
-    mutationFn: (data: OpenRegisterRequest) => CashRegisterAPI.openRegister(data),
+    mutationFn: (data: OpenRegisterRequest) =>
+      CashRegisterAPI.openRegister(data),
     onSuccess,
   });
 
@@ -56,63 +63,76 @@ const OpenRegisterForm: React.FC<Props> = ({ date, onSuccess }) => {
     data.bills.forEach(bill => {
       const quantity = Number(bill.quantity) || 0;
       if (quantity > 0) {
-        consolidated[bill.bill_type_id] = (consolidated[bill.bill_type_id] || 0) + quantity;
+        consolidated[bill.bill_type_id] =
+          (consolidated[bill.bill_type_id] || 0) + quantity;
       }
     });
-    data.bills = Object.entries(consolidated).map(([bill_type_id, quantity]) => ({
-      bill_type_id: Number(bill_type_id),
-      quantity: Number(quantity),
-    }));
+    data.bills = Object.entries(consolidated).map(
+      ([bill_type_id, quantity]) => ({
+        bill_type_id: Number(bill_type_id),
+        quantity: Number(quantity),
+      })
+    );
     mutation.mutate(data);
   };
 
   const watchedBills = watch('bills');
-  
+
   // Debugging para identificar el problema
   console.log('OpenRegisterForm - watchedBills:', watchedBills);
-  
+
   // Ensure watchedBills is always an array with valid values
-  const safeBills = Array.isArray(watchedBills) ? watchedBills.map(bill => ({
-    bill_type_id: Number(bill?.bill_type_id) || 1,
-    quantity: Number(bill?.quantity) || 0
-  })) : [];
-  
+  const safeBills = Array.isArray(watchedBills)
+    ? watchedBills.map(bill => ({
+        bill_type_id: Number(bill?.bill_type_id) || 1,
+        quantity: Number(bill?.quantity) || 0,
+      }))
+    : [];
+
   const totalAmount = calculateBillTotal(safeBills);
-  
+
   // Debugging del resultado
-  console.log('OpenRegisterForm - totalAmount:', totalAmount, 'isNaN:', isNaN(totalAmount));
+  console.log(
+    'OpenRegisterForm - totalAmount:',
+    totalAmount,
+    'isNaN:',
+    isNaN(totalAmount)
+  );
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
       {/* Header */}
-      <div className="text-center">
-        <h3 className="text-2xl font-bold text-gray-800 mb-2">
+      <div className='text-center'>
+        <h3 className='text-2xl font-bold text-gray-800 mb-2'>
           {t('cashRegister.openRegister')}
         </h3>
-        <p className="text-gray-600">
-          {t('cashRegister.date')}: <span className="font-medium">{date}</span>
+        <p className='text-gray-600'>
+          {t('cashRegister.date')}: <span className='font-medium'>{date}</span>
         </p>
       </div>
 
       <Divider />
 
       {/* Cashier Selection */}
-      <div className="space-y-4">
+      <div className='space-y-4'>
         <div>
-          <label htmlFor="cashier-select" className="block text-sm font-medium text-gray-700 mb-2">
+          <label
+            htmlFor='cashier-select'
+            className='block text-sm font-medium text-gray-700 mb-2'
+          >
             {t('cashRegister.cashier')} *
           </label>
           <Controller
-            name="cashier_id"
+            name='cashier_id'
             control={control}
             rules={{ required: t('cashRegister.pleaseSelectCashier') }}
             render={({ field }) => (
               <Dropdown
                 {...field}
-                id="cashier-select"
+                id='cashier-select'
                 options={cashiersData?.data || []}
-                optionLabel="name"
-                optionValue="id"
+                optionLabel='name'
+                optionValue='id'
                 placeholder={t('cashRegister.selectCashier')}
                 loading={loadingCashiers}
                 className={`w-full ${errors.cashier_id ? 'p-invalid' : ''}`}
@@ -120,7 +140,9 @@ const OpenRegisterForm: React.FC<Props> = ({ date, onSuccess }) => {
             )}
           />
           {errors.cashier_id && (
-            <small className="p-error block mt-1">{errors.cashier_id.message}</small>
+            <small className='p-error block mt-1'>
+              {errors.cashier_id.message}
+            </small>
           )}
         </div>
       </div>
@@ -128,23 +150,26 @@ const OpenRegisterForm: React.FC<Props> = ({ date, onSuccess }) => {
       <Divider />
 
       {/* Bills Section */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <label className="block text-sm font-medium text-gray-700">
+      <div className='space-y-4'>
+        <div className='flex items-center justify-between'>
+          <label className='block text-sm font-medium text-gray-700'>
             {t('cashRegister.bills')} *
           </label>
           <Button
-            type="button"
-            icon="pi pi-plus"
+            type='button'
+            icon='pi pi-plus'
             label={t('cashRegister.addBill')}
-            className="p-button-text p-button-sm"
+            className='p-button-text p-button-sm'
             onClick={() => append({ bill_type_id: 1, quantity: 0 })}
           />
         </div>
 
-        <div className="space-y-3">
+        <div className='space-y-3'>
           {fields.map((field, idx) => (
-            <div key={field.id} className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+            <div
+              key={field.id}
+              className='flex items-center gap-3 p-4 bg-gray-50 rounded-lg'
+            >
               <Controller
                 name={`bills.${idx}.bill_type_id`}
                 control={control}
@@ -153,10 +178,10 @@ const OpenRegisterForm: React.FC<Props> = ({ date, onSuccess }) => {
                   <Dropdown
                     {...field}
                     options={BILL_TYPES}
-                    optionLabel="label"
-                    optionValue="id"
+                    optionLabel='label'
+                    optionValue='id'
                     placeholder={t('cashRegister.selectDenomination')}
-                    className="w-32"
+                    className='w-32'
                   />
                 )}
               />
@@ -166,25 +191,48 @@ const OpenRegisterForm: React.FC<Props> = ({ date, onSuccess }) => {
                 rules={{ required: true, min: 0 }}
                 render={({ field }) => {
                   // Ensure we always have a valid number value
-                  const currentValue = field.value === null || field.value === undefined || isNaN(Number(field.value)) ? 0 : Number(field.value);
-                  
+                  const currentValue =
+                    field.value === null ||
+                    field.value === undefined ||
+                    isNaN(Number(field.value))
+                      ? 0
+                      : Number(field.value);
+
                   return (
                     <InputNumber
                       min={0}
                       placeholder={t('cashRegister.enterQuantity')}
-                      className="w-32"
+                      className='w-32'
                       value={currentValue}
-                      onValueChange={(e) => {
+                      onValueChange={e => {
                         // Ensure we always set a valid number
-                        const newValue = e.value === null || e.value === undefined || isNaN(Number(e.value)) ? 0 : Number(e.value);
-                        console.log(`InputNumber ${idx} - onValueChange:`, { original: e.value, processed: newValue });
+                        const newValue =
+                          e.value === null ||
+                          e.value === undefined ||
+                          isNaN(Number(e.value))
+                            ? 0
+                            : Number(e.value);
+                        console.log(`InputNumber ${idx} - onValueChange:`, {
+                          original: e.value,
+                          processed: newValue,
+                        });
                         field.onChange(newValue);
                       }}
                       onBlur={() => {
                         // Double-check on blur to ensure valid value
-                        const blurValue = field.value === null || field.value === undefined || isNaN(Number(field.value)) ? 0 : Number(field.value);
+                        const blurValue =
+                          field.value === null ||
+                          field.value === undefined ||
+                          isNaN(Number(field.value))
+                            ? 0
+                            : Number(field.value);
                         if (blurValue !== field.value) {
-                          console.log(`InputNumber ${idx} - onBlur fixing value:`, field.value, 'to', blurValue);
+                          console.log(
+                            `InputNumber ${idx} - onBlur fixing value:`,
+                            field.value,
+                            'to',
+                            blurValue
+                          );
                           field.onChange(blurValue);
                         }
                       }}
@@ -193,9 +241,9 @@ const OpenRegisterForm: React.FC<Props> = ({ date, onSuccess }) => {
                 }}
               />
               <Button
-                type="button"
-                icon="pi pi-trash"
-                className="p-button-text p-button-danger p-button-sm"
+                type='button'
+                icon='pi pi-trash'
+                className='p-button-text p-button-danger p-button-sm'
                 onClick={() => remove(idx)}
                 disabled={fields.length === 1}
                 aria-label={t('cashRegister.removeBill')}
@@ -205,11 +253,18 @@ const OpenRegisterForm: React.FC<Props> = ({ date, onSuccess }) => {
         </div>
 
         {/* Total Amount */}
-        <Card className="bg-blue-50 border-blue-200">
-          <div className="text-center">
-            <p className="text-sm text-gray-600 mb-1">{t('cashRegister.openingAmount')}</p>
-            <p className="text-2xl font-bold text-blue-800">
-              ${isNaN(totalAmount) || totalAmount === null || totalAmount === undefined ? '0' : totalAmount.toLocaleString()}
+        <Card className='bg-blue-50 border-blue-200'>
+          <div className='text-center'>
+            <p className='text-sm text-gray-600 mb-1'>
+              {t('cashRegister.openingAmount')}
+            </p>
+            <p className='text-2xl font-bold text-blue-800'>
+              $
+              {isNaN(totalAmount) ||
+              totalAmount === null ||
+              totalAmount === undefined
+                ? '0'
+                : totalAmount.toLocaleString()}
             </p>
           </div>
         </Card>
@@ -218,12 +273,12 @@ const OpenRegisterForm: React.FC<Props> = ({ date, onSuccess }) => {
       <Divider />
 
       {/* Submit Button */}
-      <div className="flex justify-center">
+      <div className='flex justify-center'>
         <Button
-          type="submit"
+          type='submit'
           label={t('cashRegister.openRegister')}
           loading={mutation.isPending}
-          className="px-8 py-3"
+          className='px-8 py-3'
           disabled={mutation.isPending}
         />
       </div>
@@ -231,20 +286,24 @@ const OpenRegisterForm: React.FC<Props> = ({ date, onSuccess }) => {
       {/* Messages */}
       {mutation.isSuccess && (
         <Message
-          severity="success"
+          severity='success'
           text={t('cashRegister.registerOpenedSuccessfully')}
-          className="w-full"
+          className='w-full'
         />
       )}
       {mutation.isError && (
         <Message
-          severity="error"
-          text={mutation.error instanceof Error ? mutation.error.message : t('cashRegister.error')}
-          className="w-full"
+          severity='error'
+          text={
+            mutation.error instanceof Error
+              ? mutation.error.message
+              : t('cashRegister.error')
+          }
+          className='w-full'
         />
       )}
     </form>
   );
 };
 
-export default OpenRegisterForm; 
+export default OpenRegisterForm;

@@ -23,7 +23,14 @@ describe('Guardian Form Component', () => {
       payment_method_id: 1,
       total_to_pay: '',
       weekly_payment: '',
-      terms: { id: 1, name: 'Sample', description: '', created_at: '2024-01-01', updated_at: '2024-01-01', status: "Active" },
+      terms: {
+        id: 1,
+        name: 'Sample',
+        description: '',
+        created_at: '2024-01-01',
+        updated_at: '2024-01-01',
+        status: 'Active',
+      },
       schedule: [],
       doctorInformation: {
         name: '',
@@ -35,11 +42,11 @@ describe('Guardian Form Component', () => {
       emergencyContacts: [],
       releasedToPersons: [],
       titularName: '',
-      todayDate: '2024-01-01'
+      todayDate: '2024-01-01',
     },
     setContractInformation: vi.fn(),
     setLoadingInfo: vi.fn(),
-    toast: { current: null }
+    toast: { current: null },
   };
 
   const mockViewModel = {
@@ -50,14 +57,14 @@ describe('Guardian Form Component', () => {
     getAvailableGuardianTypes: vi.fn().mockReturnValue([
       { id: 1, name: 'Father' },
       { id: 2, name: 'Mother' },
-      { id: 3, name: 'Guardian' }
+      { id: 3, name: 'Guardian' },
     ]),
     handleGuardianSelect: vi.fn(),
     t: (key: string) => key,
     guardianOptions: [
-      { 
-        id: 1, 
-        name: 'John Doe', 
+      {
+        id: 1,
+        name: 'John Doe',
         last_name: 'Doe',
         address: '123 Main St',
         city: 'Omaha',
@@ -70,11 +77,11 @@ describe('Guardian Form Component', () => {
         zip_code: '',
         created_at: '2024-01-01',
         updated_at: '2024-01-01',
-        status: "Active" as const
+        status: 'Active' as const,
       },
-      { 
-        id: 2, 
-        name: 'Jane Smith', 
+      {
+        id: 2,
+        name: 'Jane Smith',
         last_name: 'Smith',
         address: '456 Oak St',
         city: 'Omaha',
@@ -87,8 +94,8 @@ describe('Guardian Form Component', () => {
         zip_code: '',
         created_at: '2024-01-01',
         updated_at: '2024-01-01',
-        status: "Active" as const
-      }
+        status: 'Active' as const,
+      },
     ],
     control: {} as any,
     fields: [
@@ -104,8 +111,8 @@ describe('Guardian Form Component', () => {
         titular: true,
         created_at: '2024-01-01',
         updated_at: '2024-01-01',
-        status: "Active" as const
-      }
+        status: 'Active' as const,
+      },
     ] as any,
     getValues: vi.fn().mockReturnValue({
       guardians: [
@@ -117,11 +124,11 @@ describe('Guardian Form Component', () => {
           address: '123 Main St',
           city: 'Omaha',
           guardian_type_id: 1,
-          titular: true
-        }
-      ]
+          titular: true,
+        },
+      ],
     }),
-    handleSubmit: vi.fn((fn) => fn)
+    handleSubmit: vi.fn(fn => fn),
   };
 
   beforeEach(() => {
@@ -167,8 +174,8 @@ describe('Guardian Form Component', () => {
         errors: {
           'guardians.0.name': { message: 'guardianNameRequired' },
           'guardians.0.email': { message: 'emailInvalid' },
-          'guardians.0.phone': { message: 'phoneNumberPattern' }
-        }
+          'guardians.0.phone': { message: 'phoneNumberPattern' },
+        },
       };
       mockUseViewModelStepGuardians.mockReturnValue(mockViewModelWithErrors);
 
@@ -231,12 +238,16 @@ describe('Guardian Form Component', () => {
 
     it('should handle removing guardian', () => {
       renderWithProviders(<StepComponentTwo {...mockProps} />);
-      
+
       // Find the remove button by its icon or role
-      const removeButtons = screen.getAllByRole('button').filter(button => 
-        button.querySelector('.pi-trash') || button.textContent?.includes('trash')
-      );
-      
+      const removeButtons = screen
+        .getAllByRole('button')
+        .filter(
+          button =>
+            button.querySelector('.pi-trash') ||
+            button.textContent?.includes('trash')
+        );
+
       if (removeButtons.length > 0) {
         fireEvent.click(removeButtons[0]);
         expect(mockViewModel.removeGuardian).toHaveBeenCalledWith(0);
@@ -281,11 +292,13 @@ describe('Guardian Form Component', () => {
         getValues: vi.fn().mockReturnValue({
           guardians: [
             { guardian_type_id: 1, titular: true },
-            { guardian_type_id: 2, titular: false }
-          ]
-        })
+            { guardian_type_id: 2, titular: false },
+          ],
+        }),
       };
-      mockUseViewModelStepGuardians.mockReturnValue(mockViewModelWithMultipleGuardians);
+      mockUseViewModelStepGuardians.mockReturnValue(
+        mockViewModelWithMultipleGuardians
+      );
 
       renderWithProviders(<StepComponentTwo {...mockProps} />);
 
@@ -320,11 +333,13 @@ describe('Guardian Form Component', () => {
           guardians: [
             { guardian_type_id: 1, titular: true },
             { guardian_type_id: 2, titular: false },
-            { guardian_type_id: 3, titular: false }
-          ]
-        })
+            { guardian_type_id: 3, titular: false },
+          ],
+        }),
       };
-      mockUseViewModelStepGuardians.mockReturnValue(mockViewModelWithMaxGuardians);
+      mockUseViewModelStepGuardians.mockReturnValue(
+        mockViewModelWithMaxGuardians
+      );
 
       renderWithProviders(<StepComponentTwo {...mockProps} />);
       const addButton = screen.getByRole('button', { name: 'addGuardian' });
@@ -336,12 +351,12 @@ describe('Guardian Form Component', () => {
       const mockViewModelWithFewGuardians = {
         ...mockViewModel,
         getValues: vi.fn().mockReturnValue({
-          guardians: [
-            { guardian_type_id: 1, titular: true }
-          ]
-        })
+          guardians: [{ guardian_type_id: 1, titular: true }],
+        }),
       };
-      mockUseViewModelStepGuardians.mockReturnValue(mockViewModelWithFewGuardians);
+      mockUseViewModelStepGuardians.mockReturnValue(
+        mockViewModelWithFewGuardians
+      );
 
       renderWithProviders(<StepComponentTwo {...mockProps} />);
       const addButton = screen.getByRole('button', { name: 'addGuardian' });
@@ -355,10 +370,12 @@ describe('Guardian Form Component', () => {
         ...mockViewModel,
         errors: {
           'guardians.0.name': { message: 'Name is required' },
-          'guardians.0.email': { message: 'Invalid email format' }
-        }
+          'guardians.0.email': { message: 'Invalid email format' },
+        },
       };
-      mockUseViewModelStepGuardians.mockReturnValue(mockViewModelWithValidationErrors);
+      mockUseViewModelStepGuardians.mockReturnValue(
+        mockViewModelWithValidationErrors
+      );
 
       renderWithProviders(<StepComponentTwo {...mockProps} />);
 
@@ -370,7 +387,7 @@ describe('Guardian Form Component', () => {
     it('should handle API errors gracefully', () => {
       const mockViewModelWithApiError = {
         ...mockViewModel,
-        onSubmit: vi.fn().mockRejectedValue(new Error('API Error'))
+        onSubmit: vi.fn().mockRejectedValue(new Error('API Error')),
       };
       mockUseViewModelStepGuardians.mockReturnValue(mockViewModelWithApiError);
 
@@ -418,4 +435,4 @@ describe('Guardian Form Component', () => {
       expect(form).toBeInTheDocument();
     });
   });
-}); 
+});

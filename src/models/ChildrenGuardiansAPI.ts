@@ -1,5 +1,5 @@
-import { useQuery, UseQueryResult } from "@tanstack/react-query";
-import API, { ApiResponse, BASE_URL } from "./API";
+import { useQuery, UseQueryResult } from '@tanstack/react-query';
+import API, { ApiResponse, BASE_URL } from './API';
 
 // Define the structure of the data for creating children guardians
 interface ChildrenGuardiansData {
@@ -8,9 +8,15 @@ interface ChildrenGuardiansData {
 
 const ChildrenGuardiansAPI = {
   // Create Children Guardians
-  createChildrenGuardians: async (data: ChildrenGuardiansData): Promise<ApiResponse<ChildrenGuardiansData>> => {
+  createChildrenGuardians: async (
+    data: ChildrenGuardiansData
+  ): Promise<ApiResponse<ChildrenGuardiansData>> => {
     try {
-      const response = await API.post<ChildrenGuardiansData>(BASE_URL, '/children-guardians', data);
+      const response = await API.post<ChildrenGuardiansData>(
+        BASE_URL,
+        '/children-guardians',
+        data
+      );
       return response;
     } catch (error) {
       console.error('Error creating children-guardians:', error);
@@ -19,9 +25,14 @@ const ChildrenGuardiansAPI = {
   },
 
   // Get Guardians by Child ID
-  getByChildId: async (childId: string): Promise<ApiResponse<ChildrenGuardiansData>> => {
+  getByChildId: async (
+    childId: string
+  ): Promise<ApiResponse<ChildrenGuardiansData>> => {
     try {
-      const response = await API.get<ChildrenGuardiansData>(BASE_URL, `/children-guardians/child/${childId}`);
+      const response = await API.get<ChildrenGuardiansData>(
+        BASE_URL,
+        `/children-guardians/child/${childId}`
+      );
       return response;
     } catch (error) {
       console.error('Error fetching children-guardians by childId:', error);
@@ -39,4 +50,3 @@ export const useChildrenGuardiansCache = (): UseQueryResult<any, Error> => {
 };
 
 export { ChildrenGuardiansAPI };
-

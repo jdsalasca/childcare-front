@@ -2,9 +2,9 @@ name: 📊 Performance Monitoring
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [main, master]
   pull_request:
-    branches: [ main, master ]
+    branches: [main, master]
 
 jobs:
   performance:
@@ -50,30 +50,30 @@ jobs:
           # Example: Check if bundle size exceeds limits
           MAX_JS_SIZE=500000  # 500KB
           MAX_CSS_SIZE=100000 # 100KB
-          
+
           # Check if dist directory exists
           if [ ! -d "dist" ]; then
             echo "❌ Build directory not found!"
             exit 1
           fi
-          
+
           # Calculate bundle sizes more safely
           JS_SIZE=$(find dist -name "*.js" -type f -exec wc -c {} + 2>/dev/null | tail -1 | awk '{print $1}' || echo "0")
           CSS_SIZE=$(find dist -name "*.css" -type f -exec wc -c {} + 2>/dev/null | tail -1 | awk '{print $1}' || echo "0")
-          
+
           echo "JavaScript bundle size: $JS_SIZE bytes"
           echo "CSS bundle size: $CSS_SIZE bytes"
-          
+
           if [ $JS_SIZE -gt $MAX_JS_SIZE ]; then
             echo "❌ JavaScript bundle size exceeds limit!"
             exit 1
           fi
-          
+
           if [ $CSS_SIZE -gt $MAX_CSS_SIZE ]; then
             echo "❌ CSS bundle size exceeds limit!"
             exit 1
           fi
-          
+
           echo "✅ Performance budget check passed!"
 
       - name: 📊 Upload performance artifacts
@@ -84,4 +84,4 @@ jobs:
           path: |
             .lighthouseci/
             lhci_reports/
-          retention-days: 30 
+          retention-days: 30

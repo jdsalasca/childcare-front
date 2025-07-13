@@ -34,13 +34,22 @@ function getAllDatesBetween(startDate: Date, endDate: Date): Date[] {
 }
 
 // Utility function to calculate disabled dates based on availableDates
-function calculateDisabledDates(availableDates: Date[], minDate?: Date, maxDate?: Date): Date[] {
+function calculateDisabledDates(
+  availableDates: Date[],
+  minDate?: Date,
+  maxDate?: Date
+): Date[] {
   customLogger.debug('availableDates', availableDates);
   const disabledDates: Date[] = [];
-  const allDatesInRange = getAllDatesBetween(minDate ?? new Date(1970, 0, 1), maxDate ?? new Date(2100, 11, 31));
+  const allDatesInRange = getAllDatesBetween(
+    minDate ?? new Date(1970, 0, 1),
+    maxDate ?? new Date(2100, 11, 31)
+  );
 
-  allDatesInRange.forEach((date) => {
-    const isAvailable = availableDates.some(availableDate => availableDate.toDateString() === date.toDateString());
+  allDatesInRange.forEach(date => {
+    const isAvailable = availableDates.some(
+      availableDate => availableDate.toDateString() === date.toDateString()
+    );
     if (!isAvailable) {
       disabledDates.push(date);
     }
@@ -67,8 +76,8 @@ const CalendarWrapper: React.FC<CalendarWrapperProps> = ({
 }) => {
   // Memoize the disabled dates calculation
   const disabledDates = useMemo(() => {
-    return availableDates.length > 0 
-      ? calculateDisabledDates(availableDates, minDate, maxDate) 
+    return availableDates.length > 0
+      ? calculateDisabledDates(availableDates, minDate, maxDate)
       : [];
   }, [availableDates, minDate, maxDate]); // Dependencies for useMemo
 
@@ -84,7 +93,6 @@ const CalendarWrapper: React.FC<CalendarWrapperProps> = ({
 
         return (
           <span className={`relative flex flex-col w-full ${spanClassName}`}>
-         
             <Calendar
               mask={timeOnly ? undefined : '99/99/9999'} // Use undefined instead of null
               id={name}
@@ -102,7 +110,7 @@ const CalendarWrapper: React.FC<CalendarWrapperProps> = ({
               icon={icon}
               timeOnly={timeOnly}
               value={value ?? undefined} // Use undefined instead of null
-              onChange={(e) => {
+              onChange={e => {
                 const newValue = e.value instanceof Date ? e.value : undefined; // Ensure it's a Date or undefined
                 field.onChange(newValue);
                 if (onChangeCustom) {

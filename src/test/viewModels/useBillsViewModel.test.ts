@@ -57,26 +57,30 @@ vi.mock('../../../models/ChildrenAPI', () => ({
 
 vi.mock('../../../models/CashOnHandByDyAPI', () => ({
   CashOnHandByDyAPI: {
-    getCashOnHandByDay: vi.fn(() => Promise.resolve({
-      httpStatus: 200,
-      response: { amount: 100.50 },
-    })),
+    getCashOnHandByDay: vi.fn(() =>
+      Promise.resolve({
+        httpStatus: 200,
+        response: { amount: 100.5 },
+      })
+    ),
   },
 }));
 
 vi.mock('../../../models/CashRegisterAPI', () => ({
   default: {
-    getClosedMoneyByDate: vi.fn(() => Promise.resolve({
-      httpStatus: 200,
-      response: {
-        has_closed_money: true,
-        total_closing_amount: 200.00,
-        bill_types: [
-          { denomination: 100, quantity: 2, total: 200 },
-          { denomination: 50, quantity: 1, total: 50 },
-        ],
-      },
-    })),
+    getClosedMoneyByDate: vi.fn(() =>
+      Promise.resolve({
+        httpStatus: 200,
+        response: {
+          has_closed_money: true,
+          total_closing_amount: 200.0,
+          bill_types: [
+            { denomination: 100, quantity: 2, total: 200 },
+            { denomination: 50, quantity: 1, total: 50 },
+          ],
+        },
+      })
+    ),
   },
 }));
 
@@ -88,7 +92,6 @@ vi.mock('../../components/bills/utils/summaryPdf', () => ({
 vi.mock('../../components/bills/utils/boxesPdf', () => ({
   exportBoxesToPDF: vi.fn(),
 }));
-
 
 describe('useBillsViewModel', () => {
   // Skip the useBillsViewModel tests for now as they require complex mocking
@@ -160,4 +163,4 @@ describe('useBillsViewModel', () => {
       expect(true).toBe(true);
     });
   });
-}); 
+});

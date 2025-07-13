@@ -11,36 +11,36 @@ vi.mock('../../models/ChildrenAPI', () => ({
       httpStatus: 200,
       response: [
         { id: 1, first_name: 'John', last_name: 'Doe', classroom: 'Toddler' },
-        { id: 2, first_name: 'Jane', last_name: 'Smith', classroom: 'Infant' }
-      ]
-    })
+        { id: 2, first_name: 'Jane', last_name: 'Smith', classroom: 'Infant' },
+      ],
+    }),
   },
   useChildren: vi.fn().mockReturnValue({
     data: [
       { id: 1, first_name: 'John', last_name: 'Doe', classroom: 'Toddler' },
-      { id: 2, first_name: 'Jane', last_name: 'Smith', classroom: 'Infant' }
+      { id: 2, first_name: 'Jane', last_name: 'Smith', classroom: 'Infant' },
     ],
     isLoading: false,
     isError: false,
     error: null,
-    refreshChildren: vi.fn()
-  })
+    refreshChildren: vi.fn(),
+  }),
 }));
 
 vi.mock('../../models/BillTypeAPI', () => ({
   useBillTypesByCurrencyCode: vi.fn().mockReturnValue({
     data: [
       { id: 1, label: '$100 Bill', value: 100 },
-      { id: 2, label: '$50 Bill', value: 50 }
-    ]
-  })
+      { id: 2, label: '$50 Bill', value: 50 },
+    ],
+  }),
 }));
 
 // Mock react-query
 vi.mock('@tanstack/react-query', () => ({
   useQuery: vi.fn(),
   useQueryClient: vi.fn(() => ({
-    invalidateQueries: vi.fn()
+    invalidateQueries: vi.fn(),
   })),
   QueryClient: vi.fn().mockImplementation(() => ({
     invalidateQueries: vi.fn(),
@@ -69,7 +69,7 @@ vi.mock('@tanstack/react-query', () => ({
 vi.mock('react-hook-form', () => ({
   useForm: vi.fn(() => ({
     control: {},
-    handleSubmit: vi.fn((fn) => fn),
+    handleSubmit: vi.fn(fn => fn),
     formState: { errors: {} },
     watch: vi.fn(),
     setValue: vi.fn(),
@@ -86,7 +86,9 @@ vi.mock('react-hook-form', () => ({
     swap: vi.fn(),
     replace: vi.fn(),
   })),
-  Controller: vi.fn(({ render }) => render({ field: { onChange: vi.fn(), value: '' } })),
+  Controller: vi.fn(({ render }) =>
+    render({ field: { onChange: vi.fn(), value: '' } })
+  ),
 }));
 
 describe('Integration Tests', () => {
@@ -116,7 +118,7 @@ describe('Integration Tests', () => {
       // Test basic form validation logic
       const mockForm = {
         control: {},
-        handleSubmit: vi.fn((fn) => fn),
+        handleSubmit: vi.fn(fn => fn),
         formState: { errors: {} },
         watch: vi.fn(),
         setValue: vi.fn(),
@@ -132,7 +134,10 @@ describe('Integration Tests', () => {
   describe('Error Boundary Integration', () => {
     it('should catch and display errors properly', () => {
       // This test verifies error boundaries work
-      class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean }> {
+      class ErrorBoundary extends React.Component<
+        { children: React.ReactNode },
+        { hasError: boolean }
+      > {
         constructor(props: { children: React.ReactNode }) {
           super(props);
           this.state = { hasError: false };
@@ -170,22 +175,27 @@ describe('Integration Tests', () => {
   describe('Performance Integration', () => {
     it('should handle basic operations without performance issues', async () => {
       const startTime = performance.now();
-      
+
       // Reset the mock to return success for this test
       vi.mocked(ChildrenAPI.getChildren).mockResolvedValue({
         httpStatus: 200,
         response: [
           { id: 1, first_name: 'John', last_name: 'Doe', classroom: 'Toddler' },
-          { id: 2, first_name: 'Jane', last_name: 'Smith', classroom: 'Infant' }
-        ]
+          {
+            id: 2,
+            first_name: 'Jane',
+            last_name: 'Smith',
+            classroom: 'Infant',
+          },
+        ],
       });
-      
+
       // Simple operation that should be fast
       const result = await ChildrenAPI.getChildren();
-      
+
       const endTime = performance.now();
       const operationTime = endTime - startTime;
-      
+
       // Should complete within reasonable time
       expect(operationTime).toBeLessThan(1000); // Less than 1 second
       expect(result).toBeDefined();

@@ -2,7 +2,7 @@
 // @ts-ignore
 import CryptoJS from 'crypto-js';
 
-export class SecurityService  {
+export class SecurityService {
   private static instance: SecurityService;
   private secretKey: string;
 

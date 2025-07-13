@@ -1,4 +1,4 @@
-import API, { ApiResponse, BASE_URL } from "./API";
+import API, { ApiResponse, BASE_URL } from './API';
 
 export interface User {
   token?: string; // Adjust based on your API response
@@ -31,10 +31,10 @@ const UsersAPI = {
   // Get all users
   getUsers: async (): Promise<ApiResponse<User[]>> => {
     try {
-      const response = await API.get<User[]>(BASE_URL, "/users");
+      const response = await API.get<User[]>(BASE_URL, '/users');
       return response;
     } catch (error) {
-      console.error("Error getUsers:", error);
+      console.error('Error getUsers:', error);
       throw error; // Throw error for better error handling
     }
   },
@@ -42,12 +42,12 @@ const UsersAPI = {
   // Get user by nickname
   getUserByNickname: async (username: string): Promise<ApiResponse<User>> => {
     try {
-      const response = await API.get<User>(BASE_URL, "/users/username", {
+      const response = await API.get<User>(BASE_URL, '/users/username', {
         params: { username },
       });
       return response;
     } catch (error) {
-      console.error("Error getUserByNickname:", error);
+      console.error('Error getUserByNickname:', error);
       throw error;
     }
   },
@@ -55,10 +55,10 @@ const UsersAPI = {
   // Create a new user
   createUser: async (data: CreateUserData): Promise<ApiResponse<User>> => {
     try {
-      const response = await API.post<User>(BASE_URL, "/users/register", data);
+      const response = await API.post<User>(BASE_URL, '/users/register', data);
       return response;
     } catch (error) {
-      console.error("Error createUser:", error);
+      console.error('Error createUser:', error);
       throw error;
     }
   },
@@ -68,11 +68,10 @@ const UsersAPI = {
     try {
       // Debug: Log the URL being constructed
 
-
-      const response = await API.post<User>(BASE_URL, "/users/login", data);
+      const response = await API.post<User>(BASE_URL, '/users/login', data);
       return response;
     } catch (error) {
-      console.error("Error authUser:", error);
+      console.error('Error authUser:', error);
       throw error;
     }
   },
@@ -80,12 +79,12 @@ const UsersAPI = {
   // Get user by email
   getUserByEmail: async (email: string): Promise<ApiResponse<User>> => {
     try {
-      const response = await API.get<User>(BASE_URL, "/users/email", {
+      const response = await API.get<User>(BASE_URL, '/users/email', {
         params: { email },
       });
       return response;
     } catch (error) {
-      console.error("Error getUserByEmail:", error);
+      console.error('Error getUserByEmail:', error);
       throw error;
     }
   },
@@ -95,11 +94,11 @@ const UsersAPI = {
     try {
       const response = await API.get<{ id: number; name: string }[]>(
         BASE_URL,
-        "/users/roles"
+        '/users/roles'
       );
       return response;
     } catch (error) {
-      console.error("Error getRoles:", error);
+      console.error('Error getRoles:', error);
       throw error;
     }
   },
@@ -111,11 +110,11 @@ const UsersAPI = {
     try {
       const response = await API.get<{ id: number; cashierNumber: string }[]>(
         BASE_URL,
-        "/users/cashiers"
+        '/users/cashiers'
       );
       return response;
     } catch (error) {
-      console.error("Error getCashiers:", error);
+      console.error('Error getCashiers:', error);
       throw error;
     }
   },
@@ -128,7 +127,7 @@ const UsersAPI = {
       const response = await API.put<User>(BASE_URL, `/users/${id}`, data);
       return response;
     } catch (error) {
-      console.error("Error updateUser:", error);
+      console.error('Error updateUser:', error);
       throw error;
     }
   },

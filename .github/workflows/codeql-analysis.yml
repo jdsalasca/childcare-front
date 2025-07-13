@@ -2,11 +2,11 @@ name: 🔍 CodeQL Analysis
 
 on:
   push:
-    branches: [ main, master, develop ]
+    branches: [main, master, develop]
   pull_request:
-    branches: [ main, master, develop ]
+    branches: [main, master, develop]
   schedule:
-    - cron: '0 6 * * 1'  # Run every Monday at 6 AM UTC
+    - cron: '0 6 * * 1' # Run every Monday at 6 AM UTC
 
 jobs:
   analyze:
@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [ 'javascript' ]  # Simplified to avoid TypeScript/JavaScript overlap
+        language: ['javascript'] # Simplified to avoid TypeScript/JavaScript overlap
 
     steps:
       - name: 📥 Checkout repository
@@ -52,5 +52,5 @@ jobs:
       - name: 🔍 Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
         with:
-          category: "/language:${{matrix.language}}"
-          upload: true 
+          category: '/language:${{matrix.language}}'
+          upload: true

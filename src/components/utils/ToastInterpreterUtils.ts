@@ -2,7 +2,13 @@ import { ApiResponse } from '@models/API';
 import { Toast } from 'primereact/toast'; // Adjust this import based on your actual Toast type
 import { ApiModels } from '../../models/ApiModels';
 
-type ToastSeverity = 'success' | 'info' | 'warn' | 'error' | 'secondary' | 'contrast';
+type ToastSeverity =
+  | 'success'
+  | 'info'
+  | 'warn'
+  | 'error'
+  | 'secondary'
+  | 'contrast';
 
 /**
  * This class provides methods for interpreting toast messages based on the response data.
@@ -18,7 +24,7 @@ export const ToastInterpreterUtils = {
    */
   toastBackendInterpreter: (
     toast: React.RefObject<Toast>,
-    response : ApiResponse<any> = ApiModels.defaultResponseModel, 
+    response: ApiResponse<any> = ApiModels.defaultResponseModel,
     okMessage: string,
     errorMessage: string
   ): void => {
@@ -27,21 +33,21 @@ export const ToastInterpreterUtils = {
         severity: 'success',
         summary: 'Success',
         detail: okMessage,
-        life: 3000
+        life: 3000,
       });
     } else {
       toast.current?.show({
         severity: 'info',
         summary: 'Info',
         detail: errorMessage,
-        life: 3000
+        life: 3000,
       });
     }
   },
 
   /**
    * Displays a toast message based on the response status and severity.
-   * 
+   *
    * @param {Toast} toast - The toast reference (e.g., `toast.current`).
    * @param {ToastSeverity} severity - The severity of the toast message.
    * @param {string} title - The title of the toast message.
@@ -58,9 +64,18 @@ export const ToastInterpreterUtils = {
     duration: number = 3000
   ): void => {
     // Validate severity to ensure it matches one of the allowed values
-    const allowedSeverities: ToastSeverity[] = ['success', 'info', 'warn', 'error', 'contrast', 'secondary'];
+    const allowedSeverities: ToastSeverity[] = [
+      'success',
+      'info',
+      'warn',
+      'error',
+      'contrast',
+      'secondary',
+    ];
     if (!allowedSeverities.includes(severity)) {
-      console.warn(`Invalid severity level: ${severity}. Defaulting to 'info'.`);
+      console.warn(
+        `Invalid severity level: ${severity}. Defaulting to 'info'.`
+      );
       severity = 'info';
     }
 
@@ -69,7 +84,7 @@ export const ToastInterpreterUtils = {
       severity: severity,
       summary: title,
       detail: message,
-      life: duration
+      life: duration,
     });
   },
 };

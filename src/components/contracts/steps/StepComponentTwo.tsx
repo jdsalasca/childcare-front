@@ -37,12 +37,21 @@ export const StepComponentTwo: FC<StepComponentTwoProps> = ({
     getAvailableGuardianTypes,
     handleGuardianSelect,
     t,
-  } = useViewModelStepGuardians({ toast, setActiveIndex, contractInformation, setContractInformation, setLoadingInfo });
+  } = useViewModelStepGuardians({
+    toast,
+    setActiveIndex,
+    contractInformation,
+    setContractInformation,
+    setLoadingInfo,
+  });
 
   return (
     <div className='form-container'>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className='field p-float-label' style={{ marginBottom: '30px', maxWidth: '15rem' }}>
+        <div
+          className='field p-float-label'
+          style={{ marginBottom: '30px', maxWidth: '15rem' }}
+        >
           <Dropdown
             id='names-dropdown-child'
             filter
@@ -117,7 +126,7 @@ export const StepComponentTwo: FC<StepComponentTwoProps> = ({
             <InputTextWrapper
               name={`guardians[${index}].telephone`}
               control={control}
-             /*  rules={{
+              /*  rules={{
                 required: t('telephoneRequired'),
                 pattern: {
                   value: /^[0-9+()-]*$/,
@@ -129,7 +138,7 @@ export const StepComponentTwo: FC<StepComponentTwoProps> = ({
               spanClassName='c-small-field r-m-10'
             />
             <DropdownWrapper
-              dropdownStyle={{ maxWidth: '9em'}}
+              dropdownStyle={{ maxWidth: '9em' }}
               key={`guardians[${index}].guardian_type_id`}
               rules={{ required: t('guardianTypeRequired') }}
               options={getAvailableGuardianTypes(index)}
@@ -139,7 +148,7 @@ export const StepComponentTwo: FC<StepComponentTwoProps> = ({
               name={`guardians[${index}].guardian_type_id`}
               control={control}
               internationalization={true}
-              spanClassName="p-float-label c-dropdown-field m-r-inherit"
+              spanClassName='p-float-label c-dropdown-field m-r-inherit'
             />
             <CheckboxWrapper
               name={`guardians[${index}].titular`}
@@ -151,7 +160,11 @@ export const StepComponentTwo: FC<StepComponentTwoProps> = ({
             <Button
               icon='pi pi-trash'
               className='p-button-danger p-button-text p-ml-2'
-              onClick={e => { e.preventDefault(); e.stopPropagation(); removeGuardian(index); }}
+              onClick={e => {
+                e.preventDefault();
+                e.stopPropagation();
+                removeGuardian(index);
+              }}
             />
           </div>
         ))}

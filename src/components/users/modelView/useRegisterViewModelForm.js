@@ -1,10 +1,10 @@
 // src/pages/Users/modelView/useRegisterViewModelForm.js
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { useTranslation } from "react-i18next";
-import { customLogger } from "../../../configs/logger";
-import { ApiModels } from "../../../models/ApiModels";
-import UsersAPI from "../../../models/UsersAPI";
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { customLogger } from '../../../configs/logger';
+import { ApiModels } from '../../../models/ApiModels';
+import UsersAPI from '../../../models/UsersAPI';
 
 const useRegisterViewModelForm = (
   onUserCreated,
@@ -26,15 +26,15 @@ const useRegisterViewModelForm = (
     formState: { errors },
   } = useForm({
     defaultValues: {
-      username: "",
-      first_name: "",
-      last_name: "",
-      birth_date: "",
-      email: "",
-      password: "",
-      password_confirmation: "",
-      role_id: "",
-      cashiers_id: "",
+      username: '',
+      first_name: '',
+      last_name: '',
+      birth_date: '',
+      email: '',
+      password: '',
+      password_confirmation: '',
+      role_id: '',
+      cashiers_id: '',
       user_status_id: 1,
     },
   });
@@ -44,12 +44,12 @@ const useRegisterViewModelForm = (
   useEffect(() => {
     if (editingUser) {
       Object.entries(editingUser).forEach(([key, value]) => {
-        if (key !== "password" && key !== "password_confirmation") {
+        if (key !== 'password' && key !== 'password_confirmation') {
           setValue(key, value);
         }
       });
-      setValue("password", "");
-      setValue("password_confirmation", "");
+      setValue('password', '');
+      setValue('password_confirmation', '');
     } else {
       reset();
     }
@@ -63,19 +63,19 @@ const useRegisterViewModelForm = (
 
         if (rolesRes?.httpStatus === 200) {
           setRoles(
-            rolesRes.response.map((r) => ({ label: r.name, value: r.id }))
+            rolesRes.response.map(r => ({ label: r.name, value: r.id }))
           );
         }
         if (cashiersRes?.httpStatus === 200) {
           setCashiers(
-            cashiersRes.response.map((c) => ({
+            cashiersRes.response.map(c => ({
               label: c.cashierNumber,
               value: c.id,
             }))
           );
         }
       } catch (error) {
-        customLogger.error("Error fetching roles or cashiers", error);
+        customLogger.error('Error fetching roles or cashiers', error);
       }
     };
     fetchData();
@@ -83,37 +83,37 @@ const useRegisterViewModelForm = (
 
   const emailExist = async () => {
     try {
-      const res = await UsersAPI.getUserByEmail(getValues("email"));
+      const res = await UsersAPI.getUserByEmail(getValues('email'));
       if (res.httpStatus === 200) {
-        setError("email", {
-          type: "manual",
-          message: t("email_already_exists"),
+        setError('email', {
+          type: 'manual',
+          message: t('email_already_exists'),
         });
         return true;
       }
     } catch (error) {
-      customLogger.error("Email check failed", error);
+      customLogger.error('Email check failed', error);
     }
     return false;
   };
 
   const userNameExist = async () => {
     try {
-      const res = await UsersAPI.getUserByNickname(getValues("username"));
+      const res = await UsersAPI.getUserByNickname(getValues('username'));
       if (res.httpStatus === 200) {
-        setError("username", {
-          type: "manual",
-          message: t("username_already_exists"),
+        setError('username', {
+          type: 'manual',
+          message: t('username_already_exists'),
         });
         return true;
       }
     } catch (error) {
-      customLogger.error("Username check failed", error);
+      customLogger.error('Username check failed', error);
     }
     return false;
   };
 
-  const onSubmit = async (data) => {
+  const onSubmit = async data => {
     const userFormatted = ApiModels.UserBuilder.build(data);
 
     try {
@@ -127,9 +127,9 @@ const useRegisterViewModelForm = (
         result = await UsersAPI.updateUser(editingUser.id, userFormatted);
         if (result?.httpStatus === 200) {
           toastRef?.current?.show({
-            severity: "success",
-            summary: t("success"),
-            detail: t("user_updated_successfully"),
+            severity: 'success',
+            summary: t('success'),
+            detail: t('user_updated_successfully'),
             life: 3000,
           });
         }
@@ -138,9 +138,9 @@ const useRegisterViewModelForm = (
         result = await UsersAPI.createUser(userFormatted);
         if (result?.httpStatus === 201 || result?.httpStatus === 200) {
           toastRef?.current?.show({
-            severity: "success",
-            summary: t("success"),
-            detail: t("user_created_successfully"),
+            severity: 'success',
+            summary: t('success'),
+            detail: t('user_created_successfully'),
             life: 3000,
           });
         }
@@ -148,16 +148,16 @@ const useRegisterViewModelForm = (
 
       reset();
 
-      if (typeof onCancelEdit === "function") onCancelEdit();
-      if (typeof onUserCreated === "function") onUserCreated();
+      if (typeof onCancelEdit === 'function') onCancelEdit();
+      if (typeof onUserCreated === 'function') onUserCreated();
     } catch (error) {
-      customLogger.error("Error saving user", error);
+      customLogger.error('Error saving user', error);
       toastRef?.current?.show({
-        severity: "error",
-        summary: t("error"),
+        severity: 'error',
+        summary: t('error'),
         detail: isEditing
-          ? t("failed_to_update_user")
-          : t("failed_to_create_user"),
+          ? t('failed_to_update_user')
+          : t('failed_to_create_user'),
         life: 3000,
       });
     }

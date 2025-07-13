@@ -19,17 +19,17 @@ export const InputTextAreaWrapper: React.FC<InputTextAreaWrapperProps> = ({
   className = '',
 }) => {
   return (
-    <div className={"p-field " + className}>
+    <div className={'p-field ' + className}>
       <Controller
         name={name}
         control={control}
         rules={rules}
         render={({ field, fieldState }) => (
-          <span className="p-float-label">
+          <span className='p-float-label'>
             <InputTextarea id={name} rows={rows} {...field} />
             <label htmlFor={name}>{label}</label>
             {fieldState.error && (
-              <small className="p-error">{fieldState.error.message}</small>
+              <small className='p-error'>{fieldState.error.message}</small>
             )}
           </span>
         )}

@@ -18,6 +18,7 @@ We've implemented a comprehensive suite of GitHub tools to improve code quality,
 ### 1. Repository Configuration
 
 #### Enable GitHub Features
+
 1. Go to your repository settings
 2. Enable the following features:
    - **Issues** - For bug tracking and feature requests
@@ -26,6 +27,7 @@ We've implemented a comprehensive suite of GitHub tools to improve code quality,
    - **Discussions** - For community engagement
 
 #### Branch Protection Rules
+
 1. Go to Settings → Branches
 2. Add branch protection rule for `main`:
    - ✅ Require pull request reviews before merging
@@ -39,6 +41,7 @@ We've implemented a comprehensive suite of GitHub tools to improve code quality,
 Add the following secrets in Settings → Secrets and variables → Actions:
 
 #### Required Secrets
+
 ```bash
 
 
@@ -55,12 +58,14 @@ DEPLOY_TOKEN=your-deployment-token
 #### How to Get Tokens
 
 **Snyk Token:**
+
 1. Go to [snyk.io](https://snyk.io)
 2. Sign up with your GitHub account
 3. Go to Account Settings → API Token
 4. Generate and copy the token
 
 **SonarCloud Token:**
+
 1. Go to [sonarcloud.io](https://sonarcloud.io)
 2. Sign up with your GitHub account
 3. Create a new project
@@ -69,12 +74,14 @@ DEPLOY_TOKEN=your-deployment-token
 ### 3. Third-Party Service Integration
 
 #### SonarCloud Setup (Optional)
+
 1. Visit [sonarcloud.io](https://sonarcloud.io)
 2. Import your GitHub repository
 3. Update `sonar-project.properties` with your project key
 4. Add SONAR_TOKEN to GitHub secrets
 
 #### Snyk Setup
+
 1. Visit [snyk.io](https://snyk.io)
 2. Connect your GitHub account
 3. Import your repository
@@ -83,18 +90,24 @@ DEPLOY_TOKEN=your-deployment-token
 ### 4. Update Configuration Files
 
 #### Update README.md
+
 Replace placeholders in README.md:
+
 - `your-username` → Your GitHub username
 - `your-organization` → Your GitHub organization
 - `your-repo-id` → Your repository ID
 - `your-project-key` → Your SonarCloud project key
 
 #### Update Dependabot Configuration
+
 In `.github/dependabot.yml`:
+
 - Replace `your-github-username` with your actual username
 
 #### Update SonarCloud Configuration
+
 In `sonar-project.properties`:
+
 - Replace `your-organization` with your SonarCloud organization
 - Replace project key with your actual project key
 
@@ -121,8 +134,10 @@ yarn add -D lighthouse
 ### Available Workflows
 
 #### 1. CI/CD Pipeline (`.github/workflows/ci.yml`)
+
 **Triggers:** Push to main/master/develop, Pull requests
 **Features:**
+
 - Code quality checks (ESLint, Prettier)
 - Test execution with coverage
 - Security scanning
@@ -130,15 +145,19 @@ yarn add -D lighthouse
 - Deployment (on main branch)
 
 #### 2. CodeQL Analysis (`.github/workflows/codeql-analysis.yml`)
+
 **Triggers:** Push, Pull requests, Weekly schedule
 **Features:**
+
 - Advanced security vulnerability detection
 - Code quality analysis
 - Automated security alerts
 
 #### 3. Performance Monitoring (`.github/workflows/performance.yml`)
+
 **Triggers:** Push to main, Pull requests
 **Features:**
+
 - Bundle size analysis
 - Lighthouse CI performance audits
 - Performance budget checks
@@ -146,24 +165,30 @@ yarn add -D lighthouse
 ### Customizing Workflows
 
 #### Performance Budgets
+
 Edit `.github/workflows/performance.yml`:
+
 ```yaml
 MAX_JS_SIZE=500000  # 500KB - adjust as needed
 MAX_CSS_SIZE=100000 # 100KB - adjust as needed
 ```
 
 #### Test Coverage Thresholds
+
 Edit `.github/workflows/ci.yml`:
+
 ```yaml
-minimum_coverage: 70  # Adjust minimum coverage percentage
+minimum_coverage: 70 # Adjust minimum coverage percentage
 ```
 
 #### Lighthouse Thresholds
+
 Edit `.github/lighthouse/lighthouserc.json`:
+
 ```json
 {
-  "categories:performance": ["warn", {"minScore": 0.8}],
-  "categories:accessibility": ["error", {"minScore": 0.9}]
+  "categories:performance": ["warn", { "minScore": 0.8 }],
+  "categories:accessibility": ["error", { "minScore": 0.9 }]
 }
 ```
 
@@ -172,17 +197,20 @@ Edit `.github/lighthouse/lighthouserc.json`:
 ### Available Metrics
 
 #### Code Quality
+
 - **ESLint Issues** - Code style and potential bugs
 - **TypeScript Errors** - Type safety issues
 - **Test Coverage** - Percentage of code covered by tests
 - **SonarCloud Quality Gate** - Overall code quality score
 
 #### Security
+
 - **CodeQL Alerts** - Security vulnerabilities
 - **Snyk Vulnerabilities** - Dependency security issues
 - **Dependabot Alerts** - Outdated dependencies
 
 #### Performance
+
 - **Bundle Size** - JavaScript and CSS bundle sizes
 - **Lighthouse Scores** - Performance, accessibility, SEO scores
 - **Core Web Vitals** - User experience metrics
@@ -190,11 +218,13 @@ Edit `.github/lighthouse/lighthouserc.json`:
 ### Accessing Metrics
 
 #### GitHub Repository
+
 - **Actions Tab** - View workflow runs and results
 - **Security Tab** - View security alerts and advisories
 - **Insights Tab** - View repository analytics
 
 #### External Services
+
 - **SonarCloud Dashboard** - Code quality metrics
 - **Snyk Dashboard** - Security vulnerability tracking
 
@@ -203,16 +233,19 @@ Edit `.github/lighthouse/lighthouserc.json`:
 ### Development Workflow
 
 1. **Create Feature Branch**
+
    ```bash
    git checkout -b feature/your-feature-name
    ```
 
 2. **Make Changes and Test Locally**
+
    ```bash
    yarn validate  # Run all checks locally
    ```
 
 3. **Commit with Conventional Commits**
+
    ```bash
    git commit -m "feat: add new feature"
    git commit -m "fix: resolve bug in component"
@@ -227,6 +260,7 @@ Edit `.github/lighthouse/lighthouserc.json`:
 ### Code Quality Guidelines
 
 #### Before Committing
+
 ```bash
 # Check everything locally
 yarn validate
@@ -242,6 +276,7 @@ yarn test:coverage
 ```
 
 #### Pull Request Checklist
+
 - [ ] All tests pass
 - [ ] Code coverage ≥ 70%
 - [ ] No ESLint errors
@@ -254,20 +289,24 @@ yarn test:coverage
 #### Common Issues
 
 **1. Workflow Fails with "Token not found"**
+
 - Ensure all required secrets are added to repository settings
 - Check token permissions and expiration dates
 
 **2. Tests Fail in CI but Pass Locally**
+
 - Check Node.js version compatibility
 - Ensure all dependencies are in package.json
 - Verify test environment setup
 
 **3. Performance Budget Exceeded**
+
 - Analyze bundle with `yarn analyze`
 - Implement code splitting
 - Remove unused dependencies
 
 **4. Security Vulnerabilities Detected**
+
 - Run `yarn audit` to see vulnerabilities
 - Update dependencies with `yarn deps:update`
 - Use `yarn audit:fix` for automatic fixes
@@ -302,7 +341,7 @@ Create separate workflows for different environments:
 name: 🧪 Staging Deployment
 on:
   push:
-    branches: [ develop ]
+    branches: [develop]
 # ... deployment steps for staging
 ```
 
@@ -324,16 +363,19 @@ Add Slack/Discord notifications:
 ### Regular Tasks
 
 #### Weekly
+
 - Review Dependabot PRs
 - Check security alerts
 - Monitor performance metrics
 
 #### Monthly
+
 - Review code quality trends
 - Update documentation
 - Clean up old branches
 
 #### Quarterly
+
 - Review and update workflows
 - Audit dependencies
 - Update quality gates
@@ -341,10 +383,12 @@ Add Slack/Discord notifications:
 ### Updating Tools
 
 #### GitHub Actions
+
 - Dependabot will create PRs for action updates
 - Review and merge action updates regularly
 
 #### Dependencies
+
 - Use `yarn deps:update` for interactive updates
 - Monitor for breaking changes
 - Test thoroughly after updates
@@ -368,4 +412,4 @@ If you encounter issues:
 
 ---
 
-**🎉 Congratulations!** Your project now has enterprise-grade GitHub tooling for code quality, security, and performance monitoring. 
+**🎉 Congratulations!** Your project now has enterprise-grade GitHub tooling for code quality, security, and performance monitoring.

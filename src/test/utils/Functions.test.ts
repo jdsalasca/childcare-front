@@ -58,9 +58,9 @@ describe('Utility Functions', () => {
       const availableDates = [
         new Date('2024-01-01'),
         new Date('2024-01-02'),
-        new Date('2024-01-03')
+        new Date('2024-01-03'),
       ];
-      
+
       const disabledDates = dateUtils.calculateDisabledDates(availableDates);
       expect(Array.isArray(disabledDates)).toBe(true);
     });
@@ -107,11 +107,15 @@ describe('Utility Functions', () => {
       const startDate = new Date('2024-01-01');
       const endDate = new Date('2024-01-31');
       const testDate = new Date('2024-01-15');
-      
-      expect(Validations.isDateInRange(testDate, startDate, endDate)).toBe(true);
-      
+
+      expect(Validations.isDateInRange(testDate, startDate, endDate)).toBe(
+        true
+      );
+
       const outsideDate = new Date('2024-02-01');
-      expect(Validations.isDateInRange(outsideDate, startDate, endDate)).toBe(false);
+      expect(Validations.isDateInRange(outsideDate, startDate, endDate)).toBe(
+        false
+      );
     });
   });
 
@@ -120,19 +124,19 @@ describe('Utility Functions', () => {
       const largeArray = Array.from({ length: 10000 }, (_, i) => ({
         id: i,
         name: `Item ${i}`,
-        value: Math.random() * 100
+        value: Math.random() * 100,
       }));
 
       const startTime = performance.now();
-      
+
       // Test filtering performance
       const filtered = largeArray.filter(item => item.value > 50);
-      
+
       // Test mapping performance
       const mapped = filtered.map(item => ({ ...item, processed: true }));
-      
+
       const endTime = performance.now();
-      
+
       expect(endTime - startTime).toBeLessThan(100); // Should complete in under 100ms
       expect(mapped.length).toBeGreaterThan(0);
     });
@@ -143,26 +147,32 @@ describe('Utility Functions', () => {
           level2: {
             level3: {
               level4: {
-                value: 'deep value'
-              }
-            }
-          }
-        }
+                value: 'deep value',
+              },
+            },
+          },
+        },
       };
 
       const startTime = performance.now();
-      
+
       // Test deep object traversal
       const getValue = (obj: any, path: string[]): any => {
         return path.reduce((current, key) => current?.[key], obj);
       };
-      
-      const result = getValue(nestedData, ['level1', 'level2', 'level3', 'level4', 'value']);
-      
+
+      const result = getValue(nestedData, [
+        'level1',
+        'level2',
+        'level3',
+        'level4',
+        'value',
+      ]);
+
       const endTime = performance.now();
-      
+
       expect(endTime - startTime).toBeLessThan(10); // Should be very fast
       expect(result).toBe('deep value');
     });
   });
-}); 
+});

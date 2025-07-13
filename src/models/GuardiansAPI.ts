@@ -1,5 +1,5 @@
-import { Guardian } from "../types/guardian";
-import API, { ApiResponse, BASE_URL } from "./API";
+import { Guardian } from '../types/guardian';
+import API, { ApiResponse, BASE_URL } from './API';
 
 const GuardiansAPI = {
   // Fetch all guardians
@@ -25,7 +25,9 @@ const GuardiansAPI = {
   },
 
   // Create a new guardian
-  createGuardian: async (data: Omit<Guardian, 'id'>): Promise<ApiResponse<Guardian>> => {
+  createGuardian: async (
+    data: Omit<Guardian, 'id'>
+  ): Promise<ApiResponse<Guardian>> => {
     try {
       const response = await API.post<Guardian>(BASE_URL, '/guardians', data);
       return response;
@@ -36,9 +38,16 @@ const GuardiansAPI = {
   },
 
   // Update a guardian by ID
-  updateGuardian: async (id: string, data: Guardian): Promise<ApiResponse<Guardian>> => {
+  updateGuardian: async (
+    id: string,
+    data: Guardian
+  ): Promise<ApiResponse<Guardian>> => {
     try {
-      const response = await API.put<Guardian>(BASE_URL, `/guardians/${id}`, data);
+      const response = await API.put<Guardian>(
+        BASE_URL,
+        `/guardians/${id}`,
+        data
+      );
       return response;
     } catch (error) {
       console.error(`Error updating guardian with id ${id}:`, error);
@@ -54,11 +63,10 @@ const GuardiansAPI = {
       console.error(`Error deleting guardian with id ${id}:`, error);
       throw error;
     }
-  }
+  },
 };
 
 class GuardiansModel {
   // Add any properties or methods if needed
-    }
+}
 export { GuardiansAPI, GuardiansModel };
-

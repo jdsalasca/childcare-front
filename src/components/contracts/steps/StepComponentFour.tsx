@@ -15,7 +15,6 @@ import { WorkInformationCard } from './cards/WorkInformationCard';
 import { EmergencyContactCard } from './cards/EmergencyContactCard';
 import { motion } from 'framer-motion';
 
-
 interface StepComponentFourProps {
   setActiveIndex: (index: number) => void;
   contractInformation: ContractInfo;
@@ -30,8 +29,9 @@ const StepComponentFour: React.FC<StepComponentFourProps> = ({
   setContractInformation,
   toast,
 }) => {
-  const { paymentMethodsOptions: paymentMethodsCache, isLoading } = usePaymentMethodsOptions();
-  
+  const { paymentMethodsOptions: paymentMethodsCache, isLoading } =
+    usePaymentMethodsOptions();
+
   // Memoize payment methods transformation
   const paymentMethods = useMemo(() => {
     if (!paymentMethodsCache || isLoading) return [];
@@ -51,7 +51,7 @@ const StepComponentFour: React.FC<StepComponentFourProps> = ({
     setError,
     clearErrors,
     setValue,
-    formState: { },
+    formState: {},
   } = useForm({
     defaultValues: {
       contract_id: contractInformation.contract_id || null,
@@ -66,14 +66,14 @@ const StepComponentFour: React.FC<StepComponentFourProps> = ({
           employer: '',
           address: '',
           city: '',
-          phone: ''
-        }
+          phone: '',
+        },
       })),
       doctorInformation: contractInformation.doctorInformation || {
         name: '',
         address: '',
         city: '',
-        phone: ''
+        phone: '',
       },
       emergencyContacts: contractInformation.emergencyContacts || [],
       releasedToPersons: contractInformation.releasedToPersons || [],
@@ -94,7 +94,6 @@ const StepComponentFour: React.FC<StepComponentFourProps> = ({
     }
   }, [startDate, endDate, setError, clearErrors, t]);
 
-  
   const onSubmit = async (data: any) => {
     try {
       // Format payment data
@@ -103,46 +102,69 @@ const StepComponentFour: React.FC<StepComponentFourProps> = ({
         start_date: data.start_date,
         end_date: data.end_date,
         payment_method_id: data.payment_method_id,
-        total_to_pay: data.total_to_pay ? parseFloat(data.total_to_pay).toFixed(2) : '',
-        weekly_payment: data.weekly_payment ? parseFloat(data.weekly_payment).toFixed(2) : '',
-
+        total_to_pay: data.total_to_pay
+          ? parseFloat(data.total_to_pay).toFixed(2)
+          : '',
+        weekly_payment: data.weekly_payment
+          ? parseFloat(data.weekly_payment).toFixed(2)
+          : '',
       };
-  
+
       if (paymentData.contract_id == null) {
-        ToastInterpreterUtils.toastInterpreter(toast, 'info', 'info', t('contractInformationRequiredMessage'), 3000);
+        ToastInterpreterUtils.toastInterpreter(
+          toast,
+          'info',
+          'info',
+          t('contractInformationRequiredMessage'),
+          3000
+        );
         return;
       }
-  
+
       // Update guardians with work information
-      const updatedGuardians = contractInformation.guardians?.map((guardian, index) => ({
-        ...guardian,
-        workInformation: data.guardians?.[index]?.workInformation || guardian.workInformation
-      }));
-  
-   // Create the updated contract information
-   const updatedContractInfo = {
-    ...contractInformation,
-    ...paymentData,
-    guardians: updatedGuardians,
-    doctorInformation: data.doctorInformation,
-    emergencyContacts: data.emergencyContacts,
-      releasedToPersons: data.releasedToPersons,
-      caregiver_name: data.caregiver_name,
-      provider_director_staff: data.provider_director_staff,
-      restricted_activities: data.restricted_activities,
-      insurance_company: data.insurance_company,
-    };
+      const updatedGuardians = contractInformation.guardians?.map(
+        (guardian, index) => ({
+          ...guardian,
+          workInformation:
+            data.guardians?.[index]?.workInformation ||
+            guardian.workInformation,
+        })
+      );
+
+      // Create the updated contract information
+      const updatedContractInfo = {
+        ...contractInformation,
+        ...paymentData,
+        guardians: updatedGuardians,
+        doctorInformation: data.doctorInformation,
+        emergencyContacts: data.emergencyContacts,
+        releasedToPersons: data.releasedToPersons,
+        caregiver_name: data.caregiver_name,
+        provider_director_staff: data.provider_director_staff,
+        restricted_activities: data.restricted_activities,
+        insurance_company: data.insurance_company,
+      };
       // Update contract information in state
       setContractInformation(updatedContractInfo);
-  
+
       // Save payment details to backend
       await ContractAPI.updateContractPaymentDetails(paymentData);
-      
-      ToastInterpreterUtils.toastInterpreter(toast, 'success', t('success'), t('termsUpdated'));
+
+      ToastInterpreterUtils.toastInterpreter(
+        toast,
+        'success',
+        t('success'),
+        t('termsUpdated')
+      );
       setActiveIndex(4);
     } catch (error) {
       console.error('Error in form submission:', error);
-      ToastInterpreterUtils.toastInterpreter(toast, 'error', t('error'), t('failedToUpdateInformation'));
+      ToastInterpreterUtils.toastInterpreter(
+        toast,
+        'error',
+        t('error'),
+        t('failedToUpdateInformation')
+      );
     }
   };
 
@@ -160,67 +182,73 @@ const StepComponentFour: React.FC<StepComponentFourProps> = ({
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-8">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-12">
+    <div className='max-w-7xl mx-auto p-8'>
+      <form onSubmit={handleSubmit(onSubmit)} className='space-y-12'>
         {/* Payment Information Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <motion.div 
-            className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow"
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
+          <motion.div
+            className='bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow'
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
-           <h3 className="text-2xl font-semibold text-gray-800 mb-8 text-center">
-             {t('paymentInformation')}
+            <h3 className='text-2xl font-semibold text-gray-800 mb-8 text-center'>
+              {t('paymentInformation')}
             </h3>
-            <div className="space-y-6">
+            <div className='space-y-6'>
               <CalendarWrapper
-                name="start_date"
+                name='start_date'
                 control={control}
-                dateFormat="mm/dd/yy"
+                dateFormat='mm/dd/yy'
                 label={t('contractStartDate')}
-                spanClassName="p-float-label"
+                spanClassName='p-float-label'
                 showIcon
                 rules={{ required: t('contractStartDateRequired') }}
               />
               <DropdownWrapper
-                name="payment_method_id"
+                name='payment_method_id'
                 control={control}
                 filter
                 options={paymentMethods}
-                optionValue="id"
-                optionLabel="method"
+                optionValue='id'
+                optionLabel='method'
                 label={t('paymentMethod')}
                 rules={{ required: t('paymentMethodRequired') }}
-                spanClassName="p-float-label"
+                spanClassName='p-float-label'
               />
               <InputTextWrapper
-                name="total_to_pay"
+                name='total_to_pay'
                 control={control}
                 rules={{ required: t('totalAmountRequired') }}
                 label={t('totalAmount')}
                 keyFilter={/^[0-9.]*$/}
                 onBlur={formatValue}
-                spanClassName="p-float-label"
+                spanClassName='p-float-label'
               />
               <InputTextWrapper
-                name="weekly_payment"
+                name='weekly_payment'
                 control={control}
                 rules={{ required: t('weeklyPaymentRequired') }}
                 label={t('weeklyPayment')}
                 keyFilter={/^[0-9.]*$/}
                 onBlur={formatValue}
-                spanClassName="p-float-label"
+                spanClassName='p-float-label'
               />
             </div>
           </motion.div>
 
           {/* Work Information Cards */}
           {contractInformation.guardians?.map((guardian, index) => (
-            <WorkInformationCard 
+            <WorkInformationCard
               key={guardian.id || index}
               control={control}
               index={index}
-              guardianType={guardian.guardian_type_id === 1 ? t('father') : guardian.guardian_type_id === 2 ? t('mother') : t('guardian')}
+              guardianType={
+                guardian.guardian_type_id === 1
+                  ? t('father')
+                  : guardian.guardian_type_id === 2
+                    ? t('mother')
+                    : t('guardian')
+              }
             />
           ))}
 
@@ -229,32 +257,32 @@ const StepComponentFour: React.FC<StepComponentFourProps> = ({
         </div>
 
         {/* Emergency Contacts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <EmergencyContactCard 
+        <div className='grid grid-cols-1 lg:grid-cols-2 gap-8'>
+          <EmergencyContactCard
             control={control}
-            type="emergency"
+            type='emergency'
             maxContacts={4}
           />
-          
-          <EmergencyContactCard 
+
+          <EmergencyContactCard
             control={control}
-            type="release"
+            type='release'
             maxContacts={4}
           />
         </div>
 
         {/* Navigation Buttons */}
-        <div className="flex justify-end space-x-6 pt-8">
-        <Button 
-        label={t('returnToPreviousStep')} 
-        className="px-6 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-all duration-200 hover:scale-105" 
-        onClick={() => setActiveIndex(2)} 
-      />
-      <Button 
-        type="submit" 
-        label={t('saveAndContinue')} 
-        className="px-6 py-3 bg-blue-500 text-white hover:bg-blue-600 rounded-lg transition-all duration-200 hover:scale-105" 
-      />
+        <div className='flex justify-end space-x-6 pt-8'>
+          <Button
+            label={t('returnToPreviousStep')}
+            className='px-6 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-all duration-200 hover:scale-105'
+            onClick={() => setActiveIndex(2)}
+          />
+          <Button
+            type='submit'
+            label={t('saveAndContinue')}
+            className='px-6 py-3 bg-blue-500 text-white hover:bg-blue-600 rounded-lg transition-all duration-200 hover:scale-105'
+          />
         </div>
       </form>
     </div>
