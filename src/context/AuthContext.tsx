@@ -1,11 +1,6 @@
 // src/context/AuthContext.tsx
-import React, {
-  createContext,
-  ReactNode,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import { SecurityService } from '../configs/storageUtils';
 
 // Define the context type
 interface AuthContextType {
@@ -21,9 +16,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [token, setToken] = useState<string | null>(null);
+  const securityService = SecurityService.getInstance();
 
   useEffect(() => {
-    localStorage.setItem('token', token || '');
+    // Load token from encrypted storage on component mount
+    const storedToken = securityService.getDecryptedItem("token");
+    if (storedToken) {
+      setToken(storedToken);
+    }
+  }, []);
+
+  useEffect(() => {
+    // Store token using encrypted storage when token changes
+    if (token) {
+      securityService.setEncryptedItem("token", token);
+    }
   }, [token]);
 
   const login = (newToken: string) => {
