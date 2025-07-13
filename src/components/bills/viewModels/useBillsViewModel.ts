@@ -11,7 +11,7 @@ import { CashAPI } from '../../../models/CashAPI';
 import { ToastInterpreterUtils } from '../../utils/ToastInterpreterUtils';
 import { exportToSummaryPDF } from '../utils/summaryPdf';
 import { exportBoxesToPDF } from '../utils/boxesPdf';
-import ErrorHandler from '../../../utils/errorHandler';
+import ErrorHandlerComponent from '../../../utils/ErrorHandler.ts';
 import { performanceOptimizer } from '../../../utils/PerformanceOptimizer';
 
 // Types
@@ -628,7 +628,7 @@ export const useBillsViewModel = () => {
         }
       } catch (error) {
         // Use standardized error handling
-        ErrorHandler.handleApiError(error, 'Bills submission', {
+        ErrorHandlerComponent.handleApiError(error, 'Bills submission', {
           showToast: true,
           toastRef: toast,
           redirectOnAuthError: true,
@@ -672,7 +672,7 @@ export const useBillsViewModel = () => {
       }
     } catch (error) {
       // Use standardized error handling
-      ErrorHandler.handleApiError(error, 'PDF generation', {
+      ErrorHandlerComponent.handleApiError(error, 'PDF generation', {
         showToast: true,
         toastRef: toast,
         redirectOnAuthError: false,
@@ -708,7 +708,7 @@ export const useBillsViewModel = () => {
       }
     } catch (error) {
       // Use standardized error handling
-      ErrorHandler.handleApiError(error, 'PDF generation', {
+      ErrorHandlerComponent.handleApiError(error, 'PDF generation', {
         showToast: true,
         toastRef: toast,
         redirectOnAuthError: false,
