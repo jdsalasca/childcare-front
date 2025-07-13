@@ -706,20 +706,55 @@ export const Bills: React.FC = () => {
           <div className='bg-white rounded-xl shadow-sm border border-gray-100 p-6'>
             {paginatedBills.length > 0 && (
               <div className='grid grid-cols-12 gap-3 items-center mb-4 pb-3 border-b border-gray-200'>
-                <div className='col-span-4 text-sm font-semibold text-gray-700 uppercase tracking-wide'>
-                  {t('bills.names')}
+                <div className='col-span-4'>
+                  <div className='flex items-center gap-2'>
+                    <div className='w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center'>
+                      <i className='pi pi-user text-blue-600 text-xs'></i>
+                    </div>
+                    <span className='text-sm font-semibold text-gray-700 uppercase tracking-wide'>
+                      {t('bills.names')}
+                    </span>
+                  </div>
                 </div>
-                <div className='col-span-2 text-sm font-semibold text-gray-700 uppercase tracking-wide'>
-                  {t('bills.cash')}
+                <div className='col-span-2'>
+                  <div className='flex items-center gap-2'>
+                    <div className='w-6 h-6 bg-green-100 rounded-full flex items-center justify-center'>
+                      <i className='pi pi-dollar text-green-600 text-xs'></i>
+                    </div>
+                    <span className='text-sm font-semibold text-gray-700 uppercase tracking-wide'>
+                      {t('bills.cash')}
+                    </span>
+                  </div>
                 </div>
-                <div className='col-span-2 text-sm font-semibold text-gray-700 uppercase tracking-wide'>
-                  {t('bills.check')}
+                <div className='col-span-2'>
+                  <div className='flex items-center gap-2'>
+                    <div className='w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center'>
+                      <i className='pi pi-credit-card text-blue-600 text-xs'></i>
+                    </div>
+                    <span className='text-sm font-semibold text-gray-700 uppercase tracking-wide'>
+                      {t('bills.check')}
+                    </span>
+                  </div>
                 </div>
-                <div className='col-span-3 text-sm font-semibold text-gray-700 uppercase tracking-wide'>
-                  {t('bills.total')}
+                <div className='col-span-3'>
+                  <div className='flex items-center gap-2'>
+                    <div className='w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center'>
+                      <i className='pi pi-calculator text-purple-600 text-xs'></i>
+                    </div>
+                    <span className='text-sm font-semibold text-gray-700 uppercase tracking-wide'>
+                      {t('bills.total')}
+                    </span>
+                  </div>
                 </div>
-                <div className='col-span-1 text-sm font-semibold text-gray-700 uppercase tracking-wide text-center'>
-                  {t('actions', 'Actions')}
+                <div className='col-span-1 text-center'>
+                  <div className='flex items-center justify-center gap-2'>
+                    <div className='w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center'>
+                      <i className='pi pi-cog text-gray-600 text-xs'></i>
+                    </div>
+                    <span className='text-sm font-semibold text-gray-700 uppercase tracking-wide'>
+                      {t('actions', 'Actions')}
+                    </span>
+                  </div>
                 </div>
               </div>
             )}

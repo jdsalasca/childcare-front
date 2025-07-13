@@ -90,11 +90,19 @@ export const exportBoxesToPDF = (data: FormValues): void => {
     margin
   );
   // Iterate over each child and generate a receipt on a new page
+  // Only generate receipts for children with payments
   data.bills!.forEach(bill => {
-    doc.addPage(); // New page for each child
+    const cash = Number(bill.cash) || 0;
+    const check = Number(bill.check) || 0;
+    const total = cash + check;
 
-    // Call the receipt generation function for the current child
-    generateReceiptForChild(doc, bill, dateStr);
+    // Only generate receipt if the child has payments
+    if (total > 0) {
+      doc.addPage(); // New page for each child with payments
+
+      // Call the receipt generation function for the current child
+      generateReceiptForChild(doc, bill, dateStr);
+    }
   });
 
   doc.save('deposit_ticket.pdf');

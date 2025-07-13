@@ -485,17 +485,29 @@ export const useBillsViewModel = () => {
           customLogger.debug('Found existing bills:', existingBills.length);
 
           // Transform existing bills to match our Bill interface
-          const transformedBills: Bill[] = existingBills.map(
-            (bill: any, index: number) => ({
-              id: bill.id?.toString() || `bill_${index}`,
-              originalIndex: index,
-              names: bill.names || '',
-              cash: bill.cash || '',
-              check: bill.check || '',
-              total: bill.total || 0,
-              classroom: bill.classroom || '',
-              child_id: bill.child_id || 0,
-            })
+          const transformedBills: Bill[] = (children || []).map(
+            (child: any, index: number) => {
+              // Try to find a bill for this child for the selected date
+              const bill = existingBills.find(
+                (b: any) => b.child_id === child.id
+              );
+              const fallbackName =
+                [child.first_name, child.last_name].filter(Boolean).join(' ') ||
+                'Unnamed Child';
+              const cash = bill?.cash || '';
+              const check = bill?.check || '';
+              const total = (Number(cash) || 0) + (Number(check) || 0);
+              return {
+                id: bill?.id?.toString() || `child_${child.id}`,
+                originalIndex: index,
+                names: fallbackName,
+                cash,
+                check,
+                total,
+                classroom: child.classroom || '',
+                child_id: child.id,
+              };
+            }
           );
 
           // Reset form with existing bills
