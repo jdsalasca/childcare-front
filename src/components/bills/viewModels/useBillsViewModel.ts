@@ -467,6 +467,51 @@ export const useBillsViewModel = () => {
     []
   );
 
+  // Load existing bills for a specific date
+  const loadBillsForDate = useCallback(
+    async (date: Date): Promise<void> => {
+      try {
+        const formattedDate = date.toISOString().slice(0, 10);
+        
+        // Try to load existing bills for the date
+        const existingBillsResponse = await CashAPI.getDetailsByDate(formattedDate);
+        
+        if (existingBillsResponse.httpStatus === 200 && existingBillsResponse.response) {
+          // If we have existing bills, use them
+          const existingBills = existingBillsResponse.response.bills || [];
+          
+          // Transform existing bills to match our Bill interface
+          const transformedBills: Bill[] = existingBills.map((bill: any, index: number) => ({
+            id: bill.id?.toString() || `bill_${index}`,
+            originalIndex: index,
+            names: bill.names || '',
+            cash: bill.cash || '',
+            check: bill.check || '',
+            total: bill.total || 0,
+            classroom: bill.classroom || '',
+            child_id: bill.child_id || 0,
+          }));
+          
+          // Reset form with existing bills
+          reset({
+            bills: transformedBills,
+            billTypes: getValues('billTypes') || [],
+            date: date,
+            cashOnHand: getValues('cashOnHand') || 0.0,
+          });
+        } else {
+          // If no existing bills, initialize with children data
+          await onStartForm();
+        }
+      } catch (error) {
+        customLogger.warn('Error loading bills for date:', error);
+        // Fallback to initializing with children data
+        await onStartForm();
+      }
+    },
+    [reset, getValues, onStartForm]
+  );
+
   const onHandlerDateChanged = useCallback(
     async (date: Date | null) => {
       if (date === null) {
@@ -505,6 +550,11 @@ export const useBillsViewModel = () => {
           fetchClosedMoneyData(currentDateObj),
         ]);
 
+        // Load existing bills for the selected date
+        await loadBillsForDate(currentDateObj);
+
+        setBlockContent(false);
+
         setBlockContent(false);
       } catch (error) {
         customLogger.error('Error on date changed', error);
@@ -517,7 +567,7 @@ export const useBillsViewModel = () => {
         });
       }
     },
-    [onHandlerSetCashOnHand, fetchClosedMoneyData, setLoadingInfo, setValue, t]
+    [onHandlerSetCashOnHand, fetchClosedMoneyData, setLoadingInfo, setValue, t, loadBillsForDate]
   );
 
   // Submit handler
