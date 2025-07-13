@@ -23,7 +23,7 @@ jobs:
         run: corepack enable
 
       - name: 📦 Install dependencies
-        run: yarn install --immutable
+        run: yarn install
 
       - name: 🏗️ Build application
         run: yarn build

@@ -24,5 +24,9 @@
     "isolatedModules": true,
     "noEmit": true,
     "outDir": "./dist"
-  }
+  },
+  "exclude": [
+    "node_modules",
+    "src/test"
+  ]
 }
