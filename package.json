@@ -14,7 +14,7 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "@typescript-eslint/eslint-plugin": "^8.6.0",
-    "axios": "^1.7.2",
+    "axios": "^1.8.3",
     "buffer": "^6.0.3",
     "crypto-js": "^4.2.0",
     "events-browserify": "^0.0.1",
