@@ -29,7 +29,10 @@ export class ErrorHandler {
   /**
    * Handles errors in a consistent way across the application
    */
-  public handleError(error: any, options: ErrorHandlerOptions = {}): ErrorInfo {
+  public handleError(
+    error: any,
+    options: ErrorHandlerOptions = {}
+  ): ErrorInfo {
     const {
       showToast = false,
       logError = true,
@@ -65,8 +68,7 @@ export class ErrorHandler {
     // Handle API response errors
     if (error && typeof error === 'object' && 'httpStatus' in error) {
       return {
-        message:
-          error.response?.error || error.response?.message || 'API Error',
+        message: error.response?.error || error.response?.message || 'API Error',
         code: error.response?.errorType || 'API_ERROR',
         status: error.httpStatus,
         details: error.response,
@@ -76,8 +78,7 @@ export class ErrorHandler {
     // Handle Axios errors
     if (error && error.isAxiosError) {
       return {
-        message:
-          error.response?.data?.message || error.message || 'Network Error',
+        message: error.response?.data?.message || error.message || 'Network Error',
         code: 'NETWORK_ERROR',
         status: error.response?.status,
         details: error.response?.data,
@@ -114,7 +115,7 @@ export class ErrorHandler {
    */
   private logError(errorInfo: ErrorInfo, context: string): void {
     const logMessage = `[${context}] ${errorInfo.message}`;
-
+    
     if (errorInfo.status && errorInfo.status >= 500) {
       customLogger.error(logMessage, errorInfo.details);
     } else if (errorInfo.status && errorInfo.status >= 400) {
@@ -138,7 +139,7 @@ export class ErrorHandler {
    */
   public getUserFriendlyMessage(error: any): string {
     const errorInfo = this.extractErrorInfo(error);
-
+    
     // Map error codes to user-friendly messages
     switch (errorInfo.code) {
       case 'NETWORK_ERROR':

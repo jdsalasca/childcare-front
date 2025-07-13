@@ -3,7 +3,6 @@ import { ApiResponse } from '@models/API';
 import UsersAPI, { User } from '@models/UsersAPI';
 import { customLogger } from 'configs/logger';
 import { SecurityService } from 'configs/storageUtils';
-import { errorHandler } from '../../utils/ErrorHandler';
 import { inputValidator } from '../../utils/InputValidation';
 import Lottie from 'lottie-react';
 import { Button } from 'primereact/button';
@@ -65,26 +64,11 @@ const Login: React.FC = () => {
         });
       }
     } catch (error) {
-      const errorcasted = error as ApiResponse<User>;
-      customLogger.error('error on login', error);
-
-      // Check if error response exists before accessing properties
-      if (errorcasted.response && errorcasted.response.errorType) {
-        if (errorcasted.response.errorType === 'username') {
-          setError('username', {
-            type: 'manual',
-            message: errorcasted.response.error || t('username_error'),
-          });
-        } else {
-          setError('password', {
-            type: 'manual',
-            message: errorcasted.response.error || t('password_error'),
-          });
-        }
-      } else {
-        // General error fallback
-        setError('username', { type: 'manual', message: t('login_error') });
-      }
+      // General error fallback for login
+      setError('username', {
+        type: 'manual',
+        message: t('login_error'),
+      });
     } finally {
       setLoading(false);
     }
