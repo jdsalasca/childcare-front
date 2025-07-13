@@ -13,6 +13,7 @@ import { Tooltip } from 'primereact/tooltip';
 import classNames from 'classnames';
 import { programOptions } from '../contracts/utilsAndConstants';
 import Loader from '../utils/Loader';
+import ErrorBoundary from '../utils/ErrorBoundary';
 import { useBillsViewModel } from './viewModels/useBillsViewModel';
 import { Bill } from './viewModels/useBillsViewModel';
 
@@ -662,104 +663,108 @@ export const Bills: React.FC = () => {
   }
 
   return (
-    <div className='max-w-7xl mx-auto p-2 sm:p-4 space-y-4 sm:space-y-6'>
-      <Toast ref={toast} />
-      <ConfirmDialog />
+    <ErrorBoundary>
+      <div className='max-w-7xl mx-auto p-2 sm:p-4 space-y-4 sm:space-y-6'>
+        <Toast ref={toast} />
+        <ConfirmDialog />
 
-      {/* Header */}
-      <div className='mb-8'>{headerToolbar}</div>
+        {/* Header */}
+        <div className='mb-8'>{headerToolbar}</div>
 
-      {/* Content blocked overlay */}
-      {blockContent && (
-        <div className='bg-yellow-50 border border-yellow-200 rounded-lg p-4'>
-          <div className='flex items-center gap-3'>
-            <i className='pi pi-exclamation-triangle text-yellow-600 text-xl'></i>
-            <div>
-              <h4 className='text-yellow-800 font-medium m-0'>
-                {t('bills.blockContent')}
-              </h4>
-              <p className='text-yellow-700 text-sm m-0 mt-1'>
-                {t(
-                  'bills.selectDateToContinue',
-                  'Please select a date to continue managing bills'
-                )}
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Filters */}
-      {filtersPanel}
-
-      {/* Bills Form */}
-      <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
-        {/* Bills List */}
-        <div className='bg-white rounded-xl shadow-sm border border-gray-100 p-6'>
-          {paginatedBills.length > 0 && (
-            <div className='grid grid-cols-12 gap-3 items-center mb-4 pb-3 border-b border-gray-200'>
-              <div className='col-span-4 text-sm font-semibold text-gray-700 uppercase tracking-wide'>
-                {t('bills.names')}
-              </div>
-              <div className='col-span-2 text-sm font-semibold text-gray-700 uppercase tracking-wide'>
-                {t('bills.cash')}
-              </div>
-              <div className='col-span-2 text-sm font-semibold text-gray-700 uppercase tracking-wide'>
-                {t('bills.check')}
-              </div>
-              <div className='col-span-3 text-sm font-semibold text-gray-700 uppercase tracking-wide'>
-                {t('bills.total')}
-              </div>
-              <div className='col-span-1 text-sm font-semibold text-gray-700 uppercase tracking-wide text-center'>
-                {t('actions', 'Actions')}
+        {/* Content blocked overlay */}
+        {blockContent && (
+          <div className='bg-yellow-50 border border-yellow-200 rounded-lg p-4'>
+            <div className='flex items-center gap-3'>
+              <i className='pi pi-exclamation-triangle text-yellow-600 text-xl'></i>
+              <div>
+                <h4 className='text-yellow-800 font-medium m-0'>
+                  {t('bills.blockContent')}
+                </h4>
+                <p className='text-yellow-700 text-sm m-0 mt-1'>
+                  {t(
+                    'bills.selectDateToContinue',
+                    'Please select a date to continue managing bills'
+                  )}
+                </p>
               </div>
             </div>
-          )}
-          <div className='space-y-2'>
-            {paginatedBills.length > 0
-              ? paginatedBills.map((bill, index) => renderBillItem(bill, index))
-              : emptyTemplate}
+          </div>
+        )}
+
+        {/* Filters */}
+        {filtersPanel}
+
+        {/* Bills Form */}
+        <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+          {/* Bills List */}
+          <div className='bg-white rounded-xl shadow-sm border border-gray-100 p-6'>
+            {paginatedBills.length > 0 && (
+              <div className='grid grid-cols-12 gap-3 items-center mb-4 pb-3 border-b border-gray-200'>
+                <div className='col-span-4 text-sm font-semibold text-gray-700 uppercase tracking-wide'>
+                  {t('bills.names')}
+                </div>
+                <div className='col-span-2 text-sm font-semibold text-gray-700 uppercase tracking-wide'>
+                  {t('bills.cash')}
+                </div>
+                <div className='col-span-2 text-sm font-semibold text-gray-700 uppercase tracking-wide'>
+                  {t('bills.check')}
+                </div>
+                <div className='col-span-3 text-sm font-semibold text-gray-700 uppercase tracking-wide'>
+                  {t('bills.total')}
+                </div>
+                <div className='col-span-1 text-sm font-semibold text-gray-700 uppercase tracking-wide text-center'>
+                  {t('actions', 'Actions')}
+                </div>
+              </div>
+            )}
+            <div className='space-y-2'>
+              {paginatedBills.length > 0 ? (
+                paginatedBills.map((bill, index) => renderBillItem(bill, index))
+              ) : (
+                emptyTemplate
+              )}
+            </div>
+
+            {/* Pagination */}
+            {filteredBills.length > ITEMS_PER_PAGE && (
+              <div className='mt-6 pt-4 border-t border-gray-200'>
+                <Paginator
+                  first={first}
+                  rows={rows}
+                  totalRecords={filteredBills.length}
+                  rowsPerPageOptions={[5, 10, 20, 50]}
+                  onPageChange={onPageChange}
+                  template='FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport'
+                  currentPageReportTemplate={t(
+                    'bills.paginationTemplate',
+                    'Showing {first} to {last} of {totalRecords} bills'
+                  )}
+                />
+              </div>
+            )}
           </div>
 
-          {/* Pagination */}
-          {filteredBills.length > ITEMS_PER_PAGE && (
-            <div className='mt-6 pt-4 border-t border-gray-200'>
-              <Paginator
-                first={first}
-                rows={rows}
-                totalRecords={filteredBills.length}
-                rowsPerPageOptions={[5, 10, 20, 50]}
-                onPageChange={onPageChange}
-                template='FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport'
-                currentPageReportTemplate={t(
-                  'bills.paginationTemplate',
-                  'Showing {first} to {last} of {totalRecords} bills'
-                )}
+          {/* Summary */}
+          <BillSummary
+            sums={sums}
+            cashOnHand={getValues('cashOnHand')}
+            closedMoneyData={closedMoneyData}
+          />
+
+          {/* Actions */}
+          <div className='bg-white rounded-xl shadow-sm border border-gray-100 p-6'>
+            <div className='flex justify-center'>
+              <Button
+                type='submit'
+                label={t('bills.save')}
+                icon='pi pi-save'
+                className='bg-blue-600 hover:bg-blue-700 border-blue-600 text-white px-8 py-3 text-lg font-semibold'
+                disabled={blockContent}
               />
             </div>
-          )}
-        </div>
-
-        {/* Summary */}
-        <BillSummary
-          sums={sums}
-          cashOnHand={getValues('cashOnHand')}
-          closedMoneyData={closedMoneyData}
-        />
-
-        {/* Actions */}
-        <div className='bg-white rounded-xl shadow-sm border border-gray-100 p-6'>
-          <div className='flex justify-center'>
-            <Button
-              type='submit'
-              label={t('bills.save')}
-              icon='pi pi-save'
-              className='bg-blue-600 hover:bg-blue-700 border-blue-600 text-white px-8 py-3 text-lg font-semibold'
-              disabled={blockContent}
-            />
           </div>
-        </div>
-      </form>
-    </div>
+        </form>
+      </div>
+    </ErrorBoundary>
   );
 };
