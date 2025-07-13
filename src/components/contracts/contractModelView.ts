@@ -1,11 +1,10 @@
-import { customLogger } from '../../configs/logger';
 import { ApiResponseModel } from '../../models/API';
 import {
   ChildrenGuardiansBuilder,
   ContractDaySchedule,
 } from '../../models/ApiModels';
 import { ChildrenGuardiansAPI } from '../../models/ChildrenGuardiansAPI';
-import { ContractAPI, ContractBuilder } from '../../models/ContractAPI';
+import { ContractAPI } from '../../models/ContractAPI';
 import { ChildType, defaultChild } from '../../types/child';
 import { defaultGuardian, Guardian } from '../../types/guardian';
 import { ChildrenValidations, GuardiansValidations } from './utils/contractValidations';

@@ -1,6 +1,6 @@
 import { LoadingInfo } from '@models/AppModels';
 import { Button } from 'primereact/button';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { ContractAPI } from '../../../models/ContractAPI';
@@ -14,8 +14,6 @@ import { DoctorInformationCard } from './cards/DoctorInformationCard';
 import { WorkInformationCard } from './cards/WorkInformationCard';
 import { EmergencyContactCard } from './cards/EmergencyContactCard';
 import { motion } from 'framer-motion';
-import { InputTextAreaWrapper } from '@components/formsComponents/InputTextAreaWrapper';
-import { Validations } from '@utils/validations';
 
 
 interface StepComponentFourProps {
@@ -53,7 +51,7 @@ const StepComponentFour: React.FC<StepComponentFourProps> = ({
     setError,
     clearErrors,
     setValue,
-    formState: { errors },
+    formState: { },
   } = useForm({
     defaultValues: {
       contract_id: contractInformation.contract_id || null,
@@ -148,7 +146,7 @@ const StepComponentFour: React.FC<StepComponentFourProps> = ({
     }
   };
 
-  const formatValue = (event: React.FocusEvent<HTMLInputElement>) => {
+  const formatValue = (_event: React.FocusEvent<HTMLInputElement>) => {
     const value = getValues('total_to_pay');
     const cleanValue = value?.toString().replace(/[^0-9.]/g, '');
     const numberValue = parseFloat(cleanValue as string);

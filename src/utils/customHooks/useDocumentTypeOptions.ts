@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useDocumentTypesCache } from '../../models/DocumentTypeAPI'; // Adjust path accordingly
 import { DocumentType } from '../../types/documentType';
 

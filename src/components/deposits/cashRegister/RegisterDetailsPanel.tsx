@@ -53,10 +53,6 @@ const RegisterDetailsPanel: React.FC<Props> = ({ date }) => {
 
   const { data } = detailsData;
 
-  const formatTime = (timeString: string) => {
-    return new Date(timeString).toLocaleTimeString();
-  };
-
   const formatDateTime = (timeString: string) => {
     return new Date(timeString).toLocaleString();
   };

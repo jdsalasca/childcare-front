@@ -8,7 +8,6 @@ import i18n from '../configs/i18n'
 
 // Create a custom render function that includes all providers
 interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {
-  initialEntries?: string[]
   queryClient?: QueryClient
 }
 
@@ -17,7 +16,6 @@ export function renderWithProviders(
   options: CustomRenderOptions = {}
 ) {
   const {
-    initialEntries = ['/'],
     queryClient = new QueryClient({
       defaultOptions: {
         queries: {
@@ -203,7 +201,7 @@ export const mockToast = {
 }
 
 // Mock file operations
-export const mockFile = (name = 'test.pdf', type = 'application/pdf', size = 1024) =>
+export const mockFile = (name = 'test.pdf', type = 'application/pdf') =>
   new File(['test content'], name, { type })
 
 // Mock PDF generation

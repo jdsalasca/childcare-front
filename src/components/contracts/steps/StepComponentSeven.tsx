@@ -1,5 +1,5 @@
 import { LoadingInfo } from "@models/AppModels";
-import { PDFDocument, PDFForm, rgb } from "pdf-lib";
+import { PDFDocument, rgb } from "pdf-lib";
 import { Card } from "primereact/card";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -13,8 +13,6 @@ import { FormGob } from "../types/formGob";
 import { ContractPdf } from "../utils/contractPdfUtils";
 import useGenerateContract from "../viewModels/useGenerateContract";
 import { Functions } from "@utils/functions";
-import { Guardian } from "types/guardian";
-import { ChildType, MedicalInformation } from "types/child";
 import { mockContract } from '../../../data/mockContract';
 
 interface StepComponentSevenProps {
@@ -369,7 +367,6 @@ rectangles.forEach(rect => {
       total_to_pay,
       payment_method_id,
       start_date,
-      end_date,
     } = contractInfo;
 
     if (!guardians || guardians.length === 0 || !guardians[0].name) {

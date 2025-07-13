@@ -171,10 +171,6 @@ export const useBillsViewModelOptimized = () => {
     updateState({ blockContent });
   }, [updateState]);
 
-  const setSums = useCallback((sums: OptimizedSums) => {
-    updateState({ sums });
-  }, [updateState]);
-
   // Debounced recalculation function
   const debouncedRecalculate = useMemo(
     () => debounce((bills: OptimizedBill[], cashOnHand: number) => {
@@ -431,7 +427,7 @@ export const useBillsViewModelOptimized = () => {
   }, [onHandlerSetCashOnHand, fetchClosedMoneyData, onStartForm, setBlockContent]);
 
   // Optimized submit handler
-  const onSubmit = useCallback(async (data: OptimizedFormValues) => {
+  const onSubmit = useCallback(async (_data: OptimizedFormValues) => {
     try {
       setLoadingInfo({
         loading: true,

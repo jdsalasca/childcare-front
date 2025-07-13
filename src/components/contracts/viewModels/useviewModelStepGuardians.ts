@@ -1,5 +1,4 @@
-import { ApiResponse } from "models/API"
-import React, { useCallback, useEffect, useState, useMemo } from "react"
+import React, { useCallback, useEffect, useMemo } from "react"
 import { Control, FieldArrayWithId, useFieldArray, useForm, UseFormGetValues, UseFormReturn } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 import Swal from "sweetalert2"
@@ -12,8 +11,6 @@ import { ToastInterpreterUtils } from "../../utils/ToastInterpreterUtils"
 import { ContractService } from "../contractModelView"
 import { ContractInfo } from "../types/ContractInfo"
 import { GuardiansValidations } from "../utils/contractValidations"
-import { log } from "loglevel"
-import { GuardiansFactory } from "@models/factories/GuardiansFactory"
 
 // Improved type definitions
 interface GuardianFormData {
@@ -104,7 +101,6 @@ const useViewModelStepGuardians = ({
     control,
     handleSubmit,
     formState: { errors },
-    setValue,
     getValues
   } = useForm<GuardianFormData>({
     defaultValues: {
@@ -199,10 +195,6 @@ const onCreateGuardian = async (data: Guardian): Promise<ExtendedGuardian | unde
       const hasError = Array.isArray(contractResponse) 
         ? contractResponse.some(response => response.httpStatus !== 200)
         : contractResponse?.httpStatus !== 200;
-
-      const message = Array.isArray(contractResponse)
-        ? contractResponse.map(response => response.response?.message).join(', ')
-        : contractResponse?.response?.message ?? contractResponse?.message;
 
       if (hasError) {
         showToast('error', 'contractCreationFailed', 'contractCreationFailed');

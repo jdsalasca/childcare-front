@@ -43,7 +43,7 @@ const CombinedBillsForm = () => {
     name: 'bills'
   });
 
-  const { fields: billFields, update: updateBill } = useFieldArray({
+  const { fields: billFields } = useFieldArray({
     control,
     name: 'billUpload'
   });
@@ -86,26 +86,6 @@ const CombinedBillsForm = () => {
     }, 0);
     setTotalSum(sum);
   }, [billFields]);
-
-  
-  // eslint-disable-next-line no-unused-vars
-  const handleAmountChange = (index, value) => {
-    const amount = parseFloat(value) || 0;
-    const billValue = billFields[index].value;
-    const total = amount * billValue;
-
-    updateBill(index, { ...billFields[index], amount, total });
-
-    const newTotalSum = billFields.reduce((sum, bill, idx) => {
-      if (idx === index) {
-        return sum + total;
-      }
-      const billAmount = parseFloat(bill.amount) || 0;
-      const billValue = parseFloat(bill.value) || 0;
-      return sum + (billAmount * billValue);
-    }, 0);
-    setTotalSum(newTotalSum);
-  };
 
   const getFormErrorMessage = (name) => {
     return errors[name] && <small className="p-error">{errors[name].message}</small>;

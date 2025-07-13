@@ -123,7 +123,6 @@ const generateChildrenTable = (doc: jsPDF, bills: Bill[], startY: number, pageHe
 
 const generateCashOnHandSection = (doc: jsPDF, data: FormValues, startY: number, pageHeight: number, margin: number): number => {
     // Format values properly
-    const cashOnHandValue = Number(data.cashOnHand) || 0;
     const totalDepositValue = Number(data.totalDeposit) || 0;
     // Calculate total as sum of cash and check from bills
     const totalOverallValue = data.bills?.reduce((acc: number, bill: Bill) => {

@@ -1,14 +1,16 @@
+const tsParser = require('@typescript-eslint/parser');
+
 module.exports = [
   {
     ignores: ['dist', '**/*.d.ts'],
   },
   {
-    files: ['**/*.{js,jsx}'],
+    files: ['**/*.{js,jsx,ts,tsx}'],
     languageOptions: {
       ecmaVersion: 2020,
       sourceType: 'module',
+      parser: tsParser,
       globals: {
-        // Browser globals
         window: 'readonly',
         document: 'readonly',
         console: 'readonly',
@@ -26,109 +28,36 @@ module.exports = [
         alert: 'readonly',
         confirm: 'readonly',
         prompt: 'readonly',
-        // Testing globals
         describe: 'readonly',
         it: 'readonly',
-        test: 'readonly',
         expect: 'readonly',
         beforeEach: 'readonly',
         afterEach: 'readonly',
-        beforeAll: 'readonly',
-        afterAll: 'readonly',
+        test: 'readonly',
         vi: 'readonly',
-        vitest: 'readonly',
-      },
-      parserOptions: {
-        ecmaVersion: 'latest',
-        ecmaFeatures: { jsx: true },
       },
     },
     plugins: {
       react: require('eslint-plugin-react'),
       'react-hooks': require('eslint-plugin-react-hooks'),
-      'react-refresh': require('eslint-plugin-react-refresh'),
-    },
-    rules: {
-      ...require('@eslint/js').configs.recommended.rules,
-      ...require('eslint-plugin-react').configs.recommended.rules,
-      ...require('eslint-plugin-react').configs['jsx-runtime'].rules,
-      ...require('eslint-plugin-react-hooks').configs.recommended.rules,
-      'react/jsx-no-target-blank': 'off',
-      'react-refresh/only-export-components': [
-        'warn',
-        { allowConstantExport: true },
-      ],
-    },
-    settings: {
-      react: { version: '18.3' },
-    },
-  },
-  {
-    files: ['**/*.{ts,tsx}'],
-    languageOptions: {
-      ecmaVersion: 2020,
-      sourceType: 'module',
-      globals: {
-        // Browser globals
-        window: 'readonly',
-        document: 'readonly',
-        console: 'readonly',
-        setTimeout: 'readonly',
-        clearTimeout: 'readonly',
-        setInterval: 'readonly',
-        clearInterval: 'readonly',
-        fetch: 'readonly',
-        localStorage: 'readonly',
-        sessionStorage: 'readonly',
-        location: 'readonly',
-        history: 'readonly',
-        navigator: 'readonly',
-        screen: 'readonly',
-        alert: 'readonly',
-        confirm: 'readonly',
-        prompt: 'readonly',
-        // Testing globals
-        describe: 'readonly',
-        it: 'readonly',
-        test: 'readonly',
-        expect: 'readonly',
-        beforeEach: 'readonly',
-        afterEach: 'readonly',
-        beforeAll: 'readonly',
-        afterAll: 'readonly',
-        vi: 'readonly',
-        vitest: 'readonly',
-      },
-      parser: require('@typescript-eslint/parser'),
-      parserOptions: {
-        ecmaVersion: 'latest',
-        ecmaFeatures: { jsx: true },
-        sourceType: 'module',
-      },
-    },
-    plugins: {
-      react: require('eslint-plugin-react'),
-      'react-hooks': require('eslint-plugin-react-hooks'),
-      'react-refresh': require('eslint-plugin-react-refresh'),
       '@typescript-eslint': require('@typescript-eslint/eslint-plugin'),
+      'unused-imports': require('eslint-plugin-unused-imports'),
     },
     rules: {
-      ...require('@eslint/js').configs.recommended.rules,
-      ...require('eslint-plugin-react').configs.recommended.rules,
-      ...require('eslint-plugin-react').configs['jsx-runtime'].rules,
-      ...require('eslint-plugin-react-hooks').configs.recommended.rules,
-      ...require('@typescript-eslint/eslint-plugin').configs.recommended.rules,
-      'react/jsx-no-target-blank': 'off',
-      'react-refresh/only-export-components': [
-        'warn',
-        { allowConstantExport: true },
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
+      'unused-imports/no-unused-imports': 'error',
+      'unused-imports/no-unused-vars': [
+        'error',
+        { 
+          vars: 'all', 
+          varsIgnorePattern: '^_', 
+          args: 'after-used', 
+          argsIgnorePattern: '^_',
+          caughtErrors: 'all',
+          caughtErrorsIgnorePattern: '^_'
+        }
       ],
-      '@typescript-eslint/no-unused-expressions': 'off',
-      '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-non-null-assertion': 'off',
-    },
-    settings: {
-      react: { version: '18.3' },
     },
   },
 ];

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { Validations } from '../../utils/validations';
 import { RegexPatterns } from '../../utils/regexPatterns';
 import { GuardiansValidations, ChildrenValidations } from '../../components/contracts/utils/contractValidations';

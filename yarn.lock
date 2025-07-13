@@ -2346,6 +2346,7 @@ __metadata:
     eslint-plugin-react: "npm:^7.35.0"
     eslint-plugin-react-hooks: "npm:^4.6.2"
     eslint-plugin-react-refresh: "npm:^0.4.11"
+    eslint-plugin-unused-imports: "npm:^4.1.4"
     events-browserify: "npm:^0.0.1"
     framer-motion: "npm:^11.5.6"
     fs.promises: "npm:^0.1.2"
@@ -3340,6 +3341,19 @@ __metadata:
   peerDependencies:
     eslint: ^3 || ^4 || ^5 || ^6 || ^7 || ^8 || ^9.7
   checksum: 10c0/13cf55666f16d2ca45b14aad1b0e14741d1817679c86d20aff0bc1e802439a8541f40a42c4c8e3486ffb710f1bcc2f3e56697f2b5f724306a7fca174e1ad6433
+  languageName: node
+  linkType: hard
+
+"eslint-plugin-unused-imports@npm:^4.1.4":
+  version: 4.1.4
+  resolution: "eslint-plugin-unused-imports@npm:4.1.4"
+  peerDependencies:
+    "@typescript-eslint/eslint-plugin": ^8.0.0-0 || ^7.0.0 || ^6.0.0 || ^5.0.0
+    eslint: ^9.0.0 || ^8.0.0
+  peerDependenciesMeta:
+    "@typescript-eslint/eslint-plugin":
+      optional: true
+  checksum: 10c0/3899f64b0e8b23fa6b81e2754fc10f93d8741e051d70390a8100ca39af7878bde8625f234b76111af69562ef2512104b52c3703e986ccb3ac9adc07911896acf
   languageName: node
   linkType: hard
 

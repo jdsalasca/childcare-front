@@ -1,13 +1,5 @@
-import { useEffect, useState, useMemo } from "react";
+import { useMemo } from "react";
 import { usePaymentMethodsCache } from "../../models/PaymentMethodAPI";
-import { PaymentMethodType } from "../../types/paymentMethod";
-
-// Define the structure of the payment method
-interface PaymentMethod {
-    id: string; // Adjust based on your API response
-    translationLabel: string; // Adjust based on your API response
-    // Add other relevant properties as needed
-}
 
 const usePaymentMethodsOptions = () => {
     const { data: paymentMethods, error, isLoading } = usePaymentMethodsCache();

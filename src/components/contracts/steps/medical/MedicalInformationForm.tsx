@@ -7,10 +7,8 @@ import { useTranslation } from "react-i18next";
 import { InputTextAreaWrapper } from "@components/formsComponents/InputTextAreaWrapper";
 import { Toast } from "primereact/toast";
 import InputTextWrapper from "@components/formsComponents/InputTextWrapper";
-import { LoadingInfo } from "@models/AppModels";
 import { motion } from "framer-motion";
 interface MedicalInformationFormProps {
-  setLoadingInfo: (info: LoadingInfo) => void;
   contractInformation: ContractInfo;
   setContractInformation: (info: ContractInfo) => void;
   toast: React.RefObject<Toast>;
@@ -18,7 +16,6 @@ interface MedicalInformationFormProps {
 }
 
 export const MedicalInformationForm: React.FC<MedicalInformationFormProps> = ({
-  setLoadingInfo,
   contractInformation,
   setContractInformation,
   toast,

@@ -1,6 +1,4 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { renderWithProviders } from '../utils'
-import { Bills } from '../../components/bills/Bills'
 import { ChildrenValidations, GuardiansValidations } from '../../components/contracts/utils/contractValidations'
 import { DateUtilsImpl } from '../../utils/dateUtils'
 import { Validations } from '../../utils/validations'
@@ -65,13 +63,13 @@ describe('Performance Tests', () => {
 
   describe('Validation Performance', () => {
     it('should validate large lists of children efficiently', () => {
-      const largeChildrenList = Array.from({ length: 1000 }, (_, i) => ({
-        id: i,
-        first_name: `Child${i}`,
-        last_name: `LastName${i}`,
+      const largeChildrenList = Array.from({ length: 1000 }, (_, _i) => ({
+        id: _i,
+        first_name: `Child${_i}`,
+        last_name: `LastName${_i}`,
         born_date: '2020-01-01',
         gender_id: 1,
-        identification_number: `ID${i.toString().padStart(6, '0')}`,
+        identification_number: `ID${_i.toString().padStart(6, '0')}`,
         age: 3,
         classroom: 'Toddler',
         status: 'Active' as const,
@@ -86,19 +84,19 @@ describe('Performance Tests', () => {
     })
 
     it('should validate large lists of guardians efficiently', () => {
-      const largeGuardiansList = Array.from({ length: 1000 }, (_, i) => ({
-        id: i,
-        name: `Guardian${i}`,
-        last_name: `LastName${i}`,
-        email: `guardian${i}@example.com`,
-        phone: `123456789${i % 10}`,
-        address: `${i} Main St`,
+      const largeGuardiansList = Array.from({ length: 1000 }, (_, _i) => ({
+        id: _i,
+        name: `Guardian${_i}`,
+        last_name: `LastName${_i}`,
+        email: `guardian${_i}@example.com`,
+        phone: `123456789${_i % 10}`,
+        address: `${_i} Main St`,
         city: 'Anytown',
-        guardian_type_id: (i % 5) + 1,
+        guardian_type_id: (_i % 5) + 1,
         created_at: new Date(),
         updated_at: new Date(),
         status: 'Active' as const,
-        titular: i === 0, // Only first guardian is titular
+        titular: _i === 0, // Only first guardian is titular
       }))
 
       const startTime = performance.now()
@@ -110,7 +108,7 @@ describe('Performance Tests', () => {
     })
 
     it('should handle email validation efficiently', () => {
-      const emails = Array.from({ length: 10000 }, (_, i) => `user${i}@example.com`)
+      const emails = Array.from({ length: 10000 }, (_, _i) => `user${_i}@example.com`)
 
       const startTime = performance.now()
       const results = emails.map(email => Validations.isValidEmail(email))
@@ -124,9 +122,9 @@ describe('Performance Tests', () => {
   describe('Date Utilities Performance', () => {
     it('should calculate disabled dates efficiently', () => {
       const dateUtils = DateUtilsImpl.getInstance()
-      const availableDates = Array.from({ length: 100 }, (_, i) => {
+      const availableDates = Array.from({ length: 100 }, (_, _i) => {
         const date = new Date('2024-01-01')
-        date.setDate(date.getDate() + i)
+        date.setDate(date.getDate() + _i)
         return date
       })
 
@@ -141,9 +139,9 @@ describe('Performance Tests', () => {
 
     it('should convert dates to UTC efficiently', () => {
       const dateUtils = DateUtilsImpl.getInstance()
-      const dates = Array.from({ length: 1000 }, (_, i) => {
+      const dates = Array.from({ length: 1000 }, (_, _i) => {
         const date = new Date('2024-01-01')
-        date.setDate(date.getDate() + i)
+        date.setDate(date.getDate() + _i)
         return date
       })
 
@@ -162,9 +160,9 @@ describe('Performance Tests', () => {
       const initialMemory = (performance as any).memory?.usedJSHeapSize || 0
 
       // Perform memory-intensive operations
-      const largeArray = Array.from({ length: 100000 }, (_, i) => ({
-        id: i,
-        data: `data-${i}`,
+      const largeArray = Array.from({ length: 100000 }, (_, _i) => ({
+        id: _i,
+        data: `data-${_i}`,
         timestamp: new Date(),
       }))
 
@@ -195,14 +193,14 @@ describe('Performance Tests', () => {
 
   describe('Concurrent Operations', () => {
     it('should handle multiple simultaneous validations', async () => {
-      const validationPromises = Array.from({ length: 10 }, async (_, i) => {
-        const children = Array.from({ length: 100 }, (_, j) => ({
-          id: j,
-          first_name: `Child${j}`,
-          last_name: `LastName${j}`,
+      const validationPromises = Array.from({ length: 10 }, async (_, _i) => {
+        const children = Array.from({ length: 100 }, (_, _j) => ({
+          id: _j,
+          first_name: `Child${_j}`,
+          last_name: `LastName${_j}`,
           born_date: '2020-01-01',
           gender_id: 1,
-          identification_number: `ID${j.toString().padStart(6, '0')}`,
+          identification_number: `ID${_j.toString().padStart(6, '0')}`,
           age: 3,
           classroom: 'Toddler',
           status: 'Active',
@@ -238,8 +236,8 @@ describe('Performance Tests', () => {
     })
 
     it('should handle malformed data efficiently', () => {
-      const malformedChildren = Array.from({ length: 100 }, (_, i) => ({
-        id: i,
+      const malformedChildren = Array.from({ length: 100 }, (_, _i) => ({
+        id: _i,
         first_name: null,
         last_name: undefined,
         born_date: 'invalid-date',
