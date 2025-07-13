@@ -7,8 +7,12 @@ export class SecurityService {
   private secretKey: string;
 
   private constructor() {
-    // Retrieve secret key from environment variables or use default
-    this.secretKey = process.env.VITE_SECRET_KEY || 'secretKey';
+    // Retrieve secret key from environment variables - fail fast if not configured
+    const envSecretKey = import.meta.env.VITE_SECRET_KEY;
+    if (!envSecretKey) {
+      throw new Error('VITE_SECRET_KEY environment variable is required for secure token storage');
+    }
+    this.secretKey = envSecretKey;
   }
 
   // Singleton access point
