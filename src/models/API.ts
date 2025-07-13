@@ -1,5 +1,7 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { SecurityService } from 'configs/storageUtils';
+import NavigationService from '../utils/navigationService';
+import ErrorHandler from '../utils/errorHandler';
 
 // Define the base URL for the API with fallback
 export const BASE_URL =
@@ -8,22 +10,24 @@ export const BASE_URL =
 // Alternative URLs for different environments:
 // Production: 'https://www.educandochildcare.com/childadmin'
 // Development: 'http://localhost:8000/childadmin'
+
 // Define the types for the makeRequest function parameters
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
-type RequestOptions = {
-  params?: Record<string, any>; // Define as needed
-  [key: string]: any; // Allow other options
-};
+
+interface RequestOptions {
+    params?: Record<string, string | number | boolean>;
+    [key: string]: unknown;
+}
 
 export interface ApiResponse<T> {
   httpStatus: number;
   response: T;
 }
 
-export class ApiResponseModel<T = any> implements ApiResponse<T> {
-  httpStatus: number;
-  response: T;
-  message: string | null;
+export class ApiResponseModel<T = unknown> implements ApiResponse<T> {
+    httpStatus: number;
+    response: T;
+    message: string | null;
 
   /**
    * Creates an instance of ApiResponseModel.
@@ -58,11 +62,6 @@ export class ApiResponseModel<T = any> implements ApiResponse<T> {
     }
   }
 }
-// Change the return type to have httpStatus as number | undefined
-type ErrorData = {
-  response: any;
-  httpStatus?: number; // Allow httpStatus to be undefined
-};
 
 // Make the makeRequest method generic using <T>
 const makeRequest = async <T>(
@@ -102,42 +101,19 @@ const makeRequest = async <T>(
     const response: AxiosResponse<T> = await axios(requestOptions);
 
     if (response.status === 401) {
-      window.location.href = './session-expired';
+      NavigationService.navigateToSessionExpired();
       return { response: null, httpStatus: 401 } as ApiResponse<T>;
     }
 
-    return {
-      response: response.data,
-      httpStatus: response.status,
-    } as ApiResponse<T>;
+    return { response: response.data, httpStatus: response.status } as ApiResponse<T>;
   } catch (error) {
-    let errorData: ErrorData = { response: null, httpStatus: 404 }; // Initialize response to null, httpStatus is optional
-
-    if (axios.isAxiosError(error) && error.response) {
-      errorData.httpStatus = error.response.status; // This is where the error was occurring
-
-      if (error.response.status === 404) {
-        console.error('Record not found:', error.response.data);
-        errorData.response = error.response.data; // Error data for 404
-      } else if (error.response.status === 401) {
-        window.location.href = './session-expired';
-        return { response: null, httpStatus: 401 } as ApiResponse<T>;
-      } else {
-        console.error(`Error ${error.response.status}:`, error.response.data);
-        errorData.response = error.response.data; // General error data
-      }
-    } else {
-      // Handle network errors or other unexpected errors
-      console.error(
-        'Network or other error:',
-        error instanceof Error ? error.message : 'Unknown error'
-      );
-      errorData.response =
-        error instanceof Error ? error.message : 'Unknown error';
-    }
-
-    // Optionally re-throw the error if needed for further handling
-    throw errorData;
+    // Use standardized error handling
+    const apiError = ErrorHandler.handleApiError(error, `API ${method} ${endpoint}`, {
+      redirectOnAuthError: true,
+      logError: true
+    });
+    // Re-throw the standardized error
+    throw apiError;
   }
 };
 

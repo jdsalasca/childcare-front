@@ -11,6 +11,7 @@ import { CashAPI } from '../../../models/CashAPI';
 import { ToastInterpreterUtils } from '../../utils/ToastInterpreterUtils';
 import { exportToSummaryPDF } from '../utils/summaryPdf';
 import { exportBoxesToPDF } from '../utils/boxesPdf';
+import ErrorHandler from '../../../utils/errorHandler';
 
 // Types
 export interface Bill {
@@ -520,60 +521,53 @@ export const useBillsViewModel = () => {
   );
 
   // Submit handler
-  const onSubmit = useCallback(
-    async (data: FormValues) => {
-      try {
-        setLoadingInfo({
-          loading: true,
-          loadingMessage: t('weAreProcessingYourInformation'),
-        });
+  const onSubmit = useCallback(async (data: FormValues) => {
+    try {
+      setLoadingInfo({
+        loading: true,
+        loadingMessage: t('processingBills')
+      });
 
-        // Prepare data for backend API
-        const backendData: BackendFormValues = {
-          date: data.date,
-          bills: data.bills
-            .map(bill => ({
-              id: bill.child_id || 0, // Use numeric child_id, default to 0 if undefined
-              names: bill.names,
-              cash: toNumber(bill.cash),
-              check: toNumber(bill.check),
-              total: toNumber(bill.total),
-            }))
-            .filter(bill => bill.cash > 0 || bill.check > 0),
-          billTypes: data.billTypes || [],
-          cashOnHand: data.cashOnHand || 0,
-        };
+      // Transform data for backend
+      const backendData: BackendFormValues = {
+        date: data.date,
+        bills: data.bills.map(bill => ({
+          id: bill.child_id || 0, // Use numeric child_id, default to 0 if undefined
+          names: bill.names,
+          cash: toNumber(bill.cash),
+          check: toNumber(bill.check),
+          total: toNumber(bill.total)
+        })).filter(bill => (bill.cash > 0 || bill.check > 0)),
+        billTypes: data.billTypes || [],
+        cashOnHand: data.cashOnHand || 0
+      };
 
-        // Call the backend API using the centralized CashAPI service
-        const result = await CashAPI.processCashData(backendData);
-
-        if (toast.current) {
-          ToastInterpreterUtils.toastBackendInterpreter(
-            toast,
-            result,
-            t('billsProcessedSuccessfully'),
-            t('errorProcessingBills')
-          );
-        }
-      } catch (error) {
-        customLogger.error('Error submitting bills:', error);
-        if (toast.current) {
-          toast.current.show({
-            severity: 'error',
-            summary: t('errorProcessingBills'),
-            detail: t('errorProcessingBillsDetail'),
-            life: 5000,
-          });
-        }
-      } finally {
-        setLoadingInfo({
-          loading: false,
-          loadingMessage: '',
-        });
+      // Call the backend API using the centralized CashAPI service
+      const result = await CashAPI.processCashData(backendData);
+      
+      if (toast.current) {
+        ToastInterpreterUtils.toastBackendInterpreter(
+          toast,
+          result,
+          t('billsProcessedSuccessfully'),
+          t('errorProcessingBills')
+        );
       }
-    },
-    [t]
-  );
+    } catch (error) {
+      // Use standardized error handling
+      ErrorHandler.handleApiError(error, 'Bills submission', {
+        showToast: true,
+        toastRef: toast,
+        redirectOnAuthError: true,
+        logError: true
+      });
+    } finally {
+      setLoadingInfo({
+        loading: false,
+        loadingMessage: ''
+      });
+    }
+  }, [t]);
 
   // PDF generation functions
   const onDownloadFirstPartPdf = useCallback(() => {
@@ -602,18 +596,13 @@ export const useBillsViewModel = () => {
         });
       }
     } catch (error) {
-      customLogger.error('Error generating PDF:', error);
-      if (toast.current) {
-        toast.current.show({
-          severity: 'error',
-          summary: t('bills.errorGeneratingPDF', 'Error generating PDF'),
-          detail: t(
-            'bills.errorGeneratingPDFDetail',
-            'There was an error generating the PDF report'
-          ),
-          life: 5000,
-        });
-      }
+      // Use standardized error handling
+      ErrorHandler.handleApiError(error, 'PDF generation', {
+        showToast: true,
+        toastRef: toast,
+        redirectOnAuthError: false,
+        logError: true
+      });
     }
   }, [getValues, t, closedMoneyData]);
 
@@ -643,18 +632,13 @@ export const useBillsViewModel = () => {
         });
       }
     } catch (error) {
-      customLogger.error('Error generating PDF:', error);
-      if (toast.current) {
-        toast.current.show({
-          severity: 'error',
-          summary: t('bills.errorGeneratingPDF', 'Error generating PDF'),
-          detail: t(
-            'bills.errorGeneratingPDFDetail',
-            'There was an error generating the PDF report'
-          ),
-          life: 5000,
-        });
-      }
+      // Use standardized error handling
+      ErrorHandler.handleApiError(error, 'PDF generation', {
+        showToast: true,
+        toastRef: toast,
+        redirectOnAuthError: false,
+        logError: true
+      });
     }
   }, [getValues, t, closedMoneyData]);
 
