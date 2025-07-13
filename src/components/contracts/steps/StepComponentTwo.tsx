@@ -7,7 +7,7 @@ import CheckboxWrapper from '../../formsComponents/CheckboxWrapper';
 import DropdownWrapper from '../../formsComponents/DropdownWrapper';
 import InputTextWrapper from '../../formsComponents/InputTextWrapper';
 import { ContractInfo } from '../types/ContractInfo';
-import useViewModelStepGuardians from '../viewModels/useviewModelStepGuardians';
+import useViewModelStepGuardians from '../viewModels/useViewModelStepGuardians';
 import { GuardianType } from '../../../types/guardianType';
 
 interface StepComponentTwoProps {

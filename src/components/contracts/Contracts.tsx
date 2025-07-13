@@ -22,6 +22,7 @@ import { FormulaInformationForm } from './steps/medical/FormulaInformationForm';
 import { PermissionsInformationForm } from './steps/medical/PermissionsInformationForm';
 import StepComponentPricing from './steps/StepComponentPricing';
 import { ContractsErrorBoundary } from './ErrorBoundary';
+import { performanceOptimizer } from '../../utils/PerformanceOptimizer';
 
 // Define the props type for the component
 type ContractsProps = {
@@ -48,41 +49,53 @@ export const Contracts: React.FC<ContractsProps> = () => {
     return `${ContractPermissionsValidator.getValidContractPermissions(permissions)}/${totalPermissions}`;
   }, [contractInformation?.terms]);
 
-  const countChildrenWithMedicalInfo = useMemo(() => {
-    return (
-      contractInformation?.children?.filter(
-        child =>
-          child?.medicalInformation?.healthStatus !== '' &&
-          child?.medicalInformation?.healthStatus != null &&
-          child?.medicalInformation?.instructions !== '' &&
-          child?.medicalInformation?.instructions != null
-      ).length || 0
-    );
-  }, [contractInformation?.children]);
+  const countChildrenWithMedicalInfo = performanceOptimizer.useOptimizedCalculation(
+    () => {
+      return (
+        contractInformation?.children?.filter(
+          child =>
+            child?.medicalInformation?.healthStatus !== '' &&
+            child?.medicalInformation?.healthStatus != null &&
+            child?.medicalInformation?.instructions !== '' &&
+            child?.medicalInformation?.instructions != null
+        ).length || 0
+      );
+    },
+    [contractInformation?.children],
+    'medicalInfo'
+  );
 
-  const countChildrenWithFormulaInfo = useMemo(() => {
-    return (
-      contractInformation?.children?.filter(
-        child =>
-          child?.formulaInformation?.formula !== '' &&
-          child?.formulaInformation?.formula != null
-      ).length || 0
-    );
-  }, [contractInformation?.children]);
+  const countChildrenWithFormulaInfo = performanceOptimizer.useOptimizedCalculation(
+    () => {
+      return (
+        contractInformation?.children?.filter(
+          child =>
+            child?.formulaInformation?.formula !== '' &&
+            child?.formulaInformation?.formula != null
+        ).length || 0
+      );
+    },
+    [contractInformation?.children],
+    'formulaInfo'
+  );
 
-  const countChildrenWithPermissionsInfo = useMemo(() => {
-    return (
-      contractInformation?.children?.filter(child => {
-        const permissions = child?.permissionsInformation;
-        return (
-          permissions &&
-          Object.entries(permissions)
-            .filter(([key]) => key !== 'other')
-            .some(([, value]) => value === true)
-        );
-      }).length || 0
-    );
-  }, [contractInformation?.children]);
+  const countChildrenWithPermissionsInfo = performanceOptimizer.useOptimizedCalculation(
+    () => {
+      return (
+        contractInformation?.children?.filter(child => {
+          const permissions = child?.permissionsInformation;
+          return (
+            permissions &&
+            Object.entries(permissions)
+              .filter(([key]) => key !== 'other')
+              .some(([, value]) => value === true)
+          );
+        }).length || 0
+      );
+    },
+    [contractInformation?.children],
+    'permissionsInfo'
+  );
 
   const getStepClass = useCallback(
     (stepIndex: number) => {
