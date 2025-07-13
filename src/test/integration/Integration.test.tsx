@@ -5,6 +5,8 @@ import { renderWithProviders } from '../utils';
 import { Bills } from '../../components/bills/Bills';
 import { Contracts } from '../../components/contracts/Contracts';
 
+import ChildrenAPI from '../../models/ChildrenAPI';
+
 // Mock API modules
 vi.mock('../../models/ChildrenAPI', () => ({
   default: {
@@ -73,9 +75,9 @@ describe('Integration Tests', () => {
     });
 
     it('should handle API failures gracefully', async () => {
-      // Mock API failure (fix: use proper ES module import instead of CommonJS require)
+      // Mock API failure
       const mockError = new Error('API Error');
-      vi.mocked(require('../../models/ChildrenAPI').default.getChildren).mockRejectedValue(mockError);
+      vi.mocked(ChildrenAPI.getChildren).mockRejectedValue(mockError);
 
       renderWithProviders(<Bills />);
       

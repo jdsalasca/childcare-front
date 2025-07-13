@@ -3,7 +3,7 @@ import classNames from 'classnames'; // Ensure classNames is imported
 import { Button } from 'primereact/button'; // Ensure Button is imported from the correct location
 import { InputText } from 'primereact/inputtext'; // Ensure InputText is imported from the correct location
 import { Tooltip } from 'primereact/tooltip';
-import { FC, useCallback, memo, useEffect, useRef, useState } from 'react';
+import { FC, useCallback, memo, useEffect, useRef } from 'react';
 import { Controller } from 'react-hook-form';
 
 
@@ -85,11 +85,7 @@ const ChildFormField: FC<ChildFormFieldProps> = ({
         remove(index);
     }, [index, remove]);
     
-    // Function to convert input value to number or 0 if invalid
-    const toNumberOrZero = useCallback((value: string): number => {
-        const num = parseFloat(value);
-        return isNaN(num) ? 0 : num;
-    }, []);
+
 
     // Memoize the blur handler
     const handleBlur = useCallback(() => {

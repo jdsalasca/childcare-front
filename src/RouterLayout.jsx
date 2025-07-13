@@ -1,6 +1,6 @@
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom'
 import { Bills } from './components/bills/Bills'
-import { MigrateBills } from './components/bills/components/migrateBills/migrateBills'
+import { MigrateBills } from './components/bills/components/migrateBills/MigrateBills'
 import { Contracts } from './components/contracts/Contracts'
 import HomePage from './components/homepage/HomePage'
 import FormRegister from './components/users/register/register/FormRegister'
