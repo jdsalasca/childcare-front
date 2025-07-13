@@ -3,6 +3,8 @@ import { ApiResponse } from '@models/API';
 import UsersAPI, { User } from '@models/UsersAPI';
 import { customLogger } from 'configs/logger';
 import { SecurityService } from 'configs/storageUtils';
+import { errorHandler } from '../../utils/ErrorHandler';
+import { inputValidator } from '../../utils/InputValidation';
 import Lottie from 'lottie-react';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
@@ -106,6 +108,10 @@ const Login: React.FC = () => {
                 required: t('username_is_required'),
                 minLength: { value: 3, message: t('username_min_length') },
                 maxLength: { value: 20, message: t('username_max_length') },
+                validate: (value: string) => {
+                  const result = inputValidator.validate(value, inputValidator.getValidationRules().username, 'Username');
+                  return result.isValid || result.errors[0];
+                },
               }}
               label={t('userNameOrEmail')}
             />
@@ -114,6 +120,10 @@ const Login: React.FC = () => {
               control={control}
               rules={{
                 required: t('password_is_required'),
+                validate: (value: string) => {
+                  const result = inputValidator.validate(value, inputValidator.getValidationRules().password, 'Password');
+                  return result.isValid || result.errors[0];
+                },
               }}
               label={t('password')}
             />

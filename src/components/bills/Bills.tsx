@@ -15,6 +15,7 @@ import { programOptions } from '../contracts/utilsAndConstants';
 import Loader from '../utils/Loader';
 import { useBillsViewModel } from './viewModels/useBillsViewModel';
 import { Bill } from './viewModels/useBillsViewModel';
+import { inputValidator } from '../../utils/InputValidation';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -166,7 +167,12 @@ const BillCard: React.FC<{
                   })}
                   keyfilter='num'
                   value={field.value !== undefined ? field.value : ''}
-                  onChange={e => handleCashChange(e, field.onChange, 'cash')}
+                  onChange={e => {
+                    const result = inputValidator.validate(e.target.value, inputValidator.getValidationRules().currency, 'Cash Amount');
+                    if (result.isValid) {
+                      handleCashChange(e, field.onChange, 'cash');
+                    }
+                  }}
                   placeholder='0.00'
                 />
               )}
@@ -188,7 +194,12 @@ const BillCard: React.FC<{
                   })}
                   keyfilter='num'
                   value={field.value !== undefined ? field.value : ''}
-                  onChange={e => handleCashChange(e, field.onChange, 'check')}
+                  onChange={e => {
+                    const result = inputValidator.validate(e.target.value, inputValidator.getValidationRules().currency, 'Check Amount');
+                    if (result.isValid) {
+                      handleCashChange(e, field.onChange, 'check');
+                    }
+                  }}
                   placeholder='0.00'
                 />
               )}
