@@ -55,7 +55,7 @@ export class ApiResponseModel<T = unknown> implements ApiResponse<T> {
 
     if (typeof responseOrMessage === 'string') {
       this.message = responseOrMessage;
-      this.response = null as any; // or a default value if needed
+      this.response = null as T; // or a default value if needed
     } else {
       this.message = message;
       this.response = responseOrMessage as T;
@@ -63,13 +63,16 @@ export class ApiResponseModel<T = unknown> implements ApiResponse<T> {
   }
 }
 
+// Define proper types for request body
+type RequestBody = Record<string, unknown> | FormData | string | null;
+
 // Make the makeRequest method generic using <T>
 const makeRequest = async <T>(
   url: string,
   method: HttpMethod,
   endpoint: string,
   headers: Record<string, string> = {},
-  body?: any,
+  body?: RequestBody,
   options: RequestOptions = {},
   withPayload: boolean = false
 ): Promise<ApiResponse<T>> => {
@@ -135,15 +138,15 @@ const API = {
     return makeRequest<T>(url, 'GET', endpoint, {}, {}, options, withPayload);
   },
 
-  post<T>(url: string, endpoint: string, body: any, options?: RequestOptions) {
+  post<T>(url: string, endpoint: string, body: RequestBody, options?: RequestOptions) {
     return makeRequest<T>(url, 'POST', endpoint, {}, body, options);
   },
 
-  put<T>(url: string, endpoint: string, body: any, options?: RequestOptions) {
+  put<T>(url: string, endpoint: string, body: RequestBody, options?: RequestOptions) {
     return makeRequest<T>(url, 'PUT', endpoint, {}, body, options);
   },
 
-  patch<T>(url: string, endpoint: string, body: any, options?: RequestOptions) {
+  patch<T>(url: string, endpoint: string, body: RequestBody, options?: RequestOptions) {
     return makeRequest<T>(url, 'PATCH', endpoint, {}, body, options);
   },
 

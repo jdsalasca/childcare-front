@@ -1,20 +1,50 @@
-import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useFieldArray, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useForm, useFieldArray } from 'react-hook-form';
+import { ToastInterpreterUtils } from '../../utils/ToastInterpreterUtils';
 import { customLogger } from '../../../configs/logger';
 import { LoadingInfo } from '../../../models/AppModels';
-import { useBillTypesByCurrencyCode } from '../../../models/BillTypeAPI';
-import { useChildren } from '../../../models/ChildrenAPI';
+import { performanceOptimizer } from '../../../utils/PerformanceOptimizer';
+import { CashAPI } from '../../../models/CashAPI';
 import { CashOnHandByDyAPI } from '../../../models/CashOnHandByDyAPI';
 import CashRegisterAPI from '../../../models/CashRegisterAPI';
-import { CashAPI } from '../../../models/CashAPI';
-import { ToastInterpreterUtils } from '../../utils/ToastInterpreterUtils';
-import { exportToSummaryPDF } from '../utils/summaryPdf';
-import { exportBoxesToPDF } from '../utils/boxesPdf';
-import ErrorHandler from '../../../utils/errorHandler';
-import { performanceOptimizer } from '../../../utils/PerformanceOptimizer';
+import { useBillTypesByCurrencyCode } from '../../../models/BillTypeAPI';
+import { useChildren } from '../../../models/ChildrenAPI';
 
-// Types
+// Define proper types for bill types and closed money data
+export interface BillType {
+  id: number;
+  name: string;
+  currency_code: string;
+  [key: string]: unknown;
+}
+
+export interface ClosedMoneyData {
+  closing_details: Array<{
+    id: number;
+    amount: number;
+    description: string;
+    [key: string]: unknown;
+  }>;
+  opening_details: Array<{
+    id: number;
+    amount: number;
+    description: string;
+    [key: string]: unknown;
+  }>;
+  total_amount: number;
+  [key: string]: unknown;
+}
+
+export interface Child {
+  id: number;
+  childName?: string;
+  first_name: string;
+  last_name: string;
+  classroom?: string;
+  [key: string]: unknown;
+}
+
 export interface Bill {
   id?: string;
   child_id?: number; // Add numeric child_id for backend
@@ -26,7 +56,6 @@ export interface Bill {
   classroom?: string;
 }
 
-// Backend data structure for API
 interface BackendBill {
   id: number; // Numeric child_id for backend
   names?: string;
@@ -38,17 +67,17 @@ interface BackendBill {
 interface BackendFormValues {
   date?: Date;
   bills: BackendBill[];
-  billTypes: any[];
+  billTypes: BillType[];
   cashOnHand: number;
 }
 
 export interface FormValues {
   bills: Bill[];
-  billTypes: any[];
+  billTypes: BillType[];
   date?: Date;
   program?: string;
   cashOnHand: number;
-  closedMoneyData?: any; // Keep as any for now to match existing structure
+  closedMoneyData?: ClosedMoneyData; // Properly typed closed money data
   totalDeposit?: number;
   notes?: string;
 }
@@ -61,7 +90,7 @@ interface Sums {
   total_cash_on_hand: number;
 }
 
-const toNumber = (value: any): number => {
+const toNumber = (value: string | number | undefined): number => {
   if (typeof value === 'number') return value;
   if (typeof value === 'string' && value !== '') {
     const parsed = parseFloat(value);
@@ -108,7 +137,7 @@ export const useBillsViewModel = () => {
 
   // State
   const [exportableCount, setExportableCount] = useState<number>(0);
-  const [closedMoneyData, setClosedMoneyData] = useState<any>(null);
+  const [closedMoneyData, setClosedMoneyData] = useState<ClosedMoneyData | null>(null);
   const [loadingInfo, setLoadingInfo] = useState<LoadingInfo>({
     loading: false,
     loadingMessage: '',
@@ -127,7 +156,7 @@ export const useBillsViewModel = () => {
   // Refs for preventing excessive calculations
   const recalculateFieldsRef = useRef<boolean>(false);
   const lastSelectedDateRef = useRef<Date | null>(null);
-  const toast = useRef<any>(null);
+  const toast = useRef<{ current: { show: (message: unknown) => void } | null }>({ current: null });
   const recalculateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const updateIndicesTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -375,7 +404,7 @@ export const useBillsViewModel = () => {
       });
 
       // Create bills from children data directly to avoid dependency on childrenOptions
-      const billList: Bill[] = children.map((child: any, index: number) => ({
+      const billList: Bill[] = children.map((child: Child, index: number) => ({
         id: child.id?.toString() || `child_${index}`,
         originalIndex: index,
         names: child.childName || `${child.first_name} ${child.last_name}`,
@@ -493,7 +522,7 @@ export const useBillsViewModel = () => {
 
           // Transform existing bills to match our Bill interface
           const transformedBills: Bill[] = existingBills.map(
-            (bill: any, index: number) => ({
+            (bill: { id?: number; names?: string; cash?: number; check?: number; total?: number; classroom?: string; child_id?: number }, index: number) => ({
               id: bill.id?.toString() || `bill_${index}`,
               originalIndex: index,
               names: bill.names || '',

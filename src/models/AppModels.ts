@@ -57,22 +57,35 @@ export class HeaderProps {
   }
 }
 
+// Define proper types for toast functionality
+export interface ToastRef {
+  show: (message: ToastMessage) => void;
+  clear: () => void;
+}
+
+export interface ToastMessage {
+  severity: 'info' | 'success' | 'error' | 'warn';
+  summary: string;
+  detail?: string;
+  duration?: number;
+}
+
 /**
  * This class represents the toast interpreter model
- * @property {Object} _toast - The toast object
+ * @property {ToastRef | null} _toast - The toast object
  * @property {string} _summary - The summary of the toast message
  * @property {string} _detail - The detail of the toast message
  * @property {string} _severity - The severity of the toast message
  */
 export class ToastInterpreterModel {
-  private _toast: any = null; // Adjust type if you know the specific structure
+  private _toast: ToastRef | null = null;
   private _summary: string = '';
   private _detail: string = '';
   private _severity: string = '';
   private _duration: string = '';
 
   constructor(
-    toast: any,
+    toast: ToastRef | null,
     summary: string,
     detail: string,
     severity: string,
@@ -85,7 +98,7 @@ export class ToastInterpreterModel {
     this._duration = duration;
   }
 
-  set toast(toast: any) {
+  set toast(toast: ToastRef | null) {
     this._toast = toast;
   }
 
