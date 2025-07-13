@@ -472,26 +472,32 @@ export const useBillsViewModel = () => {
     async (date: Date): Promise<void> => {
       try {
         const formattedDate = date.toISOString().slice(0, 10);
-        
+
         // Try to load existing bills for the date
-        const existingBillsResponse = await CashAPI.getDetailsByDate(formattedDate);
-        
-        if (existingBillsResponse.httpStatus === 200 && existingBillsResponse.response) {
+        const existingBillsResponse =
+          await CashAPI.getDetailsByDate(formattedDate);
+
+        if (
+          existingBillsResponse.httpStatus === 200 &&
+          existingBillsResponse.response
+        ) {
           // If we have existing bills, use them
           const existingBills = existingBillsResponse.response.bills || [];
-          
+
           // Transform existing bills to match our Bill interface
-          const transformedBills: Bill[] = existingBills.map((bill: any, index: number) => ({
-            id: bill.id?.toString() || `bill_${index}`,
-            originalIndex: index,
-            names: bill.names || '',
-            cash: bill.cash || '',
-            check: bill.check || '',
-            total: bill.total || 0,
-            classroom: bill.classroom || '',
-            child_id: bill.child_id || 0,
-          }));
-          
+          const transformedBills: Bill[] = existingBills.map(
+            (bill: any, index: number) => ({
+              id: bill.id?.toString() || `bill_${index}`,
+              originalIndex: index,
+              names: bill.names || '',
+              cash: bill.cash || '',
+              check: bill.check || '',
+              total: bill.total || 0,
+              classroom: bill.classroom || '',
+              child_id: bill.child_id || 0,
+            })
+          );
+
           // Reset form with existing bills
           reset({
             bills: transformedBills,
@@ -567,57 +573,69 @@ export const useBillsViewModel = () => {
         });
       }
     },
-    [onHandlerSetCashOnHand, fetchClosedMoneyData, setLoadingInfo, setValue, t, loadBillsForDate]
+    [
+      onHandlerSetCashOnHand,
+      fetchClosedMoneyData,
+      setLoadingInfo,
+      setValue,
+      t,
+      loadBillsForDate,
+    ]
   );
 
   // Submit handler
-  const onSubmit = useCallback(async (data: FormValues) => {
-    try {
-      setLoadingInfo({
-        loading: true,
-        loadingMessage: t('processingBills')
-      });
+  const onSubmit = useCallback(
+    async (data: FormValues) => {
+      try {
+        setLoadingInfo({
+          loading: true,
+          loadingMessage: t('processingBills'),
+        });
 
-      // Transform data for backend
-      const backendData: BackendFormValues = {
-        date: data.date,
-        bills: data.bills.map(bill => ({
-          id: bill.child_id || 0, // Use numeric child_id, default to 0 if undefined
-          names: bill.names,
-          cash: toNumber(bill.cash),
-          check: toNumber(bill.check),
-          total: toNumber(bill.total)
-        })).filter(bill => (bill.cash > 0 || bill.check > 0)),
-        billTypes: data.billTypes || [],
-        cashOnHand: data.cashOnHand || 0
-      };
+        // Transform data for backend
+        const backendData: BackendFormValues = {
+          date: data.date,
+          bills: data.bills
+            .map(bill => ({
+              id: bill.child_id || 0, // Use numeric child_id, default to 0 if undefined
+              names: bill.names,
+              cash: toNumber(bill.cash),
+              check: toNumber(bill.check),
+              total: toNumber(bill.total),
+            }))
+            .filter(bill => bill.cash > 0 || bill.check > 0),
+          billTypes: data.billTypes || [],
+          cashOnHand: data.cashOnHand || 0,
+        };
 
-      // Call the backend API using the centralized CashAPI service
-      const result = await CashAPI.processCashData(backendData);
-      
-      if (toast.current) {
-        ToastInterpreterUtils.toastBackendInterpreter(
-          toast,
-          result,
-          t('billsProcessedSuccessfully'),
-          t('errorProcessingBills')
-        );
+        // Call the backend API using the centralized CashAPI service
+        const result = await CashAPI.processCashData(backendData);
+
+        if (toast.current) {
+          ToastInterpreterUtils.toastBackendInterpreter(
+            toast,
+            result,
+            t('billsProcessedSuccessfully'),
+            t('errorProcessingBills')
+          );
+        }
+      } catch (error) {
+        // Use standardized error handling
+        ErrorHandler.handleApiError(error, 'Bills submission', {
+          showToast: true,
+          toastRef: toast,
+          redirectOnAuthError: true,
+          logError: true,
+        });
+      } finally {
+        setLoadingInfo({
+          loading: false,
+          loadingMessage: '',
+        });
       }
-    } catch (error) {
-      // Use standardized error handling
-      ErrorHandler.handleApiError(error, 'Bills submission', {
-        showToast: true,
-        toastRef: toast,
-        redirectOnAuthError: true,
-        logError: true
-      });
-    } finally {
-      setLoadingInfo({
-        loading: false,
-        loadingMessage: ''
-      });
-    }
-  }, [t]);
+    },
+    [t]
+  );
 
   // PDF generation functions
   const onDownloadFirstPartPdf = useCallback(() => {
@@ -651,7 +669,7 @@ export const useBillsViewModel = () => {
         showToast: true,
         toastRef: toast,
         redirectOnAuthError: false,
-        logError: true
+        logError: true,
       });
     }
   }, [getValues, t, closedMoneyData]);
@@ -687,7 +705,7 @@ export const useBillsViewModel = () => {
         showToast: true,
         toastRef: toast,
         redirectOnAuthError: false,
-        logError: true
+        logError: true,
       });
     }
   }, [getValues, t, closedMoneyData]);
