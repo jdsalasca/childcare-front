@@ -14,6 +14,7 @@ import CalendarWrapper from '../../formsComponents/CalendarWrapper';
 import DropdownWrapper from '../../formsComponents/DropdownWrapper';
 import InputTextWrapper from '../../formsComponents/InputTextWrapper';
 import { ToastInterpreterUtils } from '../../utils/ToastInterpreterUtils';
+import { errorHandler } from '../../../utils/ErrorHandler';
 import { ContractService } from '../contractModelView';
 import { ContractInfo } from '../types/ContractInfo';
 import {
@@ -153,7 +154,7 @@ export const StepComponentOne: React.FC<StepComponentOneProps> = ({
         loading: false,
         loadingMessage: '',
       });
-      console.error('Error processing children data', error);
+      errorHandler.handleApiError(error, 'StepComponentOne.onHandlerChildBackendAsync');
       throw error;
     }
   };
@@ -212,11 +213,11 @@ export const StepComponentOne: React.FC<StepComponentOneProps> = ({
       });
       setActiveIndex(1);
     } catch (error) {
-      console.error('Error processing children data', error);
+      const errorInfo = errorHandler.handleApiError(error, 'StepComponentOne.onSubmit');
       toast?.current?.show({
         severity: 'error',
         summary: 'Error',
-        detail: t('childrenInfoSaveFailed'),
+        detail: errorHandler.getUserFriendlyMessage(error),
         life: 3000,
       });
     }

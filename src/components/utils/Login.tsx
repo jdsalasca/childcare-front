@@ -3,6 +3,7 @@ import { ApiResponse } from '@models/API';
 import UsersAPI, { User } from '@models/UsersAPI';
 import { customLogger } from 'configs/logger';
 import { SecurityService } from 'configs/storageUtils';
+import { errorHandler } from '../../utils/ErrorHandler';
 import Lottie from 'lottie-react';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
@@ -62,25 +63,25 @@ const Login: React.FC = () => {
         });
       }
     } catch (error) {
-      const errorcasted = error as ApiResponse<User>;
-      customLogger.error('error on login', error);
-
-      // Check if error response exists before accessing properties
-      if (errorcasted.response && errorcasted.response.errorType) {
-        if (errorcasted.response.errorType === 'username') {
-          setError('username', {
-            type: 'manual',
-            message: errorcasted.response.error || t('username_error'),
-          });
-        } else {
-          setError('password', {
-            type: 'manual',
-            message: errorcasted.response.error || t('password_error'),
-          });
-        }
+      const errorInfo = errorHandler.handleAuthError(error);
+      
+      // Handle specific error types
+      if (errorInfo.code === 'AUTH_ERROR' || errorInfo.status === 401) {
+        setError('password', {
+          type: 'manual',
+          message: t('password_error'),
+        });
+      } else if (errorInfo.code === 'username') {
+        setError('username', {
+          type: 'manual',
+          message: errorInfo.message || t('username_error'),
+        });
       } else {
         // General error fallback
-        setError('username', { type: 'manual', message: t('login_error') });
+        setError('username', { 
+          type: 'manual', 
+          message: errorHandler.getUserFriendlyMessage(error) 
+        });
       }
     } finally {
       setLoading(false);

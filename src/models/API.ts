@@ -1,5 +1,6 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { SecurityService } from 'configs/storageUtils';
+import { errorHandler } from '../utils/ErrorHandler';
 
 // Define the base URL for the API with fallback
 export const BASE_URL =
@@ -110,35 +111,32 @@ const makeRequest = async <T>(
       response: response.data,
       httpStatus: response.status,
     } as ApiResponse<T>;
-  } catch (error) {
-    let errorData: ErrorData = { response: null, httpStatus: 404 }; // Initialize response to null, httpStatus is optional
+      } catch (error: unknown) {
+      let errorData: ErrorData = { response: null, httpStatus: 404 };
 
-    if (axios.isAxiosError(error) && error.response) {
-      errorData.httpStatus = error.response.status; // This is where the error was occurring
+      if (axios.isAxiosError(error) && error.response) {
+        errorData.httpStatus = error.response.status;
 
-      if (error.response.status === 404) {
-        console.error('Record not found:', error.response.data);
-        errorData.response = error.response.data; // Error data for 404
-      } else if (error.response.status === 401) {
-        window.location.href = './session-expired';
-        return { response: null, httpStatus: 401 } as ApiResponse<T>;
+        if (error.response.status === 404) {
+          errorHandler.handleApiError(error, 'API.makeRequest.404');
+          errorData.response = error.response.data;
+        } else if (error.response.status === 401) {
+          window.location.href = './session-expired';
+          return { response: null, httpStatus: 401 } as ApiResponse<T>;
+        } else {
+          errorHandler.handleApiError(error, 'API.makeRequest');
+          errorData.response = error.response.data;
+        }
       } else {
-        console.error(`Error ${error.response.status}:`, error.response.data);
-        errorData.response = error.response.data; // General error data
+        // Handle network errors or other unexpected errors
+        errorHandler.handleApiError(error, 'API.makeRequest.network');
+        errorData.response =
+          error instanceof Error ? error.message : 'Unknown error';
       }
-    } else {
-      // Handle network errors or other unexpected errors
-      console.error(
-        'Network or other error:',
-        error instanceof Error ? error.message : 'Unknown error'
-      );
-      errorData.response =
-        error instanceof Error ? error.message : 'Unknown error';
-    }
 
-    // Optionally re-throw the error if needed for further handling
-    throw errorData;
-  }
+      // Optionally re-throw the error if needed for further handling
+      throw errorData;
+    }
 };
 
 // API object now can infer the type <T> from the makeRequest
