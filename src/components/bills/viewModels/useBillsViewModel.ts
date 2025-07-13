@@ -184,7 +184,7 @@ export const useBillsViewModel = () => {
 
       return () => clearTimeout(timeoutId);
     }
-  }, [cashOnHandValue]); // Remove calculateSums from dependencies to prevent infinite loop
+  }, [cashOnHandValue, billsFields, calculateSums]);
 
   // Optimized recalculation with debouncing
   const recalculateFields = useCallback(
