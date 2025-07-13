@@ -9,7 +9,7 @@ export class SecurityService {
   private constructor() {
     // Retrieve secret key from environment variables - fail fast if not configured
     const envSecretKey = import.meta.env.VITE_SECRET_KEY;
-    
+
     if (!envSecretKey) {
       console.warn(
         'VITE_SECRET_KEY environment variable is not set. Using fallback key for development.'
@@ -74,7 +74,7 @@ export class SecurityService {
   public getDecryptedItem(key: string): string | null {
     const encryptedValue = localStorage.getItem(key); // Retrieve by plain key
     if (!encryptedValue) return null;
-    
+
     const decrypted = this.decrypt(encryptedValue);
     return decrypted || null;
   }

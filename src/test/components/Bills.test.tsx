@@ -303,13 +303,13 @@ describe('Bills Component', () => {
       vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(
         createMockViewModel({
           filteredBills: [
-                         {
-               id: '1',
-               names: 'John Doe',
-               cash: '10.00',
-               check: '5.00',
-               total: 15.0,
-             },
+            {
+              id: '1',
+              names: 'John Doe',
+              cash: '10.00',
+              check: '5.00',
+              total: 15.0,
+            },
             {
               id: 2,
               names: 'Jane Smith',
@@ -961,20 +961,20 @@ describe('Bills Component', () => {
         createMockViewModel({
           exportableCount: 2,
           filteredBills: [
-                         {
-               id: '1',
-               names: 'John Doe',
-               cash: '10.00',
-               check: '5.00',
-               total: 15.0,
-             },
-             {
-               id: '2',
-               names: 'Jane Smith',
-               cash: '15.00',
-               check: '5.00',
-               total: 20.0,
-             },
+            {
+              id: '1',
+              names: 'John Doe',
+              cash: '10.00',
+              check: '5.00',
+              total: 15.0,
+            },
+            {
+              id: '2',
+              names: 'Jane Smith',
+              cash: '15.00',
+              check: '5.00',
+              total: 20.0,
+            },
           ],
         })
       );
@@ -1018,8 +1018,10 @@ describe('Bills Component', () => {
         exportableCount: 0,
         filteredBills: [],
       });
-      
-      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(mockViewModel);
+
+      vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(
+        mockViewModel
+      );
 
       renderWithProviders(<Bills />);
 
@@ -1145,7 +1147,9 @@ describe('Bills Component', () => {
     });
 
     it('handles form submission errors gracefully', async () => {
-      const onSubmitSpy = vi.fn().mockRejectedValue(new Error('Submission failed'));
+      const onSubmitSpy = vi
+        .fn()
+        .mockRejectedValue(new Error('Submission failed'));
       vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(
         createMockViewModel({ onSubmit: onSubmitSpy })
       );
@@ -1179,7 +1183,9 @@ describe('Bills Component', () => {
 
       renderWithProviders(<Bills />);
 
-      const searchInput = screen.getByPlaceholderText('bills.searchPlaceholder');
+      const searchInput = screen.getByPlaceholderText(
+        'bills.searchPlaceholder'
+      );
       await userEvent.type(searchInput, 'John');
 
       expect(setSearchTermSpy).toHaveBeenCalledWith('n'); // Last character
@@ -1269,13 +1275,17 @@ describe('Bills Component', () => {
 
       // Check for proper form labels
       expect(screen.getByLabelText('date')).toBeInTheDocument();
-      expect(screen.getByPlaceholderText('bills.searchPlaceholder')).toBeInTheDocument();
+      expect(
+        screen.getByPlaceholderText('bills.searchPlaceholder')
+      ).toBeInTheDocument();
     });
 
     it('supports keyboard navigation', async () => {
       renderWithProviders(<Bills />);
 
-      const searchInput = screen.getByPlaceholderText('bills.searchPlaceholder');
+      const searchInput = screen.getByPlaceholderText(
+        'bills.searchPlaceholder'
+      );
       searchInput.focus();
       expect(searchInput).toHaveFocus();
     });
@@ -1290,7 +1300,9 @@ describe('Bills Component', () => {
 
       renderWithProviders(<Bills />);
 
-      const searchInput = screen.getByPlaceholderText('bills.searchPlaceholder');
+      const searchInput = screen.getByPlaceholderText(
+        'bills.searchPlaceholder'
+      );
       await userEvent.type(searchInput, 'John');
 
       // Should be called for each character
@@ -1301,7 +1313,13 @@ describe('Bills Component', () => {
       const calculateSumsSpy = vi.fn();
       vi.mocked(useBillsViewModelModule.useBillsViewModel).mockReturnValue(
         createMockViewModel({
-          sums: { cash: 0, check: 0, total: 0, cash_on_hand: 0, total_cash_on_hand: 0 },
+          sums: {
+            cash: 0,
+            check: 0,
+            total: 0,
+            cash_on_hand: 0,
+            total_cash_on_hand: 0,
+          },
         })
       );
 

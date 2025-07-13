@@ -7,7 +7,6 @@ import { Calendar } from 'primereact/calendar';
 import { Toast } from 'primereact/toast';
 import { Card } from 'primereact/card';
 
-
 // Local constants for now
 const billTypes = [
   { id: 1, label: 'Hundred', name: 'Hundred', value: 100 },

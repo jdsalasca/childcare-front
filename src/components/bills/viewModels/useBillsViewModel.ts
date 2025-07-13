@@ -164,12 +164,9 @@ export const useBillsViewModel = () => {
   // Memoized children data - removed unused childrenOptions
 
   // Memoized sums calculation
-  const calculateSums = useCallback(
-    (bills: Bill[]): Sums => {
-      return createBillSums(bills, 0);
-    },
-    []
-  );
+  const calculateSums = useCallback((bills: Bill[]): Sums => {
+    return createBillSums(bills, 0);
+  }, []);
 
   // Watch for cashOnHand changes
   const cashOnHandValue = watch('cashOnHand');
@@ -180,7 +177,10 @@ export const useBillsViewModel = () => {
       const timeoutId = setTimeout(() => {
         const newSums = calculateSums(billsFields);
         setSums(newSums);
-        customLogger.debug('Sums recalculated due to cashOnHand change:', newSums);
+        customLogger.debug(
+          'Sums recalculated due to cashOnHand change:',
+          newSums
+        );
       }, 100); // Debounce the calculation
 
       return () => clearTimeout(timeoutId);
@@ -359,60 +359,68 @@ export const useBillsViewModel = () => {
   );
 
   // Optimized form initialization
-  const onStartForm = useCallback(async (preserveDate?: Date) => {
-    if (!children || !currenciesInformation) return;
+  const onStartForm = useCallback(
+    async (preserveDate?: Date) => {
+      if (!children || !currenciesInformation) return;
 
-    try {
-      setLoadingInfo({
-        loading: true,
-        loadingMessage: t('weAreLookingForChildrenInformation'),
-      });
+      try {
+        setLoadingInfo({
+          loading: true,
+          loadingMessage: t('weAreLookingForChildrenInformation'),
+        });
 
-      // Get current bills to preserve names if they exist
-      const currentBills = getValues('bills') || [];
+        // Get current bills to preserve names if they exist
+        const currentBills = getValues('bills') || [];
 
-      // Create bills from children data directly to avoid dependency on childrenOptions
-      const billList: Bill[] = children.map((child: any, index: number) => {
-        // Try to find existing bill with same child_id to preserve names
-        const existingBill = currentBills.find(bill => bill.child_id === child.id);
-        
-        return {
-          id: child.id?.toString() || `child_${index}`,
-          originalIndex: index,
-          names: existingBill?.names || child.childName || `${child.first_name} ${child.last_name}`,
-          cash: existingBill?.cash || '', // Preserve existing cash if available
-          check: existingBill?.check || '', // Preserve existing check if available
-          total: existingBill?.total || 0, // Preserve existing total if available
-          classroom: child.classroom || '',
-          child_id: child.id, // Add child_id for backend
-        };
-      });
+        // Create bills from children data directly to avoid dependency on childrenOptions
+        const billList: Bill[] = children.map((child: any, index: number) => {
+          // Try to find existing bill with same child_id to preserve names
+          const existingBill = currentBills.find(
+            bill => bill.child_id === child.id
+          );
 
-      reset({
-        bills: billList,
-        billTypes: currenciesInformation || [],
-        date: preserveDate || getValues('date'),
-        cashOnHand: getValues('cashOnHand') || 0.0,
-      });
+          return {
+            id: child.id?.toString() || `child_${index}`,
+            originalIndex: index,
+            names:
+              existingBill?.names ||
+              child.childName ||
+              `${child.first_name} ${child.last_name}`,
+            cash: existingBill?.cash || '', // Preserve existing cash if available
+            check: existingBill?.check || '', // Preserve existing check if available
+            total: existingBill?.total || 0, // Preserve existing total if available
+            classroom: child.classroom || '',
+            child_id: child.id, // Add child_id for backend
+          };
+        });
 
-      // Set initial sums and exportable count
-      setExportableCount(0);
-      setSums({
-        cash: 0,
-        check: 0,
-        total: 0,
-        cash_on_hand: getValues('cashOnHand') || 0,
-        total_cash_on_hand: 0,
-      });
-    } catch (error) {
-      customLogger.error('Error in onStartForm:', error);
-    } finally {
-      setLoadingInfo({
-        loading: false,
-        loadingMessage: '',
-      });
-    }
-  }, [children, currenciesInformation, reset, getValues, t]);
+        reset({
+          bills: billList,
+          billTypes: currenciesInformation || [],
+          date: preserveDate || getValues('date'),
+          cashOnHand: getValues('cashOnHand') || 0.0,
+        });
+
+        // Set initial sums and exportable count
+        setExportableCount(0);
+        setSums({
+          cash: 0,
+          check: 0,
+          total: 0,
+          cash_on_hand: getValues('cashOnHand') || 0,
+          total_cash_on_hand: 0,
+        });
+      } catch (error) {
+        customLogger.error('Error in onStartForm:', error);
+      } finally {
+        setLoadingInfo({
+          loading: false,
+          loadingMessage: '',
+        });
+      }
+    },
+    [children, currenciesInformation, reset, getValues, t]
+  );
 
   // Add new bill function
   const addNewBill = useCallback(() => {
@@ -473,7 +481,7 @@ export const useBillsViewModel = () => {
           // If we have existing bills, use them
           const existingBills =
             existingBillsResponse.response.child_cash_records || [];
-          
+
           customLogger.debug('Found existing bills:', existingBills.length);
 
           // Transform existing bills to match our Bill interface
@@ -501,7 +509,7 @@ export const useBillsViewModel = () => {
           // Recalculate sums and exportable count
           const newSums = calculateSums(transformedBills);
           setSums(newSums);
-          
+
           // Update exportable count for existing bills
           const count = transformedBills.filter(bill => {
             const cashNum = toNumber(bill.cash);
@@ -514,20 +522,29 @@ export const useBillsViewModel = () => {
           // If no existing bills, preserve current children names and just clear amounts
           if (!children || !currenciesInformation) return;
 
-          customLogger.debug('No existing bills found, preserving children names. Children count:', children.length);
+          customLogger.debug(
+            'No existing bills found, preserving children names. Children count:',
+            children.length
+          );
 
           // Get current bills to preserve names
           const currentBills = getValues('bills') || [];
-          
+
           // Create bills preserving existing names but clearing amounts
           const billList: Bill[] = children.map((child: any, index: number) => {
             // Try to find existing bill with same child_id to preserve names
-            const existingBill = currentBills.find(bill => bill.child_id === child.id);
-            
+            const existingBill = currentBills.find(
+              bill => bill.child_id === child.id
+            );
+
             return {
               id: child.id?.toString() || `child_${index}`,
               originalIndex: index,
-              names: existingBill?.names || child.childName || [child.first_name, child.last_name].filter(Boolean).join(' ') || 'Unnamed Child',
+              names:
+                existingBill?.names ||
+                child.childName ||
+                [child.first_name, child.last_name].filter(Boolean).join(' ') ||
+                'Unnamed Child',
               cash: '', // Always clear cash amount
               check: '', // Always clear check amount
               total: 0, // Always reset total
@@ -558,20 +575,29 @@ export const useBillsViewModel = () => {
         // Fallback to preserving children names
         if (!children || !currenciesInformation) return;
 
-        customLogger.debug('Error fallback: preserving children names. Children count:', children.length);
+        customLogger.debug(
+          'Error fallback: preserving children names. Children count:',
+          children.length
+        );
 
         // Get current bills to preserve names
         const currentBills = getValues('bills') || [];
-        
+
         // Create bills preserving existing names but clearing amounts
         const billList: Bill[] = children.map((child: any, index: number) => {
           // Try to find existing bill with same child_id to preserve names
-          const existingBill = currentBills.find(bill => bill.child_id === child.id);
-          
+          const existingBill = currentBills.find(
+            bill => bill.child_id === child.id
+          );
+
           return {
             id: child.id?.toString() || `child_${index}`,
             originalIndex: index,
-            names: existingBill?.names || child.childName || [child.first_name, child.last_name].filter(Boolean).join(' ') || 'Unnamed Child',
+            names:
+              existingBill?.names ||
+              child.childName ||
+              [child.first_name, child.last_name].filter(Boolean).join(' ') ||
+              'Unnamed Child',
             cash: '', // Clear cash amount
             check: '', // Clear check amount
             total: 0, // Reset total
@@ -638,8 +664,11 @@ export const useBillsViewModel = () => {
 
         // Get the updated cash on hand for the new date
         const updatedCashOnHand = await onHandlerSetCashOnHand(currentDateObj);
-        customLogger.debug('Updated cash on hand for new date:', updatedCashOnHand);
-        
+        customLogger.debug(
+          'Updated cash on hand for new date:',
+          updatedCashOnHand
+        );
+
         // Fetch closed money data
         await fetchClosedMoneyData(currentDateObj);
 
@@ -652,7 +681,10 @@ export const useBillsViewModel = () => {
           const currentBills = getValues('bills') || [];
           const newSums = calculateSums(currentBills);
           setSums(newSums);
-          customLogger.debug('Forced sums recalculation after date change:', newSums);
+          customLogger.debug(
+            'Forced sums recalculation after date change:',
+            newSums
+          );
         }, 50);
 
         setBlockContent(false);
