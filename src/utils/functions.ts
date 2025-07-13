@@ -51,7 +51,7 @@ static formatDateToYYYYMMDD(dateInput:string | Date ): string {
 
     // Check if date is invalid
     if (isNaN(date.getTime())) {
-        return '1970-01-01';
+        return '';
     }
 
     // Format the date as yyyy-mm-dd using UTC to avoid timezone issues

@@ -133,25 +133,36 @@ describe('Integration Tests', () => {
   describe('Error Boundary Integration', () => {
     it('should catch and display errors properly', () => {
       // This test verifies error boundaries work
+      class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean }> {
+        constructor(props: { children: React.ReactNode }) {
+          super(props);
+          this.state = { hasError: false };
+        }
+        static getDerivedStateFromError() {
+          return { hasError: true };
+        }
+        componentDidCatch() {}
+        render() {
+          if (this.state.hasError) {
+            return <div>Error caught</div>;
+          }
+          return this.props.children;
+        }
+      }
       const ThrowError = () => {
         throw new Error('Test error');
       };
-
       // Mock console.error to prevent test output noise
       const originalError = console.error;
       console.error = vi.fn();
-
       try {
-        const { container } = render(
-          <div>
+        const { getByText } = render(
+          <ErrorBoundary>
             <ThrowError />
-          </div>
+          </ErrorBoundary>
         );
-
-        // Should not crash the entire application
-        expect(container).toBeInTheDocument();
+        expect(getByText('Error caught')).toBeInTheDocument();
       } finally {
-        // Restore console.error
         console.error = originalError;
       }
     });
@@ -160,6 +171,15 @@ describe('Integration Tests', () => {
   describe('Performance Integration', () => {
     it('should handle basic operations without performance issues', async () => {
       const startTime = performance.now();
+      
+      // Reset the mock to return success for this test
+      vi.mocked(ChildrenAPI.getChildren).mockResolvedValue({
+        httpStatus: 200,
+        response: [
+          { id: 1, first_name: 'John', last_name: 'Doe', classroom: 'Toddler' },
+          { id: 2, first_name: 'Jane', last_name: 'Smith', classroom: 'Infant' }
+        ]
+      });
       
       // Simple operation that should be fast
       const result = await ChildrenAPI.getChildren();

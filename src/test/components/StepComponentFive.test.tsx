@@ -13,7 +13,19 @@ const mockDays = [
   { id: 2, name: 'Tuesday', translationLabel: 'tuesday', laboral_day: true, abbreviation: 'TUE', value: 2 }
 ];
 
-vi.mock('../../models/customHooks/useDays', () => () => ({ laboralDays: mockDays }));
+vi.mock('../../models/customHooks/useDays', () => ({
+  default: () => ({
+    days: [
+      { id: 1, name: 'Monday' },
+      { id: 2, name: 'Tuesday' }
+    ]
+  })
+}));
+
+const mockCreateContractSchedule = vi.fn();
+vi.mock('../../components/contracts/contractModelView', () => ({
+  ContractService: { createContractSchedule: mockCreateContractSchedule }
+}));
 
 const baseContractInfo = {
   contract_id: 42,
@@ -88,13 +100,6 @@ describe('StepComponentFive', () => {
   });
 
   it('sends correct payload to backend', async () => {
-    const mockCreateContractSchedule = vi.fn().mockResolvedValue([
-      { response: { day_id: 1, check_in: '09:00', check_out: '18:00' } },
-      { response: { day_id: 2, check_in: '10:00', check_out: '19:00' } }
-    ]);
-    vi.mock('../../components/contracts/contractModelView', () => ({
-      ContractService: { createContractSchedule: mockCreateContractSchedule }
-    }));
     render(
       <StepComponentFive
         setActiveIndex={mockSetActiveIndex}

@@ -14,7 +14,7 @@ export class Validations {
      * Validates phone numbers with various formats
      */
     static isValidPhone(phoneNumber: string): boolean {
-        const re = /^[\+]?[1-9][\d]{0,15}$/;
+        const re = /^[\+]?[1-9][\d]{9,15}$/;
         return re.test(String(phoneNumber).replace(/[\s\-\(\)]/g, ''));
     }
 

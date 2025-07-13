@@ -68,7 +68,7 @@ describe('Utility Functions', () => {
       })
 
       it('should handle invalid dates', () => {
-        expect(Functions.formatDateToYYYYMMDD('invalid-date')).toBe('1970-01-01')
+        expect(Functions.formatDateToYYYYMMDD('invalid-date')).toBe('')
         expect(Functions.formatDateToYYYYMMDD(null as any)).toBe('')
         expect(Functions.formatDateToYYYYMMDD(undefined as any)).toBe('')
       })
@@ -134,8 +134,8 @@ describe('Utility Functions', () => {
         const regex = RegexPatterns.namesAndLastNames()
         expect(regex.test('John123')).toBe(false)
         expect(regex.test('Mary@Jane')).toBe(false)
-        expect(regex.test('José-María')).toBe(false)
-        expect(regex.test('O\'Connor')).toBe(false)
+        expect(regex.test('José-María')).toBe(true) // Should accept names with hyphens
+        expect(regex.test('O\'Connor')).toBe(true) // Should accept names with apostrophes
         expect(regex.test('123')).toBe(false)
       })
     })

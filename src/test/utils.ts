@@ -284,4 +284,10 @@ export const cleanupAfterTest = () => {
 // Export all utilities
 export * from '@testing-library/react'
 export * from '@testing-library/user-event'
-export { vi } from 'vitest' 
+export { vi } from 'vitest'
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({ t: (key: string) => key }),
+  Trans: ({ children }: any) => children,
+  initReactI18next: { type: '3rdParty', init: () => {} },
+  I18nextProvider: ({ children }: any) => children,
+})); 
