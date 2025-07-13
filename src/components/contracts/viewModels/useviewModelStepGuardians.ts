@@ -256,7 +256,6 @@ const onCreateGuardian = async (data: Guardian): Promise<ExtendedGuardian | unde
         showToast('error', 'error', 'failedToSaveGuardians');
         return;
       }
-      console.log('updatedGuardians', updatedGuardians);
       
 
       // Create contract
@@ -296,8 +295,6 @@ const onCreateGuardian = async (data: Guardian): Promise<ExtendedGuardian | unde
     const selectedGuardian = guardianOptions.find(g => g.id === e.value);
     if (!selectedGuardian) return;
 
-    console.log("fields", fields);
-    console.log("selectedGuardian", selectedGuardian);
     
     const isGuardianAlreadyAdded = fields.some(
       guardian => guardian.value === selectedGuardian.id

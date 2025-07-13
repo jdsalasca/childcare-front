@@ -94,10 +94,6 @@ const StepComponentSeven: React.FC<StepComponentSevenProps> = ({
       // Instead of creating a new PDF, copy the original one for each child
       const childPdf = await PDFDocument.load(FormGob.contractVersion1); // Load a fresh copy for each child
       const childForm = childPdf.getForm();
-      console.log(
-        "childForm",
-        childForm.getFields().map((field) => field.getName())
-      );
 
       // Fill form fields for this child
       const currentDate = Functions.formatDateToMMDDYY(new Date());

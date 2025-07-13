@@ -53,8 +53,6 @@ const CombinedBillsForm = () => {
   const [totalSum, setTotalSum] = useState(0);
 
   const onSubmit = (data) => {
-    console.log("Combined Data:", data);
-
     if (totalSum <= 0) {
       toast.current.show({ severity: 'error', summary: t('bills.empty'), detail: t('bills.emptyDetail') });
       return;

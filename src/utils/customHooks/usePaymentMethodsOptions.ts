@@ -8,8 +8,6 @@ const usePaymentMethodsOptions = () => {
     const paymentMethodsOptions = useMemo(() => {
         if (!paymentMethods || isLoading) return [];
         
-        console.log("paymentMethods", paymentMethods);
-        
         return paymentMethods.response.map((paymentMethod) => ({
             ...paymentMethod,
             label: paymentMethod.translationLabel, // Adjust according to your data structure

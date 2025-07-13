@@ -16,7 +16,6 @@ const fatherEmail =
 contractData.guardians.find(g => g.guardian_type_id === _GUARDIAN_TYPE_ID)?.email || 
 (language === Language.English ? 'Not registered' : 'No registra');
   const schedule = contractData.schedule;
-  console.log('schedule', schedule);
   
   const DAYS: Record<number, { name: string; translationLabel: string }> = {
     1: { name: 'Monday', translationLabel: 'Monday' },

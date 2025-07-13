@@ -77,14 +77,11 @@ export class ContractService {
     }
     const childrenGuardians = new ChildrenGuardiansBuilder(children, guardians).build();
     const creations = childrenGuardians.map(childGuardian => {
-      console.log('childGuardian', childGuardian);
       return ChildrenGuardiansAPI.createChildrenGuardians(childGuardian);
     });
 
     const creationResponses = await Promise.all(creations);
 
-    console.log('childrenGuardiansBuilder', childrenGuardians);
-    console.log('creationResponses', creationResponses);
     return creationResponses;
   }
 
