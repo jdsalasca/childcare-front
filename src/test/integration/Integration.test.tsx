@@ -28,12 +28,12 @@ vi.mock('../../models/ChildrenAPI', () => ({
 }));
 
 vi.mock('../../models/BillTypeAPI', () => ({
-  useBillTypesByCurrencyCode: vi.fn().mockReturnValue({
-    data: [
-      { id: 1, label: '$100 Bill', value: 100 },
-      { id: 2, label: '$50 Bill', value: 50 },
-    ],
-  }),
+  default: {
+    getBillTypesByCurrencyCode: vi.fn().mockResolvedValue([
+      { id: 1, label: '$100', value: 100, currency_id: 1 },
+      { id: 2, label: '$50', value: 50, currency_id: 1 },
+    ]),
+  },
 }));
 
 // Mock react-query

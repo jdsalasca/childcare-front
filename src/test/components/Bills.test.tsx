@@ -1243,7 +1243,7 @@ describe('Bills Component', () => {
       expect(screen.getByText('bills.summary')).toBeInTheDocument();
       expect(screen.getByText('bills.totalCash')).toBeInTheDocument();
       expect(screen.getByText('bills.totalCheck')).toBeInTheDocument();
-      expect(screen.getByText('bills.total')).toBeInTheDocument();
+      expect(screen.getAllByText('bills.total')).toHaveLength(2); // One in header, one in summary
     });
 
     it('displays closed money data when available', () => {
@@ -1327,7 +1327,7 @@ describe('Bills Component', () => {
       renderWithProviders(<Bills />); // Re-render
 
       // Sums should be calculated efficiently
-      expect(screen.getByText('bills.summary')).toBeInTheDocument();
+      expect(screen.getAllByText('bills.summary')).toHaveLength(2); // Multiple summary sections
     });
   });
 });

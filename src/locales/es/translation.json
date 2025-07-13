@@ -474,6 +474,19 @@
     "closingUpdatedSuccessfully": "Cierre actualizado exitosamente",
     "updateError": "Error al actualizar",
     "validation": "Validación",
-    "success": "Éxito"
+    "success": "Éxito",
+    "editRegister": "Editar Registro",
+    "closeRegister": "Cerrar Registro",
+    "formDescription": "Gestionar operaciones de caja registradora para la fecha seleccionada",
+    "billsManagement": "Gestión de Billetes",
+    "billType": "Tipo de Billete",
+    "selectBillType": "Seleccionar tipo de billete",
+    "total": "Total",
+    "totalAmount": "Monto Total",
+    "noBillsAdded": "Aún no se han agregado billetes",
+    "confirmCancelForm": "¿Está seguro de que desea cancelar? Todos los datos ingresados se perderán.",
+    "confirmCancelFormHeader": "Cancelar Formulario",
+    "cashierRequired": "Por favor seleccione un cajero",
+    "pleaseLogin": "Por favor inicie sesión para acceder a esta función"
   }
 }

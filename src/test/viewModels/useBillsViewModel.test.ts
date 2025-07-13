@@ -22,16 +22,16 @@ vi.mock('../../../configs/logger', () => ({
 }));
 
 vi.mock('../../../models/BillTypeAPI', () => ({
-  useBillTypesByCurrencyCode: () => ({
-    data: [
-      { id: 1, label: '$100', value: 100 },
-      { id: 2, label: '$50', value: 50 },
-      { id: 3, label: '$20', value: 20 },
-      { id: 4, label: '$10', value: 10 },
-      { id: 5, label: '$5', value: 5 },
-      { id: 6, label: '$1', value: 1 },
-    ],
-  }),
+  default: {
+    getBillTypesByCurrencyCode: vi.fn().mockResolvedValue([
+      { id: 1, label: '$100', value: 100, currency_id: 1 },
+      { id: 2, label: '$50', value: 50, currency_id: 1 },
+      { id: 3, label: '$20', value: 20, currency_id: 1 },
+      { id: 4, label: '$10', value: 10, currency_id: 1 },
+      { id: 5, label: '$5', value: 5, currency_id: 1 },
+      { id: 6, label: '$1', value: 1, currency_id: 1 },
+    ]),
+  },
 }));
 
 vi.mock('../../../models/ChildrenAPI', () => ({

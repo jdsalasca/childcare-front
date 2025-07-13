@@ -478,6 +478,19 @@
     "closingUpdatedSuccessfully": "Closing updated successfully",
     "updateError": "Error updating",
     "validation": "Validation",
-    "success": "Success"
+    "success": "Success",
+    "editRegister": "Edit Register",
+    "closeRegister": "Close Register",
+    "formDescription": "Manage cash register operations for the selected date",
+    "billsManagement": "Bills Management",
+    "billType": "Bill Type",
+    "selectBillType": "Select bill type",
+    "total": "Total",
+    "totalAmount": "Total Amount",
+    "noBillsAdded": "No bills added yet",
+    "confirmCancelForm": "Are you sure you want to cancel? All entered data will be lost.",
+    "confirmCancelFormHeader": "Cancel Form",
+    "cashierRequired": "Please select a cashier",
+    "pleaseLogin": "Please log in to access this feature"
   }
 }

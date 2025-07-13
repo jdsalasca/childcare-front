@@ -1,373 +1,368 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { Card } from 'primereact/card';
+import { ProgressSpinner } from 'primereact/progressspinner';
+import { Message } from 'primereact/message';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Tag } from 'primereact/tag';
 import { Button } from 'primereact/button';
-import { ProgressSpinner } from 'primereact/progressspinner';
-import { Message } from 'primereact/message';
 import { Divider } from 'primereact/divider';
 import CashRegisterAPI from '../../../models/CashRegisterAPI';
-import {
-  RegisterDetailsResponse,
-  BillDetail,
-} from '../../../types/cashRegister';
-import EditOpenRegisterForm from './EditOpenRegisterForm';
+import { RegisterDetailsResponse } from '../../../types/cashRegister';
+import { formatCurrency, getStatusIcon } from './constants';
 
-interface Props {
+interface RegisterDetailsPanelProps {
   date: string;
 }
 
-const RegisterDetailsPanel: React.FC<Props> = ({ date }) => {
+const RegisterDetailsPanel: React.FC<RegisterDetailsPanelProps> = ({
+  date,
+}) => {
   const { t } = useTranslation();
-  const [editingOpening, setEditingOpening] = useState(false);
-  const [editingClosing, setEditingClosing] = useState(false);
 
   const {
     data: detailsData,
     isLoading,
     isError,
-  } = useQuery<RegisterDetailsResponse>({
+  } = useQuery({
     queryKey: ['cashRegisterDetails', date],
     queryFn: () => CashRegisterAPI.getDetails(date),
-    enabled: !!date,
   });
+
+  const hasData = (data: any): data is RegisterDetailsResponse => {
+    return data && typeof data === 'object' && 'data' in data;
+  };
 
   if (isLoading) {
     return (
-      <Card>
-        <div className='flex items-center justify-center py-8'>
+      <Card className='shadow-sm'>
+        <div className='flex items-center justify-center py-12'>
           <ProgressSpinner style={{ width: '50px', height: '50px' }} />
           <span className='ml-3 text-gray-600'>
-            {t('cashRegister.loading')}
+            {t('cashRegister.loadingDetails')}
           </span>
         </div>
       </Card>
     );
   }
 
-  if (isError || !detailsData?.success || !detailsData.data) {
+  if (isError) {
     return (
-      <Card>
+      <Card className='shadow-sm'>
         <Message
           severity='error'
-          text={t('cashRegister.error')}
+          text={t('cashRegister.errorLoadingDetails')}
           className='w-full'
         />
       </Card>
     );
   }
 
+  if (!hasData(detailsData) || !detailsData.data) {
+    return (
+      <Card className='shadow-sm'>
+        <div className='text-center py-12'>
+          <div className='text-gray-400 mb-4'>
+            <i className='pi pi-exclamation-triangle text-6xl'></i>
+          </div>
+          <h3 className='text-xl font-medium text-gray-600 mb-2'>
+            {t('cashRegister.noDetailsFound')}
+          </h3>
+          <p className='text-gray-500'>{t('cashRegister.tryAnotherDate')}</p>
+        </div>
+      </Card>
+    );
+  }
+
   const { data } = detailsData;
+  const { opening, closing, summary, status } = data;
 
-  const formatDateTime = (timeString: string) => {
-    return new Date(timeString).toLocaleString();
-  };
-
-  const formatCurrency = (amount: number | string) => {
-    const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: data.summary?.currency || 'USD',
-    }).format(numAmount);
-  };
-
-  const getDifferenceSeverity = (diff: number) => {
-    if (diff > 0) return 'success';
-    if (diff < 0) return 'danger';
-    return 'info';
-  };
-
-  const getDifferenceLabel = (diff: number) => {
-    if (diff > 0) return t('cashRegister.positiveDifference');
-    if (diff < 0) return t('cashRegister.negativeDifference');
-    return t('cashRegister.noDifference');
-  };
-
-  const billDetailColumns = [
-    {
-      field: 'bill_label',
-      header: t('cashRegister.denomination'),
-      body: (rowData: BillDetail) => (
-        <span className='font-medium'>{rowData.bill_label}</span>
-      ),
-    },
-    {
-      field: 'quantity',
-      header: t('cashRegister.quantity'),
-      body: (rowData: BillDetail) => (
-        <span className='text-center block font-medium'>
-          {rowData.quantity}
-        </span>
-      ),
-    },
-    {
-      field: 'bill_value',
-      header: t('cashRegister.unitValue'),
-      body: (rowData: BillDetail) => (
-        <span className='text-blue-700 font-medium'>
-          {formatCurrency(parseFloat(rowData.bill_value))}
-        </span>
-      ),
-    },
-    {
-      field: 'total_amount',
-      header: t('cashRegister.subtotal'),
-      body: (rowData: BillDetail) => (
-        <span className='font-bold text-green-700'>
-          {formatCurrency(parseFloat(rowData.total_amount))}
-        </span>
-      ),
-    },
-  ];
-
-  return (
-    <div className='space-y-6'>
-      {/* Header */}
-      <div className='text-center'>
-        <h3 className='text-2xl font-bold text-gray-800 mb-2'>
-          {t('cashRegister.viewDetails')}
-        </h3>
-        <p className='text-gray-600'>
-          {t('cashRegister.date')}: <span className='font-medium'>{date}</span>
-        </p>
-        <div className='mt-2'>
+  const renderStatusSection = () => (
+    <Card className='mb-6 shadow-sm border-l-4 border-l-blue-500'>
+      <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4'>
+        <div className='flex items-center gap-4'>
+          <div className='flex-shrink-0'>
+            <div
+              className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                status.status === 'not_started'
+                  ? 'bg-yellow-100'
+                  : status.status === 'opened'
+                    ? 'bg-blue-100'
+                    : 'bg-green-100'
+              }`}
+            >
+              <i
+                className={`pi ${getStatusIcon(status.status)} text-xl ${
+                  status.status === 'not_started'
+                    ? 'text-yellow-600'
+                    : status.status === 'opened'
+                      ? 'text-blue-600'
+                      : 'text-green-600'
+                }`}
+              ></i>
+            </div>
+          </div>
+          <div>
+            <h3 className='text-lg font-semibold text-gray-800'>
+              {t(`cashRegister.status_${status.status}`)}
+            </h3>
+            <p className='text-sm text-gray-600'>
+              {new Date(date).toLocaleDateString()}
+            </p>
+          </div>
+        </div>
+        <div className='flex items-center gap-2'>
           <Tag
-            value={t(`cashRegister.status_${data.status.status}`)}
-            severity='success'
-            className='text-sm'
+            value={t(`cashRegister.status_${status.status}`)}
+            severity={
+              status.status === 'not_started'
+                ? 'warning'
+                : status.status === 'opened'
+                  ? 'info'
+                  : 'success'
+            }
+            className='text-sm font-medium'
           />
         </div>
       </div>
+    </Card>
+  );
 
-      <Divider />
+  const renderOpeningSection = () => {
+    if (!opening) return null;
 
-      {/* Daily Summary */}
-      <Card className='bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200'>
-        <h4 className='text-lg font-semibold text-gray-800 mb-4 text-center'>
-          {t('cashRegister.dailySummary')}
-        </h4>
-        <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
-          <div className='text-center'>
-            <h5 className='text-sm font-medium text-gray-600 mb-1'>
-              {t('cashRegister.openingAmount')}
-            </h5>
-            <p className='text-2xl font-bold text-blue-800'>
-              {formatCurrency(data.summary.opening_total)}
-            </p>
-            <p className='text-xs text-gray-500 mt-1'>
-              {formatDateTime(data.status.opening_time)}
-            </p>
-          </div>
-          <div className='text-center'>
-            <h5 className='text-sm font-medium text-gray-600 mb-1'>
-              {t('cashRegister.closingAmount')}
-            </h5>
-            <p className='text-2xl font-bold text-green-800'>
-              {formatCurrency(data.summary.closing_total)}
-            </p>
-            <p className='text-xs text-gray-500 mt-1'>
-              {formatDateTime(data.status.closing_time)}
-            </p>
-          </div>
-          <div className='text-center'>
-            <h5 className='text-sm font-medium text-gray-600 mb-1'>
-              {t('cashRegister.dailyDifference')}
-            </h5>
-            <Tag
-              value={formatCurrency(data.summary.difference)}
-              severity={getDifferenceSeverity(data.summary.difference)}
-              className='text-lg font-bold'
-            />
-            <p className='text-sm text-gray-500 mt-1'>
-              {getDifferenceLabel(data.summary.difference)}
-            </p>
+    return (
+      <Card className='mb-6 shadow-sm border-l-4 border-l-blue-500'>
+        <div className='mb-4'>
+          <h3 className='text-lg font-semibold text-gray-800 mb-2'>
+            {t('cashRegister.openingDetails')}
+          </h3>
+          <div className='flex items-center gap-2 text-sm text-gray-600'>
+            <i className='pi pi-user'></i>
+            <span>{opening.cashier.name}</span>
+            <span>•</span>
+            <i className='pi pi-clock'></i>
+            <span>{new Date(opening.time).toLocaleTimeString()}</span>
           </div>
         </div>
-      </Card>
 
-      {/* Opening Information */}
-      {data.opening && (
-        <Card>
-          {editingOpening ? (
-            <EditOpenRegisterForm
-              date={date}
-              currentData={{
-                cashier: data.opening.cashier,
-                details: data.opening.details,
-              }}
-              onSuccess={() => {
-                setEditingOpening(false);
-                // Refetch data
-                window.location.reload(); // Simple way to refresh data
-              }}
-              onCancel={() => setEditingOpening(false)}
-            />
-          ) : (
-            <>
-              <div className='mb-4'>
-                <h4 className='text-xl font-semibold text-gray-800 mb-3 flex items-center justify-between'>
-                  <span className='flex items-center'>
-                    <i className='pi pi-play-circle text-blue-600 mr-2'></i>
-                    {t('cashRegister.opening')}
-                  </span>
-                  <Button
-                    icon='pi pi-pencil'
-                    label={t('cashRegister.edit')}
-                    className='p-button-sm p-button-outlined'
-                    onClick={() => setEditingOpening(true)}
-                    disabled={editingOpening}
-                  />
-                </h4>
-                <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 bg-blue-50 p-4 rounded-lg'>
-                  <div>
-                    <span className='text-sm font-medium text-gray-600'>
-                      {t('cashRegister.cashier')}:
-                    </span>
-                    <p className='text-gray-800 font-medium'>
-                      {data.opening.cashier.name}
-                    </p>
-                  </div>
-                  <div>
-                    <span className='text-sm font-medium text-gray-600'>
-                      {t('cashRegister.time')}:
-                    </span>
-                    <p className='text-gray-800 font-medium'>
-                      {formatDateTime(data.opening.time)}
-                    </p>
-                  </div>
-                  <div>
-                    <span className='text-sm font-medium text-gray-600'>
-                      {t('cashRegister.total')}:
-                    </span>
-                    <p className='text-gray-800 font-bold text-lg'>
-                      {formatCurrency(data.opening.total_amount)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <DataTable
-                value={data.opening.details}
-                className='border rounded-lg overflow-hidden'
-                stripedRows
-                emptyMessage={t('cashRegister.noData')}
-              >
-                {billDetailColumns.map((col, index) => (
-                  <Column
-                    key={index}
-                    field={col.field}
-                    header={col.header}
-                    body={col.body}
-                  />
-                ))}
-              </DataTable>
-            </>
-          )}
-        </Card>
-      )}
-
-      {/* Closing Information */}
-      {data.closing && (
-        <Card>
-          <div className='mb-4'>
-            <h4 className='text-xl font-semibold text-gray-800 mb-3 flex items-center justify-between'>
-              <span className='flex items-center'>
-                <i className='pi pi-stop-circle text-red-600 mr-2'></i>
-                {t('cashRegister.closing')}
-              </span>
-              <Button
-                icon='pi pi-pencil'
-                label={t('cashRegister.edit')}
-                className='p-button-sm p-button-outlined'
-                onClick={() => setEditingClosing(true)}
-                disabled={editingClosing}
-              />
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+          <div>
+            <h4 className='text-sm font-medium text-gray-700 mb-3'>
+              {t('cashRegister.billsBreakdown')}
             </h4>
-            <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 bg-green-50 p-4 rounded-lg'>
-              <div>
-                <span className='text-sm font-medium text-gray-600'>
-                  {t('cashRegister.cashier')}:
-                </span>
-                <p className='text-gray-800 font-medium'>
-                  {data.closing.cashier.name}
+            <DataTable
+              value={opening.details}
+              className='text-sm'
+              emptyMessage={t('cashRegister.noBillsFound')}
+            >
+              <Column
+                field='bill_label'
+                header={t('cashRegister.denomination')}
+                body={rowData => (
+                  <span className='font-medium'>{rowData.bill_label}</span>
+                )}
+              />
+              <Column
+                field='quantity'
+                header={t('cashRegister.quantity')}
+                body={rowData => (
+                  <span className='text-right'>{rowData.quantity}</span>
+                )}
+              />
+              <Column
+                field='total_amount'
+                header={t('cashRegister.total')}
+                body={rowData => (
+                  <span className='font-medium text-blue-600'>
+                    {formatCurrency(Number(rowData.total_amount))}
+                  </span>
+                )}
+              />
+            </DataTable>
+          </div>
+
+          <div className='flex flex-col justify-center'>
+            <div className='bg-blue-50 border border-blue-200 rounded-lg p-4'>
+              <div className='text-center'>
+                <p className='text-sm text-gray-600 mb-1'>
+                  {t('cashRegister.totalOpeningAmount')}
                 </p>
-              </div>
-              <div>
-                <span className='text-sm font-medium text-gray-600'>
-                  {t('cashRegister.time')}:
-                </span>
-                <p className='text-gray-800 font-medium'>
-                  {formatDateTime(data.closing.time)}
-                </p>
-              </div>
-              <div>
-                <span className='text-sm font-medium text-gray-600'>
-                  {t('cashRegister.total')}:
-                </span>
-                <p className='text-gray-800 font-bold text-lg'>
-                  {formatCurrency(data.closing.total_amount)}
+                <p className='text-3xl font-bold text-blue-800'>
+                  {formatCurrency(opening.total_amount)}
                 </p>
               </div>
             </div>
           </div>
+        </div>
+      </Card>
+    );
+  };
 
-          <DataTable
-            value={data.closing.details}
-            className='border rounded-lg overflow-hidden'
-            stripedRows
-            emptyMessage={t('cashRegister.noData')}
-          >
-            {billDetailColumns.map((col, index) => (
+  const renderClosingSection = () => {
+    if (!closing) return null;
+
+    return (
+      <Card className='mb-6 shadow-sm border-l-4 border-l-green-500'>
+        <div className='mb-4'>
+          <h3 className='text-lg font-semibold text-gray-800 mb-2'>
+            {t('cashRegister.closingDetails')}
+          </h3>
+          <div className='flex items-center gap-2 text-sm text-gray-600'>
+            <i className='pi pi-user'></i>
+            <span>{closing.cashier.name}</span>
+            <span>•</span>
+            <i className='pi pi-clock'></i>
+            <span>{new Date(closing.time).toLocaleTimeString()}</span>
+          </div>
+        </div>
+
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+          <div>
+            <h4 className='text-sm font-medium text-gray-700 mb-3'>
+              {t('cashRegister.billsBreakdown')}
+            </h4>
+            <DataTable
+              value={closing.details}
+              className='text-sm'
+              emptyMessage={t('cashRegister.noBillsFound')}
+            >
               <Column
-                key={index}
-                field={col.field}
-                header={col.header}
-                body={col.body}
+                field='bill_label'
+                header={t('cashRegister.denomination')}
+                body={rowData => (
+                  <span className='font-medium'>{rowData.bill_label}</span>
+                )}
               />
-            ))}
-          </DataTable>
-        </Card>
-      )}
+              <Column
+                field='quantity'
+                header={t('cashRegister.quantity')}
+                body={rowData => (
+                  <span className='text-right'>{rowData.quantity}</span>
+                )}
+              />
+              <Column
+                field='total_amount'
+                header={t('cashRegister.total')}
+                body={rowData => (
+                  <span className='font-medium text-green-600'>
+                    {formatCurrency(Number(rowData.total_amount))}
+                  </span>
+                )}
+              />
+            </DataTable>
+          </div>
 
-      {/* Additional Information */}
-      <Card className='bg-gray-50'>
-        <h4 className='text-lg font-semibold text-gray-800 mb-3'>
-          {t('cashRegister.additionalInfo')}
-        </h4>
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-4 text-sm'>
-          <div>
-            <span className='font-medium text-gray-600'>
-              {t('cashRegister.recordId')}:
-            </span>
-            <span className='ml-2 text-gray-800'>#{data.record_id}</span>
-          </div>
-          <div>
-            <span className='font-medium text-gray-600'>
-              {t('cashRegister.currency')}:
-            </span>
-            <span className='ml-2 text-gray-800'>{data.summary.currency}</span>
-          </div>
-          <div>
-            <span className='font-medium text-gray-600'>
-              {t('cashRegister.openingCashier')}:
-            </span>
-            <span className='ml-2 text-gray-800'>
-              {data.status.opening_cashier.name}
-            </span>
-          </div>
-          <div>
-            <span className='font-medium text-gray-600'>
-              {t('cashRegister.closingCashier')}:
-            </span>
-            <span className='ml-2 text-gray-800'>
-              {data.status.closing_cashier.name}
-            </span>
+          <div className='flex flex-col justify-center'>
+            <div className='bg-green-50 border border-green-200 rounded-lg p-4'>
+              <div className='text-center'>
+                <p className='text-sm text-gray-600 mb-1'>
+                  {t('cashRegister.totalClosingAmount')}
+                </p>
+                <p className='text-3xl font-bold text-green-800'>
+                  {formatCurrency(closing.total_amount)}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </Card>
+    );
+  };
+
+  const renderSummarySection = () => {
+    if (!summary) return null;
+
+    const difference = summary.closing_total - summary.opening_total;
+    const isPositive = difference >= 0;
+
+    return (
+      <Card className='shadow-sm border-l-4 border-l-purple-500'>
+        <div className='mb-4'>
+          <h3 className='text-lg font-semibold text-gray-800'>
+            {t('cashRegister.summary')}
+          </h3>
+        </div>
+
+        <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+          <div className='bg-blue-50 border border-blue-200 rounded-lg p-4'>
+            <div className='text-center'>
+              <p className='text-sm text-gray-600 mb-1'>
+                {t('cashRegister.openingTotal')}
+              </p>
+              <p className='text-2xl font-bold text-blue-800'>
+                {formatCurrency(summary.opening_total)}
+              </p>
+            </div>
+          </div>
+
+          <div className='bg-green-50 border border-green-200 rounded-lg p-4'>
+            <div className='text-center'>
+              <p className='text-sm text-gray-600 mb-1'>
+                {t('cashRegister.closingTotal')}
+              </p>
+              <p className='text-2xl font-bold text-green-800'>
+                {formatCurrency(summary.closing_total)}
+              </p>
+            </div>
+          </div>
+
+          <div
+            className={`border rounded-lg p-4 ${
+              isPositive
+                ? 'bg-green-50 border-green-200'
+                : 'bg-red-50 border-red-200'
+            }`}
+          >
+            <div className='text-center'>
+              <p className='text-sm text-gray-600 mb-1'>
+                {t('cashRegister.difference')}
+              </p>
+              <p
+                className={`text-2xl font-bold ${
+                  isPositive ? 'text-green-800' : 'text-red-800'
+                }`}
+              >
+                {formatCurrency(difference)}
+              </p>
+              <p
+                className={`text-xs mt-1 ${
+                  isPositive ? 'text-green-600' : 'text-red-600'
+                }`}
+              >
+                {isPositive
+                  ? t('cashRegister.surplus')
+                  : t('cashRegister.shortage')}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <Divider />
+
+        <div className='flex justify-center'>
+          <Button
+            icon='pi pi-download'
+            label={t('cashRegister.exportReport')}
+            className='p-button-outlined'
+            onClick={() => {
+              // TODO: Implement export functionality
+              console.log('Export report for date:', date);
+            }}
+          />
+        </div>
+      </Card>
+    );
+  };
+
+  return (
+    <div className='space-y-6'>
+      {renderStatusSection()}
+      {renderOpeningSection()}
+      {renderClosingSection()}
+      {renderSummarySection()}
     </div>
   );
 };

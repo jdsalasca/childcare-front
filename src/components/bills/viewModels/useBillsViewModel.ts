@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { customLogger } from '../../../configs/logger';
 import { LoadingInfo } from '../../../models/AppModels';
-import { useBillTypesByCurrencyCode } from '../../../models/BillTypeAPI';
+import BillTypeAPI from '../../../models/BillTypeAPI';
 import { useChildren } from '../../../models/ChildrenAPI';
 import CashRegisterAPI from '../../../models/CashRegisterAPI';
 import { CashAPI } from '../../../models/CashAPI';
@@ -131,7 +131,20 @@ export const useBillsViewModel = () => {
   const updateIndicesTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // API hooks
-  const { data: currenciesInformation } = useBillTypesByCurrencyCode('USD');
+  const [currenciesInformation, setCurrenciesInformation] = useState<any[]>([]);
+
+  // Load bill types on component mount
+  useEffect(() => {
+    const loadBillTypes = async () => {
+      try {
+        const billTypes = await BillTypeAPI.getBillTypesByCurrencyCode('USD');
+        setCurrenciesInformation(billTypes);
+      } catch (error) {
+        console.error('Error loading bill types:', error);
+      }
+    };
+    loadBillTypes();
+  }, []);
   const { data: children } = useChildren();
 
   // Form setup
