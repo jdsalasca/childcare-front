@@ -1,5 +1,6 @@
 import { ChildType } from "types/child";
 import { Guardian } from "types/guardian";
+import { ContractPermission } from "../../../types/contractPermission";
 
 export interface WorkInformation {
   employer: string;

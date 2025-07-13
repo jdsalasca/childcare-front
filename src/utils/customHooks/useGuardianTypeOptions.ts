@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { useGuardianTypes } from '../../models/cache/useGuardianTypesCache';
+import { GuardianType } from '../../types/guardianType';
 
 const useGuardianTypeOptions = () => {
   const { data: guardianTypes, error, isLoading } = useGuardianTypes();

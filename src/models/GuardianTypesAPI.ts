@@ -1,4 +1,5 @@
 import API, { ApiResponse, BASE_URL } from "./API";
+import { GuardianType } from "../types/guardianType";
 
 
 const GuardianTypesAPI = {

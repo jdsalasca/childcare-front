@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDaysCache } from "../DaysAPI";
+import { DayType } from "../../types/day";
 
 
 const useDays = () => {

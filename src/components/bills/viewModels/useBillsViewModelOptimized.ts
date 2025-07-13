@@ -206,7 +206,7 @@ export const useBillsViewModelOptimized = () => {
   }, [getValues, debouncedRecalculate]);
 
   // Optimized bill update function
-  const onRecalculateAll = useCallback((index: number, bill: OptimizedBill): void => {
+  const onRecalculateAll = useCallback((_index: number, bill: OptimizedBill): void => {
     if (!bill?.id || bill.originalIndex == null) {
       customLogger.error("Invalid bill data for recalculation");
       return;

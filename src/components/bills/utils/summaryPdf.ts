@@ -63,7 +63,7 @@ export const exportToSummaryPDF = (data: FormValues): void => {
     doc.save('summary_report.pdf');
 };
 
-const generateChildrenTable = (doc: jsPDF, bills: Bill[], startY: number, pageHeight: number, margin: number): number => {
+const generateChildrenTable = (doc: jsPDF, bills: Bill[], startY: number, _pageHeight: number, margin: number): number => {
     const headers = [["#","Children Name", "Cash", "Check", "Total"]];
     const rows: (string | number)[][] = [];
 

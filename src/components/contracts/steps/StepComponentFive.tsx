@@ -174,14 +174,14 @@ export const StepComponentFive: React.FC<StepComponentFiveProps> = ({
           {daysCache.map((day) => (
             <div key={day.id} className='day-schedule'>
               <p className='label-day'>
-                {t('schedule')} {t(day.translationLabel)}
+                {t('schedule')} {t(day.translationLabel || day.name)}
               </p>
               <CalendarWrapper
                 name={`${day.name.toLowerCase()}check_in`}
                 control={control}
                 dateFormat='mm/dd/yy'
                 timeOnly
-                label={`${t(day.translationLabel)} ${t('checkIn')}`}
+                label={`${t(day.translationLabel || day.name)} ${t('checkIn')}`}
                 spanClassName='p-float-label'
                 icon='pi pi-clock'
                 showIcon
@@ -191,7 +191,7 @@ export const StepComponentFive: React.FC<StepComponentFiveProps> = ({
                 name={`${day.name.toLowerCase()}check_out`}
                 control={control}
                 timeOnly
-                label={`${t(day.translationLabel)} ${t('checkOut')}`}
+                label={`${t(day.translationLabel || day.name)} ${t('checkOut')}`}
                 spanClassName='p-float-label'
                 icon='pi pi-clock'
                 showIcon
