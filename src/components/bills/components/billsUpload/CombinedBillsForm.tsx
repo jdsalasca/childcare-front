@@ -56,32 +56,9 @@ const CombinedBillsForm = () => {
   const [exportableCount, setExportableCount] = useState(0);
   const [totalSum, setTotalSum] = useState(0);
 
-  const onSubmit = data => {
-    console.log('Combined Data:', data);
-
-    if (totalSum <= 0) {
-      toast.current.show({
-        severity: 'error',
-        summary: t('bills.empty'),
-        detail: t('bills.emptyDetail'),
-      });
-      return;
-    }
-
-    data.bills.forEach((bill, index) => {
-      updateChild(index, {
-        ...bill,
-        total: Number(bill.cash) + Number(bill.check),
-      });
-    });
-
-    // Add the code to send the data to the backend here
-
-    toast.current.show({
-      severity: 'success',
-      summary: t('bills.saved'),
-      detail: t('bills.savedDetail'),
-    });
+  const onSubmit = (data: FormData) => {
+    // Process the form data here
+    // You can add your submission logic here
   };
 
   const recalculateFields = useCallback(

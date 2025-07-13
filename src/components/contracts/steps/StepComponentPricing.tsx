@@ -22,7 +22,6 @@ const calculateAgeCounts = (children: ChildType[]) => {
       acc.activityCount = children.length;
       acc.registrationCount = children.length;
       acc.transportationCount = children.length;
-      console.log('ageInYears', ageInYears);
 
       if (ageInYears < AGE_RANGES.INFANT.max) {
         acc.infantCount++;

@@ -78,8 +78,20 @@ const OpenRegisterForm: React.FC<Props> = ({ date, onSuccess }) => {
 
   const watchedBills = watch('bills');
 
+  useEffect(() => {
+    if (watchedBills && watchedBills.length > 0) {
+      const totalSum = watchedBills.reduce((sum, bill) => {
+        const cash = parseFloat(bill.cash?.toString() || '0');
+        const check = parseFloat(bill.check?.toString() || '0');
+        return sum + cash + check;
+      }, 0);
+
+      setValue('totalDeposit', totalSum);
+    }
+  }, [watchedBills, setValue]);
+
   // Debugging para identificar el problema
-  console.log('OpenRegisterForm - watchedBills:', watchedBills);
+  // console.log('OpenRegisterForm - watchedBills:', watchedBills);
 
   // Ensure watchedBills is always an array with valid values
   const safeBills = Array.isArray(watchedBills)
@@ -92,12 +104,12 @@ const OpenRegisterForm: React.FC<Props> = ({ date, onSuccess }) => {
   const totalAmount = calculateBillTotal(safeBills);
 
   // Debugging del resultado
-  console.log(
-    'OpenRegisterForm - totalAmount:',
-    totalAmount,
-    'isNaN:',
-    isNaN(totalAmount)
-  );
+  // console.log(
+  //   'OpenRegisterForm - totalAmount:',
+  //   totalAmount,
+  //   'isNaN:',
+  //   isNaN(totalAmount)
+  // );
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
@@ -212,10 +224,10 @@ const OpenRegisterForm: React.FC<Props> = ({ date, onSuccess }) => {
                           isNaN(Number(e.value))
                             ? 0
                             : Number(e.value);
-                        console.log(`InputNumber ${idx} - onValueChange:`, {
-                          original: e.value,
-                          processed: newValue,
-                        });
+                        // console.log(`InputNumber ${idx} - onValueChange:`, {
+                        //   original: e.value,
+                        //   processed: newValue,
+                        // });
                         field.onChange(newValue);
                       }}
                       onBlur={() => {
@@ -227,12 +239,12 @@ const OpenRegisterForm: React.FC<Props> = ({ date, onSuccess }) => {
                             ? 0
                             : Number(field.value);
                         if (blurValue !== field.value) {
-                          console.log(
-                            `InputNumber ${idx} - onBlur fixing value:`,
-                            field.value,
-                            'to',
-                            blurValue
-                          );
+                          // console.log(
+                          //   `InputNumber ${idx} - onBlur fixing value:`,
+                          //   field.value,
+                          //   'to',
+                          //   blurValue
+                          // );
                           field.onChange(blurValue);
                         }
                       }}

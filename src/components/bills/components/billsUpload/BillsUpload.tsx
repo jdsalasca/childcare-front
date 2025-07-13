@@ -50,9 +50,6 @@ const BillsUpload = () => {
     const fetchChildren = async () => {
       try {
         const response = await ChildrenAPI.getChildren();
-        console.log('====================================');
-        console.log('response', response);
-        console.log('====================================');
         // setChildren(response);
       } catch (err) {
         customLogger.error('Error fetching children:', err);
@@ -76,7 +73,6 @@ const BillsUpload = () => {
   }, [bills]);
 
   const onSubmit = data => {
-    console.log('Sending information Total:', totalSum);
     if (totalSum <= 0) {
       toast.current?.show({
         severity: 'error',
@@ -86,7 +82,6 @@ const BillsUpload = () => {
       return;
     }
 
-    console.log(data);
     // Add your form submission logic here
   };
 
