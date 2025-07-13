@@ -45,7 +45,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   const logout = () => {
     setToken(null);
-    localStorage.removeItem('token'); // Clear token from localStorage on logout
+    securityService.removeEncryptedItem('token'); // Clear token from encrypted storage on logout
   };
 
   return (

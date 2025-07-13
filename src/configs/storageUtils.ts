@@ -47,4 +47,9 @@ export class SecurityService {
     const encryptedValue = localStorage.getItem(key); // Retrieve by plain key
     return encryptedValue ? this.decrypt(encryptedValue) : null;
   }
+
+  // Remove encrypted item from localStorage
+  public removeEncryptedItem(key: string): void {
+    localStorage.removeItem(key);
+  }
 }

@@ -396,6 +396,11 @@
   resolved "https://registry.npmjs.org/@rollup/rollup-linux-x64-gnu/-/rollup-linux-x64-gnu-4.45.0.tgz"
   integrity sha512-XZdD3fEEQcwG2KrJDdEQu7NrHonPxxaV0/w2HpvINBdcqebz1aL+0vM2WFJq4DeiAVT6F5SUQas65HY5JDqoPw==
 
+"@rollup/rollup-linux-x64-musl@4.45.0":
+  version "4.45.0"
+  resolved "https://registry.npmjs.org/@rollup/rollup-linux-x64-musl/-/rollup-linux-x64-musl-4.45.0.tgz"
+  integrity sha512-7ayfgvtmmWgKWBkCGg5+xTQ0r5V1owVm67zTrsEY1008L5ro7mCyGYORomARt/OquB9KY7LpxVBZes+oSniAAQ==
+
 "@sinclair/typebox@^0.27.8":
   version "0.27.8"
 
@@ -3565,10 +3570,10 @@ svg-pathdata@^6.0.3:
   resolved "https://registry.npmjs.org/svg-pathdata/-/svg-pathdata-6.0.3.tgz"
   integrity sha512-qsjeeq5YjBZ5eMdFuUa4ZosMLxgr5RZ+F+Y1OrDhuOCEInRMA3x74XdBtggJcj9kOeInz0WE+LgCPDkZFlBYJw==
 
-sweetalert2@^11.13.2:
-  version "11.22.2"
-  resolved "https://registry.npmjs.org/sweetalert2/-/sweetalert2-11.22.2.tgz"
-  integrity sha512-GFQGzw8ZXF23PO79WMAYXLl4zYmLiaKqYJwcp5eBF07wiI5BYPbZtKi2pcvVmfUQK+FqL1risJAMxugcPbGIyg==
+sweetalert2@^11.6.13:
+  version "11.6.13"
+  resolved "https://registry.npmjs.org/sweetalert2/-/sweetalert2-11.6.13.tgz"
+  integrity sha512-n5yVF0FNx1lm4XzpPyb1HIaiptzODfVyeCzmB809tpK+1bPdoKoevKOxYjrtId75DV7xuIp4r6cjn8xUAB8dPQ==
 
 symbol-tree@^3.2.4:
   version "3.2.4"
