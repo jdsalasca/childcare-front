@@ -15,8 +15,8 @@ export const BASE_URL =
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 interface RequestOptions {
-    params?: Record<string, string | number | boolean>;
-    [key: string]: unknown;
+  params?: Record<string, string | number | boolean>;
+  [key: string]: unknown;
 }
 
 export interface ApiResponse<T> {
@@ -25,9 +25,9 @@ export interface ApiResponse<T> {
 }
 
 export class ApiResponseModel<T = unknown> implements ApiResponse<T> {
-    httpStatus: number;
-    response: T;
-    message: string | null;
+  httpStatus: number;
+  response: T;
+  message: string | null;
 
   /**
    * Creates an instance of ApiResponseModel.
@@ -105,13 +105,20 @@ const makeRequest = async <T>(
       return { response: null, httpStatus: 401 } as ApiResponse<T>;
     }
 
-    return { response: response.data, httpStatus: response.status } as ApiResponse<T>;
+    return {
+      response: response.data,
+      httpStatus: response.status,
+    } as ApiResponse<T>;
   } catch (error) {
     // Use standardized error handling
-    const apiError = ErrorHandler.handleApiError(error, `API ${method} ${endpoint}`, {
-      redirectOnAuthError: true,
-      logError: true
-    });
+    const apiError = ErrorHandler.handleApiError(
+      error,
+      `API ${method} ${endpoint}`,
+      {
+        redirectOnAuthError: true,
+        logError: true,
+      }
+    );
     // Re-throw the standardized error
     throw apiError;
   }

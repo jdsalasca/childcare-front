@@ -10,7 +10,9 @@ interface NavigationProviderProps {
  * NavigationProvider component that sets up the NavigationService
  * with React Router's navigate function for SPA navigation
  */
-const NavigationProvider: React.FC<NavigationProviderProps> = ({ children }) => {
+const NavigationProvider: React.FC<NavigationProviderProps> = ({
+  children,
+}) => {
   const navigate = useNavigate();
 
   useEffect(() => {

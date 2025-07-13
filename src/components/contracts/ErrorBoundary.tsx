@@ -52,12 +52,13 @@ export class ContractsErrorBoundary extends Component<Props, State> {
                 An error occurred in the contracts module. Please try again or
                 contact support if the problem persists.
               </p>
-              
-              {import.meta.env.DEV && this.state.error && (
-                <details className="text-left bg-gray-100 p-4 rounded mt-4">
-                  <summary className="cursor-pointer font-medium">Error Details</summary>
-                  <pre className="mt-2 text-sm text-red-600 overflow-auto">
 
+              {import.meta.env.DEV && this.state.error && (
+                <details className='text-left bg-gray-100 p-4 rounded mt-4'>
+                  <summary className='cursor-pointer font-medium'>
+                    Error Details
+                  </summary>
+                  <pre className='mt-2 text-sm text-red-600 overflow-auto'>
                     {this.state.error.toString()}
                     {this.state.errorInfo?.componentStack}
                   </pre>

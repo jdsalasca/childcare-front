@@ -718,11 +718,11 @@ export const Bills: React.FC = () => {
               </div>
             )}
             <div className='space-y-2'>
-              {paginatedBills.length > 0 ? (
-                paginatedBills.map((bill, index) => renderBillItem(bill, index))
-              ) : (
-                emptyTemplate
-              )}
+              {paginatedBills.length > 0
+                ? paginatedBills.map((bill, index) =>
+                    renderBillItem(bill, index)
+                  )
+                : emptyTemplate}
             </div>
 
             {/* Pagination */}

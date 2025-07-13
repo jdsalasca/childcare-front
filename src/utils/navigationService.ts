@@ -34,7 +34,7 @@ export const NavigationService = {
   // Navigate to home page
   navigateToHome: () => {
     NavigationService.navigate('./');
-  }
+  },
 };
 
 export default NavigationService;

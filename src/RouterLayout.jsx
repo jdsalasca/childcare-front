@@ -27,14 +27,20 @@ function RouterLayout() {
               <Route path='/session-expired' element={<SessionExpired />} />
 
               {/* Main Application Routes */}
-              <Route path='/*' element={<Layout insideAuthApplication={true} />}>
+              <Route
+                path='/*'
+                element={<Layout insideAuthApplication={true} />}
+              >
                 {/* <Route path="/" element={<HomePage />} /> */}
                 <Route path='homepage' element={<HomePage />} />
                 <Route path='report-payments-by-date' element={<HomePage />} />
                 <Route path='report-teachers' element={<HomePage />} />
                 <Route path='report-students' element={<HomePage />} />
                 <Route path='contracts' element={<Contracts />} />
-                <Route path='review-contracts' element={<UnderConstruction />} />
+                <Route
+                  path='review-contracts'
+                  element={<UnderConstruction />}
+                />
                 <Route
                   path='bills'
                   element={
