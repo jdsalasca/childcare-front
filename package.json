@@ -39,7 +39,7 @@
     "react-hook-form": "^7.52.1",
     "react-i18next": "^15.0.0",
     "react-input-mask": "^2.0.4",
-    "react-phone-number-input": "^3.4.4",
+    "react-phone-number-input": "^3.4.12",
     "react-router-dom": "^6.24.1",
     "sass": "^1.77.8",
     "stream-browserify": "^3.0.0",
