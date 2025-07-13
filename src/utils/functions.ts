@@ -6,6 +6,26 @@ export class Functions {
  * Esta es la validación para los Emails usadas en toda la aplicación
  */
     static emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    
+    /**
+     * Formats a currency value to USD format
+     * 
+     * @param {number | null | undefined} value - The number to format
+     * @returns {string} The formatted currency string
+     */
+    static formatCurrency(value: number | null | undefined): string {
+        if (value === null || value === undefined || isNaN(value)) {
+            return '$0.00';
+        }
+        
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }).format(value);
+    }
+
     /**
  * Formats a date to the format yyyy-mm-dd.
  * This is the standard format used by the application for backend communication.

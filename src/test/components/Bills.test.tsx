@@ -575,23 +575,23 @@ describe('Date Picker Value Persistence', () => {
     const calendarInput = container.querySelector('input[id="date"]');
     expect(calendarInput).toBeInTheDocument();
     
-    // Set a date value using the correct format for Calendar component
-    const testDate = '01/15/2024';
+    // Set a date value using a Date object
+    const testDate = new Date('2024-01-15');
     if (calendarInput) {
-      fireEvent.change(calendarInput, { target: { value: testDate } });
+      fireEvent.change(calendarInput, { target: { value: '01/15/2024' } });
       fireEvent.blur(calendarInput); // Trigger blur to ensure value is set
     }
     
     // Wait for any async operations
     await waitFor(() => {
-      expect(calendarInput).toHaveValue(testDate);
+      expect(calendarInput).toHaveValue('01/15/2024');
     }, { timeout: 3000 });
 
     // Simulate data loading that might reset the date
     await new Promise(resolve => setTimeout(resolve, 100));
 
     // Date should still be there
-    expect(calendarInput).toHaveValue(testDate);
+    expect(calendarInput).toHaveValue('01/15/2024');
   });
 
   it('handles date changes without losing focus', async () => {
@@ -609,7 +609,7 @@ describe('Date Picker Value Persistence', () => {
       // Focus on the date input
       fireEvent.focus(calendarInput);
       
-      // Change the date
+      // Change the date using a string (Calendar will parse it)
       fireEvent.change(calendarInput, { target: { value: '01/15/2024' } });
       
       // For Calendar component, focus management is different
@@ -643,7 +643,7 @@ describe('Date Picker Value Persistence', () => {
         
         await waitFor(() => {
           // Calendar might normalize the format, so we check if it has some value
-          expect(calendarInput).toHaveValue(expect.stringMatching(/\d{1,2}\/\d{1,2}\/\d{2,4}/));
+          expect(calendarInput.value).toMatch(/\d{1,2}\/\d{1,2}\/\d{2,4}/);
         });
       }
     }

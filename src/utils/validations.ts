@@ -11,6 +11,35 @@ export class Validations {
     }
 
     /**
+     * Validates phone numbers with various formats
+     */
+    static isValidPhone(phoneNumber: string): boolean {
+        const re = /^[\+]?[1-9][\d]{0,15}$/;
+        return re.test(String(phoneNumber).replace(/[\s\-\(\)]/g, ''));
+    }
+
+    /**
+     * Validates if a field is required (not empty)
+     */
+    static isRequired(value: any): boolean {
+        return value !== null && value !== undefined && String(value).trim() !== '';
+    }
+
+    /**
+     * Validates if a value is numeric
+     */
+    static isNumeric(value: string): boolean {
+        return !isNaN(Number(value)) && !isNaN(parseFloat(value));
+    }
+
+    /**
+     * Validates if a date is within a given range
+     */
+    static isDateInRange(date: Date, startDate: Date, endDate: Date): boolean {
+        return date >= startDate && date <= endDate;
+    }
+
+    /**
      * Method to capitalize the first letter of each word specified for names and lastNames
      * @param {*} value
      * @returns 
