@@ -588,6 +588,19 @@
     "cashBills": "Cash Bills",
     "enterQuantities": "Enter the quantities for each bill denomination",
     "sumOfAllDenominations": "Sum of all bill denominations",
-    "editOpeningClosed": "Edit opening cash amounts (register closed)"
+    "editOpeningClosed": "Edit opening cash amounts (register closed)",
+    "startDayWithInitialCash": "Start the day with initial cash",
+    "endDayWithFinalCash": "End the day with final cash",
+    "editClosing": "Edit closing cash amounts",
+    "editOpening": "Edit opening cash amounts",
+    "readyToOpenRegister": "Ready to Open Register",
+    "readyToCloseRegister": "Ready to Close Register",
+    "readyToUpdateOpening": "Ready to Update Opening",
+    "readyToUpdateClosing": "Ready to Update Closing",
+    "readyToSubmit": "Ready to Submit",
+    "reviewInformation": "Review your information and submit",
+    "updateOpening": "Update Opening",
+    "updateClosing": "Update Closing",
+    "submit": "Submit"
   }
 }

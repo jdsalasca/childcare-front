@@ -830,7 +830,7 @@ const CashRegisterForm: React.FC<CashRegisterFormProps> = ({
                 <div className='flex gap-3'>
                   <Button
                     type='button'
-                    label={t('cashRegister.cancel')}
+                    label={t('common.cancel')}
                     className='p-button-text'
                     onClick={() => {
                       setAction('');

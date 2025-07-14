@@ -584,6 +584,19 @@
     "cashBills": "Billetes en Efectivo",
     "enterQuantities": "Ingresa las cantidades para cada denominación de billete",
     "sumOfAllDenominations": "Suma de todas las denominaciones de billetes",
-    "editOpeningClosed": "Editar montos de apertura (caja cerrada)"
+    "editOpeningClosed": "Editar montos de apertura (caja cerrada)",
+    "startDayWithInitialCash": "Iniciar el día con efectivo inicial",
+    "endDayWithFinalCash": "Terminar el día con efectivo final",
+    "editClosing": "Editar montos de cierre",
+    "editOpening": "Editar montos de apertura",
+    "readyToOpenRegister": "Listo para Abrir Caja",
+    "readyToCloseRegister": "Listo para Cerrar Caja",
+    "readyToUpdateOpening": "Listo para Actualizar Apertura",
+    "readyToUpdateClosing": "Listo para Actualizar Cierre",
+    "readyToSubmit": "Listo para Enviar",
+    "reviewInformation": "Revisa tu información y envía",
+    "updateOpening": "Actualizar Apertura",
+    "updateClosing": "Actualizar Cierre",
+    "submit": "Enviar"
   }
 }
