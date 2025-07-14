@@ -570,6 +570,20 @@
     "editClosingCashier": "Editar Cajero de Cierre",
     "openingDescription": "Abriendo la caja registradora para el día. Ingrese los montos iniciales de efectivo.",
     "closingDescription": "Cerrando la caja registradora para el día. Ingrese los montos finales de efectivo.",
-    "atLeastOneBillRequired": "Al menos un billete debe tener una cantidad mayor a 0"
+    "atLeastOneBillRequired": "Al menos un billete debe tener una cantidad mayor que 0",
+    "updateOpeningClosedWarning": "⚠️ Estás actualizando los datos de apertura para una caja que ya está cerrada. Esto está permitido solo para correcciones, por favor asegúrate de la exactitud.",
+    "updateOpeningClosedButton": "Actualizar Apertura (Caja Cerrada)",
+    "readyToUpdateOpeningClosed": "Listo para Actualizar Apertura (Caja Cerrada)",
+    "reviewOpeningCorrection": "Revisa tus correcciones de apertura y envía",
+    "management": "Gestión de Caja Registradora",
+    "whatWouldYouLikeToDo": "¿Qué te gustaría hacer?",
+    "cashRegister": "Caja Registradora",
+    "selectActionAbove": "Selecciona una acción arriba para continuar",
+    "chooseRegisterAction": "Elige qué quieres hacer con la caja de este día",
+    "chooseResponsible": "Elige quién será responsable de esta operación",
+    "cashBills": "Billetes en Efectivo",
+    "enterQuantities": "Ingresa las cantidades para cada denominación de billete",
+    "sumOfAllDenominations": "Suma de todas las denominaciones de billetes",
+    "editOpeningClosed": "Editar montos de apertura (caja cerrada)"
   }
 }

@@ -46,7 +46,7 @@ const CashRegisterForm: React.FC<CashRegisterFormProps> = ({
   onCancel,
   isUpdate,
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
   const { token } = useAuth();
   const [selectedCashier, setSelectedCashier] = useState<any>(null);
@@ -233,6 +233,13 @@ const CashRegisterForm: React.FC<CashRegisterFormProps> = ({
       return;
     }
 
+    // Special validation for updating opening on closed register
+    if (action === 'update-opening' && status === 'closed') {
+      console.log(
+        '⚠️ Updating opening data on closed register - this is allowed for corrections'
+      );
+    }
+
     console.log('Submitting form data:', formData);
 
     try {
@@ -247,7 +254,9 @@ const CashRegisterForm: React.FC<CashRegisterFormProps> = ({
           await createMutation.mutateAsync(formData);
           break;
         case 'update-opening':
-          console.log('Updating opening data for date:', date);
+          console.log(
+            `Updating opening data for date: ${date} (register status: ${status})`
+          );
           await updateMutation.mutateAsync({
             date,
             data: formData,
@@ -397,20 +406,25 @@ const CashRegisterForm: React.FC<CashRegisterFormProps> = ({
                 </div>
                 <div>
                   <h3 className='text-lg font-bold text-gray-900'>
-                    {new Date(date).toLocaleDateString('en-US', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })}
+                    {new Date(date).toLocaleDateString(
+                      i18n.language === 'es' ? 'es-ES' : 'en-US',
+                      {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                      }
+                    )}
                   </h3>
                   <p className='text-sm text-gray-600'>
-                    Cash Register Management
+                    {t('cashRegister.management')}
                   </p>
                 </div>
               </div>
               <div className='text-right'>
-                <div className='text-sm text-gray-600 mb-1'>Status</div>
+                <div className='text-sm text-gray-600 mb-1'>
+                  {t('cashRegister.status')}
+                </div>
                 <span
                   className={`px-3 py-1 rounded-full text-sm font-semibold ${
                     status === 'not_started'
@@ -432,9 +446,10 @@ const CashRegisterForm: React.FC<CashRegisterFormProps> = ({
             {/* Action Selection */}
             <div className='space-y-3'>
               <h4 className='font-semibold text-gray-800 mb-3'>
-                What would you like to do?
+                {t('cashRegister.whatWouldYouLikeToDo')}
               </h4>
               <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3'>
+                {/* Open Register - Only available when not started */}
                 {status === 'not_started' && (
                   <button
                     onClick={() => {
@@ -452,67 +467,78 @@ const CashRegisterForm: React.FC<CashRegisterFormProps> = ({
                         <i className='pi pi-plus text-white'></i>
                       </div>
                       <div className='text-left'>
-                        <div className='font-semibold'>Open Register</div>
+                        <div className='font-semibold'>
+                          {t('cashRegister.openRegister')}
+                        </div>
                         <div className='text-xs text-gray-600'>
-                          Start the day with initial cash
+                          {t('cashRegister.startDayWithInitialCash')}
                         </div>
                       </div>
                     </div>
                   </button>
                 )}
 
-                {status === 'opened' && (
-                  <>
-                    <button
-                      onClick={() => {
-                        resetFormForAction();
-                        setAction('update-opening');
-                      }}
-                      className={`p-4 rounded-lg border-2 transition-all duration-200 ${
-                        action === 'update-opening'
-                          ? 'border-orange-500 bg-orange-50 text-orange-800'
-                          : 'border-gray-200 bg-white hover:border-orange-300 hover:bg-orange-50'
-                      }`}
-                    >
-                      <div className='flex items-center gap-3'>
-                        <div className='p-2 bg-orange-500 rounded-full'>
-                          <i className='pi pi-pencil text-white'></i>
+                {/* Update Opening - Available when opened OR closed */}
+                {(status === 'opened' || status === 'closed') && (
+                  <button
+                    onClick={() => {
+                      resetFormForAction();
+                      setAction('update-opening');
+                    }}
+                    className={`p-4 rounded-lg border-2 transition-all duration-200 ${
+                      action === 'update-opening'
+                        ? 'border-orange-500 bg-orange-50 text-orange-800'
+                        : 'border-gray-200 bg-white hover:border-orange-300 hover:bg-orange-50'
+                    }`}
+                  >
+                    <div className='flex items-center gap-3'>
+                      <div className='p-2 bg-orange-500 rounded-full'>
+                        <i className='pi pi-pencil text-white'></i>
+                      </div>
+                      <div className='text-left'>
+                        <div className='font-semibold'>
+                          {t('cashRegister.updateOpening')}
                         </div>
-                        <div className='text-left'>
-                          <div className='font-semibold'>Update Opening</div>
-                          <div className='text-xs text-gray-600'>
-                            Edit opening cash amounts
-                          </div>
+                        <div className='text-xs text-gray-600'>
+                          {status === 'closed'
+                            ? t('cashRegister.editOpeningClosed')
+                            : t('cashRegister.editOpening')}
                         </div>
                       </div>
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        resetFormForAction();
-                        setAction('close');
-                      }}
-                      className={`p-4 rounded-lg border-2 transition-all duration-200 ${
-                        action === 'close'
-                          ? 'border-red-500 bg-red-50 text-red-800'
-                          : 'border-gray-200 bg-white hover:border-red-300 hover:bg-red-50'
-                      }`}
-                    >
-                      <div className='flex items-center gap-3'>
-                        <div className='p-2 bg-red-500 rounded-full'>
-                          <i className='pi pi-times text-white'></i>
-                        </div>
-                        <div className='text-left'>
-                          <div className='font-semibold'>Close Register</div>
-                          <div className='text-xs text-gray-600'>
-                            End the day with final cash
-                          </div>
-                        </div>
-                      </div>
-                    </button>
-                  </>
+                    </div>
+                  </button>
                 )}
 
+                {/* Close Register - Only available when opened */}
+                {status === 'opened' && (
+                  <button
+                    onClick={() => {
+                      resetFormForAction();
+                      setAction('close');
+                    }}
+                    className={`p-4 rounded-lg border-2 transition-all duration-200 ${
+                      action === 'close'
+                        ? 'border-red-500 bg-red-50 text-red-800'
+                        : 'border-gray-200 bg-white hover:border-red-300 hover:bg-red-50'
+                    }`}
+                  >
+                    <div className='flex items-center gap-3'>
+                      <div className='p-2 bg-red-500 rounded-full'>
+                        <i className='pi pi-times text-white'></i>
+                      </div>
+                      <div className='text-left'>
+                        <div className='font-semibold'>
+                          {t('cashRegister.closeRegister')}
+                        </div>
+                        <div className='text-xs text-gray-600'>
+                          {t('cashRegister.endDayWithFinalCash')}
+                        </div>
+                      </div>
+                    </div>
+                  </button>
+                )}
+
+                {/* Update Closing - Only available when closed */}
                 {status === 'closed' && (
                   <button
                     onClick={() => {
@@ -530,9 +556,11 @@ const CashRegisterForm: React.FC<CashRegisterFormProps> = ({
                         <i className='pi pi-pencil text-white'></i>
                       </div>
                       <div className='text-left'>
-                        <div className='font-semibold'>Update Closing</div>
+                        <div className='font-semibold'>
+                          {t('cashRegister.updateClosing')}
+                        </div>
                         <div className='text-xs text-gray-600'>
-                          Edit closing cash amounts
+                          {t('cashRegister.editClosing')}
                         </div>
                       </div>
                     </div>
@@ -544,9 +572,21 @@ const CashRegisterForm: React.FC<CashRegisterFormProps> = ({
 
           {/* Form Title */}
           <h2 className='text-2xl font-bold text-gray-900 mb-3'>
-            Cash Register - {new Date(date).toLocaleDateString()}
+            {t('cashRegister.cashRegister')} -{' '}
+            {new Date(date).toLocaleDateString()}
           </h2>
         </div>
+
+        {/* Warning for updating opening on closed register */}
+        {action === 'update-opening' && status === 'closed' && (
+          <div className='mb-6'>
+            <Message
+              severity='warn'
+              text={t('cashRegister.updateOpeningClosedWarning')}
+              className='w-full'
+            />
+          </div>
+        )}
 
         <form onSubmit={handleSubmit(onSubmit)} className='space-y-8'>
           {/* Cashier Selection */}
@@ -559,10 +599,10 @@ const CashRegisterForm: React.FC<CashRegisterFormProps> = ({
                   </div>
                   <div>
                     <label className='block text-sm font-semibold text-gray-700'>
-                      Select Cashier
+                      {t('cashRegister.selectCashier')}
                     </label>
                     <p className='text-xs text-gray-500 mt-1'>
-                      Choose who will be responsible for this operation
+                      {t('cashRegister.chooseResponsible')}
                     </p>
                   </div>
                 </div>
@@ -612,17 +652,17 @@ const CashRegisterForm: React.FC<CashRegisterFormProps> = ({
                     </div>
                     <div>
                       <h3 className='text-lg font-semibold text-gray-800'>
-                        Cash Bills
+                        {t('cashRegister.cashBills')}
                       </h3>
                       <p className='text-xs text-gray-500'>
-                        Enter the quantities for each bill denomination
+                        {t('cashRegister.enterQuantities')}
                       </p>
                     </div>
                   </div>
                   <Button
                     type='button'
                     icon='pi pi-plus'
-                    label='Add Bill'
+                    label={t('cashRegister.addBill')}
                     className='p-button-primary p-button-sm'
                     onClick={handleAddBill}
                     disabled={!billTypes || billTypes.length === 0}
@@ -642,7 +682,7 @@ const CashRegisterForm: React.FC<CashRegisterFormProps> = ({
                       >
                         <div className='flex-1'>
                           <label className='block text-sm font-medium text-gray-700 mb-1'>
-                            Bill Type
+                            {t('cashRegister.billType')}
                           </label>
                           <Dropdown
                             value={field.bill_type_id}
@@ -655,14 +695,14 @@ const CashRegisterForm: React.FC<CashRegisterFormProps> = ({
                             options={billTypes}
                             optionLabel='label'
                             optionValue='id'
-                            placeholder='Select bill type'
+                            placeholder={t('cashRegister.selectBillType')}
                             className='w-full'
                           />
                         </div>
 
                         <div className='flex-1'>
                           <label className='block text-sm font-medium text-gray-700 mb-1'>
-                            Quantity
+                            {t('cashRegister.quantity')}
                           </label>
                           <InputNumber
                             value={field.quantity}
@@ -671,13 +711,13 @@ const CashRegisterForm: React.FC<CashRegisterFormProps> = ({
                             }
                             min={0}
                             className='w-full'
-                            placeholder='0'
+                            placeholder={t('cashRegister.quantityPlaceholder')}
                           />
                         </div>
 
                         <div className='flex-1'>
                           <label className='block text-sm font-medium text-gray-700 mb-1'>
-                            Total
+                            {t('cashRegister.total')}
                           </label>
                           <div className='p-2 bg-white rounded border'>
                             <span className='text-gray-700 font-medium'>
@@ -694,7 +734,7 @@ const CashRegisterForm: React.FC<CashRegisterFormProps> = ({
                             icon='pi pi-trash'
                             className='p-button-danger p-button-text p-button-sm'
                             onClick={() => remove(index)}
-                            tooltip='Remove bill'
+                            tooltip={t('cashRegister.removeBill')}
                           />
                         </div>
                       </div>
@@ -705,7 +745,7 @@ const CashRegisterForm: React.FC<CashRegisterFormProps> = ({
                 {fields.length === 0 && (
                   <div className='text-center py-8 text-gray-500'>
                     <i className='pi pi-money-bill text-4xl mb-2'></i>
-                    <p>No bills added yet</p>
+                    <p>{t('cashRegister.noBillsAdded')}</p>
                   </div>
                 )}
               </div>
@@ -722,10 +762,10 @@ const CashRegisterForm: React.FC<CashRegisterFormProps> = ({
                   </div>
                   <div>
                     <span className='font-semibold text-gray-800'>
-                      Total Amount
+                      {t('cashRegister.totalAmount')}
                     </span>
                     <p className='text-xs text-gray-600'>
-                      Sum of all bill denominations
+                      {t('cashRegister.sumOfAllDenominations')}
                     </p>
                   </div>
                 </div>
@@ -769,24 +809,28 @@ const CashRegisterForm: React.FC<CashRegisterFormProps> = ({
                   <div>
                     <h4 className='font-semibold text-gray-800'>
                       {action === 'open'
-                        ? 'Ready to Open Register'
+                        ? t('cashRegister.readyToOpenRegister')
                         : action === 'close'
-                          ? 'Ready to Close Register'
+                          ? t('cashRegister.readyToCloseRegister')
                           : action === 'update-opening'
-                            ? 'Ready to Update Opening'
+                            ? status === 'closed'
+                              ? t('cashRegister.readyToUpdateOpeningClosed')
+                              : t('cashRegister.readyToUpdateOpening')
                             : action === 'update-closing'
-                              ? 'Ready to Update Closing'
-                              : 'Ready to Submit'}
+                              ? t('cashRegister.readyToUpdateClosing')
+                              : t('cashRegister.readyToSubmit')}
                     </h4>
                     <p className='text-xs text-gray-500'>
-                      Review your information and submit
+                      {action === 'update-opening' && status === 'closed'
+                        ? t('cashRegister.reviewOpeningCorrection')
+                        : t('cashRegister.reviewInformation')}
                     </p>
                   </div>
                 </div>
                 <div className='flex gap-3'>
                   <Button
                     type='button'
-                    label='Cancel'
+                    label={t('cashRegister.cancel')}
                     className='p-button-text'
                     onClick={() => {
                       setAction('');
@@ -798,14 +842,16 @@ const CashRegisterForm: React.FC<CashRegisterFormProps> = ({
                     type='submit'
                     label={
                       action === 'open'
-                        ? 'Open Register'
+                        ? t('cashRegister.openRegister')
                         : action === 'close'
-                          ? 'Close Register'
+                          ? t('cashRegister.closeRegister')
                           : action === 'update-opening'
-                            ? 'Update Opening'
+                            ? status === 'closed'
+                              ? t('cashRegister.updateOpeningClosed')
+                              : t('cashRegister.updateOpening')
                             : action === 'update-closing'
-                              ? 'Update Closing'
-                              : 'Submit'
+                              ? t('cashRegister.updateClosing')
+                              : t('cashRegister.submit')
                     }
                     loading={isSubmitting}
                     disabled={fields.length === 0 || !selectedCashier}
@@ -819,10 +865,10 @@ const CashRegisterForm: React.FC<CashRegisterFormProps> = ({
               <div className='p-4 bg-gray-50 rounded-lg border border-gray-200'>
                 <i className='pi pi-arrow-up text-4xl mb-3 text-gray-400'></i>
                 <p className='font-medium'>
-                  Select an action above to continue
+                  {t('cashRegister.selectActionAbove')}
                 </p>
                 <p className='text-sm mt-1'>
-                  Choose what you want to do with this day's register
+                  {t('cashRegister.chooseRegisterAction')}
                 </p>
               </div>
             </div>

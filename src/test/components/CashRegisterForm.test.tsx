@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { I18nextProvider } from 'react-i18next';
 import { vi } from 'vitest';
@@ -224,31 +224,45 @@ describe('CashRegisterForm Component', () => {
     renderWithProviders(<CashRegisterForm {...defaultProps} />);
 
     await waitFor(() => {
-      expect(screen.getByText('cashRegister.openRegister')).toBeInTheDocument();
+      expect(screen.getByText('Open Register')).toBeInTheDocument();
     });
 
-    expect(screen.getByText('cashRegister.selectCashier')).toBeInTheDocument();
-    expect(screen.getByText('cashRegister.date')).toBeInTheDocument();
+    // Form elements should not be visible until action is selected
+    expect(screen.queryByText('Select Cashier')).not.toBeInTheDocument();
     expect(
-      screen.getByText('cashRegister.billsManagement')
+      screen.getByText('Select an action above to continue')
     ).toBeInTheDocument();
   });
 
-  it('displays cashier dropdown with options', async () => {
+  it('displays cashier dropdown with options after action selection', async () => {
     renderWithProviders(<CashRegisterForm {...defaultProps} />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Open Register')).toBeInTheDocument();
+    });
+
+    // Click on the Open Register action
+    const openButton = screen.getByText('Open Register').closest('button');
+    fireEvent.click(openButton!);
 
     await waitFor(() => {
       expect(screen.getByTestId('dropdown')).toBeInTheDocument();
     });
   });
 
-  it('displays bill types when loaded', async () => {
+  it('displays bill types when loaded and action selected', async () => {
     renderWithProviders(<CashRegisterForm {...defaultProps} />);
 
     await waitFor(() => {
-      expect(
-        screen.getByText('cashRegister.billsManagement')
-      ).toBeInTheDocument();
+      expect(screen.getByText('Open Register')).toBeInTheDocument();
+    });
+
+    // Click on the Open Register action
+    const openButton = screen.getByText('Open Register').closest('button');
+    fireEvent.click(openButton!);
+
+    await waitFor(() => {
+      expect(screen.getByText('Cash Bills')).toBeInTheDocument();
     });
   });
 
@@ -258,38 +272,68 @@ describe('CashRegisterForm Component', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('cashRegister.openRegister')).toBeInTheDocument();
+      expect(screen.getByText('Open Register')).toBeInTheDocument();
     });
 
     // Test for close register
-    rerender(<CashRegisterForm {...defaultProps} status='opened' />);
-
-    await waitFor(() => {
-      expect(
-        screen.getByText('cashRegister.closeRegister')
-      ).toBeInTheDocument();
-    });
-
-    // Test for edit register
     rerender(
-      <CashRegisterForm {...defaultProps} status='opened' isUpdate={true} />
+      <AuthProvider>
+        <I18nextProvider i18n={i18n}>
+          <QueryClientProvider client={new QueryClient()}>
+            <CashRegisterForm {...defaultProps} status='opened' />
+          </QueryClientProvider>
+        </I18nextProvider>
+      </AuthProvider>
     );
 
     await waitFor(() => {
-      expect(screen.getByText('cashRegister.editRegister')).toBeInTheDocument();
+      expect(screen.getByText('Close Register')).toBeInTheDocument();
+      expect(screen.getByText('Update Opening')).toBeInTheDocument();
+    });
+
+    // Test for closed register
+    rerender(
+      <AuthProvider>
+        <I18nextProvider i18n={i18n}>
+          <QueryClientProvider client={new QueryClient()}>
+            <CashRegisterForm {...defaultProps} status='closed' />
+          </QueryClientProvider>
+        </I18nextProvider>
+      </AuthProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Update Opening')).toBeInTheDocument();
+      expect(screen.getByText('Update Closing')).toBeInTheDocument();
     });
   });
 
-  it('handles form submission', async () => {
+  it('handles form submission after action selection', async () => {
     renderWithProviders(<CashRegisterForm {...defaultProps} />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Open Register')).toBeInTheDocument();
+    });
+
+    // Click on the Open Register action
+    const openButton = screen.getByText('Open Register').closest('button');
+    fireEvent.click(openButton!);
 
     await waitFor(() => {
       expect(screen.getByTestId('submit-button')).toBeInTheDocument();
     });
   });
 
-  it('displays error message when no cashier selected', async () => {
+  it('displays error message when no cashier selected after action selection', async () => {
     renderWithProviders(<CashRegisterForm {...defaultProps} />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Open Register')).toBeInTheDocument();
+    });
+
+    // Click on the Open Register action
+    const openButton = screen.getByText('Open Register').closest('button');
+    fireEvent.click(openButton!);
 
     await waitFor(() => {
       expect(
@@ -298,10 +342,18 @@ describe('CashRegisterForm Component', () => {
     });
   });
 
-  it('includes cashier_id in form submission', async () => {
+  it('includes cashier_id in form submission after action selection', async () => {
     const mockCashier = { id: 1, name: 'John Doe' };
 
     renderWithProviders(<CashRegisterForm {...defaultProps} />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Open Register')).toBeInTheDocument();
+    });
+
+    // Click on the Open Register action
+    const openButton = screen.getByText('Open Register').closest('button');
+    fireEvent.click(openButton!);
 
     await waitFor(() => {
       expect(screen.getByTestId('dropdown')).toBeInTheDocument();
@@ -309,7 +361,29 @@ describe('CashRegisterForm Component', () => {
 
     // Simulate selecting a cashier
     const dropdown = screen.getByTestId('dropdown');
-    // Note: This is a simplified test - in a real scenario you'd simulate the dropdown change
     expect(dropdown).toBeInTheDocument();
+  });
+
+  it('allows updating opening data on closed register', async () => {
+    renderWithProviders(<CashRegisterForm {...defaultProps} status='closed' />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Update Opening')).toBeInTheDocument();
+      expect(screen.getByText('Update Closing')).toBeInTheDocument();
+    });
+
+    // Click on the Update Opening action
+    const updateOpeningButton = screen
+      .getByText('Update Opening')
+      .closest('button');
+    fireEvent.click(updateOpeningButton!);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(
+          '⚠️ You are updating opening data for a register that is already closed. This is allowed for correction purposes, but please ensure accuracy.'
+        )
+      ).toBeInTheDocument();
+    });
   });
 });

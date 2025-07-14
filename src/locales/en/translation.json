@@ -574,6 +574,20 @@
     "editClosingCashier": "Edit Closing Cashier",
     "openingDescription": "Opening the cash register for the day. Enter the initial cash amounts.",
     "closingDescription": "Closing the cash register for the day. Enter the final cash amounts.",
-    "atLeastOneBillRequired": "At least one bill must have a quantity greater than 0"
+    "atLeastOneBillRequired": "At least one bill must have a quantity greater than 0",
+    "updateOpeningClosedWarning": "⚠️ You are updating opening data for a register that is already closed. This is allowed for correction purposes, but please ensure accuracy.",
+    "updateOpeningClosedButton": "Update Opening (Closed Register)",
+    "readyToUpdateOpeningClosed": "Ready to Update Opening (Register Closed)",
+    "reviewOpeningCorrection": "Review your opening data corrections and submit",
+    "management": "Cash Register Management",
+    "whatWouldYouLikeToDo": "What would you like to do?",
+    "cashRegister": "Cash Register",
+    "selectActionAbove": "Select an action above to continue",
+    "chooseRegisterAction": "Choose what you want to do with this day's register",
+    "chooseResponsible": "Choose who will be responsible for this operation",
+    "cashBills": "Cash Bills",
+    "enterQuantities": "Enter the quantities for each bill denomination",
+    "sumOfAllDenominations": "Sum of all bill denominations",
+    "editOpeningClosed": "Edit opening cash amounts (register closed)"
   }
 }
