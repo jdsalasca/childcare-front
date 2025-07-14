@@ -571,6 +571,9 @@
     "updateOpening": "Update Opening",
     "updateClosing": "Update Closing",
     "editOpeningCashier": "Edit Opening Cashier",
-    "editClosingCashier": "Edit Closing Cashier"
+    "editClosingCashier": "Edit Closing Cashier",
+    "openingDescription": "Opening the cash register for the day. Enter the initial cash amounts.",
+    "closingDescription": "Closing the cash register for the day. Enter the final cash amounts.",
+    "atLeastOneBillRequired": "At least one bill must have a quantity greater than 0"
   }
 }

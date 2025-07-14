@@ -16,7 +16,6 @@ import ErrorBoundary from '../../utils/ErrorBoundary';
 import CashRegisterAPI from '../../../models/CashRegisterAPI';
 import { CashRegisterStatusResponse } from '../../../types/cashRegister';
 import CashRegisterForm from './CashRegisterForm';
-import RegisterDetailsPanel from './RegisterDetailsPanel';
 import ExcelReportButton from './ExcelReportButton';
 
 interface CashRegisterProps {}
@@ -461,41 +460,14 @@ const CashRegister: React.FC<CashRegisterProps> = () => {
       <div className='space-y-6'>
         {renderStatusCard()}
 
-        {isEditing ? (
-          <CashRegisterForm
-            date={formattedDate!}
-            status={statusData.data.status}
-            onSuccess={handleFormSuccess}
-            onCancel={handleCancelEdit}
-            isUpdate={true}
-          />
-        ) : (
-          <>
-            {statusData.data.status === 'not_started' && (
-              <CashRegisterForm
-                date={formattedDate!}
-                status={statusData.data.status}
-                onSuccess={handleFormSuccess}
-                onCancel={handleCancelEdit}
-                isUpdate={false}
-              />
-            )}
-
-            {statusData.data.status === 'opened' && (
-              <CashRegisterForm
-                date={formattedDate!}
-                status={statusData.data.status}
-                onSuccess={handleFormSuccess}
-                onCancel={handleCancelEdit}
-                isUpdate={false}
-              />
-            )}
-
-            {statusData.data.status === 'closed' && (
-              <RegisterDetailsPanel date={formattedDate!} />
-            )}
-          </>
-        )}
+        {/* Simple Form Logic */}
+        <CashRegisterForm
+          date={formattedDate!}
+          status={statusData.data.status}
+          onSuccess={handleFormSuccess}
+          onCancel={handleCancelEdit}
+          isUpdate={isEditing}
+        />
       </div>
     );
   };

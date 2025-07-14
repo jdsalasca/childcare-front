@@ -115,13 +115,7 @@ export const useBillsViewModel = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [searchedProgram, SetSearchedProgram] = useState<string | null>(null);
   const [blockContent, setBlockContent] = useState<boolean>(true);
-  const [sums, setSums] = useState<Sums>({
-    cash: 0,
-    check: 0,
-    total: 0,
-    cash_on_hand: 0,
-    total_cash_on_hand: 0,
-  });
+  // Removed all setSums and sums state logic below, use only the sums from useMemo.
 
   // Refs for preventing excessive calculations
   const recalculateFieldsRef = useRef<boolean>(false);
@@ -133,7 +127,7 @@ export const useBillsViewModel = () => {
   // API hooks
   const [currenciesInformation, setCurrenciesInformation] = useState<any[]>([]);
 
-  // Load bill types on component mount
+  // Load bill types on component mount - ONLY ONCE
   useEffect(() => {
     const loadBillTypes = async () => {
       try {
@@ -144,7 +138,8 @@ export const useBillsViewModel = () => {
       }
     };
     loadBillTypes();
-  }, []);
+  }, []); // Empty dependency array - only run once
+
   const { data: children } = useChildren();
 
   // Form setup
@@ -174,33 +169,26 @@ export const useBillsViewModel = () => {
   // Memoized bills with proper type assertion
   const billsFields = useMemo(() => fields as Array<Bill>, [fields]);
 
-  // Memoized children data - removed unused childrenOptions
-
-  // Memoized sums calculation
-  const calculateSums = useCallback((bills: Bill[]): Sums => {
-    return createBillSums(bills, 0);
-  }, []);
-
-  // Watch for cashOnHand changes
+  // Watch for cashOnHand changes - STABLE
   const cashOnHandValue = watch('cashOnHand');
 
-  // Recalculate sums when cashOnHand changes (but not when bills change - that's handled elsewhere)
-  useEffect(() => {
+  // Memoized sums calculation - STABLE
+  const sums = useMemo(() => {
     if (billsFields.length > 0) {
-      const timeoutId = setTimeout(() => {
-        const newSums = calculateSums(billsFields);
-        setSums(newSums);
-        customLogger.debug(
-          'Sums recalculated due to cashOnHand change:',
-          newSums
-        );
-      }, 100); // Debounce the calculation
-
-      return () => clearTimeout(timeoutId);
+      const newSums = createBillSums(billsFields, 0);
+      customLogger.debug('Sums recalculated:', newSums);
+      return newSums;
     }
-  }, [cashOnHandValue, billsFields, calculateSums]);
+    return {
+      cash: 0,
+      check: 0,
+      total: 0,
+      cash_on_hand: 0,
+      total_cash_on_hand: 0,
+    };
+  }, [billsFields, cashOnHandValue]);
 
-  // Optimized recalculation with debouncing
+  // Optimized recalculation with debouncing - STABLE
   const recalculateFields = useCallback(
     (newFields?: Bill[]) => {
       if (recalculateFieldsRef.current) return;
@@ -231,8 +219,8 @@ export const useBillsViewModel = () => {
             setExportableCount(count);
 
             // Update sums
-            const newSums = calculateSums(fieldsToUse);
-            setSums(newSums);
+            const newSums = createBillSums(fieldsToUse, 0);
+            // setSums(newSums); // This line is removed as per the edit hint
           } finally {
             recalculateFieldsRef.current = false;
           }
@@ -243,10 +231,10 @@ export const useBillsViewModel = () => {
 
       debouncedCalculation();
     },
-    [calculateSums, getValues]
+    [] // Only stable dependencies
   );
 
-  // Optimized recalculate all function
+  // Optimized recalculate all function - STABLE
   const onRecalculateAll = useCallback(
     async (index: number = 0, bill: Bill | null = null): Promise<void> => {
       if (!bill?.id || bill.originalIndex == null || index == null) {
@@ -275,8 +263,8 @@ export const useBillsViewModel = () => {
 
       // Immediately recalculate sums without triggering the recalculateFields function
       const allBills = getValues('bills') || [];
-      const newSums = calculateSums(allBills);
-      setSums(newSums);
+      const newSums = createBillSums(allBills, 0);
+      // setSums(newSums); // This line is removed as per the edit hint
 
       // Update exportable count with improved logic
       const count = allBills.filter(b => {
@@ -289,10 +277,10 @@ export const useBillsViewModel = () => {
       }).length;
       setExportableCount(count);
     },
-    [getValues, update, calculateSums]
+    [] // Only stable dependencies
   );
 
-  // Optimized bills filtering
+  // Optimized bills filtering - STABLE
   const filteredBills = useMemo(() => {
     if (!searchTerm && !searchedProgram) return billsFields;
 
@@ -311,7 +299,7 @@ export const useBillsViewModel = () => {
     });
   }, [billsFields, searchTerm, searchedProgram]);
 
-  // Optimized safe remove function
+  // Optimized safe remove function - STABLE
   const safeRemove = useCallback(
     (index: number): void => {
       try {
@@ -342,8 +330,8 @@ export const useBillsViewModel = () => {
           });
 
           // Immediately recalculate sums without triggering the recalculateFields function
-          const newSums = calculateSums(updatedBills);
-          setSums(newSums);
+          const newSums = createBillSums(updatedBills, 0);
+          // setSums(newSums); // This line is removed as per the edit hint
 
           // Update exportable count
           const count = updatedBills.filter(b => {
@@ -368,10 +356,10 @@ export const useBillsViewModel = () => {
         }
       }
     },
-    [billsFields, getValues, remove, t, update, calculateSums]
+    [billsFields, remove, t, update] // Only stable dependencies
   );
 
-  // Optimized form initialization
+  // Optimized form initialization - STABLE
   const onStartForm = useCallback(
     async (preserveDate?: Date) => {
       if (!children || !currenciesInformation) return;
@@ -416,13 +404,13 @@ export const useBillsViewModel = () => {
 
         // Set initial sums and exportable count
         setExportableCount(0);
-        setSums({
-          cash: 0,
-          check: 0,
-          total: 0,
-          cash_on_hand: getValues('cashOnHand') || 0,
-          total_cash_on_hand: 0,
-        });
+        // setSums({ // This line is removed as per the edit hint
+        //   cash: 0,
+        //   check: 0,
+        //   total: 0,
+        //   cash_on_hand: getValues('cashOnHand') || 0,
+        //   total_cash_on_hand: 0,
+        // });
       } catch (error) {
         customLogger.error('Error in onStartForm:', error);
       } finally {
@@ -432,10 +420,10 @@ export const useBillsViewModel = () => {
         });
       }
     },
-    [children, currenciesInformation, reset, getValues, t]
+    [children, currenciesInformation, reset, t] // Only stable dependencies
   );
 
-  // Add new bill function
+  // Add new bill function - STABLE
   const addNewBill = useCallback(() => {
     const currentBills = getValues('bills') || [];
     const newBill: Bill = {
@@ -450,7 +438,7 @@ export const useBillsViewModel = () => {
     };
 
     append(newBill);
-  }, [append, getValues]);
+  }, [append]); // Only stable dependencies
 
   // Removed cash on hand API call as it's not needed
   const onHandlerSetCashOnHand = useCallback(
@@ -476,7 +464,7 @@ export const useBillsViewModel = () => {
     []
   );
 
-  // Load existing bills for a specific date
+  // Load existing bills for a specific date - STABLE
   const loadBillsForDate = useCallback(
     async (date: Date): Promise<void> => {
       try {
@@ -532,8 +520,8 @@ export const useBillsViewModel = () => {
           });
 
           // Recalculate sums and exportable count
-          const newSums = calculateSums(transformedBills);
-          setSums(newSums);
+          const newSums = createBillSums(transformedBills, 0);
+          // setSums(newSums); // This line is removed as per the edit hint
 
           // Update exportable count for existing bills
           const count = transformedBills.filter(bill => {
@@ -587,13 +575,13 @@ export const useBillsViewModel = () => {
 
           // Set initial sums and exportable count
           setExportableCount(0);
-          setSums({
-            cash: 0,
-            check: 0,
-            total: 0,
-            cash_on_hand: 0,
-            total_cash_on_hand: 0,
-          });
+          // setSums({ // This line is removed as per the edit hint
+          //   cash: 0,
+          //   check: 0,
+          //   total: 0,
+          //   cash_on_hand: 0,
+          //   total_cash_on_hand: 0,
+          // });
         }
       } catch (error) {
         customLogger.warn('Error loading bills for date:', error);
@@ -640,16 +628,16 @@ export const useBillsViewModel = () => {
 
         // Set initial sums and exportable count
         setExportableCount(0);
-        setSums({
-          cash: 0,
-          check: 0,
-          total: 0,
-          cash_on_hand: 0,
-          total_cash_on_hand: 0,
-        });
+        // setSums({ // This line is removed as per the edit hint
+        //   cash: 0,
+        //   check: 0,
+        //   total: 0,
+        //   cash_on_hand: 0,
+        //   total_cash_on_hand: 0,
+        // });
       }
     },
-    [reset, getValues, children, currenciesInformation, calculateSums]
+    [reset, children, currenciesInformation, createBillSums] // Only stable dependencies
   );
 
   const onHandlerDateChanged = useCallback(
@@ -704,8 +692,8 @@ export const useBillsViewModel = () => {
         // Add a small delay to ensure form state is updated
         setTimeout(() => {
           const currentBills = getValues('bills') || [];
-          const newSums = calculateSums(currentBills);
-          setSums(newSums);
+          const newSums = createBillSums(currentBills, 0);
+          // setSums(newSums); // This line is removed as per the edit hint
           customLogger.debug(
             'Forced sums recalculation after date change:',
             newSums
@@ -731,11 +719,11 @@ export const useBillsViewModel = () => {
       setValue,
       t,
       loadBillsForDate,
-      calculateSums,
-    ]
+      createBillSums,
+    ] // Only stable dependencies
   );
 
-  // Submit handler
+  // Submit handler - STABLE
   const onSubmit = useCallback(
     async (data: FormValues) => {
       try {
@@ -784,7 +772,7 @@ export const useBillsViewModel = () => {
     [t]
   );
 
-  // PDF generation functions
+  // PDF generation functions - STABLE
   const onDownloadFirstPartPdf = useCallback(() => {
     try {
       customLogger.info('Generating summary PDF');
@@ -814,7 +802,7 @@ export const useBillsViewModel = () => {
       // Use standardized error handling
       ErrorHandlerComponent.handleApiError(error, 'PDF generation');
     }
-  }, [getValues, t, closedMoneyData]);
+  }, [t, closedMoneyData]); // Only stable dependencies
 
   const onDownloadBoxedPdf = useCallback(() => {
     try {
@@ -845,62 +833,17 @@ export const useBillsViewModel = () => {
       // Use standardized error handling
       ErrorHandlerComponent.handleApiError(error, 'PDF generation');
     }
-  }, [getValues, t, closedMoneyData]);
+  }, [t, closedMoneyData]); // Only stable dependencies
 
-  // Effects
+  // Effects - STABLE
+  // Simple initialization effect that only runs once
   useEffect(() => {
-    if (!children && !currenciesInformation) {
-      setLoadingInfo({
-        loading: true,
-        loadingMessage: t('weAreLookingForChildrenInformation'),
-      });
-      return;
+    if (children && currenciesInformation && children.length > 0) {
+      // Initialize the form when data is available
+      const currentDate = getValues('date');
+      onStartForm(currentDate);
     }
-
-    if (!children || !currenciesInformation) return;
-
-    setLoadingInfo({
-      loading: true,
-      loadingMessage: t('weAreLookingForChildrenInformation'),
-    });
-
-    // Pass the current date to preserve it during initialization
-    const currentDate = getValues('date');
-    onStartForm(currentDate);
-  }, [currenciesInformation, children, t, onStartForm, getValues]); // Add getValues to dependencies
-
-  useEffect(() => {
-    if (children === undefined) {
-      setLoadingInfo({
-        loading: true,
-        loadingMessage: t('weAreLookingForChildrenInformation'),
-      });
-    } else if (children === null) {
-      setLoadingInfo({
-        loading: true,
-        loadingMessage: t('weAreLookingForChildrenInformation'),
-      });
-    } else if (children && children.length > 0) {
-      setTimeout(() => {
-        setLoadingInfo({
-          loading: false,
-          loadingMessage: '',
-        });
-      }, 500);
-    }
-  }, [children, t]);
-
-  // Watch for changes in bills and trigger recalculation
-  useEffect(() => {
-    if (billsFields.length === 0) return;
-
-    // Use a stable reference to prevent infinite loops
-    const timeoutId = setTimeout(() => {
-      recalculateFields();
-    }, 50); // Small delay to batch updates
-
-    return () => clearTimeout(timeoutId);
-  }, [billsFields.length]); // Only depend on length, not the entire array
+  }, [children, currenciesInformation]); // Only depend on data availability, not on functions
 
   // Cleanup effect to prevent memory leaks
   useEffect(() => {

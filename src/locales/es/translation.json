@@ -567,6 +567,9 @@
     "updateOpening": "Actualizar Apertura",
     "updateClosing": "Actualizar Cierre",
     "editOpeningCashier": "Editar Cajero de Apertura",
-    "editClosingCashier": "Editar Cajero de Cierre"
+    "editClosingCashier": "Editar Cajero de Cierre",
+    "openingDescription": "Abriendo la caja registradora para el día. Ingrese los montos iniciales de efectivo.",
+    "closingDescription": "Cerrando la caja registradora para el día. Ingrese los montos finales de efectivo.",
+    "atLeastOneBillRequired": "Al menos un billete debe tener una cantidad mayor a 0"
   }
 }
