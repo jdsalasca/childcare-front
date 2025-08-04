@@ -2633,7 +2633,7 @@ __metadata:
     vite-plugin-eslint: "npm:^1.8.1"
     vite-plugin-node-polyfills: "npm:^0.22.0"
     vitest: "npm:0.34.6"
-    web-vitals: "npm:^2.1.4"
+    web-vitals: "npm:^5.1.0"
     xlsx: "npm:^0.18.5"
   languageName: unknown
   linkType: soft
@@ -8145,10 +8145,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"web-vitals@npm:^2.1.4":
-  version: 2.1.4
-  resolution: "web-vitals@npm:2.1.4"
-  checksum: 10c0/c71ab674936c6b4d51679e037e3819c24bdad9f30410fe8a84fd8218d29d9bacf15ae9fd570d361f3e9621aa8454f61277f66ac1a5c19b50facf3220a37a73eb
+"web-vitals@npm:^5.1.0":
+  version: 5.1.0
+  resolution: "web-vitals@npm:5.1.0"
+  checksum: 10c0/1af22ddbe2836ba880fcb492cfba24c3349f4760ebb5e92f38324ea67bca3c4dbb9c86f1a32af4795b6115cdaf98b90000cf3a7402bffef6e8c503f0d1b2e706
   languageName: node
   linkType: hard
 
