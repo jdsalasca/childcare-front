@@ -18,7 +18,7 @@
     "buffer": "^6.0.3",
     "crypto-js": "^4.2.0",
     "events-browserify": "^0.0.1",
-    "framer-motion": "^11.5.6",
+    "framer-motion": "^12.23.12",
     "fs.promises": "^0.1.2",
     "https-browserify": "^1.0.0",
     "i18next": "^23.12.2",
