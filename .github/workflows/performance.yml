@@ -77,7 +77,7 @@ jobs:
           echo "✅ Performance budget check passed!"
 
       - name: 📊 Upload performance artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: always()
         with:
           name: performance-results
